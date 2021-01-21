@@ -23,7 +23,7 @@
 # 移植
 #### 如果需要在自己的软件中使用本软件的音频功能，只需要将AudioProcThread.h、AudioProcThread.cpp和各个库文件夹复制到自己的软件中，然后实现UserInit、UserProcess、UserDestroy、UserReadInputFrame、UserWriteOutputFrame、UserGetPcmOutputFrame这六个函数即可。
 #### 如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改AudioProcThread.h、AudioProcThread.cpp文件即可。
-#### 普通免费版功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、本端TCP协议服务端套接字、本端TCP协议客户端套接字。
+#### 普通免费版功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、本端TCP协议服务端套接字、本端UDP协议客户端套接字。
 #### 高级收费版功能包括：Speex声学回音消除器、WebRtc浮点版声学回音消除器、SpeexWebRtc三重声学回音消除器、RNNoise噪音抑制器、自己设计的自适应抖动缓冲器。
 
 # 注意
