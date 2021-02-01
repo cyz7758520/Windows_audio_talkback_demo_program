@@ -101,6 +101,8 @@ __FUNC_DLLAPI__ int FuncAudioDataFlt32ToInt16( const float * AudioDataFlt32Pt, i
 //字符、字符串函数。
 __FUNC_DLLAPI__ int FuncIsBlank( char Chr );
 __FUNC_DLLAPI__ int FuncIsNum( char Chr );
+__FUNC_DLLAPI__ int FuncPathFindFileName( const char * PathStrPt, const char * * FileNameStrPtPt );
+__FUNC_DLLAPI__ int FuncPathRmvFileName( char * PathStrPt );
 #ifdef __cplusplus
 __FUNC_DLLAPI__ int FuncStrToInt( const char * IntStrPt, void * IntValPt, size_t IntValSz, size_t * IntStrLenPt, size_t MaxReadFigure = SIZE_MAX, size_t MinReadFigure = 0 );
 #else

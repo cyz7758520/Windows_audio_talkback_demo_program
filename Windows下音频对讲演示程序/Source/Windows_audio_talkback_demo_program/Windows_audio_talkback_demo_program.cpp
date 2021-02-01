@@ -517,7 +517,7 @@ int __cdecl MyAudioProcThreadUserInit( AudioProcThread * AudioProcThreadPt )
 	    }
 	    case 1: //如果使用自适应抖动缓冲器。
 	    {
-			if( AjbInit( &g_AudioInfoPt->m_AjbPt, AudioProcThreadPt->m_SamplingRate, AudioProcThreadPt->m_FrameLen, 1, 0, g_AudioInfoPt->m_AjbMinNeedBufFrameCnt, g_AudioInfoPt->m_AjbMaxNeedBufFrameCnt, g_AudioInfoPt->m_AjbAdaptSensitivity ) == 0 )
+			if( AjbInit( &g_AudioInfoPt->m_AjbPt, AudioProcThreadPt->m_SamplingRate, AudioProcThreadPt->m_FrameLen, 1, 1, 0, g_AudioInfoPt->m_AjbMinNeedBufFrameCnt, g_AudioInfoPt->m_AjbMaxNeedBufFrameCnt, g_AudioInfoPt->m_AjbAdaptSensitivity ) == 0 )
 			{
 				LOGI( "创建并初始化自适应抖动缓冲器成功。" );
 			}
@@ -537,7 +537,7 @@ int __cdecl MyAudioProcThreadUserInit( AudioProcThread * AudioProcThreadPt )
 
 	g_AudioInfoPt->m_LastSendInputFrameIsAct = 0; //设置最后发送的一个音频帧为无语音活动。
 	g_AudioInfoPt->m_LastSendInputFrameIsRecv = 1; //设置最后一个发送的输入帧远端已经接收到。
-	g_AudioInfoPt->m_SendInputFrameTimeStamp = 0 - AudioProcThreadPt->m_FrameLen; //设置发送输入帧的时间戳为0的前一个。
+	g_AudioInfoPt->m_SendInputFrameTimeStamp = 0 - 1; //设置发送输入帧的时间戳为0的前一个，因为第一次发送输入帧时会递增一个步进。
 	g_AudioInfoPt->m_RecvOutputFrameTimeStamp = 0; //设置接收输出帧的时间戳为0。
 	
 	VarStrFmtCpy( AudioProcThreadPt->m_ErrInfoVarStrPt, "开始进行音频对讲。" );
@@ -973,7 +973,7 @@ int __cdecl MyAudioProcThreadUserReadInputFrame( AudioProcThread * AudioProcThre
         if( ( p_TmpInt != 1 + 4 ) || //如果本音频输入数据帧为有语音活动，就发送。
             ( ( p_TmpInt == 1 + 4 ) && ( g_AudioInfoPt->m_LastSendInputFrameIsAct != 0 ) ) ) //如果本音频输入数据帧为无语音活动，但最后一个发送的输入帧为有语音活动，就发送。
         {
-			g_AudioInfoPt->m_SendInputFrameTimeStamp += AudioProcThreadPt->m_FrameLen; //时间戳递增一个帧的数据长度。
+			g_AudioInfoPt->m_SendInputFrameTimeStamp += 1; //时间戳递增一个步进。
 
 			//设置输入帧包。
             g_AudioInfoPt->m_TmpBytePt[0] = 0x01;

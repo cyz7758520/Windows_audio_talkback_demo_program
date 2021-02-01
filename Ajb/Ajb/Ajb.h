@@ -45,7 +45,7 @@ extern "C"
 
 typedef struct Ajb Ajb;
 
-__AJB_DLLAPI__ int AjbInit( Ajb * * AjbPtPt, int32_t SamplingRate, int32_t FrameLen, int8_t IsHaveTimeStamp, int8_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, uint8_t AdaptSensitivity );
+__AJB_DLLAPI__ int AjbInit( Ajb * * AjbPtPt, int32_t SamplingRate, int32_t FrameLen, int8_t IsHaveTimeStamp, int32_t TimeStampStep, int8_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, uint8_t AdaptSensitivity );
 
 __AJB_DLLAPI__ int AjbPutOneFrame( Ajb * AjbPt, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen );
 __AJB_DLLAPI__ int AjbGetOneFrame( Ajb * AjbPt, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt );
