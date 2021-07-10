@@ -1,7 +1,7 @@
 ﻿#ifndef __READWRITELOCK_H__
 #define __READWRITELOCK_H__
 
-#include "VarStr.h"
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -49,7 +49,13 @@ extern "C"
 #include <atomic>
 typedef struct MutexLock
 {
-	std::atomic_flag m_FlagCount = ATOMIC_FLAG_INIT;
+	#if( defined __MS_VCXX__ )
+	std::atomic_flag m_StdAtomicFlag = ATOMIC_FLAG_INIT;
+	#elif( defined __CYGWIN_GCC__ )
+	unsigned int m_ICE = 0;
+	#elif( ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
+	std::atomic<int> m_StdAtomicInt;
+	#endif
 }MutexLock;
 extern "C"
 {

@@ -53,7 +53,16 @@ typedef struct VarStr
 	size_t m_StrLen; //存放字符串的数据长度。
 }VarStr;
 
-__FUNC_DLLAPI__ int VarStrInit( VarStr * * VarStrPtPt );
+#ifdef __cplusplus
+__FUNC_DLLAPI__ int VarStrInit( VarStr * * VarStrPtPt, size_t StrSz = sizeof( size_t ) );
+#else
+__FUNC_DLLAPI__ int VarStrInit( VarStr * * VarStrPtPt, size_t StrSz );
+#endif
+#ifdef __cplusplus
+__FUNC_DLLAPI__ int VarStrInitByStr( VarStr * * VarStrPtPt, const char * StrPt, size_t MaxCpyLen = SIZE_MAX );
+#else
+__FUNC_DLLAPI__ int VarStrInitByStr( VarStr * * VarStrPtPt, const char * StrPt, size_t MaxCpyLen );
+#endif
 
 #ifdef __cplusplus
 __FUNC_DLLAPI__ int VarStrCpy( VarStr * VarStrPt, const char * StrPt, size_t MaxCpyLen = SIZE_MAX );

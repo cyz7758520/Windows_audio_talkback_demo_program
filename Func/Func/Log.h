@@ -1,7 +1,7 @@
 ﻿#ifndef __LOG_H__
 #define __LOG_H__
 
-#include "VarStr.h"
+#include "Func.h"
 
 //日志级别
 #define LOG_LVL_ERROR                 1   //错误级别

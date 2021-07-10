@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\Func\Func;..\..\..\Sokt\Sokt;..\..\..\DataStruct\DataStruct;..\..\..\SpeexDsp\SpeexDsp;..\..\..\WebRtc\WebRtc;..\..\..\SpeexWebRtcAec\SpeexWebRtcAec;..\..\..\RNNoise\RNNoise;..\..\..\Speex\Speex;..\..\..\WaveFile\WaveFile;..\..\..\Ajb\Ajb;..\..\..\LibYUV\LibYUV;..\..\..\OpenH264\OpenH264;$(UCRTContentRoot)\Include\10.0.17763.0\um;$(UCRTContentRoot)\Include\10.0.17763.0\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>..\..\..\Func\Func;..\..\..\DataStruct\DataStruct;..\..\..\SpeexDsp\SpeexDsp;..\..\..\WebRtc\WebRtc;..\..\..\SpeexWebRtcAec\SpeexWebRtcAec;..\..\..\RNNoise\RNNoise;..\..\..\Speex\Speex;..\..\..\WaveFile\WaveFile;..\..\..\Ajb\Ajb;..\..\..\Sokt\Sokt;..\..\..\LibYUV\LibYUV;..\..\..\OpenH264\OpenH264;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WinMM.lib;Ws2_32.lib;Psapi.lib;Strmiids.lib;Quartz.lib;Func_$(ProjectNameLibSuffix);Sokt_$(ProjectNameLibSuffix);DataStruct_$(ProjectNameLibSuffix);SpeexDsp_$(ProjectNameLibSuffix);WebRtc_$(ProjectNameLibSuffix);SpeexWebRtcAec_$(ProjectNameLibSuffix);RNNoise_$(ProjectNameLibSuffix);Speex_$(ProjectNameLibSuffix);WaveFile_$(ProjectNameLibSuffix);Ajb_$(ProjectNameLibSuffix);LibYUV_$(ProjectNameLibSuffix);OpenH264_$(ProjectNameLibSuffix);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

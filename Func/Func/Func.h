@@ -1,22 +1,41 @@
 ﻿#ifndef __FUNC_H__
 #define __FUNC_H__
 
-#include "VarStr.h"
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-#define WIN32_LEAN_AND_MEAN //防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
-#include <windows.h>
-#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-#include <arpa/inet.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdarg.h>
 #include <limits.h>
 #include <errno.h>
 #include <string.h>
+#include <inttypes.h>
+#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
+#include <winsdkver.h>                    //包含Windows SDK支持的最高版本Windows的相关宏
+#define _WIN32_WINNT  _WIN32_WINNT_MAXVER //设置_WIN32_WINNT宏为最高版本Windows
+#define WINVER        WINVER_MAXVER       //设置WINVER宏为最高版本Windows
+#define NTDDI_VERSION NTDDI_MAXVER        //设置NTDDI_VERSION宏为最高版本Windows
+#define _WIN32_IE     _WIN32_IE_MAXVER    //设置_WIN32_IE宏为最高版本IE
+#define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
+#include <windows.h>                      //包含整个Windows SDK支持的API
+#include <psapi.h>
+#endif
+#if( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#endif
 #if( defined __ANDROID_GCC__ )
 #include <jni.h>
+#include <android/bitmap.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 #endif
+#include "VarStr.h"
+#include "Log.h"
+#include "ThreadLock.h"
 
 //线程局部变量宏。
 #if( defined __MS_VCXX__ )

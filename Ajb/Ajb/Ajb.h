@@ -43,18 +43,32 @@ extern "C"
 	#endif
 #endif
 
-typedef struct Ajb Ajb;
+typedef struct AAjb AAjb;
 
-__AJB_DLLAPI__ int AjbInit( Ajb * * AjbPtPt, int32_t SamplingRate, int32_t FrameLen, int8_t IsHaveTimeStamp, int32_t TimeStampStep, int8_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, uint8_t AdaptSensitivity );
+__AJB_DLLAPI__ int AAjbInit( AAjb * * AAjbPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, int32_t IsUseMutexLock );
 
-__AJB_DLLAPI__ int AjbPutOneFrame( Ajb * AjbPt, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen );
-__AJB_DLLAPI__ int AjbGetOneFrame( Ajb * AjbPt, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt );
+__AJB_DLLAPI__ int AAjbPutOneFrame( AAjb * AAjbPt, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen );
+__AJB_DLLAPI__ int AAjbGetOneFrame( AAjb * AAjbPt, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt );
 
-__AJB_DLLAPI__ int AjbGetBufFrameCnt( Ajb * AjbPt, int32_t * CurHaveBufActFrameCntPt, int32_t * CurHaveBufInactFrameCntPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt );
+__AJB_DLLAPI__ int AAjbGetBufFrameCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFrameCntPt, int32_t * CurHaveBufInactFrameCntPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt );
 
-__AJB_DLLAPI__ int AjbClear( Ajb * AjbPt );
+__AJB_DLLAPI__ int AAjbClear( AAjb * AAjbPt );
 
-__AJB_DLLAPI__ int AjbDestroy( Ajb * AjbPt );
+__AJB_DLLAPI__ int AAjbDestroy( AAjb * AAjbPt );
+
+typedef struct VAjb VAjb;
+
+__AJB_DLLAPI__ int VAjbInit( VAjb * * VAjbPtPt, int32_t IsHaveTimeStamp, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, int32_t IsUseMutexLock );
+
+__AJB_DLLAPI__ int VAjbPutOneFrame( VAjb * VAjbPt, uint64_t CurTime, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen );
+__AJB_DLLAPI__ int VAjbGetOneFrame( VAjb * VAjbPt, uint64_t CurTime, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt );
+__AJB_DLLAPI__ int VAjbGetOneFrameWantTimeStamp( VAjb * VAjbPt, uint64_t CurTime, uint32_t WantTimeStamp, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt );
+
+__AJB_DLLAPI__ int VAjbGetBufFrameCnt( VAjb * VAjbPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt );
+
+__AJB_DLLAPI__ int VAjbClear( VAjb * VAjbPt );
+
+__AJB_DLLAPI__ int VAjbDestroy( VAjb * VAjbPt );
 
 #ifdef __cplusplus
 }

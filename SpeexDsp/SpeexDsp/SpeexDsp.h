@@ -46,19 +46,19 @@ extern "C"
 
 typedef struct SpeexAec SpeexAec;
 
-__SPEEXDSP_DLLAPI__ int SpeexAecInit( SpeexAec * * SpeexAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMultiple, float EchoCont, int32_t EchoSupes, int32_t EchoSupesAct );
-__SPEEXDSP_DLLAPI__ int SpeexAecInitByMem( SpeexAec * * SpeexAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMultiple, float EchoCont, int32_t EchoSupes, int32_t EchoSupesAct, const char * SpeexAecMemPt, size_t SpeexAecMemLen );
-__SPEEXDSP_DLLAPI__ int SpeexAecInitByMemFile( SpeexAec * * SpeexAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMultiple, float EchoCont, int32_t EchoSupes, int32_t EchoSupesAct, const char * SpeexAecMemFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecGetMemLen( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMultiple, float EchoCont, int32_t EchoSupes, int32_t EchoSupesAct, size_t * SpeexAecMemLenPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecGetMem( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMultiple, float EchoCont, int32_t EchoSupes, int32_t EchoSupesAct, char * SpeexAecMemPt, size_t SpeexAecMemSz );
-__SPEEXDSP_DLLAPI__ int SpeexAecSaveMemFile( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMultiple, float EchoCont, int32_t EchoSupes, int32_t EchoSupesAct, const char * SpeexAecMemFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecGetIsConvergence( SpeexAec * SpeexAecPt, int32_t * IsConvergencePt );
+__SPEEXDSP_DLLAPI__ int SpeexAecInit( SpeexAec * * SpeexAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct );
+__SPEEXDSP_DLLAPI__ int SpeexAecInitByMem( SpeexAec * * SpeexAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const char * SpeexAecMemPt, size_t SpeexAecMemLen );
+__SPEEXDSP_DLLAPI__ int SpeexAecInitByMemFile( SpeexAec * * SpeexAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const char * SpeexAecMemFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
+__SPEEXDSP_DLLAPI__ int SpeexAecGetMemLen( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, size_t * SpeexAecMemLenPt );
+__SPEEXDSP_DLLAPI__ int SpeexAecGetMem( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, char * SpeexAecMemPt, size_t SpeexAecMemSz );
+__SPEEXDSP_DLLAPI__ int SpeexAecSaveMemFile( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const char * SpeexAecMemFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
+__SPEEXDSP_DLLAPI__ int SpeexAecGetIsCnvgnc( SpeexAec * SpeexAecPt, int32_t * IsCnvgncPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecProc( SpeexAec * SpeexAecPt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
 __SPEEXDSP_DLLAPI__ int SpeexAecDestroy( SpeexAec * SpeexAecPt );
 
 typedef struct SpeexPreprocessState_ SpeexPreprocessState;
 
-__SPEEXDSP_DLLAPI__ int SpeexPprocInit( SpeexPreprocessState * * SpeexPprocPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCont, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain );
+__SPEEXDSP_DLLAPI__ int SpeexPprocInit( SpeexPreprocessState * * SpeexPprocPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCntu, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain );
 __SPEEXDSP_DLLAPI__ int SpeexPprocProc( SpeexPreprocessState * SpeexPprocPt, int16_t * FramePt, int16_t * ResultFramePt, int32_t * VoiceActStsPt );
 __SPEEXDSP_DLLAPI__ int SpeexPprocDestroy( SpeexPreprocessState * SpeexPprocPt );
 

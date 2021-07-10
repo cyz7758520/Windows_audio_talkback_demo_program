@@ -62,7 +62,7 @@ __WEBRTC_DLLAPI__ int WebRtcAecGetMem( WebRtcAec * WebRtcAecPt, int32_t Sampling
 __WEBRTC_DLLAPI__ int WebRtcAecSaveMemFile( WebRtcAec * WebRtcAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, const char * WebRtcAecMemFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
 __WEBRTC_DLLAPI__ int WebRtcAecSetDelay( WebRtcAec * WebRtcAecPt, int32_t Delay );
 __WEBRTC_DLLAPI__ int WebRtcAecGetDelay( WebRtcAec * WebRtcAecPt, int32_t * DelayPt );
-__WEBRTC_DLLAPI__ int WebRtcAecGetIsConvergence( WebRtcAec * WebRtcAecPt, int32_t * IsConvergencePt );
+__WEBRTC_DLLAPI__ int WebRtcAecGetIsCnvgnc( WebRtcAec * WebRtcAecPt, int32_t * IsCnvgncPt );
 __WEBRTC_DLLAPI__ int WebRtcAecProc( WebRtcAec * WebRtcAecPt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
 __WEBRTC_DLLAPI__ int WebRtcAecDestroy( WebRtcAec * WebRtcAecPt );
 
