@@ -1692,7 +1692,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	{
 		CheckRadioButton( g_SettingWndHdl, IDC_UseLnkLstRecvOutputFrame, IDC_UseAjbRecvOutputFrame, IDC_UseAjbRecvOutputFrame );
 		CheckDlgButton( g_SettingWndHdl, IDC_IsSaveSettingToFile, BST_CHECKED );
-		CheckDlgButton( g_SettingWndHdl, IDC_IsPrintLog, BST_CHECKED );
+		CheckDlgButton( g_SettingWndHdl, IDC_IsPrintLogShowToast, BST_CHECKED );
 		CheckDlgButton( g_SettingWndHdl, IDC_IsSaveAudioToFile, BST_CHECKED );
 		SendMessage( g_MainWndHdl, WM_COMMAND, IDC_UseEffectSuper, 0 );
 		SendMessage( g_MainWndHdl, WM_COMMAND, IDC_UseBitrateSuper, 0 );
@@ -2127,14 +2127,14 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 							MediaProcThreadSetIsSaveSettingToFile( g_MediaProcThreadPt, 0, NULL, g_ErrInfoVarStrPt );
 						}
 						
-						//判断是否打印Log日志。
-						if( IsDlgButtonChecked( g_SettingWndHdl, IDC_IsPrintLog ) == BST_CHECKED )
+						//判断是否打印Log日志，并显示Toast。
+						if( IsDlgButtonChecked( g_SettingWndHdl, IDC_IsPrintLogShowToast ) == BST_CHECKED )
 						{
-							MediaProcThreadSetIsPrintLog( g_MediaProcThreadPt, 1, g_ErrInfoVarStrPt );
+							MediaProcThreadSetIsPrintLogShowToast( g_MediaProcThreadPt, 1, 1, g_ErrInfoVarStrPt );
 						}
 						else
 						{
-							MediaProcThreadSetIsPrintLog( g_MediaProcThreadPt, 0, g_ErrInfoVarStrPt );
+							MediaProcThreadSetIsPrintLogShowToast( g_MediaProcThreadPt, 0, 0, g_ErrInfoVarStrPt );
 						}
 
 						//判断是否使用音频输入。

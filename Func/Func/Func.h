@@ -190,6 +190,8 @@ __FUNC_DLLAPI__ int FuncGetPrivateProfileStringFromSectionMem( const char * KeyN
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __FUNC_DLLAPI__ int FuncSetCurActDir( const char * FullPathStrPt, VarStr * ErrInfoVarStrPt );
 __FUNC_DLLAPI__ int FuncSetWndCenter( HWND SpecWndHdl, HWND OtherWndHdl, VarStr * ErrInfoVarStrPt );
+__FUNC_DLLAPI__ int FuncToast( HWND SpecWndHdl, uint64_t TimeOutMesc, VarStr * ErrInfoVarStrPt, const char * TextPt );
+__FUNC_DLLAPI__ int FuncToastFmt( HWND SpecWndHdl, uint64_t TimeOutMesc, VarStr * ErrInfoVarStrPt, const char * FmtStrPt, ... );
 #endif
 
 //判断函数。

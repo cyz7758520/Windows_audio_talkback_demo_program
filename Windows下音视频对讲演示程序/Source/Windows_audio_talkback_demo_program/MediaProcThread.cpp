@@ -265,10 +265,11 @@ int MediaProcThreadSetIsSaveSettingToFile( MediaProcThread * MediaProcThreadPt, 
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：MediaProcThreadSetIsPrintLog
+ * 函数名称：MediaProcThreadSetIsPrintLogShowToast
  * 功能说明：设置是否打印Log日志。
  * 参数说明：MediaProcThreadPt：[输入]，存放媒体处理线程的内存指针，不能为NULL。
 			 IsPrintLog：[输入]，存放是否打印Log日志，为非0表示要打印，为0表示不打印。
+			 IsShowToast：[输入]，存放是否显示Toast，为非0表示要显示，为0表示不显示。
 			 ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的内存指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -276,7 +277,7 @@ int MediaProcThreadSetIsSaveSettingToFile( MediaProcThread * MediaProcThreadPt, 
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaProcThreadSetIsPrintLog( MediaProcThread * MediaProcThreadPt, int IsPrintLog, VarStr * ErrInfoVarStrPt )
+int MediaProcThreadSetIsPrintLogShowToast( MediaProcThread * MediaProcThreadPt, int IsPrintLog, int IsShowToast, VarStr * ErrInfoVarStrPt )
 {
 	int p_Result = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
 
@@ -288,6 +289,7 @@ int MediaProcThreadSetIsPrintLog( MediaProcThread * MediaProcThreadPt, int IsPri
 	}
 
 	MediaProcThreadPt->m_IsPrintLog = IsPrintLog;
+	MediaProcThreadPt->m_IsShowToast = IsShowToast;
 
 	p_Result = 0; //设置本函数执行成功。
 
@@ -3351,6 +3353,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( p_TmpInt321 != MMSYSERR_NOERROR )
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：打开音频输入设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：打开音频输入设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
 				goto out;
 			}
 			for( p_TmpInt322 = 0; p_TmpInt322 < MediaProcThreadPt->m_AudioInput.m_AudioInputWaveHdrTotal; p_TmpInt322++ )
@@ -3550,6 +3553,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( p_TmpInt321 != MMSYSERR_NOERROR )
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：打开音频输出设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：打开音频输出设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
 				goto out;
 			}
 			for( p_TmpInt322 = 0; p_TmpInt322 < MediaProcThreadPt->m_AudioOutput.m_AudioOutputWaveHdrTotal; p_TmpInt322++ )
@@ -3724,7 +3728,8 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			p_CreateDevEnumPt = NULL;
 			if( p_VideoInputDeviceFilterPt == NULL ) //如果创建视频输入设备失败。
 			{
-				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：创建视频输入设备过滤器失败。" );
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：创建视频输入设备过滤器失败。原因：可能没有视频输入设备。" );
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：创建视频输入设备过滤器失败。原因：可能没有视频输入设备。" );
 				goto outInitVideoInputDevice;
 			}
 			if( MediaProcThreadPt->m_VideoInput.m_FilterGraphManagerPt->AddFilter( p_VideoInputDeviceFilterPt, L"Video Capture" ) != S_OK ) //如果添加视频输入设备过滤器到视频输入过滤器图失败。
@@ -4778,8 +4783,8 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 	if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：本线程开始退出。" );
 	
 	//请求音视频输入输出线程退出。必须在销毁音视频输入输出前退出，因为音视频输入输出线程会使用音视频输入输出相关变量。
-	if( MediaProcThreadPt->m_AudioInput.m_AudioInputThreadHdl != NULL ) PostThreadMessage( MediaProcThreadPt->m_AudioInput.m_AudioInputThreadId, WM_QUIT, NULL, NULL ); //请求音频输入线程退出。不要使用退出标记，因为音频输入设备可能会打开失败，导致音频输入线程不会进入消息循环。
-	if( MediaProcThreadPt->m_AudioOutput.m_AudioOutputThreadHdl != NULL ) PostThreadMessage( MediaProcThreadPt->m_AudioOutput.m_AudioOutputThreadId, WM_QUIT, NULL, NULL ); //请求音频输出线程退出。不要使用退出标记，因为音频输出设备可能会打开失败，导致音频输出线程不会进入消息循环。
+	if( MediaProcThreadPt->m_AudioInput.m_AudioInputThreadHdl != NULL ) while( PostThreadMessage( MediaProcThreadPt->m_AudioInput.m_AudioInputThreadId, WM_QUIT, NULL, NULL ) == 0 ) Sleep( 0 ); //循环发送请求音频输入线程退出，直到线程消息发送成功，因为线程刚启动时还来不及创建消息队列从而导致发送失败。不要使用退出标记，因为音频输入设备可能会打开失败，导致音频输入线程不会进入消息循环。
+	if( MediaProcThreadPt->m_AudioOutput.m_AudioOutputThreadHdl != NULL ) while( PostThreadMessage( MediaProcThreadPt->m_AudioOutput.m_AudioOutputThreadId, WM_QUIT, NULL, NULL ) == 0 ) Sleep( 0 ); //循环发送请求音频输出线程退出，直到线程消息发送成功，因为线程刚启动时还来不及创建消息队列从而导致发送失败。不要使用退出标记，因为音频输出设备可能会打开失败，导致音频输出线程不会进入消息循环。
 	if( MediaProcThreadPt->m_VideoOutput.m_VideoOutputThreadHdl != NULL ) MediaProcThreadPt->m_VideoOutput.m_VideoOutputThreadExitFlag = 1; //请求视频输出线程退出。
 
 	//销毁音频输入。

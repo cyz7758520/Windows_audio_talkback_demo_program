@@ -50,6 +50,7 @@ typedef struct MediaProcThread
     VarStr * m_SettingFileFullPathVarStrPt; //存放设置文件的完整路径动态字符串的内存指针。
 
 	int32_t m_IsPrintLog; //存放是否打印Log日志，为非0表示要打印，为0表示不打印。
+	int32_t m_IsShowToast; //存放是否显示Toast，为非0表示要显示，为0表示不显示。
 
 	typedef struct AudioInput //音频输入结构体。
 	{
@@ -339,7 +340,7 @@ int MediaProcThreadInit( MediaProcThread * * MediaProcThreadPtPt, void * UserDat
 						 VarStr * ErrInfoVarStrPt );
 
 int MediaProcThreadSetIsSaveSettingToFile( MediaProcThread * MediaProcThreadPt, int IsSaveSettingToFile, const char * SettingFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
-int MediaProcThreadSetIsPrintLog( MediaProcThread * MediaProcThreadPt, int IsPrintLog, VarStr * ErrInfoVarStrPt );
+int MediaProcThreadSetIsPrintLogShowToast( MediaProcThread * MediaProcThreadPt, int IsPrintLog, int IsShowToast, VarStr * ErrInfoVarStrPt );
 
 int MediaProcThreadGetAudioInputDeviceName( VarStr * * * AudioInputDeviceNameArrPtPtPt, UINT * AudioInputDeviceTotalPt, VarStr * ErrInfoVarStrPt );
 int MediaProcThreadGetAudioOutputDeviceName( VarStr * * * AudioOutputDeviceNameArrPtPtPt, UINT * AudioOutputDeviceTotalPt, VarStr * ErrInfoVarStrPt );

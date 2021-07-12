@@ -42,7 +42,7 @@
 #define	IDC_UseAjbRecvOutputFrame	1023
 #define	IDC_AjbSetting	1024
 #define	IDC_IsSaveSettingToFile	1025
-#define	IDC_IsPrintLog	1026
+#define	IDC_IsPrintLogShowToast	1026
 #define	IDC_UseEffectLow	1027
 #define	IDC_UseEffectMid	1028
 #define	IDC_UseEffectHigh	1029
