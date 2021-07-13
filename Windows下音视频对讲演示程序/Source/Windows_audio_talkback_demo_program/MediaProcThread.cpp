@@ -3759,39 +3759,49 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 									#define VIDEOINFOHEADER_Height( AmMediaTypePt ) ( ( ( VIDEOINFOHEADER * )AmMediaTypePt->pbFormat )->bmiHeader.biHeight )
 									#define VIDEOINFOHEADER_WidthHeightCom( AmMediaType1Pt, Com, AmMediaType2Pt ) ( ( VIDEOINFOHEADER_Width( AmMediaType1Pt ) Com VIDEOINFOHEADER_Width( AmMediaType2Pt ) ) && ( VIDEOINFOHEADER_Height( AmMediaType1Pt ) Com VIDEOINFOHEADER_Height( AmMediaType2Pt ) ) )
 
-									if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备支持的媒体格式：subtype：%s  AvgTimePerFrame：%lld  %.1f  Width：%ld  Height：%ld。", ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) ? "MJPEG" : ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ? "YUY2" : "unkown", VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ), 1000.0 / ( VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ) / 10.0 / 1000.0 ), VIDEOINFOHEADER_Width( p_AmMediaTypePt ), VIDEOINFOHEADER_Height( p_AmMediaTypePt ) );
-									//如果选择的为空，就设置选择的为本次的。
-									//如果选择的分辨率不满足目标，但是本次的分辨率比选择的高，就设置选择的为本次的。
-									//如果本次的分辨率满足目标（选择的分辨率肯定也满足目标，如果选择的分辨率不满足目标，那么就会走上一条判断），或本次的分辨率和选择的相同，且：
-										//如果选择的帧率不满足目标，但是本次的帧率比选择的高，就设置选择的为本次的。
-										//如果本次的帧率满足目标（选择的帧率肯定也满足目标，如果选择的帧率不满足目标，那么就会走上一条判断），或本次的帧率和选择的相同，且：
-											//如果本次的分辨率比选择的低，就设置选择的为本次的。
-											//如果本次的分辨率与选择的相同，但本次的帧率比选择的低，就设置选择的为本次的。
-									if( p_SelAmMediaTypePt == NULL )
+									if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备支持的媒体格式：subtype：%s  AvgTimePerFrame：%lld  %.1f  Width：%ld  Height：%ld。",
+																					  ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) ? "MJPEG" : ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ? "YUY2" : ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_RGB24 ) ? "RGB24" : "unkown",
+																					  VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ), 1000.0 / ( VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ) / 10.0 / 1000.0 ),
+																					  VIDEOINFOHEADER_Width( p_AmMediaTypePt ), VIDEOINFOHEADER_Height( p_AmMediaTypePt ) );
+									if( ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) || ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ) //如果媒体格式为MJPEG或YUY2才进行选择。
 									{
-										p_TmpInt321 = 1;
-									}
-									else if( ( ( VIDEOINFOHEADER_Width( p_SelAmMediaTypePt ) < p_TargetWidth ) || ( VIDEOINFOHEADER_Height( p_SelAmMediaTypePt ) < p_TargetHeight ) ) && ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
-									{
-										p_TmpInt321 = 1;
-									}
-									else if( ( ( VIDEOINFOHEADER_Width( p_AmMediaTypePt ) >= p_TargetWidth ) && ( VIDEOINFOHEADER_Height( p_AmMediaTypePt ) >= p_TargetHeight ) ) || ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
-									{
-										if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) > p_TargetAvgTimePerFrame ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) ) )
+										//如果选择的为空，就设置选择的为本次的。
+										//如果选择的分辨率不满足目标，但是本次的分辨率比选择的高，就设置选择的为本次的。
+										//如果本次的分辨率满足目标（选择的分辨率肯定也满足目标，如果选择的分辨率不满足目标，那么就会走上一条判断），或本次的分辨率和选择的相同，且：
+											//如果选择的帧率不满足目标，但是本次的帧率比选择的高，就设置选择的为本次的。
+											//如果本次的帧率满足目标（选择的帧率肯定也满足目标，如果选择的帧率不满足目标，那么就会走上一条判断），或本次的帧率和选择的相同，且：
+												//如果本次的分辨率比选择的低，就设置选择的为本次的。
+												//如果本次的分辨率与选择的相同，但本次的帧率比选择的低，就设置选择的为本次的。
+										if( p_SelAmMediaTypePt == NULL )
 										{
 											p_TmpInt321 = 1;
 										}
-										else if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ) <= p_TargetAvgTimePerFrame ) || ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
+										else if( ( ( VIDEOINFOHEADER_Width( p_SelAmMediaTypePt ) < p_TargetWidth ) || ( VIDEOINFOHEADER_Height( p_SelAmMediaTypePt ) < p_TargetHeight ) ) && ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
 										{
-											if( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) )
+											p_TmpInt321 = 1;
+										}
+										else if( ( ( VIDEOINFOHEADER_Width( p_AmMediaTypePt ) >= p_TargetWidth ) && ( VIDEOINFOHEADER_Height( p_AmMediaTypePt ) >= p_TargetHeight ) ) || ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
+										{
+											if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) > p_TargetAvgTimePerFrame ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) ) )
 											{
 												p_TmpInt321 = 1;
 											}
-											else if( ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
+											else if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ) <= p_TargetAvgTimePerFrame ) || ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
 											{
-												p_TmpInt321 = 1;
+												if( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) )
+												{
+													p_TmpInt321 = 1;
+												}
+												else if( ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
+												{
+													p_TmpInt321 = 1;
+												}
 											}
 										}
+									}
+									else
+									{
+										if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGI( "媒体处理线程：本次视频输入设备支持的媒体格式不是为MJPEG或YUY2，不能被选择。" );
 									}
 
 									if( p_TmpInt321 != 0 ) //如果需要选择本次的。
@@ -3897,7 +3907,10 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：选择视频输入设备过滤器上合适的引脚和媒体类型失败。" );
 				goto outInitVideoInputDevice;
 			}
-			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备选择的媒体格式：subtype：%s  AvgTimePerFrame：%lld  %.1f  Width：%ld  Height：%ld。", ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) ? "MJPEG" : ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ? "YUY2" : "unkown", VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ), 1000.0 / ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) / 10.0 / 1000.0 ), VIDEOINFOHEADER_Width( p_SelAmMediaTypePt ), VIDEOINFOHEADER_Height( p_SelAmMediaTypePt ) );
+			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备选择的媒体格式：subtype：%s  AvgTimePerFrame：%lld  %.1f  Width：%ld  Height：%ld。",
+															  ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) ? "MJPEG" : ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ? "YUY2" : ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_RGB24 ) ? "RGB24" : "unkown",
+															  VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ), 1000.0 / ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) / 10.0 / 1000.0 ),
+															  VIDEOINFOHEADER_Width( p_SelAmMediaTypePt ), VIDEOINFOHEADER_Height( p_SelAmMediaTypePt ) );
 
 			//创建视频输入设备过滤器上选择的引脚和媒体类型对应的解码过滤器，并连接引脚。
 			if( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_MJPG )

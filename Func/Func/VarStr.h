@@ -92,6 +92,8 @@ __FUNC_DLLAPI__ int VarStrVaFmtCat( VarStr * VarStrPt, const char * FmtStrPt, va
 __FUNC_DLLAPI__ int VarStrSetSz( VarStr * VarStrPt, size_t StrSz );
 __FUNC_DLLAPI__ int VarStrGetSz( VarStr * VarStrPt, size_t * StrSzPt );
 
+__FUNC_DLLAPI__ int VarStrReSetLen( VarStr * VarStrPt );
+
 __FUNC_DLLAPI__ int VarStrDestroy( VarStr * VarStrPt );
 
 #ifdef __cplusplus

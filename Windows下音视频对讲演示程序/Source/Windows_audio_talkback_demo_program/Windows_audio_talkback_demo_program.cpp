@@ -1,5 +1,6 @@
 ﻿// Windows_audio_talkback_demo_program.cpp : 定义应用程序的入口点。
 //
+//#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include "Func.h"
 #include "framework.h"
@@ -1280,8 +1281,7 @@ void __cdecl MyMediaProcThreadUserReadAudioVideoInputFrame( MediaProcThread * Me
             }
             else
             {
-				LOGFE( "视频输入帧时间戳：%" PRIu32 "，音频输入帧时间戳：%" PRIu32 "，总长度：%d，类型：%d。", g_MediaInfoPt->m_LastSendVideoInputFrameTimeStamp, g_MediaInfoPt->m_LastSendAudioInputFrameTimeStamp, p_FramePktLen, g_MediaInfoPt->m_TmpBytePt[13] & 0xff );
-				VarStrIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "发送一个有图像活动的视频输入帧包失败。原因：" );
+				VarStrFmtIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "发送一个有图像活动的视频输入帧包失败。视频输入帧时间戳：%" PRIu32 "，音频输入帧时间戳：%" PRIu32 "，总长度：%d，类型：%d。原因：", g_MediaInfoPt->m_LastSendVideoInputFrameTimeStamp, g_MediaInfoPt->m_LastSendAudioInputFrameTimeStamp, p_FramePktLen, g_MediaInfoPt->m_TmpBytePt[13] & 0xff );
 				LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
 				{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 				goto out;
@@ -1681,6 +1681,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	//打印可执行文件所在目录完整绝对路径到日志。
 	if( g_ErrInfoVarStrPt->m_StrSz < MAX_PATH ) VarStrSetSz( g_ErrInfoVarStrPt, MAX_PATH );
 	GetCurrentDirectory( g_ErrInfoVarStrPt->m_StrSz, g_ErrInfoVarStrPt->m_StrPt );
+	VarStrReSetLen( g_ErrInfoVarStrPt );
 	VarStrIns( g_ErrInfoVarStrPt, 0, "可执行文件所在目录完整绝对路径：" );
 	LOGI( g_ErrInfoVarStrPt->m_StrPt );
 	{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, g_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainWndHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
