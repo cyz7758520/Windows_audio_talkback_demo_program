@@ -2694,7 +2694,7 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecMode, BST_UNCHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelay, BST_CHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecIsUseSameRoomAec, BST_UNCHECKED );
-					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "420" );
+					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "380" );
 
 					CheckDlgButton( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocIsUseNs, BST_CHECKED );
 					SetWindowText( GetDlgItem( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocNoiseSupes ), "-32768" );
@@ -2775,7 +2775,7 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecMode, BST_UNCHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelay, BST_CHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecIsUseSameRoomAec, BST_UNCHECKED );
-					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "420" );
+					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "380" );
 
 					CheckDlgButton( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocIsUseNs, BST_CHECKED );
 					SetWindowText( GetDlgItem( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocNoiseSupes ), "-32768" );
@@ -2856,7 +2856,7 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecMode, BST_UNCHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelay, BST_CHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecIsUseSameRoomAec, BST_UNCHECKED );
-					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "420" );
+					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "380" );
 
 					CheckDlgButton( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocIsUseNs, BST_CHECKED );
 					SetWindowText( GetDlgItem( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocNoiseSupes ), "-32768" );
@@ -2936,8 +2936,8 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseExtdFilterMode, BST_CHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecMode, BST_UNCHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelay, BST_CHECKED );
-					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecIsUseSameRoomAec, BST_UNCHECKED );
-					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "420" );
+					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecIsUseSameRoomAec, BST_CHECKED );
+					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "380" );
 
 					CheckDlgButton( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocIsUseNs, BST_CHECKED );
 					SetWindowText( GetDlgItem( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocNoiseSupes ), "-32768" );
@@ -3017,8 +3017,8 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseExtdFilterMode, BST_CHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecMode, BST_UNCHECKED );
 					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelay, BST_CHECKED );
-					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecIsUseSameRoomAec, BST_UNCHECKED );
-					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "420" );
+					CheckDlgButton( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecIsUseSameRoomAec, BST_CHECKED );
+					SetWindowText( GetDlgItem( g_SpeexWebRtcAecSettingWndHdl, IDC_SpeexWebRtcAecSameRoomEchoMinDelay ), "380" );
 
 					CheckDlgButton( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocIsUseNs, BST_CHECKED );
 					SetWindowText( GetDlgItem( g_SpeexPprocNsSettingWndHdl, IDC_SpeexPprocNoiseSupes ), "-32768" );

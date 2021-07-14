@@ -3905,6 +3905,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( p_SelPinPt == NULL || p_SelAmMediaTypePt == NULL )
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：选择视频输入设备过滤器上合适的引脚和媒体类型失败。" );
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToast( NULL, 3000, NULL, "媒体处理线程：选择视频输入设备过滤器上合适的引脚和媒体类型失败。" );
 				goto outInitVideoInputDevice;
 			}
 			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备选择的媒体格式：subtype：%s  AvgTimePerFrame：%lld  %.1f  Width：%ld  Height：%ld。",
