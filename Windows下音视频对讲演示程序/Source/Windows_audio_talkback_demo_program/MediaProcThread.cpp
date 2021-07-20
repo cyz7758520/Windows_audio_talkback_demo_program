@@ -1703,12 +1703,12 @@ int MediaProcThreadSetIsUseVideoInput( MediaProcThread * MediaProcThreadPt, int3
 		VarStrCpy( ErrInfoVarStrPt, "最大采样频率不正确。" );
 		goto out; //本函数返回失败。
 	}
-	if( ( IsUseVideoInput != 0 ) && ( FrameWidth < 1 ) )
+	if( ( IsUseVideoInput != 0 ) && ( ( FrameWidth <= 0 ) || ( ( FrameWidth & 1 ) != 0 ) ) )
 	{
 		VarStrCpy( ErrInfoVarStrPt, "帧的宽度不正确。" );
 		goto out; //本函数返回失败。
 	}
-	if( ( IsUseVideoInput != 0 ) && ( FrameHeight < 1 ) )
+	if( ( IsUseVideoInput != 0 ) && ( ( FrameHeight <= 0 ) || ( ( FrameHeight & 1 ) != 0 ) ) )
 	{
 		VarStrCpy( ErrInfoVarStrPt, "帧的高度不正确。" );
 		goto out; //本函数返回失败。
@@ -1904,12 +1904,12 @@ int MediaProcThreadSetIsUseVideoOutput( MediaProcThread * MediaProcThreadPt, int
 		VarStrCpy( ErrInfoVarStrPt, "媒体处理线程的内存指针不正确。" );
 		goto out; //本函数返回失败。
 	}
-	if( ( IsUseVideoOutput != 0 ) && ( FrameWidth < 1 ) )
+	if( ( IsUseVideoOutput != 0 ) && ( ( FrameWidth <= 0 ) || ( ( FrameWidth & 1 ) != 0 ) ) )
 	{
 		VarStrCpy( ErrInfoVarStrPt, "帧的宽度不正确。" );
 		goto out; //本函数返回失败。
 	}
-	if( ( IsUseVideoOutput != 0 ) && ( FrameHeight < 1 ) )
+	if( ( IsUseVideoOutput != 0 ) && ( ( FrameHeight <= 0 ) || ( ( FrameHeight & 1 ) != 0 ) ) )
 	{
 		VarStrCpy( ErrInfoVarStrPt, "帧的高度不正确。" );
 		goto out; //本函数返回失败。
@@ -2660,7 +2660,7 @@ public:
 										 m_MediaProcThreadPt->m_VideoInput.m_VideoInputFrameElmPt->m_EncoderVideoInputFramePt, m_MediaProcThreadPt->m_VideoInput.m_FrameWidth * m_MediaProcThreadPt->m_VideoInput.m_FrameHeight * 3 / 2, &m_MediaProcThreadPt->m_VideoInput.m_VideoInputFrameElmPt->m_EncoderVideoInputFrameLen,
 										 NULL ) == 0 )
                 {
-                    if( m_MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "视频输入线程：使用OpenH264编码器成功。H264格式视频输入帧的数据长度：%" PRIuPTR "，时间戳：%" PRIu64 "。", m_MediaProcThreadPt->m_VideoInput.m_VideoInputFrameElmPt->m_EncoderVideoInputFrameLen, m_MediaProcThreadPt->m_VideoInput.m_LastTimeMsec );
+                    if( m_MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "视频输入线程：使用OpenH264编码器成功。H264格式视频输入帧的数据长度：%" PRIuPTR "，时间戳：%" PRIu64 "，类型：%hhd。", m_MediaProcThreadPt->m_VideoInput.m_VideoInputFrameElmPt->m_EncoderVideoInputFrameLen, m_MediaProcThreadPt->m_VideoInput.m_LastTimeMsec, m_MediaProcThreadPt->m_VideoInput.m_VideoInputFrameElmPt->m_EncoderVideoInputFramePt[4] );
                 }
                 else
                 {
@@ -3651,9 +3651,11 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			IBaseFilter * p_VideoInputDeviceFilterPt = NULL; //存放视频输入设备过滤器的内存指针。
 			IPin * p_SelPinPt = NULL;
 			AM_MEDIA_TYPE * p_SelAmMediaTypePt = NULL;
-			int32_t p_TargetAvgTimePerFrame = 1000.0 / ( MediaProcThreadPt->m_VideoInput.m_MaxSamplingRate / 10.0 / 1000.0 );
-			int32_t p_TargetWidth = MediaProcThreadPt->m_VideoInput.m_FrameWidth;
-			int32_t p_TargetHeight = MediaProcThreadPt->m_VideoInput.m_FrameHeight;
+			int32_t p_AvgTimePerFrame = 1000.0 / ( MediaProcThreadPt->m_VideoInput.m_MaxSamplingRate / 10.0 / 1000.0 );
+			double p_FrameWidthToHeightRatio = ( double )MediaProcThreadPt->m_VideoInput.m_FrameWidth / ( double )MediaProcThreadPt->m_VideoInput.m_FrameHeight; //存放指定帧的宽高比。
+            double p_VideoInputDeviceFrameWidthToHeightRatio = 0; //存放本次视频输入设备帧的宽高比。
+            int32_t p_VideoInputDeviceFrameCropWidth = 0; //存放本次视频输入设备帧的裁剪宽度。
+            int32_t p_VideoInputDeviceFrameCropHeight = 0; //存放本次视频输入设备帧的裁剪高度。
 
 			IBaseFilter * p_DecFilterPt = NULL;
 			IPin * p_DecFilterInputPinPt = NULL;
@@ -3763,36 +3765,52 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 																					  ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) ? "MJPEG" : ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ? "YUY2" : ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_RGB24 ) ? "RGB24" : "unkown",
 																					  VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ), 1000.0 / ( VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ) / 10.0 / 1000.0 ),
 																					  VIDEOINFOHEADER_Width( p_AmMediaTypePt ), VIDEOINFOHEADER_Height( p_AmMediaTypePt ) );
+									
 									if( ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) || ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ) //如果媒体格式为MJPEG或YUY2才进行选择。
 									{
+										//设置本次视频输入设备帧的宽高比、裁剪宽度、裁剪高度。
+										p_VideoInputDeviceFrameWidthToHeightRatio = ( double )VIDEOINFOHEADER_Width( p_AmMediaTypePt ) / ( double )VIDEOINFOHEADER_Height( p_AmMediaTypePt );
+										if( p_VideoInputDeviceFrameWidthToHeightRatio >= p_FrameWidthToHeightRatio )
+										{
+											p_VideoInputDeviceFrameCropWidth = ( int )( ( double )VIDEOINFOHEADER_Height( p_AmMediaTypePt ) * p_FrameWidthToHeightRatio );
+											p_VideoInputDeviceFrameCropWidth -= p_VideoInputDeviceFrameCropWidth % 2;
+											p_VideoInputDeviceFrameCropHeight = VIDEOINFOHEADER_Height( p_AmMediaTypePt );
+										}
+										else
+										{
+											p_VideoInputDeviceFrameCropWidth = VIDEOINFOHEADER_Width( p_AmMediaTypePt );
+											p_VideoInputDeviceFrameCropHeight = ( int )( ( double )VIDEOINFOHEADER_Width( p_AmMediaTypePt ) / p_FrameWidthToHeightRatio );
+											p_VideoInputDeviceFrameCropHeight -= p_VideoInputDeviceFrameCropHeight % 2;
+										}
+
 										//如果选择的为空，就设置选择的为本次的。
-										//如果选择的分辨率不满足目标，但是本次的分辨率比选择的高，就设置选择的为本次的。
-										//如果本次的分辨率满足目标（选择的分辨率肯定也满足目标，如果选择的分辨率不满足目标，那么就会走上一条判断），或本次的分辨率和选择的相同，且：
-											//如果选择的帧率不满足目标，但是本次的帧率比选择的高，就设置选择的为本次的。
-											//如果本次的帧率满足目标（选择的帧率肯定也满足目标，如果选择的帧率不满足目标，那么就会走上一条判断），或本次的帧率和选择的相同，且：
-												//如果本次的分辨率比选择的低，就设置选择的为本次的。
-												//如果本次的分辨率与选择的相同，但本次的帧率比选择的低，就设置选择的为本次的。
+										//如果选择的裁剪帧大小不满足指定的，但是本次的裁剪帧大小比选择的高，就设置选择的为本次的。
+										//如果本次的裁剪帧大小满足指定的（选择的裁剪帧大小肯定也满足指定的，如果选择的裁剪帧大小不满足指定的，那么就会走上一条判断），或本次的裁剪帧大小和选择的相同，且：
+											//如果选择的帧率不满足指定的，但是本次的帧率比选择的高，就设置选择的为本次的。
+											//如果本次的帧率满足指定的（选择的帧率肯定也满足指定的，如果选择的帧率不满足指定的，那么就会走上一条判断），或本次的帧率和选择的相同，且：
+												//如果本次的裁剪帧大小比选择的低，就设置选择的为本次的。
+												//如果本次的裁剪帧大小与选择的相同，但本次的帧率比选择的低，就设置选择的为本次的。
 										if( p_SelAmMediaTypePt == NULL )
 										{
 											p_TmpInt321 = 1;
 										}
-										else if( ( ( VIDEOINFOHEADER_Width( p_SelAmMediaTypePt ) < p_TargetWidth ) || ( VIDEOINFOHEADER_Height( p_SelAmMediaTypePt ) < p_TargetHeight ) ) && ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
+										else if( ( ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth < MediaProcThreadPt->m_VideoInput.m_FrameWidth ) || ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight < MediaProcThreadPt->m_VideoInput.m_FrameHeight ) ) && ( ( p_VideoInputDeviceFrameCropWidth > MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth ) || ( p_VideoInputDeviceFrameCropHeight > MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight ) ) )
 										{
 											p_TmpInt321 = 1;
 										}
-										else if( ( ( VIDEOINFOHEADER_Width( p_AmMediaTypePt ) >= p_TargetWidth ) && ( VIDEOINFOHEADER_Height( p_AmMediaTypePt ) >= p_TargetHeight ) ) || ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
+										else if( ( ( p_VideoInputDeviceFrameCropWidth >= MediaProcThreadPt->m_VideoInput.m_FrameWidth ) || ( p_VideoInputDeviceFrameCropHeight >= MediaProcThreadPt->m_VideoInput.m_FrameHeight ) ) || ( ( p_VideoInputDeviceFrameCropWidth == MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth ) && ( p_VideoInputDeviceFrameCropHeight == MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight ) ) )
 										{
-											if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) > p_TargetAvgTimePerFrame ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) ) )
+											if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) > p_AvgTimePerFrame ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) ) )
 											{
 												p_TmpInt321 = 1;
 											}
-											else if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ) <= p_TargetAvgTimePerFrame ) || ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
+											else if( ( VIDEOINFOHEADER_AvgTimePerFrame( p_AmMediaTypePt ) <= p_AvgTimePerFrame ) || ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
 											{
-												if( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) )
+												if( ( ( p_VideoInputDeviceFrameCropWidth < MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth ) || ( p_VideoInputDeviceFrameCropHeight < MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight ) ) )
 												{
 													p_TmpInt321 = 1;
 												}
-												else if( ( VIDEOINFOHEADER_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
+												else if( ( ( p_VideoInputDeviceFrameCropWidth == MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth ) && ( p_VideoInputDeviceFrameCropHeight == MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight ) ) && ( VIDEOINFOHEADER_AvgTimePerFrameCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
 												{
 													p_TmpInt321 = 1;
 												}
@@ -3814,9 +3832,13 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 										DeleteMediaType( p_SelAmMediaTypePt );
 										p_SelAmMediaTypePt = p_AmMediaTypePt;
 										p_AmMediaTypePt = NULL;
+
 										MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceMaxSamplingRate = 1000.0 / ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) / 10.0 / 1000.0 );
 										MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth = VIDEOINFOHEADER_Width( p_SelAmMediaTypePt );
 										MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight = VIDEOINFOHEADER_Height( p_SelAmMediaTypePt );
+
+										MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth = p_VideoInputDeviceFrameCropWidth;
+										MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight = p_VideoInputDeviceFrameCropHeight;
 									}
 									else //如果不要选择本次的。
 									{
@@ -3834,26 +3856,26 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 									#define VIDEOINFOHEADER2_WidthHeightCom( AmMediaType1Pt, Com, AmMediaType2Pt ) ( ( VIDEOINFOHEADER2_Width( AmMediaType1Pt ) Com VIDEOINFOHEADER2_Width( AmMediaType2Pt ) ) && ( VIDEOINFOHEADER2_Height( AmMediaType1Pt ) Com VIDEOINFOHEADER2_Height( AmMediaType2Pt ) ) )
 
 									//如果选择的为空，就设置选择的为本次的。
-									//如果选择的分辨率不满足目标，但是本次的分辨率比选择的高，就设置选择的为本次的。
-									//如果本次的分辨率满足目标（选择的分辨率肯定也满足目标，如果选择的分辨率不满足目标，那么就会走上一条判断），或本次的分辨率和选择的相同，且：
-										//如果选择的帧率不满足目标，但是本次的帧率比选择的高，就设置选择的为本次的。
-										//如果本次的帧率满足目标（选择的帧率肯定也满足目标，如果选择的帧率不满足目标，那么就会走上一条判断），或本次的帧率和选择的相同，且：
-											//如果本次的分辨率比选择的低，或本次的帧率比选择的低，就设置选择的为本次的。
+									//如果选择的帧大小不满足指定的，但是本次的帧大小比选择的高，就设置选择的为本次的。
+									//如果本次的帧大小满足指定的（选择的帧大小肯定也满足指定的，如果选择的帧大小不满足指定的，那么就会走上一条判断），或本次的帧大小和选择的相同，且：
+										//如果选择的帧率不满足指定的，但是本次的帧率比选择的高，就设置选择的为本次的。
+										//如果本次的帧率满足指定的（选择的帧率肯定也满足指定的，如果选择的帧率不满足指定的，那么就会走上一条判断），或本次的帧率和选择的相同，且：
+											//如果本次的帧大小比选择的低，或本次的帧率比选择的低，就设置选择的为本次的。
 									if( p_SelAmMediaTypePt == NULL )
 									{
 										p_TmpInt321 = 1;
 									}
-									else if( ( ( VIDEOINFOHEADER2_Width( p_SelAmMediaTypePt ) < p_TargetWidth ) || ( VIDEOINFOHEADER2_Height( p_SelAmMediaTypePt ) < p_TargetHeight ) ) && ( VIDEOINFOHEADER2_WidthHeightCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
+									else if( ( ( VIDEOINFOHEADER2_Width( p_SelAmMediaTypePt ) < MediaProcThreadPt->m_VideoInput.m_FrameWidth ) || ( VIDEOINFOHEADER2_Height( p_SelAmMediaTypePt ) < MediaProcThreadPt->m_VideoInput.m_FrameHeight ) ) && ( VIDEOINFOHEADER2_WidthHeightCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
 									{
 										p_TmpInt321 = 1;
 									}
-									else if( ( ( VIDEOINFOHEADER2_Width( p_AmMediaTypePt ) >= p_TargetWidth ) && ( VIDEOINFOHEADER2_Height( p_AmMediaTypePt ) >= p_TargetHeight ) ) || ( VIDEOINFOHEADER2_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
+									else if( ( ( VIDEOINFOHEADER2_Width( p_AmMediaTypePt ) >= MediaProcThreadPt->m_VideoInput.m_FrameWidth ) && ( VIDEOINFOHEADER2_Height( p_AmMediaTypePt ) >= MediaProcThreadPt->m_VideoInput.m_FrameHeight ) ) || ( VIDEOINFOHEADER2_WidthHeightCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
 									{
-										if( ( VIDEOINFOHEADER2_AvgTimePerFrame( p_SelAmMediaTypePt ) > p_TargetAvgTimePerFrame ) && ( VIDEOINFOHEADER2_AvgTimePerFrameCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) ) )
+										if( ( VIDEOINFOHEADER2_AvgTimePerFrame( p_SelAmMediaTypePt ) > p_AvgTimePerFrame ) && ( VIDEOINFOHEADER2_AvgTimePerFrameCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) ) )
 										{
 											p_TmpInt321 = 1;
 										}
-										else if( ( VIDEOINFOHEADER2_AvgTimePerFrame( p_AmMediaTypePt ) <= p_TargetAvgTimePerFrame ) || ( VIDEOINFOHEADER2_AvgTimePerFrameCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
+										else if( ( VIDEOINFOHEADER2_AvgTimePerFrame( p_AmMediaTypePt ) <= p_AvgTimePerFrame ) || ( VIDEOINFOHEADER2_AvgTimePerFrameCom( p_AmMediaTypePt, == , p_SelAmMediaTypePt ) ) )
 										{
 											if( ( VIDEOINFOHEADER2_WidthHeightCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) ) || ( VIDEOINFOHEADER2_AvgTimePerFrameCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) ) )
 											{
@@ -3912,6 +3934,41 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 															  ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) ? "MJPEG" : ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ? "YUY2" : ( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_RGB24 ) ? "RGB24" : "unkown",
 															  VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ), 1000.0 / ( VIDEOINFOHEADER_AvgTimePerFrame( p_SelAmMediaTypePt ) / 10.0 / 1000.0 ),
 															  VIDEOINFOHEADER_Width( p_SelAmMediaTypePt ), VIDEOINFOHEADER_Height( p_SelAmMediaTypePt ) );
+			
+            //判断视频输入设备帧是否裁剪。
+            if( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth > MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth ) //如果视频输入设备帧的宽度比裁剪宽度大，就表示需要裁剪宽度。
+            {
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop = 1; //设置视频输入设备帧要裁剪。
+
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX = ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth - MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth ) / 2; //设置视频输入设备帧裁剪区域左上角的横坐标，使裁剪区域居中。
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY = 0; //设置视频输入设备帧裁剪区域左上角的纵坐标。
+            }
+            else if( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight > MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight ) //如果视频输入设备帧的高度比裁剪高度大，就表示需要裁剪高度。
+            {
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop = 1; //设置视频输入设备帧要裁剪。
+
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX = 0; //设置视频输入设备帧裁剪区域左上角的横坐标。
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY = ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight - MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight ) / 2; //设置视频输入设备帧裁剪区域左上角的纵坐标，使裁剪区域居中。
+            }
+            else //如果视频输入设备帧的宽度和高度与裁剪宽度和高度一致，就表示不需要裁剪。
+            {
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop = 0; //设置视频输入设备帧不裁剪。
+
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX = 0; //设置视频输入设备帧裁剪区域左上角的横坐标。
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY = 0; //设置视频输入设备帧裁剪区域左上角的纵坐标。
+            }
+            if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备帧是否裁剪：%" PRIi32 "  左上角的横坐标：%" PRIi32 "  纵坐标：%" PRIi32 "  裁剪区域的宽度：%" PRIi32 "  高度：%" PRIi32 "。", MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight );
+
+            //判断视频输入设备帧是否缩放。
+            if( ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth != MediaProcThreadPt->m_VideoInput.m_FrameWidth ) || ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight != MediaProcThreadPt->m_VideoInput.m_FrameHeight ) )
+            {
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsScale = 1; //设置视频输入设备帧要缩放。
+            }
+            else
+            {
+                MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsScale = 0; //设置视频输入设备帧不缩放。
+            }
+            if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备帧是否缩放：%" PRIi32 "。", MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsScale );
 
 			//创建视频输入设备过滤器上选择的引脚和媒体类型对应的解码过滤器，并连接引脚。
 			if( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_MJPG )
@@ -3958,6 +4015,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( MediaProcThreadPt->m_VideoInput.m_FilterGraphManagerPt->ConnectDirect( p_SelPinPt, p_DecFilterInputPinPt, p_SelAmMediaTypePt ) != S_OK ) //如果连接引脚失败。
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：连接视频输入设备过滤器与解码过滤器的引脚失败。" );
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：连接视频输入设备过滤器与解码过滤器的引脚失败。原因：可能是视频输入设备无法正常工作。" );
 				goto outInitVideoInputDevice;
 			}
 
@@ -4014,55 +4072,6 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：设置采样抓取过滤器的回调函数失败。" );
 				goto outInitVideoInputDevice;
 			}
-
-			//判断视频输入设备帧是否裁剪。
-			double p_VideoInputDeviceFrameWidthToHeightRatio = ( double )MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth / ( double )MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight;
-			double p_FrameWidthToHeightRatio = ( double )MediaProcThreadPt->m_VideoInput.m_FrameWidth / ( double )MediaProcThreadPt->m_VideoInput.m_FrameHeight;
-			if( p_VideoInputDeviceFrameWidthToHeightRatio != p_FrameWidthToHeightRatio ) //如果视频输入设备帧的宽高比与指定的宽高比不一致，就表示需要裁剪。
-			{
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop = 1; //设置视频输入设备帧要裁剪。
-
-				if( p_VideoInputDeviceFrameWidthToHeightRatio > p_FrameWidthToHeightRatio ) //如果视频输入设备帧的宽高比与指定的宽高比大，表示需要裁剪宽度。
-				{
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth = p_FrameWidthToHeightRatio * ( double )MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight; //设置视频输入设备帧裁剪区域的宽度，使裁剪区域的宽高比与指定的宽高比一致。
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth -= MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth % 2; //裁剪区域的宽度转为偶数，因为YU12格式必须要偶数。
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight = MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight; //设置视频输入设备帧裁剪区域的高度保持不变。
-
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX = ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth - MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth ) / 2; //设置视频输入设备帧裁剪区域左上角的横坐标，使裁剪区域居中。
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY = 0; //设置视频输入设备帧裁剪区域左上角的纵坐标。
-				}
-				else //如果视频输入设备帧的宽高比与指定的宽高比小，表示需要裁剪高度。
-				{
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth = MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth; //设置视频输入设备帧裁剪区域的宽度保持不变。
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight = ( double )MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth / p_FrameWidthToHeightRatio; //设置视频输入设备帧裁剪区域的高度，使裁剪区域的宽高比与指定的宽高比一致。
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight -= MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight % 2; //裁剪区域的高度转为偶数，因为YU12格式必须要偶数。
-
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX = 0; //设置视频输入设备帧裁剪区域左上角的横坐标。
-					MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY = ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight - MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight ) / 2; //设置视频输入设备帧裁剪区域左上角的纵坐标，使裁剪区域居中。
-				}
-			}
-			else
-			{
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop = 0; //设置视频输入设备帧不裁剪。
-
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth = MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth; //设置视频输入设备帧裁剪区域的宽度保持不变。
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight = MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight; //设置视频输入设备帧裁剪区域的高度保持不变。
-				
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX = 0; //设置视频输入设备帧裁剪区域左上角的横坐标。
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY = 0; //设置视频输入设备帧裁剪区域左上角的纵坐标。
-			}
-			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备帧是否裁剪：%" PRIi32 "  左上角的横坐标：%" PRIi32 "  纵坐标：%" PRIi32 "  裁剪区域的宽度：%" PRIi32 "  高度：%" PRIi32 "。", MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth, MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight );
-
-			//判断视频输入设备帧是否缩放。
-			if( ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth != MediaProcThreadPt->m_VideoInput.m_FrameWidth ) || ( MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight != MediaProcThreadPt->m_VideoInput.m_FrameHeight ) )
-			{
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsScale = 1; //设置视频输入设备帧要缩放。
-			}
-			else
-			{
-				MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsScale = 0; //设置视频输入设备帧不缩放。
-			}
-			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备帧是否缩放：%" PRIi32 "。", MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsScale );
 
 			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：创建并初始化视频输入设备成功。" );
 
@@ -4132,7 +4141,6 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( MediaProcThreadPt->m_VideoInput.m_FrameWidth * MediaProcThreadPt->m_VideoInput.m_FrameHeight >= MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth * MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight ) //如果视频输入帧指定的尺寸大于等于视频输入设备帧的尺寸。
 			{
 				MediaProcThreadPt->m_VideoInput.m_VideoInputResultFrameSz = MediaProcThreadPt->m_VideoInput.m_FrameWidth * MediaProcThreadPt->m_VideoInput.m_FrameHeight * 4; //初始化视频输入结果帧的内存大小。
-				
 			}
 			else //如果视频输入帧指定的尺寸小于视频输入设备帧的尺寸。
 			{
@@ -5283,6 +5291,15 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 		{
 			p_TmpSz1 = MediaProcThreadPt->m_VideoInput.m_FilterGraphManagerPt->Release();
 			MediaProcThreadPt->m_VideoInput.m_FilterGraphManagerPt = NULL;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceMaxSamplingRate = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameWidth = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameHeight = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsCrop = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropX = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropY = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropWidth = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameCropHeight = 0;
+			MediaProcThreadPt->m_VideoInput.m_VideoInputDeviceFrameIsScale = 0;
 			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：销毁视频输入设备成功。" );
 		}
 

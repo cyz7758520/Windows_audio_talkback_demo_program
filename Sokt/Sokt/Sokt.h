@@ -1,14 +1,8 @@
 ﻿#ifndef __SOKT_H__
 #define __SOKT_H__
 
-#include "VarStr.h"
-#include <stdint.h>
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-#include <Ws2tcpip.h>
-#elif( ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+#include "Func.h"
+#if( ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 typedef int SOCKET;
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR (-1)

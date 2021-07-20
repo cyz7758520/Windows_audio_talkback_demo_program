@@ -283,6 +283,22 @@ int __cdecl MyMediaProcThreadUserInit( MediaProcThread * MediaProcThreadPt )
 			{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 			goto out;
 		}
+
+		if( TcpClntSetSendBufSz( g_MediaInfoPt->m_TcpClntSoktPt, 65535, MediaProcThreadPt->m_ErrInfoVarStrPt ) != 0 ) //如果设置已连接的本端TCP协议客户端套接字的发送缓冲区内存大小失败。
+        {
+			VarStrFmtIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "设置已连接的本端TCP协议客户端套接字的发送缓冲区内存大小失败。原因：" );
+			LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+			{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+            goto out;
+        }
+
+		if( TcpClntSetRecvBufSz( g_MediaInfoPt->m_TcpClntSoktPt, 65535, MediaProcThreadPt->m_ErrInfoVarStrPt ) != 0 ) //如果设置已连接的本端TCP协议客户端套接字的接收缓冲区内存大小失败。
+        {
+			VarStrFmtIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "设置已连接的本端TCP协议客户端套接字的接收缓冲区内存大小失败。原因：" );
+			LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+			{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+            goto out;
+        }
 	}
 	else //如果使用UDP协议。
     {
@@ -536,6 +552,22 @@ int __cdecl MyMediaProcThreadUserInit( MediaProcThread * MediaProcThreadPt )
 				UdpClntReRecv:;
             }
 			UdpClntReSend:;
+        }
+		
+		if( UdpSetSendBufSz( g_MediaInfoPt->m_UdpSoktPt, 65535, MediaProcThreadPt->m_ErrInfoVarStrPt ) != 0 ) //如果设置已监听的本端UDP协议套接字的发送缓冲区内存大小失败。
+        {
+			VarStrFmtIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "设置已监听的本端UDP协议套接字的发送缓冲区内存大小失败。原因：" );
+			LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+			{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+            goto out;
+        }
+			
+		if( UdpSetRecvBufSz( g_MediaInfoPt->m_UdpSoktPt, 65535, MediaProcThreadPt->m_ErrInfoVarStrPt ) != 0 ) //如果设置已监听的本端UDP协议套接字的接收缓冲区内存大小失败。
+        {
+			VarStrFmtIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "设置已监听的本端UDP协议套接字的接收缓冲区内存大小失败。原因：" );
+			LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+			{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+            goto out;
         }
     } //协议连接结束。
 
