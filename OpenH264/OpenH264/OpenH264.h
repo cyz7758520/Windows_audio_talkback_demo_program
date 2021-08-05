@@ -50,7 +50,7 @@ __OPENH264_DLLAPI__ int OpenH264EncoderInit( OpenH264Encoder * * OpenH264Encoder
 __OPENH264_DLLAPI__ int OpenH264EncoderSetEncodedBitrate( OpenH264Encoder * OpenH264EncoderPt, int32_t EncodedBitrate, VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264EncoderGetEncodedBitrate( OpenH264Encoder * OpenH264EncoderPt, int32_t * EncodedBitratePt, VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264EncoderProc( OpenH264Encoder * OpenH264EncoderPt,
-											 uint8_t * YU12FramePt, int32_t YU12Width, int32_t YU12Height, uint64_t YU12FrameTimeStamp,
+											 uint8_t * YU12FramePt, int32_t YU12FrameWidth, int32_t YU12FrameHeight, uint64_t YU12FrameTimeStamp,
 											 uint8_t * H264FramePt, size_t H264FrameSz, size_t * H264FrameLenPt,
 											 VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264EncoderDestroy( OpenH264Encoder * OpenH264EncoderPt, VarStr * ErrInfoVarStrPt );
@@ -60,7 +60,7 @@ typedef struct OpenH264Decoder OpenH264Decoder;
 __OPENH264_DLLAPI__ int OpenH264DecoderInit( OpenH264Decoder * * OpenH264DecoderPtPt, int32_t DecodeThreadNum, VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264DecoderProc( OpenH264Decoder * OpenH264DecoderPt,
 											 uint8_t * H264FramePt, size_t H264FrameLen,
-											 uint8_t * YU12FramePt, size_t YU12FrameSz, int32_t * YU12WidthPt, int32_t * YU12HeightPt,
+											 uint8_t * YU12FramePt, size_t YU12FrameSz, int32_t * YU12FrameWidthPt, int32_t * YU12FrameHeightPt,
 											 VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264DecoderDestroy( OpenH264Decoder * OpenH264EncoderPt, VarStr * ErrInfoVarStrPt );
 

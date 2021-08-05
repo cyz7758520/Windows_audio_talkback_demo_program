@@ -3353,7 +3353,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( p_TmpInt321 != MMSYSERR_NOERROR )
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：打开音频输入设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
-				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：打开音频输入设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
+				if( MediaProcThreadPt->m_IsShowToast != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：打开音频输入设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
 				goto out;
 			}
 			for( p_TmpInt322 = 0; p_TmpInt322 < MediaProcThreadPt->m_AudioInput.m_AudioInputWaveHdrTotal; p_TmpInt322++ )
@@ -3553,7 +3553,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( p_TmpInt321 != MMSYSERR_NOERROR )
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：打开音频输出设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
-				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：打开音频输出设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
+				if( MediaProcThreadPt->m_IsShowToast != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：打开音频输出设备失败。原因：%s", FuncGetErrInfo( p_TmpInt321, 'M' ) );
 				goto out;
 			}
 			for( p_TmpInt322 = 0; p_TmpInt322 < MediaProcThreadPt->m_AudioOutput.m_AudioOutputWaveHdrTotal; p_TmpInt322++ )
@@ -3731,7 +3731,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( p_VideoInputDeviceFilterPt == NULL ) //如果创建视频输入设备失败。
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：创建视频输入设备过滤器失败。原因：可能没有视频输入设备。" );
-				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：创建视频输入设备过滤器失败。原因：可能没有视频输入设备。" );
+				if( MediaProcThreadPt->m_IsShowToast != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：创建视频输入设备过滤器失败。原因：可能没有视频输入设备。" );
 				goto outInitVideoInputDevice;
 			}
 			if( MediaProcThreadPt->m_VideoInput.m_FilterGraphManagerPt->AddFilter( p_VideoInputDeviceFilterPt, L"Video Capture" ) != S_OK ) //如果添加视频输入设备过滤器到视频输入过滤器图失败。
@@ -3927,7 +3927,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( p_SelPinPt == NULL || p_SelAmMediaTypePt == NULL )
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：选择视频输入设备过滤器上合适的引脚和媒体类型失败。" );
-				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToast( NULL, 3000, NULL, "媒体处理线程：选择视频输入设备过滤器上合适的引脚和媒体类型失败。" );
+				if( MediaProcThreadPt->m_IsShowToast != 0 ) FuncToast( NULL, 3000, NULL, "媒体处理线程：选择视频输入设备过滤器上合适的引脚和媒体类型失败。" );
 				goto outInitVideoInputDevice;
 			}
 			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：视频输入设备选择的媒体格式：subtype：%s  AvgTimePerFrame：%lld  %.1f  Width：%ld  Height：%ld。",
@@ -4015,7 +4015,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			if( MediaProcThreadPt->m_VideoInput.m_FilterGraphManagerPt->ConnectDirect( p_SelPinPt, p_DecFilterInputPinPt, p_SelAmMediaTypePt ) != S_OK ) //如果连接引脚失败。
 			{
 				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：连接视频输入设备过滤器与解码过滤器的引脚失败。" );
-				if( MediaProcThreadPt->m_IsPrintLog != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：连接视频输入设备过滤器与解码过滤器的引脚失败。原因：可能是视频输入设备无法正常工作。" );
+				if( MediaProcThreadPt->m_IsShowToast != 0 ) FuncToastFmt( NULL, 3000, NULL, "媒体处理线程：连接视频输入设备过滤器与解码过滤器的引脚失败。原因：可能是视频输入设备无法正常工作。" );
 				goto outInitVideoInputDevice;
 			}
 
