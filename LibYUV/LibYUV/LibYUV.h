@@ -50,20 +50,21 @@ __LIBYUV_DLLAPI__ int LibYUVDestroy( LibYUVStruct * LibYUVEncoderPt );
 //图片格式。
 enum PictrFmt
 {
-	PICTR_FMT_BT601F8_NV21,     //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VUVUVUVU……'。libyuv::FOURCC_NV21，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_BT601F8_YV12,     //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VVVV……','UUUU……'。libyuv::FOURCC_YV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_BT601F8_YU12,     //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UUUU……','VVVV……'。libyuv::FOURCC_J420，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_BT601F8_I420,     //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UUUU……','VVVV……'。libyuv::FOURCC_J420，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_SRGBF8_RGB555,    //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
-	PICTR_FMT_SRGBF8_BGR555,    //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB555
-	PICTR_FMT_SRGBF8_RGB565,    //sRGB标准，Full Range，8位，内存排列：'R','G','B'。libyuv::FOURCC_RGBP，WINDOW_FORMAT_RGB_565
-	PICTR_FMT_SRGBF8_BGR565,    //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB565
-	PICTR_FMT_SRGBF8_RGB888,    //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
-	PICTR_FMT_SRGBF8_BGR888,    //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB24
-	PICTR_FMT_SRGBF8_ARGB8888,  //sRGB标准，Full Range，8位，内存排列：'A','R','G','B'。
-	PICTR_FMT_SRGBF8_ABGR8888,  //sRGB标准，Full Range，8位，内存排列：'A','B','G','R'。libyuv::FOURCC_ABGR，WINDOW_FORMAT_RGBA_8888
-	PICTR_FMT_SRGBF8_RGBA8888,  //sRGB标准，Full Range，8位，内存排列：'R','G','B','A'。
-	PICTR_FMT_SRGBF8_BGRA8888   //sRGB标准，Full Range，8位，内存排列：'B','G','R','A'。libyuv::FOURCC_ARGB，MEDIASUBTYPE_RGB32
+	PICTR_FMT_BT601F8_NV12,       //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UVUVUVUV……'。libyuv::FOURCC_NV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PICTR_FMT_BT601F8_NV21,       //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VUVUVUVU……'。libyuv::FOURCC_NV21，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PICTR_FMT_BT601F8_YU12_I420,  //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UUUU……','VVVV……'。libyuv::FOURCC_J420，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PICTR_FMT_BT601F8_YV12,       //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VVVV……','UUUU……'。libyuv::FOURCC_YV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PICTR_FMT_SRGBF8_RGB555,      //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
+	PICTR_FMT_SRGBF8_BGR555,      //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB555
+	PICTR_FMT_SRGBF8_RGB565,      //sRGB标准，Full Range，8位，内存排列：'R','G','B'。libyuv::FOURCC_RGBP，WINDOW_FORMAT_RGB_565
+	PICTR_FMT_SRGBF8_BGR565,      //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB565
+	PICTR_FMT_SRGBF8_RGB888,      //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
+	PICTR_FMT_SRGBF8_BGR888,      //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB24
+	PICTR_FMT_SRGBF8_ARGB8888,    //sRGB标准，Full Range，8位，内存排列：'A','R','G','B'。
+	PICTR_FMT_SRGBF8_ABGR8888,    //sRGB标准，Full Range，8位，内存排列：'A','B','G','R'。libyuv::FOURCC_ABGR，WINDOW_FORMAT_RGBA_8888
+	PICTR_FMT_SRGBF8_RGBA8888,    //sRGB标准，Full Range，8位，内存排列：'R','G','B','A'。
+	PICTR_FMT_SRGBF8_BGRA8888,    //sRGB标准，Full Range，8位，内存排列：'B','G','R','A'。libyuv::FOURCC_ARGB，MEDIASUBTYPE_RGB32
+	PICTR_FMT_UNKOWN = 99         //未知格式。
 };
 
 //旋转角度。
@@ -120,6 +121,17 @@ __LIBYUV_DLLAPI__ int LibYUVPictrScale( const uint8_t * SrcPictrPt, int32_t SrcP
 __LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrt( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										   uint8_t * DstPictrPt, size_t DstPictrSz, size_t * DstPictrLenPt, int32_t DstPictrFmt,
 										   VarStr * ErrInfoVarStrPt );
+__LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrtWithStride( const uint8_t * SrcPictrPlane1Pt, int32_t SrcPictrPlane1Stride,
+													 const uint8_t * SrcPictrPlane2Pt, int32_t SrcPictrPlane2Stride,
+													 const uint8_t * SrcPictrPlane3Pt, int32_t SrcPictrPlane3Stride,
+													 int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+
+													 uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1Sz, int32_t DstPictrPlane1Stride, size_t * DstPictrPlane1LenPt,
+													 uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2Sz, int32_t DstPictrPlane2Stride, size_t * DstPictrPlane2LenPt,
+													 uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3Sz, int32_t DstPictrPlane3Stride, size_t * DstPictrPlane3LenPt,
+													 int32_t DstPictrFmt,
+
+													 VarStr * ErrInfoVarStrPt );
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __LIBYUV_DLLAPI__ int LibYUVPictrDrawToWnd( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 											int32_t CenterOrStretch,

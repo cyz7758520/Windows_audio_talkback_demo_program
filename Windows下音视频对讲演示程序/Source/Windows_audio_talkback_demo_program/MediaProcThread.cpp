@@ -2622,7 +2622,7 @@ public:
 
 		//将BGRA格式视频输入帧转为YU12格式视频输入帧。
 		if( LibYUVPictrFmtCnvrt( m_MediaProcThreadPt->m_VideoInput.m_VideoInputResultFramePt, PICTR_FMT_SRGBF8_BGRA8888, m_MediaProcThreadPt->m_VideoInput.m_FrameWidth, m_MediaProcThreadPt->m_VideoInput.m_FrameHeight,
-								 m_MediaProcThreadPt->m_VideoInput.m_VideoInputFrameElmPt->m_YU12VideoInputFramePt, m_MediaProcThreadPt->m_VideoInput.m_FrameWidth * m_MediaProcThreadPt->m_VideoInput.m_FrameHeight * 3 / 2, NULL, PICTR_FMT_BT601F8_YU12,
+								 m_MediaProcThreadPt->m_VideoInput.m_VideoInputFrameElmPt->m_YU12VideoInputFramePt, m_MediaProcThreadPt->m_VideoInput.m_FrameWidth * m_MediaProcThreadPt->m_VideoInput.m_FrameHeight * 3 / 2, NULL, PICTR_FMT_BT601F8_YU12_I420,
 								 NULL ) == 0 )
 		{
 			if( m_MediaProcThreadPt->m_IsPrintLog != 0 ) LOGI( "视频输入线程：将BGRA格式视频输入帧转为YU12格式视频输入帧成功。" );
@@ -2766,7 +2766,7 @@ DWORD WINAPI VideoOutputThreadRun( MediaProcThread * MediaProcThreadPt )
 		//视频输出显示缩放。
 		if( MediaProcThreadPt->m_VideoOutput.m_VideoOutputDisplayScale != 1.0f )
 		{
-			if( LibYUVPictrScale( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, PICTR_FMT_BT601F8_YU12, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight,
+			if( LibYUVPictrScale( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, PICTR_FMT_BT601F8_YU12_I420, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight,
 								  3,
 								  MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameSz, NULL, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth * MediaProcThreadPt->m_VideoOutput.m_VideoOutputDisplayScale, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight * MediaProcThreadPt->m_VideoOutput.m_VideoOutputDisplayScale,
 								  NULL ) != 0 )
@@ -2781,7 +2781,7 @@ DWORD WINAPI VideoOutputThreadRun( MediaProcThread * MediaProcThreadPt )
 		}
 
 		//将本次YU12格式视频输出帧转为BGRA格式视频输出帧。
-		if( LibYUVPictrFmtCnvrt( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, PICTR_FMT_BT601F8_YU12, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight,
+		if( LibYUVPictrFmtCnvrt( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, PICTR_FMT_BT601F8_YU12_I420, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight,
 								 MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameSz, NULL, PICTR_FMT_SRGBF8_BGRA8888,
 								 NULL ) != 0 )
 		{
