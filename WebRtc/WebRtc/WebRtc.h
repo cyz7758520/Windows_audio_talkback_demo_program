@@ -1,8 +1,7 @@
 ﻿#ifndef __WEBRTC_H__
 #define __WEBRTC_H__
 
-#include "VarStr.h"
-#include <stdint.h>
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"

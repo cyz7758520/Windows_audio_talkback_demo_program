@@ -595,7 +595,7 @@ int __cdecl MyMediaProcThreadUserInit( MediaProcThread * MediaProcThreadPt )
 			}
 			else
 			{
-				VarStrFmtIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "创建并初始化接收视频输出帧链表失败。原因：" );
+				VarStrIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "创建并初始化接收视频输出帧链表失败。原因：" );
 				LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
 				{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 				goto out;
@@ -605,26 +605,26 @@ int __cdecl MyMediaProcThreadUserInit( MediaProcThread * MediaProcThreadPt )
 	    case 1: //如果使用自适应抖动缓冲器。
 	    {
 			//初始化音频自适应抖动缓冲器。
-            if( AAjbInit( &g_MediaInfoPt->m_AAjbPt, MediaProcThreadPt->m_AudioOutput.m_SamplingRate, MediaProcThreadPt->m_AudioOutput.m_FrameLen, 1, 1, 0, g_MediaInfoPt->m_AAjbMinNeedBufFrameCnt, g_MediaInfoPt->m_AAjbMaxNeedBufFrameCnt, g_MediaInfoPt->m_AAjbAdaptSensitivity, 1 ) == 0 )
+            if( AAjbInit( &g_MediaInfoPt->m_AAjbPt, MediaProcThreadPt->m_AudioOutput.m_SamplingRate, MediaProcThreadPt->m_AudioOutput.m_FrameLen, 1, 1, 0, g_MediaInfoPt->m_AAjbMinNeedBufFrameCnt, g_MediaInfoPt->m_AAjbMaxNeedBufFrameCnt, g_MediaInfoPt->m_AAjbAdaptSensitivity, 1, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
             {
                 LOGI( "创建并初始化音频自适应抖动缓冲器成功。" );
             }
             else
             {
-                VarStrFmtCpy( MediaProcThreadPt->m_ErrInfoVarStrPt, "创建并初始化音频自适应抖动缓冲器失败。" );
+                VarStrIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "创建并初始化音频自适应抖动缓冲器失败。原因：" );
 				LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
 				{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 	            goto out;
             }
 
             //初始化视频自适应抖动缓冲器。
-            if( VAjbInit( &g_MediaInfoPt->m_VAjbPt, 1, g_MediaInfoPt->m_VAjbMinNeedBufFrameCnt, g_MediaInfoPt->m_VAjbMaxNeedBufFrameCnt, g_MediaInfoPt->m_VAjbAdaptSensitivity, 1 ) == 0 )
+            if( VAjbInit( &g_MediaInfoPt->m_VAjbPt, 1, g_MediaInfoPt->m_VAjbMinNeedBufFrameCnt, g_MediaInfoPt->m_VAjbMaxNeedBufFrameCnt, g_MediaInfoPt->m_VAjbAdaptSensitivity, 1, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
             {
                 LOGI( "创建并初始化视频自适应抖动缓冲器成功。" );
             }
             else
             {
-                VarStrFmtCpy( MediaProcThreadPt->m_ErrInfoVarStrPt, "创建并初始化视频自适应抖动缓冲器失败。" );
+                VarStrIns( MediaProcThreadPt->m_ErrInfoVarStrPt, 0, "创建并初始化视频自适应抖动缓冲器失败。原因：" );
 				LOGE( MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
 				{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MediaInfoPt->m_MainWindowHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 	            goto out;
@@ -727,12 +727,12 @@ int __cdecl MyMediaProcThreadUserProcess( MediaProcThread * MediaProcThreadPt )
 						{
 							if( p_TmpSz > 1 + 4 ) //如果该音频输出帧为有语音活动。
                             {
-                                AAjbPutOneFrame( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4 );
+                                AAjbPutOneFrame( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, NULL );
                                 LOGFI( "接收一个有语音活动的音频输出帧包，并放入音频自适应抖动缓冲器成功。音频输出帧时间戳：%" PRIu32 "，总长度：%" PRIuPTR "。", p_TmpUint32, p_TmpSz );
                             }
                             else //如果该音频输出帧为无语音活动。
                             {
-								AAjbPutOneFrame( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, 0 );
+								AAjbPutOneFrame( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, 0, NULL );
                                 LOGFI( "接收一个无语音活动的音频输出帧包，并放入音频自适应抖动缓冲器成功。音频输出帧时间戳：%" PRIu32 "，总长度：%" PRIuPTR "。", p_TmpUint32, p_TmpSz );
                             }
 
@@ -742,7 +742,7 @@ int __cdecl MyMediaProcThreadUserProcess( MediaProcThread * MediaProcThreadPt )
 							int32_t p_MinNeedBufFrameCnt; //存放最小需缓冲帧的数量。
 							int32_t p_MaxNeedBufFrameCnt; //存放最大需缓冲帧的数量。
 							int32_t p_CurNeedBufFrameCnt; //存放当前需缓冲帧的数量。
-							AAjbGetBufFrameCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrameCnt, &p_CurHaveBufInactFrameCnt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt );
+							AAjbGetBufFrameCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrameCnt, &p_CurHaveBufInactFrameCnt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt, NULL );
 							LOGFI( "音频自适应抖动缓冲器：有活动帧：%" PRIi32 "，无活动帧：%" PRIi32 "，帧：%" PRIi32 "，最小需帧：%" PRIi32 "，最大需帧：%" PRIi32 "，当前需帧：%" PRIi32 "。", p_CurHaveBufActFrameCnt, p_CurHaveBufInactFrameCnt, p_CurHaveBufFrameCnt, p_MinNeedBufFrameCnt, p_MaxNeedBufFrameCnt, p_CurNeedBufFrameCnt );
 
 							break;
@@ -825,7 +825,7 @@ int __cdecl MyMediaProcThreadUserProcess( MediaProcThread * MediaProcThreadPt )
                         {
 							if( p_TmpSz > 1 + 4 ) //如果该视频输出帧为有图像活动。
                             {
-                                VAjbPutOneFrame( g_MediaInfoPt->m_VAjbPt, g_MediaInfoPt->m_LastPktRecvTime, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4 );
+                                VAjbPutOneFrame( g_MediaInfoPt->m_VAjbPt, g_MediaInfoPt->m_LastPktRecvTime, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, NULL );
                                 LOGFI( "接收一个有图像活动的视频输出帧包，并放入视频自适应抖动缓冲器成功。视频输出帧时间戳：%" PRIu32 "，总长度：%" PRIuPTR "。", p_TmpUint32, p_TmpSz );
                             }
                             else //如果该视频输出帧为无图像活动。
@@ -837,7 +837,7 @@ int __cdecl MyMediaProcThreadUserProcess( MediaProcThread * MediaProcThreadPt )
 							int32_t p_MinNeedBufFrameCnt; //存放最小需缓冲帧的数量。
 							int32_t p_MaxNeedBufFrameCnt; //存放最大需缓冲帧的数量。
 							int32_t p_CurNeedBufFrameCnt; //存放当前需缓冲帧的数量。
-							VAjbGetBufFrameCnt( g_MediaInfoPt->m_VAjbPt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt );
+							VAjbGetBufFrameCnt( g_MediaInfoPt->m_VAjbPt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt, NULL );
 							LOGFI( "视频自适应抖动缓冲器：帧：%" PRIi32 "，最小需帧：%" PRIi32 "，最大需帧：%" PRIi32 "，当前需帧：%" PRIi32 "。", p_CurHaveBufFrameCnt, p_MinNeedBufFrameCnt, p_MaxNeedBufFrameCnt, p_CurNeedBufFrameCnt );
                             break;
                         }
@@ -1081,7 +1081,7 @@ void __cdecl MyMediaProcThreadUserDestroy( MediaProcThread * MediaProcThreadPt )
     //销毁音频自适应抖动缓冲器。
     if( g_MediaInfoPt->m_AAjbPt != NULL )
     {
-        AAjbDestroy( g_MediaInfoPt->m_AAjbPt );
+        AAjbDestroy( g_MediaInfoPt->m_AAjbPt, NULL );
         g_MediaInfoPt->m_AAjbPt = NULL;
 
 		LOGI( "销毁音频自适应抖动缓冲器成功。" );
@@ -1090,7 +1090,7 @@ void __cdecl MyMediaProcThreadUserDestroy( MediaProcThread * MediaProcThreadPt )
     //销毁视频自适应抖动缓冲器。
     if( g_MediaInfoPt->m_VAjbPt != NULL )
     {
-        VAjbDestroy( g_MediaInfoPt->m_VAjbPt );
+        VAjbDestroy( g_MediaInfoPt->m_VAjbPt, NULL );
         g_MediaInfoPt->m_VAjbPt = NULL;
 
 		LOGI( "销毁视频自适应抖动缓冲器成功。" );
@@ -1368,7 +1368,7 @@ void __cdecl MyMediaProcThreadUserWriteAudioOutputFrame( MediaProcThread * Media
 				uint32_t p_AudioOutputFrameTimeStamp; //存放音频输出帧的时间戳。
 
 				//从音频自适应抖动缓冲器取出一个音频输出帧。
-				AAjbGetOneFrame( g_MediaInfoPt->m_AAjbPt, &p_AudioOutputFrameTimeStamp, g_MediaInfoPt->m_TmpByte2Pt, g_MediaInfoPt->m_TmpByte2Sz, &m_TmpSz );
+				AAjbGetOneFrame( g_MediaInfoPt->m_AAjbPt, &p_AudioOutputFrameTimeStamp, g_MediaInfoPt->m_TmpByte2Pt, g_MediaInfoPt->m_TmpByte2Sz, &m_TmpSz, NULL );
 				
 				if( ( m_TmpSz > 0 ) && ( m_TmpSz != SIZE_MAX ) ) //如果音频输出帧为有语音活动。
 				{
@@ -1393,7 +1393,7 @@ void __cdecl MyMediaProcThreadUserWriteAudioOutputFrame( MediaProcThread * Media
 				int32_t p_MinNeedBufFrameCnt; //存放最小需缓冲帧的数量。
 				int32_t p_MaxNeedBufFrameCnt; //存放最大需缓冲帧的数量。
 				int32_t p_CurNeedBufFrameCnt; //存放当前需缓冲帧的数量。
-				AAjbGetBufFrameCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrameCnt, &p_CurHaveBufInactFrameCnt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt );
+				AAjbGetBufFrameCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrameCnt, &p_CurHaveBufInactFrameCnt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt, NULL );
 				LOGFI( "自适应抖动缓冲器：有活动帧：%" PRIi32 "，无活动帧：%" PRIi32 "，帧：%" PRIi32 "，最小需帧：%" PRIi32 "，最大需帧：%" PRIi32 "，当前需帧：%" PRIi32 "。", p_CurHaveBufActFrameCnt, p_CurHaveBufInactFrameCnt, p_CurHaveBufFrameCnt, p_MinNeedBufFrameCnt, p_MaxNeedBufFrameCnt, p_CurNeedBufFrameCnt );
 
 				break;
@@ -1501,7 +1501,7 @@ void __cdecl MyMediaProcThreadUserWriteVideoOutputFrame( MediaProcThread * Media
 			int32_t p_MinNeedBufFrameCnt; //存放最小需缓冲帧的数量。
 			int32_t p_MaxNeedBufFrameCnt; //存放最大需缓冲帧的数量。
 			int32_t p_CurNeedBufFrameCnt; //存放当前需缓冲帧的数量。
-			VAjbGetBufFrameCnt( g_MediaInfoPt->m_VAjbPt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt );
+			VAjbGetBufFrameCnt( g_MediaInfoPt->m_VAjbPt, &p_CurHaveBufFrameCnt, &p_MinNeedBufFrameCnt, &p_MaxNeedBufFrameCnt, &p_CurNeedBufFrameCnt, NULL );
 			
 			if( p_CurHaveBufFrameCnt != 0 ) //如果视频自适应抖动缓冲器不为空。
 			{
@@ -1511,11 +1511,11 @@ void __cdecl MyMediaProcThreadUserWriteVideoOutputFrame( MediaProcThread * Media
 				FuncGetTimeAsMsec( &p_NowTimeMesc );
 				if( MediaProcThreadPt->m_AudioOutput.m_IsUseAudioOutput != 0 && g_MediaInfoPt->m_LastGetAudioOutputFrameIsAct != 0 ) //如果要使用音频输出，且最后一个取出的音频输出帧为有语音活动，就根据最后一个取出的音频输出帧对应视频输出帧的时间戳来取出。
 				{
-					VAjbGetOneFrameWantTimeStamp( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, g_MediaInfoPt->m_LastGetAudioOutputFrameVideoOutputFrameTimeStamp, &p_VideoOutputFrameTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz );
+					VAjbGetOneFrameWantTimeStamp( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, g_MediaInfoPt->m_LastGetAudioOutputFrameVideoOutputFrameTimeStamp, &p_VideoOutputFrameTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz, NULL );
 				}
 				else //如果最后一个取出的音频输出帧为无语音活动，就根据直接取出。
 				{
-					VAjbGetOneFrame( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, &p_VideoOutputFrameTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz );
+					VAjbGetOneFrame( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, &p_VideoOutputFrameTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz, NULL );
 				}
 
 				if( m_TmpSz != 0 ) //如果视频输出帧为有图像活动。

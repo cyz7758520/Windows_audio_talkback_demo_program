@@ -50,7 +50,7 @@ __OPENH264_DLLAPI__ int OpenH264EncoderInit( OpenH264Encoder * * OpenH264Encoder
 __OPENH264_DLLAPI__ int OpenH264EncoderSetEncodedBitrate( OpenH264Encoder * OpenH264EncoderPt, int32_t EncodedBitrate, VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264EncoderGetEncodedBitrate( OpenH264Encoder * OpenH264EncoderPt, int32_t * EncodedBitratePt, VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264EncoderProc( OpenH264Encoder * OpenH264EncoderPt,
-											 uint8_t * YU12FramePt, int32_t YU12FrameWidth, int32_t YU12FrameHeight, uint64_t YU12FrameTimeStamp,
+											 uint8_t * YU12FramePt, int32_t YU12FrameWidth, int32_t YU12FrameHeight, uint64_t YU12FrameTimeStampMs,
 											 uint8_t * H264FramePt, size_t H264FrameSz, size_t * H264FrameLenPt,
 											 VarStr * ErrInfoVarStrPt );
 __OPENH264_DLLAPI__ int OpenH264EncoderDestroy( OpenH264Encoder * OpenH264EncoderPt, VarStr * ErrInfoVarStrPt );

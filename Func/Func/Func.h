@@ -88,6 +88,16 @@ extern "C"
 //交换两个指针变量的值。
 #define SWAPPT( type, pt1, pt2 ) ( pt1 = ( type )( ( size_t )pt1 ^ ( size_t )pt2 ), pt2 = ( type )( ( size_t )pt1 ^ ( size_t )pt2 ), pt1 = ( type )( ( size_t )pt1 ^ ( size_t )pt2 ) )
 
+//计算最大值和最小值。
+#ifndef __cplusplus
+#ifndef max
+#define max( a, b ) ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
+#endif
+#ifndef min
+#define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
+#endif
+#endif
+
 //日期时间函数。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 __FUNC_DLLAPI__ int FuncGetTimeAsSec( uint64_t * SecPt );
@@ -117,8 +127,8 @@ __FUNC_DLLAPI__ int FuncGetFileSzByHdl( HANDLE FileHdl, uint64_t * FileSzPt, Var
 #endif
 
 //音频函数。
-__FUNC_DLLAPI__ int FuncAudioDataInt16ToFlt32( const int16_t * AudioDataInt16Pt, float * AudioDataFlt32Pt, int NumOfSamples, int FltRange );
-__FUNC_DLLAPI__ int FuncAudioDataFlt32ToInt16( const float * AudioDataFlt32Pt, int16_t * AudioDataInt16Pt, int NumOfSamples, int FltRange );
+__FUNC_DLLAPI__ int FuncAudioDataInt16ToFlt32( const int16_t * AudioDataInt16Pt, float * AudioDataFlt32Pt, int SampleCnt, int FltRange, const char * Drct );
+__FUNC_DLLAPI__ int FuncAudioDataFlt32ToInt16( const float * AudioDataFlt32Pt, int16_t * AudioDataInt16Pt, int SampleCnt, int FltRange, const char * Drct );
 
 //字符、字符串函数。
 __FUNC_DLLAPI__ int FuncIsBlank( char Chr );
