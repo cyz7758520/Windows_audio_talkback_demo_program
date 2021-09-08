@@ -1141,7 +1141,7 @@ void __cdecl MyMediaProcThreadUserDestroy( MediaProcThread * MediaProcThreadPt )
 }
 
 //用户定义的读取音视频输入帧函数，在读取到一个音频输入帧或视频输入帧并处理完后回调一次，为0表示成功，为非0表示失败。
-void __cdecl MyMediaProcThreadUserReadAudioVideoInputFrame( MediaProcThread * MediaProcThreadPt, int16_t * PcmAudioInputFramePt, int16_t * PcmAudioResultFramePt, int32_t VoiceActSts, uint8_t * EncoderAudioInputFramePt, size_t EncoderAudioInputFrameLen, int32_t EncoderAudioInputFrameIsNeedTrans, uint8_t * YU12VideoInputFramePt, int32_t YU12VideoInputFrameWidth, int32_t YU12VideoInputFrameHeigth, uint8_t * EncoderVideoInputFramePt, size_t EncoderVideoInputFrameLen )
+void __cdecl MyMediaProcThreadUserReadAudioVideoInputFrame( MediaProcThread * MediaProcThreadPt, int16_t * PcmAudioInputFramePt, int16_t * PcmAudioResultFramePt, int32_t VoiceActSts, uint8_t * EncoderAudioInputFramePt, size_t EncoderAudioInputFrameLen, int32_t EncoderAudioInputFrameIsNeedTrans, uint8_t * YU12VideoInputFramePt, int32_t YU12VideoInputFrameWidth, int32_t YU12VideoInputFrameHeight, uint8_t * EncoderVideoInputFramePt, size_t EncoderVideoInputFrameLen )
 {
     int p_Result = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
 	int p_FramePktLen = 0; //存放输入输出帧数据包的数据长度，单位字节。
@@ -1284,8 +1284,19 @@ void __cdecl MyMediaProcThreadUserReadAudioVideoInputFrame( MediaProcThread * Me
         }
         else //如果要使用YU12格式视频输入帧。
         {
-			memcpy( g_MediaInfoPt->m_TmpBytePt + 1 + 4 + 4, YU12VideoInputFramePt, YU12VideoInputFrameWidth * YU12VideoInputFrameHeigth * 3 / 2 ); //设置视频输入输出帧。
-            p_FramePktLen = 1 + 4 + 4 + YU12VideoInputFrameWidth * YU12VideoInputFrameHeigth * 3 / 2; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 音频输入帧时间戳 + YU12格式视频输入帧。
+			//设置视频输入帧宽度。
+            g_MediaInfoPt->m_TmpBytePt[9] = ( int8_t ) ( YU12VideoInputFrameWidth & 0xFF );
+            g_MediaInfoPt->m_TmpBytePt[10] = ( int8_t ) ( ( YU12VideoInputFrameWidth & 0xFF00 ) >> 8 );
+            g_MediaInfoPt->m_TmpBytePt[11] = ( int8_t ) ( ( YU12VideoInputFrameWidth & 0xFF0000 ) >> 16 );
+            g_MediaInfoPt->m_TmpBytePt[12] = ( int8_t ) ( ( YU12VideoInputFrameWidth & 0xFF000000 ) >> 24 );
+            //设置视频输入帧高度。
+            g_MediaInfoPt->m_TmpBytePt[13] = ( int8_t ) ( YU12VideoInputFrameHeight & 0xFF );
+            g_MediaInfoPt->m_TmpBytePt[14] = ( int8_t ) ( ( YU12VideoInputFrameHeight & 0xFF00 ) >> 8 );
+            g_MediaInfoPt->m_TmpBytePt[15] = ( int8_t ) ( ( YU12VideoInputFrameHeight & 0xFF0000 ) >> 16 );
+            g_MediaInfoPt->m_TmpBytePt[16] = ( int8_t ) ( ( YU12VideoInputFrameHeight & 0xFF000000 ) >> 24 );
+
+			memcpy( g_MediaInfoPt->m_TmpBytePt + 1 + 4 + 4 + 4 + 4, YU12VideoInputFramePt, YU12VideoInputFrameWidth * YU12VideoInputFrameHeight * 3 / 2 ); //设置视频输入输出帧。
+            p_FramePktLen = 1 + 4 + 4 + 4 + 4 + YU12VideoInputFrameWidth * YU12VideoInputFrameHeight * 3 / 2; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 音频输入帧时间戳 + 视频输入帧宽度 + 视频输入帧高度 + YU12格式视频输入帧。
         }
 
         //发送视频输入帧数据包。
@@ -1466,7 +1477,7 @@ void __cdecl MyMediaProcThreadUserGetPcmAudioOutputFrame( MediaProcThread * Medi
 }
 
 //用户定义的写入视频输出帧函数，在可以显示一个视频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在视频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音视频输出帧不同步。
-void __cdecl MyMediaProcThreadUserWriteVideoOutputFrame( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, uint8_t * EncoderVideoOutputFramePt, size_t * EncoderVideoOutputFrameLenPt )
+void __cdecl MyMediaProcThreadUserWriteVideoOutputFrame( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, int32_t * YU12VideoOutputFrameWidthPt, int32_t * YU12VideoOutputFrameHeightPt, uint8_t * EncoderVideoOutputFramePt, size_t * EncoderVideoOutputFrameLenPt )
 {
 	uint32_t p_VideoOutputFrameTimeStamp;
     uint32_t p_VideoOutputFrameAudioOutputFrameTimeStamp;
@@ -1539,15 +1550,19 @@ void __cdecl MyMediaProcThreadUserWriteVideoOutputFrame( MediaProcThread * Media
 
         if( YU12VideoOutputFramePt != NULL ) //如果要使用YU12格式视频输出帧。
         {
-            if( m_TmpSz - 4 != *EncoderVideoOutputFrameLenPt )
+			*YU12VideoOutputFrameWidthPt = ( g_MediaInfoPt->m_TmpByte3Pt[4] & 0xFF ) + ( ( g_MediaInfoPt->m_TmpByte3Pt[5] & 0xFF ) << 8 ) + ( ( g_MediaInfoPt->m_TmpByte3Pt[6] & 0xFF ) << 16 ) + ( ( g_MediaInfoPt->m_TmpByte3Pt[7] & 0xFF ) << 24 );
+			*YU12VideoOutputFrameHeightPt = ( g_MediaInfoPt->m_TmpByte3Pt[8] & 0xFF ) + ( ( g_MediaInfoPt->m_TmpByte3Pt[9] & 0xFF ) << 8 ) + ( ( g_MediaInfoPt->m_TmpByte3Pt[10] & 0xFF ) << 16 ) + ( ( g_MediaInfoPt->m_TmpByte3Pt[11] & 0xFF ) << 24 );
+
+            if( m_TmpSz - 4 - 4 - 4 != *YU12VideoOutputFrameWidthPt * *YU12VideoOutputFrameHeightPt * 3 / 2 )
             {
-                memset( YU12VideoOutputFramePt, 0, *EncoderVideoOutputFrameLenPt );
-                LOGFE( "视频输出帧的数据长度不等于YU12格式的数据长度。视频输出帧：%" PRIuPTR "，YU12格式：%" PRIi32"。", m_TmpSz - 4, *EncoderVideoOutputFrameLenPt );
-                return;
+                LOGFE( "视频输出帧的数据长度不等于YU12格式的数据长度。视频输出帧：%" PRIuPTR "，YU12格式：%" PRIi32"。", m_TmpSz - 4 - 4 - 4, *EncoderVideoOutputFrameLenPt );
+				*YU12VideoOutputFrameWidthPt = 0;
+				*YU12VideoOutputFrameHeightPt = 0;
+				return;
             }
 
             //写入YU12格式视频输出帧。
-			memcpy( YU12VideoOutputFramePt, g_MediaInfoPt->m_TmpByte3Pt + 4, m_TmpSz - 4 );
+			memcpy( YU12VideoOutputFramePt, g_MediaInfoPt->m_TmpByte3Pt + 4 + 4 + 4, m_TmpSz - 4 - 4 - 4 );
         }
         else //如果要使用已编码格式视频输出帧。
         {
@@ -1577,7 +1592,7 @@ void __cdecl MyMediaProcThreadUserWriteVideoOutputFrame( MediaProcThread * Media
 }
 
 //用户定义的获取YU12格式视频输出帧函数，在解码完一个已编码视频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在视频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音视频输出帧不同步。
-void __cdecl MyMediaProcThreadUserGetYU12VideoOutputFrame( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, int32_t YU12VideoOutputFrameWidth, int32_t YU12VideoOutputFrameHeigth )
+void __cdecl MyMediaProcThreadUserGetYU12VideoOutputFrame( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, int32_t YU12VideoOutputFrameWidth, int32_t YU12VideoOutputFrameHeight )
 {
 	
 }

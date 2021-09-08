@@ -2718,33 +2718,37 @@ DWORD WINAPI VideoOutputThreadRun( MediaProcThread * MediaProcThreadPt )
 			case 0: //如果使用YU12原始数据。
 			{
 				//调用用户定义的写入视频输出帧函数。
+				MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth = 0;
+				MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight = 0;
 				MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen = MediaProcThreadPt->m_VideoOutput.m_FrameWidth * MediaProcThreadPt->m_VideoOutput.m_FrameHeight * 3 / 2;
-				MediaProcThreadPt->m_UserWriteVideoOutputFrameFuncPt( MediaProcThreadPt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, NULL, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen );
+				MediaProcThreadPt->m_UserWriteVideoOutputFrameFuncPt( MediaProcThreadPt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight, NULL, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen );
 				
-				if( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen == MediaProcThreadPt->m_VideoOutput.m_FrameWidth * MediaProcThreadPt->m_VideoOutput.m_FrameHeight * 3 / 2 )
-				{
-					MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth = MediaProcThreadPt->m_VideoOutput.m_FrameWidth;
-					MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight = MediaProcThreadPt->m_VideoOutput.m_FrameHeight;
-				}
-				else
-				{
-					if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "视频输出线程：YU12格式视频输出帧的数据长度不正确，本次视频输出帧丢弃。" );
-					goto skip;
-				}
+				if( ( MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth > 0 ) && ( MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight > 0 ) ) //如果本次写入了视频输出帧。
+                {
+                    if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "视频输出线程：使用YU12原始数据成功。YU12格式帧宽度：%" PRId32 "，YU12格式帧高度：%" PRId32 "。", MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight );
+                }
+                else //如果本次没写入视频输出帧。
+                {
+                    goto skip;
+                }
 				break;
 			}
 			case 1: //如果使用OpenH264解码器。
 			{
 				//调用用户定义的写入视频输出帧函数。
 				MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen = MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameSz;
-				MediaProcThreadPt->m_UserWriteVideoOutputFrameFuncPt( MediaProcThreadPt, NULL, MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen );
+				MediaProcThreadPt->m_UserWriteVideoOutputFrameFuncPt( MediaProcThreadPt, NULL, NULL, NULL, MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen );
 
-				if( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen != 0 )
+				if( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen > 0 ) //如果本次写入了视频输出帧。
 				{
 					//使用OpenH264解码器。
-					if( OpenH264DecoderProc( MediaProcThreadPt->m_VideoOutput.m_OpenH264DecoderPt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameSz, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight, NULL ) == 0 )
+					if( OpenH264DecoderProc( MediaProcThreadPt->m_VideoOutput.m_OpenH264DecoderPt,
+											 MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameLen,
+											 MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameSz, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, &MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight,
+											 NULL ) == 0 )
 					{
-						if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "视频输出线程：使用OpenH264解码器成功。" );
+						if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "视频输出线程：使用OpenH264解码器成功。已解码YU12格式帧宽度：%" PRId32 "，已解码YU12格式帧高度：%" PRId32 "。", MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight );
+                        if( ( MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth == 0 ) || ( MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight == 0 ) ) goto skip; //如果未解码出YU12格式帧，就把本次视频输出帧丢弃。
 					}
 					else
 					{
@@ -2762,8 +2766,16 @@ DWORD WINAPI VideoOutputThreadRun( MediaProcThread * MediaProcThreadPt )
 
 		//用户定义的获取YU12格式视频输出帧函数。
 		MediaProcThreadPt->m_UserGetYU12VideoOutputFrameFuncPt( MediaProcThreadPt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight );
+		
+        //判断视频输出设备是否黑屏。在视频处理完后再设置黑屏，这样可以保证视频处理器的连续性。
+        if( MediaProcThreadPt->m_VideoOutput.m_VideoOutputIsBlack != 0 )
+        {
+            int p_TmpLen = MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth * MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight;
+            memset( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, 0, p_TmpLen );
+            memset( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt + p_TmpLen, 128, p_TmpLen / 2 );
+        }
 
-		//视频输出显示缩放。
+		//缩放视频输出帧。
 		if( MediaProcThreadPt->m_VideoOutput.m_VideoOutputDisplayScale != 1.0f )
 		{
 			if( LibYUVPictrScale( MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt, PICTR_FMT_BT601F8_YU12_I420, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight,
@@ -2771,7 +2783,7 @@ DWORD WINAPI VideoOutputThreadRun( MediaProcThread * MediaProcThreadPt )
 								  MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt, MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFrameSz, NULL, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameWidth * MediaProcThreadPt->m_VideoOutput.m_VideoOutputDisplayScale, MediaProcThreadPt->m_VideoOutput.m_VideoOutputFrameHeight * MediaProcThreadPt->m_VideoOutput.m_VideoOutputDisplayScale,
 								  NULL ) != 0 )
 			{
-				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGE( "视频输出线程：视频输出显示缩放失败，本次视频输出帧丢弃。" );
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGE( "视频输出线程：缩放视频输出帧失败，本次视频输出帧丢弃。" );
 				goto skip;
 			}
 			MediaProcThreadPt->m_VideoOutput.m_VideoOutputSwapFramePt = MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt; MediaProcThreadPt->m_VideoOutput.m_VideoOutputResultFramePt = MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt; MediaProcThreadPt->m_VideoOutput.m_VideoOutputTmpFramePt = MediaProcThreadPt->m_VideoOutput.m_VideoOutputSwapFramePt; //交换视频结果帧和视频临时帧。

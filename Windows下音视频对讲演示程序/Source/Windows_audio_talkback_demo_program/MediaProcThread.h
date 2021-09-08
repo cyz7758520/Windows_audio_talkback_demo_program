@@ -23,16 +23,24 @@ typedef struct IMediaControl IMediaControl;
 typedef struct IMediaEventEx IMediaEventEx;
 typedef struct IBaseFilter IBaseFilter;
 typedef class VideoInputThread VideoInputThread;
-
 typedef struct MediaProcThread MediaProcThread;
+
 typedef int( __cdecl *USER_INIT_FUNC_PT )( MediaProcThread * MediaProcThreadPt );
+
 typedef int( __cdecl *USER_PROCESS_FUNC_PT )( MediaProcThread * MediaProcThreadPt );
+
 typedef void( __cdecl *USER_DESTROY_FUNC_PT )( MediaProcThread * MediaProcThreadPt );
-typedef void( __cdecl *USER_READ_AUDIO_VIDEO_INPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, int16_t * PcmAudioInputFramePt, int16_t * PcmAudioResultFramePt, int32_t VoiceActSts, uint8_t * EncoderAudioInputFramePt, size_t EncoderAudioInputFrameLen, int32_t EncoderAudioInputFrameIsNeedTrans, uint8_t * YU12VideoInputFramePt, int32_t YU12VideoInputFrameWidth, int32_t YU12VideoInputFrameHeigth, uint8_t * EncoderVideoInputFramePt, size_t EncoderVideoInputFrameLen );
+
+typedef void( __cdecl *USER_READ_AUDIO_VIDEO_INPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, int16_t * PcmAudioInputFramePt, int16_t * PcmAudioResultFramePt, int32_t VoiceActSts, uint8_t * EncoderAudioInputFramePt, size_t EncoderAudioInputFrameLen, int32_t EncoderAudioInputFrameIsNeedTrans,
+																	uint8_t * YU12VideoInputFramePt, int32_t YU12VideoInputFrameWidth, int32_t YU12VideoInputFrameHeight, uint8_t * EncoderVideoInputFramePt, size_t EncoderVideoInputFrameLen );
+
 typedef void( __cdecl *USER_WRITE_AUDIO_OUTPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, int16_t * PcmAudioOutputFramePt, uint8_t * EncoderAudioOutputFramePt, size_t * AudioOutputFrameLenPt );
+
 typedef void( __cdecl *USER_GET_PCM_AUDIO_OUTPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, int16_t * PcmAudioOutputFramePt, size_t PcmAudioOutputFrameLen );
-typedef void( __cdecl *USER_WRITE_VIDEO_OUTPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, uint8_t * EncoderVideoOutputFramePt, size_t * VideoOutputFrameLenPt );
-typedef void( __cdecl *USER_GET_YU12_VIDEO_OUTPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, int32_t YU12VideoOutputFrameWidth, int32_t YU12VideoOutputFrameHeigth );
+
+typedef void( __cdecl *USER_WRITE_VIDEO_OUTPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, int32_t * YU12VideoOutputFrameWidthPt, int32_t * YU12VideoOutputFrameHeightPt, uint8_t * EncoderVideoOutputFramePt, size_t * VideoOutputFrameLenPt );
+
+typedef void( __cdecl *USER_GET_YU12_VIDEO_OUTPUT_FRAME_FUNC_PT )( MediaProcThread * MediaProcThreadPt, uint8_t * YU12VideoOutputFramePt, int32_t YU12VideoOutputFrameWidth, int32_t YU12VideoOutputFrameHeight );
 
 //媒体处理线程。
 typedef struct MediaProcThread
@@ -321,15 +329,34 @@ typedef struct MediaProcThread
 
 	VarStr * m_ErrInfoVarStrPt; //存放错误信息动态字符串的内存指针。
 
-	void * m_UserDataPt; //存放用户数据的内存指针。
-	USER_INIT_FUNC_PT m_UserInitFuncPt; //用户定义的初始化函数，在本线程刚启动时回调一次，返回值表示是否成功，为0表示成功，为非0表示失败。
-	USER_PROCESS_FUNC_PT m_UserProcessFuncPt; //用户定义的处理函数，在本线程运行时每隔1毫秒就回调一次，返回值表示是否成功，为0表示成功，为非0表示失败。
-	USER_DESTROY_FUNC_PT m_UserDestroyFuncPt; //用户定义的销毁函数，在本线程退出时回调一次。
-	USER_READ_AUDIO_VIDEO_INPUT_FRAME_FUNC_PT m_UserReadAudioVideoInputFrameFuncPt; //用户定义的读取音视频输入帧函数，在读取到一个音频输入帧或视频输入帧并处理完后回调一次，为0表示成功，为非0表示失败。
-	USER_WRITE_AUDIO_OUTPUT_FRAME_FUNC_PT m_UserWriteAudioOutputFrameFuncPt; //用户定义的写入音频输出帧函数，在需要写入一个音频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。
-	USER_GET_PCM_AUDIO_OUTPUT_FRAME_FUNC_PT m_UserGetPcmAudioOutputFrameFuncPt; //用户定义的获取PCM格式音频输出帧函数，在解码完一个已编码音频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。
-	USER_WRITE_VIDEO_OUTPUT_FRAME_FUNC_PT m_UserWriteVideoOutputFrameFuncPt; //用户定义的写入视频输出帧函数，在可以显示一个视频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在视频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音视频输出帧不同步。
-	USER_GET_YU12_VIDEO_OUTPUT_FRAME_FUNC_PT m_UserGetYU12VideoOutputFrameFuncPt; //用户定义的获取YU12格式视频输出帧函数，在解码完一个已编码视频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在视频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音视频输出帧不同步。
+	//用户定义的相关回调函数。
+
+	//存放用户数据的内存指针。
+	void * m_UserDataPt;
+	
+	//用户定义的初始化函数，在本线程刚启动时回调一次，返回值表示是否成功，为0表示成功，为非0表示失败。
+	USER_INIT_FUNC_PT m_UserInitFuncPt;
+
+	//用户定义的处理函数，在本线程运行时每隔1毫秒就回调一次，返回值表示是否成功，为0表示成功，为非0表示失败。
+	USER_PROCESS_FUNC_PT m_UserProcessFuncPt;
+
+	//用户定义的销毁函数，在本线程退出时回调一次。
+	USER_DESTROY_FUNC_PT m_UserDestroyFuncPt;
+
+	//用户定义的读取音视频输入帧函数，在读取到一个音频输入帧或视频输入帧并处理完后回调一次，为0表示成功，为非0表示失败。
+	USER_READ_AUDIO_VIDEO_INPUT_FRAME_FUNC_PT m_UserReadAudioVideoInputFrameFuncPt;
+
+	//用户定义的写入音频输出帧函数，在需要写入一个音频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。
+	USER_WRITE_AUDIO_OUTPUT_FRAME_FUNC_PT m_UserWriteAudioOutputFrameFuncPt;
+
+	//用户定义的获取PCM格式音频输出帧函数，在解码完一个已编码音频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。
+	USER_GET_PCM_AUDIO_OUTPUT_FRAME_FUNC_PT m_UserGetPcmAudioOutputFrameFuncPt;
+
+	//用户定义的写入视频输出帧函数，在可以显示一个视频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在视频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音视频输出帧不同步。
+	USER_WRITE_VIDEO_OUTPUT_FRAME_FUNC_PT m_UserWriteVideoOutputFrameFuncPt;
+
+	//用户定义的获取YU12格式视频输出帧函数，在解码完一个已编码视频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在视频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音视频输出帧不同步。
+	USER_GET_YU12_VIDEO_OUTPUT_FRAME_FUNC_PT m_UserGetYU12VideoOutputFrameFuncPt;
 }MediaProcThread;
 
 int MediaProcThreadInit( MediaProcThread * * MediaProcThreadPtPt, void * UserDataPt,

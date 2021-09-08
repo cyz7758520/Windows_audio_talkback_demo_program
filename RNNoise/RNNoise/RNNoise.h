@@ -1,7 +1,7 @@
 ﻿#ifndef __RNNOISE_H__
 #define __RNNOISE_H__
 
-#include <stdint.h>
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
