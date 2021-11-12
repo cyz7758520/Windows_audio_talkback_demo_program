@@ -1,13 +1,7 @@
-﻿#ifndef __SPEEX_H__
+﻿#include "Func.h"
+
+#ifndef __SPEEX_H__
 #define __SPEEX_H__
-
-#include <stdint.h>
-#include <stddef.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 //Speex项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_SPEEX__ ) //如果正在编译Speex项目。
@@ -42,6 +36,11 @@ extern "C"
 	#else //如果正在使用未知编译器。
 		#define __SPEEX_DLLAPI__
 	#endif
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
 typedef struct SpeexEncoder SpeexEncoder;

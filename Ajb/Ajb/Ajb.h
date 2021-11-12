@@ -1,12 +1,7 @@
-﻿#ifndef __AJB_H__
+﻿#include "Func.h"
+
+#ifndef __AJB_H__
 #define __AJB_H__
-
-#include "Func.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 //Ajb项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_AJB__ ) //如果正在编译Ajb项目。
@@ -42,36 +37,108 @@ extern "C"
 		#define __AJB_DLLAPI__
 	#endif
 #endif
+	
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 typedef struct AAjb AAjb;
 
-__AJB_DLLAPI__ int AAjbInit( AAjb * * AAjbPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, int32_t IsUseMutexLock, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbInit( AAjb * * AAjbPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int AAjbPutOneFrame( AAjb * AAjbPt, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen, VarStr * ErrInfoVarStrPt );
-__AJB_DLLAPI__ int AAjbGetOneFrame( AAjb * AAjbPt, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbLock( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbUnlock( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int AAjbGetBufFrameCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFrameCntPt, int32_t * CurHaveBufInactFrameCntPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbPutOneFrame( AAjb * AAjbPt, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbGetOneFrame( AAjb * AAjbPt, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int AAjbClear( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbGetBufFrameCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFrameCntPt, int32_t * CurHaveBufInactFrameCntPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+
+__AJB_DLLAPI__ int AAjbClear( AAjb * AAjbPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
 __AJB_DLLAPI__ int AAjbDestroy( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
 
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+class AAjbCls
+{
+public:
+	AAjb * m_AAjbPt;
+
+	AAjbCls() { m_AAjbPt = NULL; }
+	~AAjbCls() { Destroy( NULL ); }
+
+	int Init( int32_t SamplingRate, int32_t FrameLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt ) { return AAjbInit( &m_AAjbPt, SamplingRate, FrameLen, IsHaveTimeStamp, TimeStampStep, InactIsContPut, MinNeedBufFrameCnt, MaxNeedBufFrameCnt, AdaptSensitivity, ErrInfoVarStrPt ); }
+	
+	int Lock( VarStr * ErrInfoVarStrPt ) { return AAjbLock( m_AAjbPt, ErrInfoVarStrPt ); }
+	int Unlock( VarStr * ErrInfoVarStrPt ) { return AAjbUnlock( m_AAjbPt, ErrInfoVarStrPt ); }
+	
+	int PutOneFrame( uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbPutOneFrame( m_AAjbPt, TimeStamp, FramePt, FrameLen, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int GetOneFrame( uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbGetOneFrame( m_AAjbPt, TimeStampPt, FramePt, FrameSz, FrameLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+
+	int GetBufFrameCnt( int32_t * CurHaveBufActFrameCntPt, int32_t * CurHaveBufInactFrameCntPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbGetBufFrameCnt( m_AAjbPt, CurHaveBufActFrameCntPt, CurHaveBufInactFrameCntPt, CurHaveBufFrameCntPt, MinNeedBufFrameCntPt, MaxNeedBufFrameCntPt, CurNeedBufFrameCntPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+
+	int Clear( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbClear( m_AAjbPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+
+	int Destroy( VarStr * ErrInfoVarStrPt ) { int p_Result = AAjbDestroy( m_AAjbPt, ErrInfoVarStrPt ); m_AAjbPt = NULL; return p_Result; }
+};
+#endif
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef struct VAjb VAjb;
 
-__AJB_DLLAPI__ int VAjbInit( VAjb * * VAjbPtPt, int32_t IsHaveTimeStamp, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, int32_t IsUseMutexLock, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbInit( VAjb * * VAjbPtPt, int32_t IsHaveTimeStamp, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int VAjbPutOneFrame( VAjb * VAjbPt, uint64_t CurTime, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen, VarStr * ErrInfoVarStrPt );
-__AJB_DLLAPI__ int VAjbGetOneFrame( VAjb * VAjbPt, uint64_t CurTime, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, VarStr * ErrInfoVarStrPt );
-__AJB_DLLAPI__ int VAjbGetOneFrameWantTimeStamp( VAjb * VAjbPt, uint64_t CurTime, uint32_t WantTimeStamp, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbLock( VAjb * VAjbPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbUnlock( VAjb * VAjbPt, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int VAjbGetBufFrameCnt( VAjb * VAjbPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbPutOneFrame( VAjb * VAjbPt, uint64_t CurTime, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbGetOneFrame( VAjb * VAjbPt, uint64_t CurTime, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbGetOneFrameWantTimeStamp( VAjb * VAjbPt, uint64_t CurTime, uint32_t WantTimeStamp, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int VAjbClear( VAjb * VAjbPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbGetBufFrameCnt( VAjb * VAjbPt, int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+
+__AJB_DLLAPI__ int VAjbClear( VAjb * VAjbPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
 __AJB_DLLAPI__ int VAjbDestroy( VAjb * VAjbPt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __cplusplus
+class VAjbCls
+{
+public:
+	VAjb * m_VAjbPt;
+
+	VAjbCls() { m_VAjbPt = NULL; }
+	~VAjbCls() { Destroy( NULL ); }
+
+	int Init( int32_t IsHaveTimeStamp, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt ) { return VAjbInit( &m_VAjbPt, IsHaveTimeStamp, MinNeedBufFrameCnt, MaxNeedBufFrameCnt, AdaptSensitivity, ErrInfoVarStrPt ); }
+	
+	int Lock( VarStr * ErrInfoVarStrPt ) { return VAjbLock( m_VAjbPt, ErrInfoVarStrPt ); }
+	int Unlock( VarStr * ErrInfoVarStrPt ) { return VAjbUnlock( m_VAjbPt, ErrInfoVarStrPt ); }
+	
+	int PutOneFrame( uint64_t CurTime, uint32_t TimeStamp, const int8_t * FramePt, size_t FrameLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VAjbPutOneFrame( m_VAjbPt, CurTime, TimeStamp, FramePt, FrameLen, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int GetOneFrame( uint64_t CurTime, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VAjbGetOneFrame( m_VAjbPt, CurTime, TimeStampPt, FramePt, FrameSz, FrameLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int GetOneFrameWantTimeStamp( uint64_t CurTime, uint32_t WantTimeStamp, uint32_t * TimeStampPt, int8_t * FramePt, size_t FrameSz, size_t * FrameLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VAjbGetOneFrameWantTimeStamp( m_VAjbPt, CurTime, WantTimeStamp, TimeStampPt, FramePt, FrameSz, FrameLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+
+	int GetBufFrameCnt( int32_t * CurHaveBufFrameCntPt, int32_t * MinNeedBufFrameCntPt, int32_t * MaxNeedBufFrameCntPt, int32_t * CurNeedBufFrameCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VAjbGetBufFrameCnt( m_VAjbPt, CurHaveBufFrameCntPt, MinNeedBufFrameCntPt, MaxNeedBufFrameCntPt, CurNeedBufFrameCntPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+
+	int Clear( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VAjbClear( m_VAjbPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+
+	int Destroy( VarStr * ErrInfoVarStrPt ) { int p_Result = VAjbDestroy( m_VAjbPt, ErrInfoVarStrPt ); m_VAjbPt = NULL; return p_Result; }
+};
 #endif
 
 #endif

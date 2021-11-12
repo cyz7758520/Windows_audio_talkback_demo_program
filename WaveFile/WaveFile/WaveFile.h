@@ -1,7 +1,7 @@
-﻿#ifndef __WAVEFILE_H__
-#define __WAVEFILE_H__
+﻿#include "Func.h"
 
-#include <stdint.h>
+#ifndef __WAVEFILE_H__
+#define __WAVEFILE_H__
 
 #ifdef __cplusplus
 extern "C"

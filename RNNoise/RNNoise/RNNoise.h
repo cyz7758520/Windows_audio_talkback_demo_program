@@ -45,7 +45,7 @@ extern "C"
 
 typedef struct RNNoise RNNoise;
 
-__RNNOISE_DLLAPI__ int RNNoiseInit( RNNoise * * RNNoisePtPt, int32_t SamplingRate, int32_t FrameLen );
+__RNNOISE_DLLAPI__ int RNNoiseInit( RNNoise * * RNNoisePtPt, int32_t SamplingRate, int32_t FrameLen, VarStr * ErrInfoVarStrPt );
 __RNNOISE_DLLAPI__ int RNNoiseProc( RNNoise * RNNoisePt, int16_t * FramePt, int16_t * ResultFramePt );
 __RNNOISE_DLLAPI__ int RNNoiseDestroy( RNNoise * RNNoisePt );
 

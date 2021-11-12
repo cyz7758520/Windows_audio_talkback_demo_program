@@ -1,47 +1,47 @@
+ï»¿#include "Func.h"
+
 #ifndef __MAP_H__
 #define __MAP_H__
 
-#include "VarStr.h"
-
-#define MAP_BUF_AUTO_ADJ_METH_FREERATIO        1      //»º³åÇø×Ô¶¯µ÷Õû·½Ê½Îª°´¿ÕÏĞ±ÈÂÊ£¬×Ô¶¯µ÷Õû²ÎÊıÎª¿ÕÏĞÔªËØµÄ±ÈÂÊ¡£
-#define MAP_BUF_AUTO_ADJ_METH_FREENUMBER       2      //»º³åÇø×Ô¶¯µ÷Õû·½Ê½Îª°´¿ÕÏĞ¸öÊı£¬×Ô¶¯µ÷Õû²ÎÊıÎª¿ÕÏĞÔªËØµÄ¸öÊı¡£
+#define MAP_BUF_AUTO_ADJ_METH_FREERATIO        1      //ç¼“å†²åŒºè‡ªåŠ¨è°ƒæ•´æ–¹å¼ä¸ºæŒ‰ç©ºé—²æ¯”ç‡ï¼Œè‡ªåŠ¨è°ƒæ•´å‚æ•°ä¸ºç©ºé—²å…ƒç´ çš„æ¯”ç‡ã€‚
+#define MAP_BUF_AUTO_ADJ_METH_FREENUMBER       2      //ç¼“å†²åŒºè‡ªåŠ¨è°ƒæ•´æ–¹å¼ä¸ºæŒ‰ç©ºé—²ä¸ªæ•°ï¼Œè‡ªåŠ¨è°ƒæ•´å‚æ•°ä¸ºç©ºé—²å…ƒç´ çš„ä¸ªæ•°ã€‚
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-//DataStructÏîÄ¿µÄDLL¶¯Ì¬¿âÎÄ¼şµ¼Èëµ¼³ö·ûºÅºê¡£
-#if( defined __NAME_DATASTRUCT__ ) //Èç¹ûÕıÔÚ±àÒëDataStructÏîÄ¿¡£
-	#if( ( defined __MS_VCXX__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃMS VC++±àÒëÆ÷¡£
-		#if( defined __COMLIB__ ) //Èç¹ûÕıÔÚ±àÒëLIB¾²Ì¬¿âÎÄ¼ş¡£
+//DataStructé¡¹ç›®çš„DLLåŠ¨æ€åº“æ–‡ä»¶å¯¼å…¥å¯¼å‡ºç¬¦å·å®ã€‚
+#if( defined __NAME_DATASTRUCT__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘DataStructé¡¹ç›®ã€‚
+	#if( ( defined __MS_VCXX__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨MS VC++ç¼–è¯‘å™¨ã€‚
+		#if( defined __COMLIB__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘LIBé™æ€åº“æ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__
-		#elif( defined __COMDLL__ ) //Èç¹ûÕıÔÚ±àÒëDLL¶¯Ì¬¿âÎÄ¼ş¡£
+		#elif( defined __COMDLL__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘DLLåŠ¨æ€åº“æ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__ __declspec( dllexport )
-		#elif( defined __COMEXE__ ) //Èç¹ûÕıÔÚ±àÒëEXE¿ÉÖ´ĞĞÎÄ¼ş¡£
+		#elif( defined __COMEXE__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘EXEå¯æ‰§è¡Œæ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃCygwin GCC/G++¡¢Linux GCC/G++¡¢Android GCC/G++¡¢KEIL ARMCLANG/ARMCC±àÒëÆ÷¡£
-		#if( defined __COMLIB__ ) //Èç¹ûÕıÔÚ±àÒëLIB¾²Ì¬¿âÎÄ¼ş¡£
+	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨Cygwin GCC/G++ã€Linux GCC/G++ã€Android GCC/G++ã€KEIL ARMCLANG/ARMCCç¼–è¯‘å™¨ã€‚
+		#if( defined __COMLIB__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘LIBé™æ€åº“æ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__
-		#elif( defined __COMDLL__ ) //Èç¹ûÕıÔÚ±àÒëDLL¶¯Ì¬¿âÎÄ¼ş¡£
+		#elif( defined __COMDLL__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘DLLåŠ¨æ€åº“æ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__ __attribute__( ( visibility( "default" ) ) )
-		#elif( defined __COMEXE__ ) //Èç¹ûÕıÔÚ±àÒëEXE¿ÉÖ´ĞĞÎÄ¼ş¡£
+		#elif( defined __COMEXE__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘EXEå¯æ‰§è¡Œæ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__
 		#endif
-	#else //Èç¹ûÕıÔÚÊ¹ÓÃÎ´Öª±àÒëÆ÷¡£
+	#else //å¦‚æœæ­£åœ¨ä½¿ç”¨æœªçŸ¥ç¼–è¯‘å™¨ã€‚
 		#define __DATASTRUCT_DLLAPI__
 	#endif
-#else //Èç¹ûÕıÔÚ±àÒëÆäËûÏîÄ¿¡£
-	#if( ( defined __MS_VCXX__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃMS VC++±àÒëÆ÷¡£
-		#if( defined __LNKLIB__ ) //Èç¹ûÕıÔÚÁ´½ÓLIB¾²Ì¬¿âÎÄ¼ş¡£
+#else //å¦‚æœæ­£åœ¨ç¼–è¯‘å…¶ä»–é¡¹ç›®ã€‚
+	#if( ( defined __MS_VCXX__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨MS VC++ç¼–è¯‘å™¨ã€‚
+		#if( defined __LNKLIB__ ) //å¦‚æœæ­£åœ¨é“¾æ¥LIBé™æ€åº“æ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__
-		#elif( defined __LNKDLL__ ) //Èç¹ûÕıÔÚÁ´½ÓDLL¶¯Ì¬¿âÎÄ¼ş¡£
+		#elif( defined __LNKDLL__ ) //å¦‚æœæ­£åœ¨é“¾æ¥DLLåŠ¨æ€åº“æ–‡ä»¶ã€‚
 			#define __DATASTRUCT_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃCygwin GCC/G++¡¢Linux GCC/G++¡¢Android GCC/G++¡¢KEIL ARMCLANG/ARMCC±àÒëÆ÷¡£
+	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨Cygwin GCC/G++ã€Linux GCC/G++ã€Android GCC/G++ã€KEIL ARMCLANG/ARMCCç¼–è¯‘å™¨ã€‚
 		#define __DATASTRUCT_DLLAPI__
-	#else //Èç¹ûÕıÔÚÊ¹ÓÃÎ´Öª±àÒëÆ÷¡£
+	#else //å¦‚æœæ­£åœ¨ä½¿ç”¨æœªçŸ¥ç¼–è¯‘å™¨ã€‚
 		#define __DATASTRUCT_DLLAPI__
 	#endif
 #endif

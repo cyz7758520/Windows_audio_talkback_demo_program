@@ -1,15 +1,8 @@
-﻿#ifndef __VARSTR_H__
+﻿#include "Func.h"
+
+#ifndef __VARSTR_H__
 #define __VARSTR_H__
 
-#include <stdint.h>
-#include <stdarg.h>
-#include <stddef.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-	
 //Func项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_FUNC__ ) //如果正在编译Func项目。
 	#if( ( defined __MS_VCXX__ ) ) //如果正在使用MS VC++编译器。
@@ -53,6 +46,11 @@ typedef struct VarStr
 	size_t m_StrLen; //存放字符串的数据长度。
 }VarStr;
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+	
 #ifdef __cplusplus
 __FUNC_DLLAPI__ int VarStrInit( VarStr * * VarStrPtPt, size_t StrSz = sizeof( size_t ) );
 #else

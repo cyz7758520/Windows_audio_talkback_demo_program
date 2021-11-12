@@ -1,16 +1,26 @@
 ﻿#ifndef __FUNC_H__
 #define __FUNC_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <errno.h>
-#include <string.h>
-#include <inttypes.h>
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
+#include <stdio.h>                        //*printf、*scanf、fopen、fseek、fread、fwrite、fclose、SEEK_CUR、SEEK_END、SEEK_SET
+#include <stdlib.h>                       //*alloc、free、exit、system、rand
+#include <stddef.h>                       //size_t、wchar_t、NULL、offsetof
+#include <stdint.h>                       //int*_t、uint*_t、INT*_MAX、INT*_MIN、UINT*_MAX、UINT*_MIN
+#include <stdarg.h>                       //va_list、va_start、va_arg、va_end
+#include <time.h>                         //clock_t、time_t、struct tm、asctime、clock、ctime、difftime、gmtime、localtime、mktime、strftime、time
+#include <limits.h>                       //CHAR_BIT、SCHAR_MIN、SCHAR_MAX、UCHAR_MAX、CHAR_MIN、CHAR_MAX、MB_LEN_MAX、SHRT_MIN、SHRT_MAX、USHRT_MAX、INT_MIN、INT_MAX、UINT_MAX、LONG_MIN、LONG_MAX、ULONG_MAX、LLONG_MIN、LLONG_MIN、ULLONG_MAX
+#include <errno.h>                        //errno
+#include <string.h>                       //memchr、memcmp、memcpy、memmove、memset、strcat、strncat、strchr、strcmp、strncmp、strcoll、strcpy、strncpy、strcspn、strerror、strlen、strpbrk、strrchr、strspn、strstr、strtok、strxfrm
+#include <inttypes.h>                     //PRId*、PRIi*、PRIu*、PRIo*、PRIx*、PRIX*、SCNd*、SCNi*、SCNu*、SCNo*、SCNx*
+
+#ifdef __cplusplus
+#include <thread>                         //std::thread
+#include <queue>                          //std::queue
+#include <list>                           //std::list
+#include <map>                            //std::map
+#include <atomic>                         //std::atomic
+#endif
+
+#if( defined __MS_VCXX__ )
 #include <winsdkver.h>                    //包含Windows SDK支持的最高版本Windows的相关宏
 #define _WIN32_WINNT  _WIN32_WINNT_MAXVER //设置_WIN32_WINNT宏为最高版本Windows
 #define WINVER        WINVER_MAXVER       //设置WINVER宏为最高版本Windows
@@ -18,36 +28,104 @@
 #define _WIN32_IE     _WIN32_IE_MAXVER    //设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
 #include <windows.h>                      //包含整个Windows SDK支持的API
-#include <psapi.h>
-#include <Ws2tcpip.h>
+#include <tchar.h>                        //_tmain、_tWinMain、TCHAR
+#include <process.h>                      //
+#include <psapi.h>                        //GetProcessImageFileName
+#include <shellapi.h>                     //ShellExecute
+#include <Ws2tcpip.h>                     //Windows套接字相关
+#include <Dshow.h>                        //waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
+
+#include <sys/types.h>                    //
+#include <sys/stat.h>                     //struct stat、fstat
 #endif
-#if( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+
+#if( defined __CYGWIN_GCC__ )
+#include <winsdkver.h>                    //包含Windows SDK支持的最高版本Windows的相关宏
+#define _WIN32_WINNT  _WIN32_WINNT_MAXVER //设置_WIN32_WINNT宏为最高版本Windows
+#define WINVER        WINVER_MAXVER       //设置WINVER宏为最高版本Windows
+#define NTDDI_VERSION NTDDI_MAXVER        //设置NTDDI_VERSION宏为最高版本Windows
+#define _WIN32_IE     _WIN32_IE_MAXVER    //设置_WIN32_IE宏为最高版本IE
+#define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
+#include <windows.h>                      //包含整个Windows SDK支持的API
+#include <tchar.h>                        //_tmain、_tWinMain、TCHAR
+#include <process.h>                      //
+#include <psapi.h>                        //GetProcessImageFileName
+#include <shellapi.h>                     //ShellExecute
+//#include <Ws2tcpip.h>                   //不包含该头文件，因为会与Linux套接字相关声明相冲突
+//#include <Dshow.h>                      //不包含该头文件，因为会编译报错
+
+#include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
+#include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
+#include <netinet/tcp.h>                  //TCP_NODELAY
+#include <sys/select.h>                   //fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
+#include <sys/ioctl.h>                    //ioctl
+#include <sys/stat.h>                     //struct stat、fstat、chmod、fchmod、mkdir、stat
+#include <sys/time.h>                     //gettimeofday
+#include <fcntl.h>                        //open、fcntl
+#include <unistd.h>                       //getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
+
+typedef int SOCKET;
+#define INVALID_SOCKET (-1)
+#define SOCKET_ERROR (-1)
 #endif
+
+#if( defined __LINUX_GCC__ )
+#include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
+#include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
+#include <netinet/tcp.h>                  //TCP_NODELAY
+#include <sys/select.h>                   //fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
+#include <sys/ioctl.h>                    //ioctl
+#include <sys/syscall.h>
+#include <sys/stat.h>                     //struct stat、fstat、chmod、fchmod、mkdir、stat
+#include <sys/time.h>                     //gettimeofday
+#include <fcntl.h>                        //open、fcntl
+#include <unistd.h>                       //getpid、getopt、close
+#include <arpa/inet.h>
+#include <netdb.h>
+
+#define gettid() ( pid_t )syscall( SYS_gettid )
+
+typedef int SOCKET;
+#define INVALID_SOCKET (-1)
+#define SOCKET_ERROR (-1)
+typedef int HANDLE;
+#endif
+
 #if( defined __ANDROID_GCC__ )
+#include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
+#include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
+#include <netinet/tcp.h>                  //TCP_NODELAY
+#include <sys/select.h>                   //fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
+#include <asm/ioctls.h>                   //ioctl
+#include <sys/stat.h>                     //struct stat、fstat、chmod、fchmod、mkdir、stat
+#include <sys/time.h>                     //gettimeofday
+#include <fcntl.h>                        //open、fcntl
+#include <unistd.h>                       //getpid、getopt、close
+#include <arpa/inet.h>
+#include <netdb.h>
+
+typedef int SOCKET;
+#define INVALID_SOCKET (-1)
+#define SOCKET_ERROR (-1)
+typedef int HANDLE;
+
 #include <jni.h>
+#include <android/log.h>
 #include <android/bitmap.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #endif
+
 #include "VarStr.h"
 #include "Log.h"
 #include "ThreadLock.h"
+#include "Audio.h"
 
 //线程局部变量宏。
 #if( defined __MS_VCXX__ )
 #define __thread __declspec( thread )
-#endif
-
-#ifdef __cplusplus
-extern "C"
-{
 #endif
 
 //Func项目的DLL动态库文件导入导出符号宏。
@@ -96,6 +174,28 @@ extern "C"
 #ifndef min
 #define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 #endif
+#endif
+
+//定义方向宏。
+#define DRCT_L_TO_R        1   //方向为从左向右。
+#define DRCT_R_TO_L        2   //方向为从右向左。
+
+//定义位置宏。
+#define POS_L              1   //位置为左边。
+#define POS_M              2   //位置为中间。
+#define POS_R              4   //位置为右边。
+#define POS_LR             ( POS_LEFT | POS_RIGHT )   //位置为左右两边。
+#define POS_LMR            ( POS_LEFT | POS_MID | POS_RIGHT )   //位置为左中右三边。
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+//进程线程函数。
+#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
+__FUNC_DLLAPI__ int FuncGetCurProcId();
+__FUNC_DLLAPI__ int FuncGetCurThrdId();
 #endif
 
 //日期时间函数。

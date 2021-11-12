@@ -1,7 +1,7 @@
-﻿#ifndef __WEBRTC_H__
-#define __WEBRTC_H__
+﻿#include "Func.h"
 
-#include "Func.h"
+#ifndef __WEBRTC_H__
+#define __WEBRTC_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -45,7 +45,7 @@ extern "C"
 	
 typedef struct WebRtcAecm WebRtcAecm;
 
-__WEBRTC_DLLAPI__ int WebRtcAecmInit( WebRtcAecm * * WebRtcAecmPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsUseCNGMode, int32_t EchoMode, int32_t Delay );
+__WEBRTC_DLLAPI__ int WebRtcAecmInit( WebRtcAecm * * WebRtcAecmPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsUseCNGMode, int32_t EchoMode, int32_t Delay, VarStr * ErrInfoVarStrPt );
 __WEBRTC_DLLAPI__ int WebRtcAecmSetDelay( WebRtcAecm * WebRtcAecmPt, int32_t Delay );
 __WEBRTC_DLLAPI__ int WebRtcAecmGetDelay( WebRtcAecm * WebRtcAecmPt, int32_t * DelayPt );
 __WEBRTC_DLLAPI__ int WebRtcAecmProc( WebRtcAecm * WebRtcAecmPt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
@@ -53,8 +53,8 @@ __WEBRTC_DLLAPI__ int WebRtcAecmDestroy( WebRtcAecm * WebRtcAecmPt );
 
 typedef struct WebRtcAec WebRtcAec;
 
-__WEBRTC_DLLAPI__ int WebRtcAecInit( WebRtcAec * * WebRtcAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay );
-__WEBRTC_DLLAPI__ int WebRtcAecInitByMem( WebRtcAec * * WebRtcAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, char * WebRtcAecMemPt, size_t WebRtcAecMemLen );
+__WEBRTC_DLLAPI__ int WebRtcAecInit( WebRtcAec * * WebRtcAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, VarStr * ErrInfoVarStrPt );
+__WEBRTC_DLLAPI__ int WebRtcAecInitByMem( WebRtcAec * * WebRtcAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, char * WebRtcAecMemPt, size_t WebRtcAecMemLen, VarStr * ErrInfoVarStrPt );
 __WEBRTC_DLLAPI__ int WebRtcAecInitByMemFile( WebRtcAec * * WebRtcAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, const char * WebRtcAecMemFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
 __WEBRTC_DLLAPI__ int WebRtcAecGetMemLen( WebRtcAec * WebRtcAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, size_t * WebRtcAecMemLenPt );
 __WEBRTC_DLLAPI__ int WebRtcAecGetMem( WebRtcAec * WebRtcAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgnosticMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, char * WebRtcAecMemPt, size_t WebRtcAecMemSz );
@@ -67,17 +67,17 @@ __WEBRTC_DLLAPI__ int WebRtcAecDestroy( WebRtcAec * WebRtcAecPt );
 
 typedef struct WebRtcNsx WebRtcNsx;
 
-__WEBRTC_DLLAPI__ int WebRtcNsxInit( WebRtcNsx * * WebRtcNsxPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t PolicyMode );
+__WEBRTC_DLLAPI__ int WebRtcNsxInit( WebRtcNsx * * WebRtcNsxPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t PolicyMode, VarStr * ErrInfoVarStrPt );
 __WEBRTC_DLLAPI__ int WebRtcNsxProc( WebRtcNsx * WebRtcNsxPt, int16_t * FramePt, int16_t * ResultFramePt );
 __WEBRTC_DLLAPI__ int WebRtcNsxDestroy( WebRtcNsx * WebRtcNsxPt );
 
 typedef struct WebRtcNs WebRtcNs;
 
-__WEBRTC_DLLAPI__ int WebRtcNsInit( WebRtcNs * * WebRtcNsPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t PolicyMode );
+__WEBRTC_DLLAPI__ int WebRtcNsInit( WebRtcNs * * WebRtcNsPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t PolicyMode, VarStr * ErrInfoVarStrPt );
 __WEBRTC_DLLAPI__ int WebRtcNsProc( WebRtcNs * WebRtcNsPt, int16_t * FramePt, int16_t * ResultFramePt );
 __WEBRTC_DLLAPI__ int WebRtcNsDestroy( WebRtcNs * WebRtcNsPt );
 
-__WEBRTC_DLLAPI__ int WebRtcResamplerInit( void * * WebRtcResamplerPtPt, int32_t BeforeSamplingRate, int32_t AfterSamplingRate );
+__WEBRTC_DLLAPI__ int WebRtcResamplerInit( void * * WebRtcResamplerPtPt, int32_t BeforeSamplingRate, int32_t AfterSamplingRate, VarStr * ErrInfoVarStrPt );
 __WEBRTC_DLLAPI__ int WebRtcResamplerProc( void * WebRtcResamplerPt, int16_t * BeforeFramePt, int32_t BeforeFrameLen, int16_t * AfterFramePt, size_t AfterFrameSz, int32_t * AfterFrameLenPt );
 __WEBRTC_DLLAPI__ int WebRtcResamplerDestroy( void * WebRtcResamplerPt );
 

@@ -1,7 +1,7 @@
-﻿#ifndef __LOG_H__
-#define __LOG_H__
+﻿#include "Func.h"
 
-#include "Func.h"
+#ifndef __LOG_H__
+#define __LOG_H__
 
 //日志级别
 #define LOG_LVL_ERROR                 1   //错误级别
@@ -38,11 +38,6 @@
 
 #define LOG_DEFAULT_HEAD      LOG_HEAD_TIME,LOG_HEAD_INTERVALS,LOG_HEAD_FILE,LOG_HEAD_PID,LOG_HEAD_TID,LOG_HEAD_LEVEL,LOG_HEAD_END   //默认日志头。
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-	
 //Func项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_FUNC__ ) //如果正在编译Func项目。
 	#if( ( defined __MS_VCXX__ ) ) //如果正在使用MS VC++编译器。
@@ -76,6 +71,11 @@ extern "C"
 	#else //如果正在使用未知编译器。
 		#define __FUNC_DLLAPI__
 	#endif
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
 __FUNC_DLLAPI__ int LogInit( VarStr * ErrInfoVarStrPt );
@@ -115,34 +115,34 @@ __FUNC_DLLAPI__ void LogWrite( size_t FileNum, int8_t Lvl, const char * SrcFileN
 __FUNC_DLLAPI__ void LogFmtWrite( size_t FileNum, int8_t Lvl, const char * SrcFileNameStrPt, long SrcFileLine, const char * FuncNameStrPt, const char * FmtStrPt, ... );
 
 
-#define LOGH( Lvl, Text, TextSz ) LogHexWrite( SIZE_MAX, Lvl, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHE( Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHW( Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHI( Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHD( Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
+#define LOGH( Lvl, LineLen, Text, TextSz ) LogHexWrite( SIZE_MAX, Lvl, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHE( LineLen, Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHW( LineLen, Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHI( LineLen, Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHD( LineLen, Text, TextSz ) LogHexWrite( SIZE_MAX, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
 
-#define LOGHN( FileNum, Lvl, Text, TextSz ) LogHexWrite( FileNum, Lvl, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHNE( FileNum, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHNW( FileNum, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHNI( FileNum, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
-#define LOGHND( FileNum, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, Text, TextSz )
+#define LOGHN( FileNum, Lvl, LineLen, Text, TextSz ) LogHexWrite( FileNum, Lvl, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHNE( FileNum, LineLen, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHNW( FileNum, LineLen, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHNI( FileNum, LineLen, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
+#define LOGHND( FileNum, LineLen, Text, TextSz ) LogHexWrite( FileNum, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, LineLen, Text, TextSz )
 
-__FUNC_DLLAPI__ void LogHexWrite( size_t FileNum, int8_t Lvl, const char * SrcFileNameStrPt, long SrcFileLine, const char * FuncNameStrPt, const char * TextPt, size_t TextSz );
+__FUNC_DLLAPI__ void LogHexWrite( size_t FileNum, int8_t Lvl, const char * SrcFileNameStrPt, long SrcFileLine, const char * FuncNameStrPt, int LineLen, const char * TextPt, size_t TextSz );
 
 
-#define LOGHF( Lvl, Fmt, ... ) LogHexFmtWrite( SIZE_MAX, Lvl, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHFE( Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHFW( Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHFI( Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHFD( Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
+#define LOGHF( Lvl, LineLen, Fmt, ... ) LogHexFmtWrite( SIZE_MAX, Lvl, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHFE( LineLen, Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHFW( LineLen, Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHFI( LineLen, Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHFD( LineLen, Fmt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
 
-#define LOGHNF( FileNum, Lvl, Fmt, ... ) LogHexFmtWrite( FileNum, Lvl, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHNFE( FileNum, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHNFW( FileNum, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHNFI( FileNum, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
-#define LOGHNFD( FileNum, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, Fmt, __VA_ARGS__ )
+#define LOGHNF( FileNum, Lvl, LineLen, Fmt, ... ) LogHexFmtWrite( FileNum, Lvl, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHNFE( FileNum, LineLen, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_ERROR, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHNFW( FileNum, LineLen, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_WARN, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHNFI( FileNum, LineLen, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_INFO, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
+#define LOGHNFD( FileNum, LineLen, Fmt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_DEBUG, __FILE__, __LINE__, __FUNCTION__, LineLen, Fmt, __VA_ARGS__ )
 
-__FUNC_DLLAPI__ void LogHexFmtWrite( size_t FileNum, int8_t Lvl, const char * SrcFileNameStrPt, long SrcFileLine, const char * FuncNameStrPt, const char * FmtStrPt, ... );
+__FUNC_DLLAPI__ void LogHexFmtWrite( size_t FileNum, int8_t Lvl, const char * SrcFileNameStrPt, long SrcFileLine, const char * FuncNameStrPt, int LineLen, const char * FmtStrPt, ... );
 
 
 __FUNC_DLLAPI__ void LogDestroy();
