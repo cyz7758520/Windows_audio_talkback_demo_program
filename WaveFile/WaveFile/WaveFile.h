@@ -3,11 +3,6 @@
 #ifndef __WAVEFILE_H__
 #define __WAVEFILE_H__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 //WaveFile项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_WAVEFILE__ ) //如果正在编译WaveFile项目。
 	#if( ( defined __MS_VCXX__ ) ) //如果正在使用MS VC++编译器。
@@ -41,6 +36,11 @@ extern "C"
 	#else //如果正在使用未知编译器。
 		#define __WAVEFILE_DLLAPI__
 	#endif
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
 typedef struct WaveFileWriter WaveFileWriter;

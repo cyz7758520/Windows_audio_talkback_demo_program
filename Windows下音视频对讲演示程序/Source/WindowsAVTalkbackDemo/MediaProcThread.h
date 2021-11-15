@@ -10,6 +10,7 @@
 #include "RNNoise.h"
 #include "Speex.h"
 #include "WaveFile.h"
+#include "AudioOscillo.h"
 #include "LibYUV.h"
 #include "OpenH264.h"
 
@@ -153,6 +154,12 @@ typedef struct MediaProcThread
 		VarStr * m_AudioInputFileFullPathVarStrPt; //存放音频输入文件完整路径动态字符串的内存指针。
 		VarStr * m_AudioResultFileFullPathVarStrPt; //存放音频结果文件完整路径动态字符串的内存指针。
 
+        int32_t m_IsDrawAudioOscilloToWnd; //存放是否绘制音频波形到窗口，为非0表示要绘制，为0表示不绘制。
+		HWND m_AudioInputOscilloWndHdl; //存放音频输入波形窗口的句柄。
+        AudioOscillo * m_AudioInputOscilloPt; //存放音频输入波形器对象的指针。
+        HWND m_AudioResultOscilloWndHdl; //存放音频结果波形窗口的句柄。
+        AudioOscillo * m_AudioResultOscilloPt; //存放音频结果波形器对象的指针。
+
 		UINT m_AudioInputDeviceID; //存放音频输入设备的标识符。
 		HWAVEIN m_AudioInputDeviceHdl; //存放音频输入设备的句柄。
 		WAVEHDR * m_AudioInputWaveHdrPt; //存放音频输入缓冲区块数组的内存指针。
@@ -192,6 +199,10 @@ typedef struct MediaProcThread
 		WaveFileWriter * m_AudioOutputWaveFileWriterPt; //存放音频输出Wave文件写入器的内存指针。
 		VarStr * m_AudioOutputFileFullPathVarStrPt; //存放音频输出文件完整路径动态字符串的内存指针。
 		
+        int32_t m_IsDrawAudioOscilloToWnd; //存放是否绘制音频波形到窗口，为非0表示要绘制，为0表示不绘制。
+        HWND m_AudioOutputOscilloWndHdl; //存放音频输出波形窗口的句柄。
+        AudioOscillo * m_AudioOutputOscilloPt; //存放音频输出波形器对象的指针。
+
 		UINT m_AudioOutputDeviceID; //存放音频输出设备的标识符。
 		HWAVEOUT m_AudioOutputDeviceHdl; //存放音频输出设备的句柄。
 		WAVEHDR * m_AudioOutputWaveHdrPt; //存放音频缓冲区块数组的内存指针。
@@ -395,6 +406,7 @@ int MediaProcThreadSetAudioInputUseSpeexEncoder( MediaProcThread * MediaProcThre
 int MediaProcThreadSetAudioInputUseOpusEncoder( MediaProcThread * MediaProcThreadPt, VarStr * ErrInfoVarStrPt );
 
 int MediaProcThreadSetAudioInputIsSaveAudioToFile( MediaProcThread * MediaProcThreadPt, int32_t IsSaveAudioToFile, const char * AudioInputFileFullPathStrPt, const char * AudioResultFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
+int MediaProcThreadSetAudioInputIsDrawAudioOscilloToWnd( MediaProcThread * MediaProcThreadPt, int32_t IsDrawAudioOscilloToWnd, HWND AudioInputOscilloWndHdl, HWND AudioResultOscilloWndHdl, VarStr * ErrInfoVarStrPt );
 
 int MediaProcThreadSetAudioInputUseDevice( MediaProcThread * MediaProcThreadPt, UINT AudioInputDeviceID, VarStr * ErrInfoVarStrPt );
 int MediaProcThreadSetAudioInputIsMute( MediaProcThread * MediaProcThreadPt, int32_t IsMute, VarStr * ErrInfoVarStrPt );
@@ -406,6 +418,7 @@ int MediaProcThreadSetAudioOutputUseSpeexDecoder( MediaProcThread * MediaProcThr
 int MediaProcThreadSetAudioOutputUseOpusDecoder( MediaProcThread * MediaProcThreadPt, VarStr * ErrInfoVarStrPt );
 
 int MediaProcThreadSetAudioOutputIsSaveAudioToFile( MediaProcThread * MediaProcThreadPt, int32_t IsSaveAudioToFile, const char * AudioOutputFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
+int MediaProcThreadSetAudioOutputIsDrawAudioOscilloToWnd( MediaProcThread * MediaProcThreadPt, int32_t IsDrawAudioOscilloToWnd, HWND AudioOutputOscilloWndHdl, VarStr * ErrInfoVarStrPt );
 
 int MediaProcThreadSetAudioOutputUseDevice( MediaProcThread * MediaProcThreadPt, UINT AudioOutputDeviceID, VarStr * ErrInfoVarStrPt );
 int MediaProcThreadSetAudioOutputIsMute( MediaProcThread * MediaProcThreadPt, int32_t IsMute, VarStr * ErrInfoVarStrPt );

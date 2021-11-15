@@ -1601,13 +1601,13 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	
 	// TODO: 在此处放置代码。
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	//_CrtSetBreakAlloc( 748 );
+	//_CrtSetBreakAlloc( 322 );
 
 	size_t LogNum;
 
 	hInst = hInstance; //设置当前实例的句柄。
 	
-	FuncSetCurActDir( NULL, NULL ); //设置当前进程的当前活动目录的路径。
+	FuncSetCurActPath( NULL, NULL ); //设置当前进程活动目录的路径为为当前进程可执行文件的上级路径。
 
 	VarStrInit( &g_ErrInfoVarStrPt );
 
@@ -1720,11 +1720,10 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	ScreenToClient( g_MainWndHdl, ( LPPOINT )&g_VideoOutputDisplayWndRect );
 	ScreenToClient( g_MainWndHdl, ( LPPOINT )&g_VideoOutputDisplayWndRect.right );
 	
-	//打印可执行文件所在目录完整绝对路径到日志。
+	//打印当前进程活动目录的完整绝对路径到日志。
 	if( g_ErrInfoVarStrPt->m_StrSz < MAX_PATH ) VarStrSetSz( g_ErrInfoVarStrPt, MAX_PATH );
-	GetCurrentDirectory( g_ErrInfoVarStrPt->m_StrSz, g_ErrInfoVarStrPt->m_StrPt );
-	VarStrReSetLen( g_ErrInfoVarStrPt );
-	VarStrIns( g_ErrInfoVarStrPt, 0, "可执行文件所在目录完整绝对路径：" );
+	FuncGetCurActPath( g_ErrInfoVarStrPt->m_StrPt, g_ErrInfoVarStrPt->m_StrSz, &g_ErrInfoVarStrPt->m_StrLen, g_ErrInfoVarStrPt );
+	VarStrIns( g_ErrInfoVarStrPt, 0, "当前进程活动目录的完整绝对路径：" );
 	LOGI( g_ErrInfoVarStrPt->m_StrPt );
 	{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, g_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainWndHdl, WM_SHOWLOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 
@@ -1737,8 +1736,10 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		CheckDlgButton( g_SettingWndHdl, IDC_IsSaveSettingToFile, BST_CHECKED );
 		CheckDlgButton( g_SettingWndHdl, IDC_IsPrintLogShowToast, BST_CHECKED );
 		CheckDlgButton( g_SettingWndHdl, IDC_IsSaveAudioToFile, BST_CHECKED );
-		SendMessage( g_MainWndHdl, WM_COMMAND, IDC_UseEffectSuper, 0 );
-		SendMessage( g_MainWndHdl, WM_COMMAND, IDC_UseBitrateSuper, 0 );
+		CheckDlgButton( g_SettingWndHdl, IDC_IsDrawAudioOscilloToWnd, BST_CHECKED );
+
+		SendMessage( g_MainWndHdl, WM_COMMAND, IDC_UseEffectSuper, 0 ); //默认效果等级：超。
+		SendMessage( g_MainWndHdl, WM_COMMAND, IDC_UseBitrateSuper, 0 ); //默认比特率等级：超。
 		
 		SetWindowText( GetDlgItem( g_AjbSettingWndHdl, IDC_AAjbMinNeedBufFrameCnt ), "5" );
 		SetWindowText( GetDlgItem( g_AjbSettingWndHdl, IDC_AAjbMaxNeedBufFrameCnt ), "50" );
@@ -2455,6 +2456,16 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 							MediaProcThreadSetAudioInputIsSaveAudioToFile( g_MediaProcThreadPt, 0, NULL, NULL, g_ErrInfoVarStrPt );
 						}
 						
+						//判断音频输入是否绘制音频波形到窗口。
+						if( IsDlgButtonChecked( g_SettingWndHdl, IDC_IsDrawAudioOscilloToWnd ) == BST_CHECKED )
+						{
+							MediaProcThreadSetAudioInputIsDrawAudioOscilloToWnd( g_MediaProcThreadPt, 1, GetDlgItem( g_MainWndHdl, IDC_AudioInputOscillo ), GetDlgItem( g_MainWndHdl, IDC_AudioResultOscillo ), g_ErrInfoVarStrPt );
+						}
+						else
+						{
+							MediaProcThreadSetAudioInputIsSaveAudioToFile( g_MediaProcThreadPt, 0, NULL, NULL, g_ErrInfoVarStrPt );
+						}
+						
 						//判断使用的音频输入设备。
 						MediaProcThreadSetAudioInputUseDevice( g_MediaProcThreadPt, SendMessage( GetDlgItem( g_MainWndHdl, IDC_UseAudioInputDevice ), CB_GETCURSEL, 0, 0 ) - 1, g_ErrInfoVarStrPt );
 
@@ -2500,6 +2511,16 @@ INT_PTR CALLBACK DialogProc( HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 						if( IsDlgButtonChecked( g_SettingWndHdl, IDC_IsSaveAudioToFile ) == BST_CHECKED )
 						{
 							MediaProcThreadSetAudioOutputIsSaveAudioToFile( g_MediaProcThreadPt, 1, ".\\AudioOutput.wav", g_ErrInfoVarStrPt );
+						}
+						else
+						{
+							MediaProcThreadSetAudioOutputIsSaveAudioToFile( g_MediaProcThreadPt, 0, NULL, g_ErrInfoVarStrPt );
+						}
+						
+						//判断音频输出是否绘制音频波形到窗口。
+						if( IsDlgButtonChecked( g_SettingWndHdl, IDC_IsDrawAudioOscilloToWnd ) == BST_CHECKED )
+						{
+							MediaProcThreadSetAudioOutputIsDrawAudioOscilloToWnd( g_MediaProcThreadPt, 1, GetDlgItem( g_MainWndHdl, IDC_AudioOutputOscillo ), g_ErrInfoVarStrPt );
 						}
 						else
 						{

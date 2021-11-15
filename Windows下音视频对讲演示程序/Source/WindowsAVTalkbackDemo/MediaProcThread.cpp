@@ -1304,6 +1304,59 @@ int MediaProcThreadSetAudioInputIsSaveAudioToFile( MediaProcThread * MediaProcTh
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * 函数名称：MediaProcThreadSetAudioInputIsDrawAudioOscilloToWnd
+ * 功能说明：设置音频输入是否绘制音频波形到窗口。
+ * 参数说明：MediaProcThreadPt：[输入]，存放媒体处理线程的内存指针，不能为NULL。
+			 IsSaveAudioToFile：[输入]，存放是否保存音频到文件，非0表示要使用，0表示不使用。
+			 AudioInputOscilloWndHdl：[输入]，存放音频输入波形窗口的句柄。
+			 AudioResultOscilloWndHdl：[输入]，存放音频结果波形窗口的句柄。
+			 ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的内存指针，可以为NULL。
+ * 返回说明：0：成功。
+			 非0：失败。
+ * 线程安全：是 或 否
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+int MediaProcThreadSetAudioInputIsDrawAudioOscilloToWnd( MediaProcThread * MediaProcThreadPt, int32_t IsDrawAudioOscilloToWnd, HWND AudioInputOscilloWndHdl, HWND AudioResultOscilloWndHdl, VarStr * ErrInfoVarStrPt )
+{
+	int p_Result = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+
+	//判断各个变量是否正确。
+	if( MediaProcThreadPt == NULL )
+	{
+		VarStrCpy( ErrInfoVarStrPt, "媒体处理线程的内存指针不正确。" );
+		goto out; //本函数返回失败。
+	}
+	if( ( IsDrawAudioOscilloToWnd != 0 ) && ( AudioInputOscilloWndHdl == NULL ) )
+	{
+		VarStrCpy( ErrInfoVarStrPt, "音频输入波形窗口的句柄不正确。" );
+		goto out; //本函数返回失败。
+	}
+	if( ( IsDrawAudioOscilloToWnd != 0 ) && ( AudioResultOscilloWndHdl == NULL ) )
+	{
+		VarStrCpy( ErrInfoVarStrPt, "音频结果波形窗口的句柄不正确。" );
+		goto out; //本函数返回失败。
+	}
+
+	MediaProcThreadPt->m_AudioInput.m_IsDrawAudioOscilloToWnd = IsDrawAudioOscilloToWnd;
+	if( IsDrawAudioOscilloToWnd != 0 )
+	{
+		MediaProcThreadPt->m_AudioInput.m_AudioInputOscilloWndHdl = AudioInputOscilloWndHdl;
+		MediaProcThreadPt->m_AudioInput.m_AudioResultOscilloWndHdl = AudioResultOscilloWndHdl;
+	}
+
+	p_Result = 0; //设置本函数执行成功。
+
+	out:
+	if( p_Result != 0 ) //如果本函数执行失败。
+	{
+		MediaProcThreadPt->m_AudioInput.m_IsDrawAudioOscilloToWnd = 0;
+	}
+
+	return p_Result;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaProcThreadSetAudioInputUseDevice
  * 功能说明：设置音频输入使用的设备。
  * 参数说明：MediaProcThreadPt：[输入]，存放媒体处理线程的内存指针，不能为NULL。
@@ -1589,6 +1642,52 @@ int MediaProcThreadSetAudioOutputIsSaveAudioToFile( MediaProcThread * MediaProcT
 			VarStrDestroy( MediaProcThreadPt->m_AudioOutput.m_AudioOutputFileFullPathVarStrPt );
 			MediaProcThreadPt->m_AudioOutput.m_AudioOutputFileFullPathVarStrPt = NULL;
 		}
+	}
+
+	return p_Result;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * 函数名称：MediaProcThreadSetAudioOutputIsDrawAudioOscilloToWnd
+ * 功能说明：设置音频输出是否绘制音频波形到窗口。
+ * 参数说明：MediaProcThreadPt：[输出]，存放媒体处理线程的内存指针，不能为NULL。
+			 IsSaveAudioToFile：[输出]，存放是否保存音频到文件，非0表示要使用，0表示不使用。
+			 AudioOutputOscilloWndHdl：[输出]，存放音频输出波形窗口的句柄。
+			 ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的内存指针，可以为NULL。
+ * 返回说明：0：成功。
+			 非0：失败。
+ * 线程安全：是 或 否
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+int MediaProcThreadSetAudioOutputIsDrawAudioOscilloToWnd( MediaProcThread * MediaProcThreadPt, int32_t IsDrawAudioOscilloToWnd, HWND AudioOutputOscilloWndHdl, VarStr * ErrInfoVarStrPt )
+{
+	int p_Result = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+
+	//判断各个变量是否正确。
+	if( MediaProcThreadPt == NULL )
+	{
+		VarStrCpy( ErrInfoVarStrPt, "媒体处理线程的内存指针不正确。" );
+		goto out; //本函数返回失败。
+	}
+	if( ( IsDrawAudioOscilloToWnd != 0 ) && ( AudioOutputOscilloWndHdl == NULL ) )
+	{
+		VarStrCpy( ErrInfoVarStrPt, "音频输出波形窗口的句柄不正确。" );
+		goto out; //本函数返回失败。
+	}
+
+	MediaProcThreadPt->m_AudioOutput.m_IsDrawAudioOscilloToWnd = IsDrawAudioOscilloToWnd;
+	if( IsDrawAudioOscilloToWnd != 0 )
+	{
+		MediaProcThreadPt->m_AudioOutput.m_AudioOutputOscilloWndHdl = AudioOutputOscilloWndHdl;
+	}
+
+	p_Result = 0; //设置本函数执行成功。
+
+	out:
+	if( p_Result != 0 ) //如果本函数执行失败。
+	{
+		MediaProcThreadPt->m_AudioOutput.m_IsDrawAudioOscilloToWnd = 0;
 	}
 
 	return p_Result;
@@ -3263,6 +3362,29 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			}
 		}
 		
+        //创建并初始化音频输入波形器、音频结果波形器。
+        if( MediaProcThreadPt->m_AudioInput.m_IsDrawAudioOscilloToWnd != 0 )
+        {
+            if( AudioOscilloInit( &MediaProcThreadPt->m_AudioInput.m_AudioInputOscilloPt, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+            {
+                if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：创建并初始化音频输入波形器成功。" );
+            }
+            else
+            {
+                if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：创建并初始化音频输入波形器失败。原因：%s", MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+				goto out;
+            }
+            if( AudioOscilloInit( &MediaProcThreadPt->m_AudioInput.m_AudioResultOscilloPt, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+            {
+                if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：创建并初始化音频结果波形器成功。" );
+            }
+            else
+            {
+                if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：创建并初始化音频结果波形器失败。原因：%s", MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+				goto out;
+            }
+        }
+
 		//创建并初始化音频输入帧链表、音频输入空闲帧链表。
 		{
 			MediaProcThreadPt->m_AudioInput.m_AudioInputFrameElmTotal = 6; //音频输入帧链表最多只存储几帧，避免因为音频设备有变化导致卡顿并积累大量音频输入帧，从而导致不同步。音频输入空闲帧链表最多存储总数与音频输入帧链表一致。
@@ -3426,7 +3548,7 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 		}
 
 		//创建并初始化音频输出Wave文件写入器。
-		if( MediaProcThreadPt->m_AudioInput.m_IsSaveAudioToFile != 0 )
+		if( MediaProcThreadPt->m_AudioOutput.m_IsSaveAudioToFile != 0 )
 		{
 			if( WaveFileWriterInit( &MediaProcThreadPt->m_AudioOutput.m_AudioOutputWaveFileWriterPt, MediaProcThreadPt->m_AudioOutput.m_AudioOutputFileFullPathVarStrPt->m_StrPt, 1, MediaProcThreadPt->m_AudioOutput.m_SamplingRate, 16 ) == 0 )
 			{
@@ -3439,6 +3561,20 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			}
 		}
 		
+        //创建并初始化音频输入波形器、音频结果波形器。
+        if( MediaProcThreadPt->m_AudioOutput.m_IsDrawAudioOscilloToWnd != 0 )
+        {
+            if( AudioOscilloInit( &MediaProcThreadPt->m_AudioOutput.m_AudioOutputOscilloPt, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+            {
+                if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：创建并初始化音频输出波形器成功。" );
+            }
+            else
+            {
+                if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：创建并初始化音频输出波形器失败。原因：%s", MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+				goto out;
+            }
+        }
+
 		//创建并初始化音频输出帧链表、音频输出空闲帧链表。
 		{
 			MediaProcThreadPt->m_AudioOutput.m_AudioOutputFrameElmTotal = 6; //音频输出帧链表最多只存储几帧，避免因为音频设备有变化导致卡顿并积累大量音频输出帧，从而导致不同步。音频输出空闲帧链表最多存储总数与音频输出帧链表一致。
@@ -4691,6 +4827,27 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 					if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：使用音频结果Wave文件写入器写入结果帧数据失败。" );
 				}
 			}
+
+            //使用音频输入波形器绘制音频输入波形到窗口、音频结果波形器绘制音频结果波形到窗口。
+            if( MediaProcThreadPt->m_AudioInput.m_IsDrawAudioOscilloToWnd != 0 )
+            {
+                if( AudioOscilloDrawToWnd( MediaProcThreadPt->m_AudioInput.m_AudioInputOscilloPt, MediaProcThreadPt->m_PcmAudioInputFramePt, MediaProcThreadPt->m_AudioInput.m_FrameLen, MediaProcThreadPt->m_AudioInput.m_AudioInputOscilloWndHdl, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+                {
+					if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：使用音频输入波形器绘制音频输入波形到窗口成功。" );
+                }
+                else
+                {
+                    if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：使用音频输入波形器绘制音频输入波形到窗口失败。原因：%s", MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+                }
+                if( AudioOscilloDrawToWnd( MediaProcThreadPt->m_AudioInput.m_AudioResultOscilloPt, MediaProcThreadPt->m_PcmAudioResultFramePt, MediaProcThreadPt->m_AudioInput.m_FrameLen, MediaProcThreadPt->m_AudioInput.m_AudioResultOscilloWndHdl, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+                {
+					if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：使用音频结果波形器绘制音频结果波形到窗口成功。" );
+                }
+                else
+                {
+                    if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：使用音频结果波形器绘制音频结果波形到窗口失败。原因：%s", MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+                }
+            }
 		}
 		
 		if( MediaProcThreadPt->m_IsPrintLog != 0 )
@@ -4715,6 +4872,19 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 					if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：使用音频输出Wave文件写入器写入输出帧数据失败。" );
 				}
 			}
+
+            //使用音频输出波形器绘制音频输出波形到窗口。
+            if( MediaProcThreadPt->m_AudioOutput.m_IsDrawAudioOscilloToWnd != 0 )
+            {
+                if( AudioOscilloDrawToWnd( MediaProcThreadPt->m_AudioOutput.m_AudioOutputOscilloPt, MediaProcThreadPt->m_PcmAudioOutputFramePt, MediaProcThreadPt->m_AudioOutput.m_FrameLen, MediaProcThreadPt->m_AudioOutput.m_AudioOutputOscilloWndHdl, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+                {
+					if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：使用音频输出波形器绘制音频输出波形到窗口成功。" );
+                }
+                else
+                {
+                    if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：使用音频输出波形器绘制音频输出波形到窗口失败。原因：%s", MediaProcThreadPt->m_ErrInfoVarStrPt->m_StrPt );
+                }
+            }
 		}
 		
 		if( MediaProcThreadPt->m_IsPrintLog != 0 )
@@ -4926,7 +5096,33 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			MediaProcThreadPt->m_AudioInput.m_AudioInputWaveHdrTotal = 0;
 			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：销毁音频输入缓冲区块数组成功。" );
 		}
-
+		
+		//销毁音频输入波形器、音频结果波形器。
+		if( MediaProcThreadPt->m_AudioInput.m_AudioInputOscilloPt != NULL )
+		{
+			if( AudioOscilloDestroy( MediaProcThreadPt->m_AudioInput.m_AudioInputOscilloPt, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+			{
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：销毁音频输入波形器成功。" );
+			}
+			else
+			{
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：销毁音频输入波形器失败。" );
+			}
+			MediaProcThreadPt->m_AudioInput.m_AudioInputOscilloPt = NULL;
+		}
+		if( MediaProcThreadPt->m_AudioInput.m_AudioResultOscilloPt != NULL )
+		{
+			if( AudioOscilloDestroy( MediaProcThreadPt->m_AudioInput.m_AudioResultOscilloPt, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+			{
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：销毁音频结果波形器成功。" );
+			}
+			else
+			{
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：销毁音频结果波形器失败。" );
+			}
+			MediaProcThreadPt->m_AudioInput.m_AudioResultOscilloPt = NULL;
+		}
+		
 		//销毁音频输入Wave文件写入器、音频结果Wave文件写入器。
 		if( MediaProcThreadPt->m_AudioInput.m_AudioInputWaveFileWriterPt != NULL )
 		{
@@ -5251,7 +5447,21 @@ DWORD WINAPI MediaProcThreadRun( MediaProcThread * MediaProcThreadPt )
 			MediaProcThreadPt->m_AudioOutput.m_AudioOutputWaveHdrTotal = 0;
 			if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：销毁音频输出缓冲区块数组成功。" );
 		}
-
+		
+		//销毁音频输出波形器。
+		if( MediaProcThreadPt->m_AudioOutput.m_AudioOutputOscilloPt != NULL )
+		{
+			if( AudioOscilloDestroy( MediaProcThreadPt->m_AudioOutput.m_AudioOutputOscilloPt, MediaProcThreadPt->m_ErrInfoVarStrPt ) == 0 )
+			{
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFI( "媒体处理线程：销毁音频输出波形器成功。" );
+			}
+			else
+			{
+				if( MediaProcThreadPt->m_IsPrintLog != 0 ) LOGFE( "媒体处理线程：销毁音频输出波形器失败。" );
+			}
+			MediaProcThreadPt->m_AudioOutput.m_AudioOutputOscilloPt = NULL;
+		}
+		
 		//销毁音频输出Wave文件写入器。
 		if( MediaProcThreadPt->m_AudioOutput.m_AudioOutputWaveFileWriterPt != NULL )
 		{

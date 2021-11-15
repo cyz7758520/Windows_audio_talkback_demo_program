@@ -91,6 +91,7 @@ typedef int SOCKET;
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR (-1)
 typedef int HANDLE;
+#define MAX_PATH PATH_MAX
 #endif
 
 #if( defined __ANDROID_GCC__ )
@@ -110,6 +111,7 @@ typedef int SOCKET;
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR (-1)
 typedef int HANDLE;
+#define MAX_PATH PATH_MAX
 
 #include <jni.h>
 #include <android/log.h>
@@ -300,8 +302,10 @@ __FUNC_DLLAPI__ int FuncGetPrivateProfileStringFromSectionMem( const char * KeyN
 #endif
 
 //设置函数。
+__FUNC_DLLAPI__ int FuncGetCurExePath( char * FullAbsPathStrPt, size_t FullAbsPathStrSz, size_t * FullAbsPathStrLenPt, VarStr * ErrInfoVarStrPt );
+__FUNC_DLLAPI__ int FuncSetCurActPath( const char * PathStrPt, VarStr * ErrInfoVarStrPt );
+__FUNC_DLLAPI__ int FuncGetCurActPath( char * FullAbsPathStrPt, size_t FullAbsPathStrSz, size_t * FullAbsPathStrLenPt, VarStr * ErrInfoVarStrPt );
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__FUNC_DLLAPI__ int FuncSetCurActDir( const char * FullPathStrPt, VarStr * ErrInfoVarStrPt );
 __FUNC_DLLAPI__ int FuncSetWndCenter( HWND SpecWndHdl, HWND OtherWndHdl, VarStr * ErrInfoVarStrPt );
 __FUNC_DLLAPI__ int FuncToast( HWND SpecWndHdl, uint64_t TimeOutMesc, VarStr * ErrInfoVarStrPt, const char * TextPt );
 __FUNC_DLLAPI__ int FuncToastFmt( HWND SpecWndHdl, uint64_t TimeOutMesc, VarStr * ErrInfoVarStrPt, const char * FmtStrPt, ... );

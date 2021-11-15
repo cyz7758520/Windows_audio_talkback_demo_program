@@ -1,12 +1,7 @@
-﻿#ifndef __LIBYUV_H__
+﻿#include "Func.h"
+
+#ifndef __LIBYUV_H__
 #define __LIBYUV_H__
-
-#include "Func.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 //LibYUV项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_LIBYUV__ ) //如果正在编译LibYUV项目。
@@ -43,9 +38,10 @@ extern "C"
 	#endif
 #endif
 
-typedef struct LibYUVStruct LibYUVStruct;
-
-__LIBYUV_DLLAPI__ int LibYUVDestroy( LibYUVStruct * LibYUVEncoderPt );
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 //图片格式。
 enum PictrFmt
