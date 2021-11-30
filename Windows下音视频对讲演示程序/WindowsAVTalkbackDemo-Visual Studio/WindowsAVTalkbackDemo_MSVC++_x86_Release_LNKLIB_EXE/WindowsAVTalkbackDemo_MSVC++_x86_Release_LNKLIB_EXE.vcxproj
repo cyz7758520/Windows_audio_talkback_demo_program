@@ -62,13 +62,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\MediaProcThread.h" />
+    <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\MediaPocsThrd.h" />
     <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\qedit.h" />
     <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\resource.h" />
     <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\WindowsAVTalkbackDemo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\WindowsAVTalkbackDemo\MediaProcThread.cpp" />
+    <ClCompile Include="..\..\Source\WindowsAVTalkbackDemo\MediaPocsThrd.cpp" />
     <ClCompile Include="..\..\Source\WindowsAVTalkbackDemo\WindowsAVTalkbackDemo.cpp" />
   </ItemGroup>
   <ItemGroup>

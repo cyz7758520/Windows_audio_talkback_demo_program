@@ -47,13 +47,13 @@ typedef struct WaveFileWriter WaveFileWriter;
 
 __WAVEFILE_DLLAPI__ int WaveFileWriterInit( WaveFileWriter * * WaveFileWriterPtPt, const char * WaveFileFullPathStrPt, int16_t NumChanl, int32_t SamplingRate, int32_t SamplingBit );
 __WAVEFILE_DLLAPI__ int WaveFileWriterWriteData( WaveFileWriter * WaveFileWriterPt, const char * DataPt, size_t DataLen );
-__WAVEFILE_DLLAPI__ int WaveFileWriterDestroy( WaveFileWriter * WaveFileWriterPt );
+__WAVEFILE_DLLAPI__ int WaveFileWriterDstoy( WaveFileWriter * WaveFileWriterPt );
 
 typedef struct WaveFileReader WaveFileReader;
 
 __WAVEFILE_DLLAPI__ int WaveFileReaderInit( WaveFileReader * * WaveFileReaderPtPt, const char * WaveFileFullPathStrPt, int16_t * NumChanlPt, int32_t * SamplingRatePt, int32_t * SamplingBitPt );
 __WAVEFILE_DLLAPI__ int WaveFileReaderReadData( WaveFileReader * WaveFileReaderPt, char * DataPt, size_t DataSz, size_t * DataLenPt );
-__WAVEFILE_DLLAPI__ int WaveFileReaderDestroy( WaveFileReader * WaveFileReaderPt );
+__WAVEFILE_DLLAPI__ int WaveFileReaderDstoy( WaveFileReader * WaveFileReaderPt );
 
 #ifdef __cplusplus
 }

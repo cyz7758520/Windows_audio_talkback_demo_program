@@ -69,7 +69,7 @@ __DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapDelAll( AVLTreeConstLenMap * AVLTree
 
 __DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapAdjBufSz( AVLTreeConstLenMap * AVLTreeConstLenMapPt, size_t AdjSz, VarStr * ErrInfoVarStrPt );
 
-__DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapDestroy( AVLTreeConstLenMap * AVLTreeConstLenMapPt, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapDstoy( AVLTreeConstLenMap * AVLTreeConstLenMapPt, VarStr * ErrInfoVarStrPt );
 
 struct RBTreeMap;
 

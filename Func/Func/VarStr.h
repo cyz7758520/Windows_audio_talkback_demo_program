@@ -92,10 +92,44 @@ __FUNC_DLLAPI__ int VarStrGetSz( VarStr * VarStrPt, size_t * StrSzPt );
 
 __FUNC_DLLAPI__ int VarStrReSetLen( VarStr * VarStrPt );
 
-__FUNC_DLLAPI__ int VarStrDestroy( VarStr * VarStrPt );
+__FUNC_DLLAPI__ int VarStrDstoy( VarStr * VarStrPt );
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __cplusplus
+class VarStrCls
+{
+public:
+	VarStr * m_VarStrPt;
+
+	VarStrCls() { m_VarStrPt = NULL; }
+	~VarStrCls() { Dstoy( NULL ); }
+
+	int Init( size_t StrSz = sizeof( size_t ) ) { return VarStrInit( &m_VarStrPt, StrSz ); }
+	int InitByStr( const char * StrPt, size_t MaxCpyLen = SIZE_MAX ) { return VarStrInitByStr( &m_VarStrPt, StrPt, MaxCpyLen ); }
+
+	int Cpy( const char * StrPt, size_t MaxCpyLen = SIZE_MAX ) { return VarStrCpy( m_VarStrPt, StrPt, MaxCpyLen ); }
+	int FmtCpy( const char * FmtStrPt, ... ) { va_list p_VaLst; va_start( p_VaLst, FmtStrPt ); int p_Result = VarStrVaFmtCpy( m_VarStrPt, FmtStrPt, p_VaLst ); va_end( p_VaLst ); return p_Result; }
+	int VaFmtCpy( const char * FmtStrPt, va_list VaLst ) { return VarStrVaFmtCpy( m_VarStrPt, FmtStrPt, VaLst ); }
+
+	int Ins( size_t Pos, const char * StrPt, size_t MaxInsLen = SIZE_MAX ) { return VarStrIns( m_VarStrPt, Pos, StrPt, MaxInsLen ); }
+	int FmtIns( size_t Pos, const char * FmtStrPt, ... ) { va_list p_VaLst; va_start( p_VaLst, FmtStrPt ); int p_Result = VarStrVaFmtIns( m_VarStrPt, Pos, FmtStrPt, p_VaLst ); va_end( p_VaLst ); return p_Result; }
+	int VaFmtIns( size_t Pos, const char * FmtStrPt, va_list VaLst ) { return VarStrVaFmtIns( m_VarStrPt, Pos, FmtStrPt, VaLst ); }
+
+	int Cat( const char * StrPt, size_t MaxCatLen = SIZE_MAX ) { return VarStrCat( m_VarStrPt, StrPt, MaxCatLen ); }
+	int FmtCat( const char * FmtStrPt, ... ) { va_list p_VaLst; va_start( p_VaLst, FmtStrPt ); int p_Result = VarStrVaFmtCat( m_VarStrPt, FmtStrPt, p_VaLst ); va_end( p_VaLst ); return p_Result; }
+	int VaFmtCat( const char * FmtStrPt, va_list VaLst ) { return VarStrVaFmtCat( m_VarStrPt, FmtStrPt, VaLst ); }
+
+	int SetEmpty() { return VarStrSetEmpty( m_VarStrPt ); }
+	int SetSz( size_t StrSz ) { return VarStrSetSz( m_VarStrPt, StrSz ); }
+	int GetSz( size_t * StrSzPt ) { return VarStrGetSz( m_VarStrPt, StrSzPt ); }
+
+	int ReSetLen() { return VarStrReSetLen( m_VarStrPt ); }
+
+	int Dstoy( VarStr * VarStrPt ) { int p_Result = VarStrDstoy( m_VarStrPt ); m_VarStrPt = NULL; return p_Result; }
+};
 #endif
 
 #endif

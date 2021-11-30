@@ -57,7 +57,7 @@ __AJB_DLLAPI__ int AAjbGetBufFrameCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFra
 
 __AJB_DLLAPI__ int AAjbClear( AAjb * AAjbPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int AAjbDestroy( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbDstoy( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }
@@ -70,7 +70,7 @@ public:
 	AAjb * m_AAjbPt;
 
 	AAjbCls() { m_AAjbPt = NULL; }
-	~AAjbCls() { Destroy( NULL ); }
+	~AAjbCls() { Dstoy( NULL ); }
 
 	int Init( int32_t SamplingRate, int32_t FrameLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt ) { return AAjbInit( &m_AAjbPt, SamplingRate, FrameLen, IsHaveTimeStamp, TimeStampStep, InactIsContPut, MinNeedBufFrameCnt, MaxNeedBufFrameCnt, AdaptSensitivity, ErrInfoVarStrPt ); }
 	
@@ -84,7 +84,7 @@ public:
 
 	int Clear( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbClear( m_AAjbPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Destroy( VarStr * ErrInfoVarStrPt ) { int p_Result = AAjbDestroy( m_AAjbPt, ErrInfoVarStrPt ); m_AAjbPt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = AAjbDstoy( m_AAjbPt, ErrInfoVarStrPt ); m_AAjbPt = NULL; return p_Result; }
 };
 #endif
 
@@ -109,7 +109,7 @@ __AJB_DLLAPI__ int VAjbGetBufFrameCnt( VAjb * VAjbPt, int32_t * CurHaveBufFrameC
 
 __AJB_DLLAPI__ int VAjbClear( VAjb * VAjbPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int VAjbDestroy( VAjb * VAjbPt, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int VAjbDstoy( VAjb * VAjbPt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }
@@ -122,7 +122,7 @@ public:
 	VAjb * m_VAjbPt;
 
 	VAjbCls() { m_VAjbPt = NULL; }
-	~VAjbCls() { Destroy( NULL ); }
+	~VAjbCls() { Dstoy( NULL ); }
 
 	int Init( int32_t IsHaveTimeStamp, int32_t MinNeedBufFrameCnt, int32_t MaxNeedBufFrameCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt ) { return VAjbInit( &m_VAjbPt, IsHaveTimeStamp, MinNeedBufFrameCnt, MaxNeedBufFrameCnt, AdaptSensitivity, ErrInfoVarStrPt ); }
 	
@@ -137,7 +137,7 @@ public:
 
 	int Clear( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VAjbClear( m_VAjbPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Destroy( VarStr * ErrInfoVarStrPt ) { int p_Result = VAjbDestroy( m_VAjbPt, ErrInfoVarStrPt ); m_VAjbPt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = VAjbDstoy( m_VAjbPt, ErrInfoVarStrPt ); m_VAjbPt = NULL; return p_Result; }
 };
 #endif
 

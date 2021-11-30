@@ -65,7 +65,7 @@ __FUNC_DLLAPI__ int MutexLockInit( MutexLock * * MutexLockPtPt, VarStr * ErrInfo
 __FUNC_DLLAPI__ int MutexLockLock( MutexLock * MutexLockPt, VarStr * ErrInfoVarStrPt );
 __FUNC_DLLAPI__ int MutexLockUnlock( MutexLock * MutexLockPt, VarStr * ErrInfoVarStrPt );
 
-__FUNC_DLLAPI__ int MutexLockDestroy( MutexLock * MutexLockPt, VarStr * ErrInfoVarStrPt );
+__FUNC_DLLAPI__ int MutexLockDstoy( MutexLock * MutexLockPt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }
@@ -109,7 +109,7 @@ __FUNC_DLLAPI__ int RWLockRUnlock( RWLock * RWLockPt, VarStr * ErrInfoVarStrPt )
 __FUNC_DLLAPI__ int RWLockWLock( RWLock * RWLockPt, VarStr * ErrInfoVarStrPt );
 __FUNC_DLLAPI__ int RWLockWUnlock( RWLock * RWLockPt, VarStr * ErrInfoVarStrPt );
 
-__FUNC_DLLAPI__ int RWLockDestroy( RWLock * RWLockPt, VarStr * ErrInfoVarStrPt );
+__FUNC_DLLAPI__ int RWLockDstoy( RWLock * RWLockPt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }

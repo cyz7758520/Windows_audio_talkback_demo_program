@@ -52,20 +52,20 @@ __SPEEXDSP_DLLAPI__ int SpeexAecGetMemLen( SpeexAec * SpeexAecPt, int32_t Sampli
 __SPEEXDSP_DLLAPI__ int SpeexAecGetMem( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, char * SpeexAecMemPt, size_t SpeexAecMemSz );
 __SPEEXDSP_DLLAPI__ int SpeexAecSaveMemFile( SpeexAec * SpeexAecPt, int32_t SamplingRate, int32_t FrameLen, int32_t FilterLen, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const char * SpeexAecMemFileFullPathStrPt, VarStr * ErrInfoVarStrPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecGetIsCnvgnc( SpeexAec * SpeexAecPt, int32_t * IsCnvgncPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecProc( SpeexAec * SpeexAecPt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
-__SPEEXDSP_DLLAPI__ int SpeexAecDestroy( SpeexAec * SpeexAecPt );
+__SPEEXDSP_DLLAPI__ int SpeexAecPocs( SpeexAec * SpeexAecPt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
+__SPEEXDSP_DLLAPI__ int SpeexAecDstoy( SpeexAec * SpeexAecPt );
 
 typedef struct SpeexPreprocessState_ SpeexPreprocessState;
 
-__SPEEXDSP_DLLAPI__ int SpeexPprocInit( SpeexPreprocessState * * SpeexPprocPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCntu, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain, VarStr * ErrInfoVarStrPt );
-__SPEEXDSP_DLLAPI__ int SpeexPprocProc( SpeexPreprocessState * SpeexPprocPt, int16_t * FramePt, int16_t * ResultFramePt, int32_t * VoiceActStsPt );
-__SPEEXDSP_DLLAPI__ int SpeexPprocDestroy( SpeexPreprocessState * SpeexPprocPt );
+__SPEEXDSP_DLLAPI__ int SpeexPrpocsInit( SpeexPreprocessState * * SpeexPrpocsPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCntu, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain, VarStr * ErrInfoVarStrPt );
+__SPEEXDSP_DLLAPI__ int SpeexPrpocsPocs( SpeexPreprocessState * SpeexPrpocsPt, int16_t * FramePt, int16_t * ResultFramePt, int32_t * VoiceActStsPt );
+__SPEEXDSP_DLLAPI__ int SpeexPrpocsDstoy( SpeexPreprocessState * SpeexPrpocsPt );
 
 typedef struct SpeexResamplerState_ SpeexResamplerState;
 
 __SPEEXDSP_DLLAPI__ int SpeexResamplerInit( SpeexResamplerState * * SpeexResamplerPtPt, int32_t BeforeSamplingRate, int32_t AfterSamplingRate, int32_t Quality, VarStr * ErrInfoVarStrPt );
-__SPEEXDSP_DLLAPI__ int SpeexResamplerProc( SpeexResamplerState * SpeexResamplerPt, int16_t * BeforeFramePt, int32_t BeforeFrameLen, int16_t * AfterFramePt, size_t AfterFrameSz, int32_t * AfterFrameLenPt );
-__SPEEXDSP_DLLAPI__ int SpeexResamplerDestroy( SpeexResamplerState * SpeexResamplerPt );
+__SPEEXDSP_DLLAPI__ int SpeexResamplerPocs( SpeexResamplerState * SpeexResamplerPt, int16_t * BeforeFramePt, int32_t BeforeFrameLen, int16_t * AfterFramePt, size_t AfterFrameSz, int32_t * AfterFrameLenPt );
+__SPEEXDSP_DLLAPI__ int SpeexResamplerDstoy( SpeexResamplerState * SpeexResamplerPt );
 
 #ifdef __cplusplus
 }

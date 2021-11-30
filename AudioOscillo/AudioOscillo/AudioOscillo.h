@@ -47,7 +47,7 @@ typedef struct AudioOscillo AudioOscillo;
 
 __AUDIOOSCILLO_DLLAPI__ int AudioOscilloInit( AudioOscillo * * AudioOscilloPtPt, VarStr * ErrInfoVarStrPt );
 __AUDIOOSCILLO_DLLAPI__ int AudioOscilloDrawToWnd( AudioOscillo * AudioOscilloPt, int16_t * PcmFramePt, int FrameLen, HWND DstWndHdl, VarStr * ErrInfoVarStrPt );
-__AUDIOOSCILLO_DLLAPI__ int AudioOscilloDestroy( AudioOscillo * AudioOscilloPt, VarStr * ErrInfoVarStrPt );
+__AUDIOOSCILLO_DLLAPI__ int AudioOscilloDstoy( AudioOscillo * AudioOscilloPt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }

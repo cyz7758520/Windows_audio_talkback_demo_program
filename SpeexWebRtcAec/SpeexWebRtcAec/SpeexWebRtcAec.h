@@ -7,11 +7,6 @@
 #define SPEEXWEBRTCAEC_WORKMODE_WEBRTCAECM_WEBRTCAEC 2 //SpeexWebRtc三重声学回音消除器的工作模式为WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器。
 #define SPEEXWEBRTCAEC_WORKMODE_SPEEXAEC_WEBRTCAECM_WEBRTCAEC 3 //SpeexWebRtc三重声学回音消除器的工作模式为Speex声学回音消除器+WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器。
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 //SpeexWebRtcAec项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_SPEEXWEBRTCAEC__ ) //如果正在编译SpeexWebRtcAec项目。
 	#if( ( defined __MS_VCXX__ ) ) //如果正在使用MS VC++编译器。
@@ -47,6 +42,11 @@ extern "C"
 	#endif
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef struct SpeexWebRtcAec SpeexWebRtcAec;
 
 __SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecInit( SpeexWebRtcAec * * SpeexWebRtcAecPtPt, int32_t SamplingRate, int32_t FrameLen, int32_t WorkMode, int32_t SpeexAecFilterLen, int32_t SpeexAecIsUseRec, float SpeexAecEchoMutp, float SpeexAecEchoCntu, int32_t SpeexAecEchoSupes, int32_t SpeexAecEchoSupesAct, int32_t WebRtcAecmIsUseCNGMode, int32_t WebRtcAecmEchoMode, int32_t WebRtcAecmDelay, int32_t WebRtcAecEchoMode, int32_t WebRtcAecDelay, int32_t WebRtcAecIsUseDelayAgnosticMode, int32_t WebRtcAecIsUseExtdFilterMode, int32_t WebRtcAecIsUseRefinedFilterAdaptAecMode, int32_t WebRtcAecIsUseAdaptAdjDelay, int32_t IsUseSameRoomAec, int32_t SameRoomEchoMinDelay, VarStr * ErrInfoVarStrPt );
@@ -54,8 +54,8 @@ __SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecSetWebRtcAecmDelay( SpeexWebRtcAec *
 __SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecGetWebRtcAecmDelay( SpeexWebRtcAec * SpeexWebRtcAecPt, int32_t * WebRtcAecmDelayPt );
 __SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecSetWebRtcAecDelay( SpeexWebRtcAec * SpeexWebRtcAecPt, int32_t WebRtcAecDelay );
 __SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecGetWebRtcAecDelay( SpeexWebRtcAec * SpeexWebRtcAecPt, int32_t * WebRtcAecDelayPt );
-__SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecProc( SpeexWebRtcAec * SpeexWebRtcAecPt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
-__SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecDestroy( SpeexWebRtcAec * SpeexWebRtcAecPt );
+__SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecPocs( SpeexWebRtcAec * SpeexWebRtcAecPt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
+__SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecDstoy( SpeexWebRtcAec * SpeexWebRtcAecPt );
 
 #ifdef __cplusplus
 }

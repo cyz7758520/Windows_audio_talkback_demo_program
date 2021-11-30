@@ -1,12 +1,7 @@
-﻿#ifndef __RNNOISE_H__
+﻿#include "Func.h"
+
+#ifndef __RNNOISE_H__
 #define __RNNOISE_H__
-
-#include "Func.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 //RNNoise项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_RNNOISE__ ) //如果正在编译RNNoise项目。
@@ -43,11 +38,16 @@ extern "C"
 	#endif
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef struct RNNoise RNNoise;
 
 __RNNOISE_DLLAPI__ int RNNoiseInit( RNNoise * * RNNoisePtPt, int32_t SamplingRate, int32_t FrameLen, VarStr * ErrInfoVarStrPt );
-__RNNOISE_DLLAPI__ int RNNoiseProc( RNNoise * RNNoisePt, int16_t * FramePt, int16_t * ResultFramePt );
-__RNNOISE_DLLAPI__ int RNNoiseDestroy( RNNoise * RNNoisePt );
+__RNNOISE_DLLAPI__ int RNNoisePocs( RNNoise * RNNoisePt, int16_t * FramePt, int16_t * ResultFramePt );
+__RNNOISE_DLLAPI__ int RNNoiseDstoy( RNNoise * RNNoisePt );
 
 #ifdef __cplusplus
 }

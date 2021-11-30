@@ -24,14 +24,14 @@
 #### 特别注意：如果把两台设备放在同一房间里测试，有可能会出现啸叫、声音不完整、等问题，这是因为现在的麦克风都很灵敏了，一点小小的声音都会被录进去，两台设备会相互录音，导致软件无法正确识别回音，所以建议放在不同的房间里测试。如果实在要测试这种情况，就在设置里，Speex预处理器的其他功能设置里，关闭“使用自动增益控制”后再测试。
 
 # 移植
-#### 如果需要在自己的软件中使用本软件的音频功能，只需要将MediaProcThread.h、MediaProcThread.cpp和各个库文件夹复制到自己的软件中，然后实现实现UserInit、UserProcess、UserDestroy、UserReadAudioVideoInputFrame、UserWriteAudioOutputFrame、UserGetPcmAudioOutputFrame、UserWriteVideoOutputFrame、UserGetYU12VideoOutputFrame这八个函数即可。
-#### 如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaProcThread.h、MediaProcThread.cpp文件即可。
+#### 如果需要在自己的软件中使用本软件的音频功能，只需要将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中，然后实现UserInit、UserPocs、UserDstoy、UserReadAudioVideoInputFrame、UserWriteAudioOutputFrame、UserGetPcmAudioOutputFrame、UserWriteVideoOutputFrame、UserGetYU12VideoOutputFrame这八个回调函数即可。
+#### 如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。
 #### 普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、Wave文件读取器、Wave文件写入器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。
 #### 高级收费功能包括：Speex声学回音消除器、WebRtc浮点版声学回音消除器、SpeexWebRtc三重声学回音消除器、RNNoise噪音抑制器、OpenH264编解码器、自己设计的自适应抖动缓冲器。
 
 # 注意
 #### 从老版本更新到新版本时，类文件和库文件全部都要更新，不能只更新类文件或库文件，否则会导致意想不到的问题。
-#### 如果要使用8000Hz采样频率时，最好不要使用RNNoise噪音抑制，因为它对8000Hz的声音抑制非常强烈。
+#### 如果要使用8000Hz采样频率时，最好不要使用RNNoise噪音抑制，因为它可能对8000Hz的声音抑制非常强烈。
 #### 本软件不支持音乐，尤其是RNNoise噪音抑制器可能对音乐的抑制非常强烈。
 #### 某些Windows设备的软硬件环境可能存在问题，从而可能会导致声学回音消除失败，这种情况必须要先解决这些问题。
 

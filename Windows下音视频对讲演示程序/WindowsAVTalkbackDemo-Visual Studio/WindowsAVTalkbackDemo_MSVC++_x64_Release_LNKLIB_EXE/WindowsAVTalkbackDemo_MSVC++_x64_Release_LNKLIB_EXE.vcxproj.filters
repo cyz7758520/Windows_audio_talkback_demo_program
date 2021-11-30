@@ -21,7 +21,7 @@
     <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\MediaProcThread.h">
+    <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\MediaPocsThrd.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\WindowsAVTalkbackDemo\qedit.h">
@@ -32,7 +32,7 @@
     <ClCompile Include="..\..\Source\WindowsAVTalkbackDemo\WindowsAVTalkbackDemo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\WindowsAVTalkbackDemo\MediaProcThread.cpp">
+    <ClCompile Include="..\..\Source\WindowsAVTalkbackDemo\MediaPocsThrd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

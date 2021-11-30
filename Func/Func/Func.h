@@ -347,27 +347,27 @@ __FUNC_DLLAPI__ int FuncNewJavaStringClsObjByUTF8CharArr( JNIEnv * env, const ch
 #define FuncGetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) FuncGetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
 
 __FUNC_DLLAPI__ int FuncGetJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * * ByteArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * ByteArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * ByteArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * * ShortArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * ShortArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * ShortArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * * IntArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * IntArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * IntArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * * LongArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * LongArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * LongArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * * FloatArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * FloatArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * FloatArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * * DoubleArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * DoubleArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * DoubleArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * * BooleanArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * BooleanArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * BooleanArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * * CharArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * CharArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * CharArrPt );
 //__FUNC_DLLAPI__ int FuncGetJavaStringClsObjByteArr( JNIEnv * env, jstring StringClsObj, const jbyte * * ByteArrPtPt );
-//__FUNC_DLLAPI__ int FuncDestroyJavaStringClsObjByteArr( JNIEnv * env, jstring StringClsObj, const jbyte * ByteArrPt );
+//__FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjByteArr( JNIEnv * env, jstring StringClsObj, const jbyte * ByteArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * * CharArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * CharArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * CharArrPt );
 __FUNC_DLLAPI__ int FuncGetJavaStringClsObjUTF8CharArr( JNIEnv * env, jstring StringClsObj, const char * * UTF8CharArrPtPt );
-__FUNC_DLLAPI__ int FuncDestroyJavaStringClsObjUTF8CharArr( JNIEnv * env, jstring StringClsObj, const char * UTF8CharArrPt );
+__FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjUTF8CharArr( JNIEnv * env, jstring StringClsObj, const char * UTF8CharArrPt );
 
 __FUNC_DLLAPI__ int FuncGetAndroidPkgName( JNIEnv * env, char * PkgNameStrPt, size_t PkgNameStrSz, size_t * PkgNameStrLenPt );
 #endif

@@ -69,7 +69,7 @@ __DATASTRUCT_DLLAPI__ int ConstLenQueueDelTail( ConstLenQueue * ConstLenQueuePt,
 __DATASTRUCT_DLLAPI__ int ConstLenQueueDelByNum( ConstLenQueue * ConstLenQueuePt, size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 __DATASTRUCT_DLLAPI__ int ConstLenQueueDelAll( ConstLenQueue * ConstLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueDestroy( ConstLenQueue * ConstLenQueuePt, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueDstoy( ConstLenQueue * ConstLenQueuePt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }
@@ -82,7 +82,7 @@ public:
 	ConstLenQueue * m_ConstLenQueuePt;
 
 	ConstLenQueueCls() { m_ConstLenQueuePt = NULL; }
-	~ConstLenQueueCls() { Destroy( NULL ); }
+	~ConstLenQueueCls() { Dstoy( NULL ); }
 
 	int Init( size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueInit( &m_ConstLenQueuePt, ElmDataLen, BufAutoAdjMeth, BufAutoAdjParm, ElmMinNum, ElmMaxNum, ErrInfoVarStrPt ); }
 	
@@ -102,7 +102,7 @@ public:
 	int DelByNum( size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelByNum( m_ConstLenQueuePt, SpecElmNum, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int DelAll( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelAll( m_ConstLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Destroy( VarStr * ErrInfoVarStrPt ) { int p_Result = ConstLenQueueDestroy( m_ConstLenQueuePt, ErrInfoVarStrPt ); m_ConstLenQueuePt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = ConstLenQueueDstoy( m_ConstLenQueuePt, ErrInfoVarStrPt ); m_ConstLenQueuePt = NULL; return p_Result; }
 };
 #endif
 
@@ -132,7 +132,7 @@ __DATASTRUCT_DLLAPI__ int VarLenQueueDelTail( VarLenQueue * VarLenQueuePt, int32
 __DATASTRUCT_DLLAPI__ int VarLenQueueDelByNum( VarLenQueue * VarLenQueuePt, size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 __DATASTRUCT_DLLAPI__ int VarLenQueueDelAll( VarLenQueue * VarLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
-__DATASTRUCT_DLLAPI__ int VarLenQueueDestroy( VarLenQueue * VarLenQueuePt, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueDstoy( VarLenQueue * VarLenQueuePt, VarStr * ErrInfoVarStrPt );
 
 #ifdef __cplusplus
 }
@@ -145,7 +145,7 @@ public:
 	VarLenQueue * m_VarLenQueuePt;
 
 	VarLenQueueCls() { m_VarLenQueuePt = NULL; }
-	~VarLenQueueCls() { Destroy( NULL ); }
+	~VarLenQueueCls() { Dstoy( NULL ); }
 
 	int Init( int BufAutoAdjMeth, float BufAutoAdjParm, size_t BufMinSz, size_t BufMaxSz, VarStr * ErrInfoVarStrPt ) { return VarLenQueueInit( &m_VarLenQueuePt, BufAutoAdjMeth, BufAutoAdjParm, BufMinSz, BufMaxSz, ErrInfoVarStrPt ); }
 	
@@ -165,7 +165,7 @@ public:
 	int DelByNum( size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelByNum( m_VarLenQueuePt, SpecElmNum, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int DelAll( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelAll( m_VarLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Destroy( VarStr * ErrInfoVarStrPt ) { int p_Result = VarLenQueueDestroy( m_VarLenQueuePt, ErrInfoVarStrPt ); m_VarLenQueuePt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = VarLenQueueDstoy( m_VarLenQueuePt, ErrInfoVarStrPt ); m_VarLenQueuePt = NULL; return p_Result; }
 };
 #endif
 
