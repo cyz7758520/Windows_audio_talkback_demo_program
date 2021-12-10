@@ -102,7 +102,7 @@ public:
 	int DelByNum( size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelByNum( m_ConstLenQueuePt, SpecElmNum, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int DelAll( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelAll( m_ConstLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = ConstLenQueueDstoy( m_ConstLenQueuePt, ErrInfoVarStrPt ); m_ConstLenQueuePt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Rslt = ConstLenQueueDstoy( m_ConstLenQueuePt, ErrInfoVarStrPt ); m_ConstLenQueuePt = NULL; return p_Rslt; }
 };
 #endif
 
@@ -165,7 +165,7 @@ public:
 	int DelByNum( size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelByNum( m_VarLenQueuePt, SpecElmNum, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int DelAll( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelAll( m_VarLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = VarLenQueueDstoy( m_VarLenQueuePt, ErrInfoVarStrPt ); m_VarLenQueuePt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Rslt = VarLenQueueDstoy( m_VarLenQueuePt, ErrInfoVarStrPt ); m_VarLenQueuePt = NULL; return p_Rslt; }
 };
 #endif
 

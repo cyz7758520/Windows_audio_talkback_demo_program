@@ -45,8 +45,8 @@ extern "C"
 
 typedef struct RNNoise RNNoise;
 
-__RNNOISE_DLLAPI__ int RNNoiseInit( RNNoise * * RNNoisePtPt, int32_t SamplingRate, int32_t FrameLen, VarStr * ErrInfoVarStrPt );
-__RNNOISE_DLLAPI__ int RNNoisePocs( RNNoise * RNNoisePt, int16_t * FramePt, int16_t * ResultFramePt );
+__RNNOISE_DLLAPI__ int RNNoiseInit( RNNoise * * RNNoisePtPt, int32_t SmplRate, int32_t FrmLen, VarStr * ErrInfoVarStrPt );
+__RNNOISE_DLLAPI__ int RNNoisePocs( RNNoise * RNNoisePt, int16_t * FrmPt, int16_t * RsltFrmPt );
 __RNNOISE_DLLAPI__ int RNNoiseDstoy( RNNoise * RNNoisePt );
 
 #ifdef __cplusplus

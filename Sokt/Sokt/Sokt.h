@@ -118,7 +118,7 @@ public:
 	int SendPkt( const void * DataBufPt, size_t DataBufLen, uint16_t TimeOutMsec, uint32_t Times, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return TcpClntSendPkt( m_TcpClntSoktPt, DataBufPt, DataBufLen, TimeOutMsec, Times, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int RecvPkt( void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TimeOutMsec, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return TcpClntRecvPkt( m_TcpClntSoktPt, DataBufPt, DataBufSz, DataBufLenPt, TimeOutMsec, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Dstoy( uint16_t TimeOutSec, VarStr * ErrInfoVarStrPt ) { int p_Result = TcpClntDstoy( m_TcpClntSoktPt, TimeOutSec, ErrInfoVarStrPt ); m_TcpClntSoktPt = NULL; return p_Result; }
+	int Dstoy( uint16_t TimeOutSec, VarStr * ErrInfoVarStrPt ) { int p_Rslt = TcpClntDstoy( m_TcpClntSoktPt, TimeOutSec, ErrInfoVarStrPt ); m_TcpClntSoktPt = NULL; return p_Rslt; }
 };
 
 class TcpSrvrSoktCls
@@ -138,7 +138,7 @@ public:
 	
 	int Accept( int * RmtNodeAddrFmlyPt, char * RmtNodeAddrPt, char * RmtNodePortPt, uint16_t TimeOutMsec, TcpClntSoktCls * TcpClntSoktPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return TcpSrvrAccept( m_TcpSrvrSoktPt, RmtNodeAddrFmlyPt, RmtNodeAddrPt, RmtNodePortPt, TimeOutMsec, &TcpClntSoktPt->m_TcpClntSoktPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	
-	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = TcpSrvrDstoy( m_TcpSrvrSoktPt, ErrInfoVarStrPt ); m_TcpSrvrSoktPt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Rslt = TcpSrvrDstoy( m_TcpSrvrSoktPt, ErrInfoVarStrPt ); m_TcpSrvrSoktPt = NULL; return p_Rslt; }
 };
 #endif
 
@@ -208,7 +208,7 @@ public:
 	int SendPkt( int RmtNodeAddrFmly, const char * RmtNodeNamePt, const char * RmtNodeSrvcPt, const void * DataBufPt, size_t DataBufLen, uint16_t TimeOutMsec, uint32_t Times, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpSendPkt( m_UdpSoktPt, RmtNodeAddrFmly, RmtNodeNamePt, RmtNodeSrvcPt, DataBufPt, DataBufLen, TimeOutMsec, Times, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int RecvPkt( int * RmtNodeAddrFmlyPt, char * RmtNodeAddrPt, char * RmtNodePortPt, void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TimeOutMsec, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpRecvPkt( m_UdpSoktPt, RmtNodeAddrFmlyPt, RmtNodeAddrPt, RmtNodePortPt, DataBufPt, DataBufSz, DataBufLenPt, TimeOutMsec, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Result = UdpDstoy( m_UdpSoktPt, ErrInfoVarStrPt ); m_UdpSoktPt = NULL; return p_Result; }
+	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Rslt = UdpDstoy( m_UdpSoktPt, ErrInfoVarStrPt ); m_UdpSoktPt = NULL; return p_Rslt; }
 };
 #endif
 

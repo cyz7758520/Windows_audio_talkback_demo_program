@@ -9,6 +9,7 @@
 #### 支持语音活动检测，只有在人说话时才发送网络数据，无人说话时不产生网络数据，从而降低噪音、降低网络流量。
 #### 支持自动增益控制，当人说话声音较小时会自动增大音量，当人说话声音较大时会自动减小音量。
 #### 支持音频编解码，对音频数据的压缩率在1~20%之间，且支持动态比特率，从而大幅度降低网络流量，还支持数据包丢失隐藏，当网络丢包率高达30%时，仍然可以进行对讲。
+#### 支持保存音频到文件和绘制音频波形到窗口，可以直观且方便的调试音频。
 #### 支持视频编解码，支持指定比特率，最低到10KB/s仍然可以进行视频对讲。
 #### 支持音视频自适应抖动缓冲，当网络存在丢包、乱序、延时等抖动情况时，通过自适应调节缓冲深度来应对这些抖动。
 #### 支持与Android下音视频对讲演示程序进行全双工实时音视频对讲。
@@ -24,7 +25,7 @@
 #### 特别注意：如果把两台设备放在同一房间里测试，有可能会出现啸叫、声音不完整、等问题，这是因为现在的麦克风都很灵敏了，一点小小的声音都会被录进去，两台设备会相互录音，导致软件无法正确识别回音，所以建议放在不同的房间里测试。如果实在要测试这种情况，就在设置里，Speex预处理器的其他功能设置里，关闭“使用自动增益控制”后再测试。
 
 # 移植
-#### 如果需要在自己的软件中使用本软件的音频功能，只需要将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中，然后实现UserInit、UserPocs、UserDstoy、UserReadAudioVideoInputFrame、UserWriteAudioOutputFrame、UserGetPcmAudioOutputFrame、UserWriteVideoOutputFrame、UserGetYU12VideoOutputFrame这八个回调函数即可。
+#### 如果需要在自己的软件中使用本软件的音频功能，只需要将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中，然后实现UserInit、UserPocs、UserDstoy、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这八个回调函数即可。
 #### 如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。
 #### 普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、Wave文件读取器、Wave文件写入器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。
 #### 高级收费功能包括：Speex声学回音消除器、WebRtc浮点版声学回音消除器、SpeexWebRtc三重声学回音消除器、RNNoise噪音抑制器、OpenH264编解码器、自己设计的自适应抖动缓冲器。

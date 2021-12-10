@@ -123,7 +123,7 @@ typedef int HANDLE;
 #include "VarStr.h"
 #include "Log.h"
 #include "ThreadLock.h"
-#include "Audio.h"
+#include "Ado.h"
 
 //线程局部变量宏。
 #if( defined __MS_VCXX__ )
@@ -227,10 +227,6 @@ __FUNC_DLLAPI__ int FuncGetFileSzByFileStream( FILE * FileStreamPt, uint64_t * F
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __FUNC_DLLAPI__ int FuncGetFileSzByHdl( HANDLE FileHdl, uint64_t * FileSzPt, VarStr * ErrInfoVarStrPt );
 #endif
-
-//音频函数。
-__FUNC_DLLAPI__ int FuncAudioDataInt16ToFlt32( const int16_t * AudioDataInt16Pt, float * AudioDataFlt32Pt, int SampleCnt, int FltRange, const char * Drct );
-__FUNC_DLLAPI__ int FuncAudioDataFlt32ToInt16( const float * AudioDataFlt32Pt, int16_t * AudioDataInt16Pt, int SampleCnt, int FltRange, const char * Drct );
 
 //字符、字符串函数。
 __FUNC_DLLAPI__ int FuncIsBlank( char Chr );
@@ -369,7 +365,7 @@ __FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjCharArr( JNIEnv * env, jstring Stri
 __FUNC_DLLAPI__ int FuncGetJavaStringClsObjUTF8CharArr( JNIEnv * env, jstring StringClsObj, const char * * UTF8CharArrPtPt );
 __FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjUTF8CharArr( JNIEnv * env, jstring StringClsObj, const char * UTF8CharArrPt );
 
-__FUNC_DLLAPI__ int FuncGetAndroidPkgName( JNIEnv * env, char * PkgNameStrPt, size_t PkgNameStrSz, size_t * PkgNameStrLenPt );
+__FUNC_DLLAPI__ int FuncGetAndrdPkgName( JNIEnv * env, char * PkgNameStrPt, size_t PkgNameStrSz, size_t * PkgNameStrLenPt );
 #endif
 
 #ifdef __cplusplus

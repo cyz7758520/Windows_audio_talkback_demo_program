@@ -43,17 +43,17 @@ extern "C"
 {
 #endif
 
-typedef struct SpeexEncoder SpeexEncoder;
+typedef struct SpeexEncd SpeexEncd;
 
-__SPEEX_DLLAPI__ int SpeexEncoderInit( SpeexEncoder * * SpeexEncoderPtPt, int32_t SamplingRate, int32_t UseCbrOrVbr, int32_t Qualt, int32_t Cmplxt, int32_t PlcExpectedLossRate );
-__SPEEX_DLLAPI__ int SpeexEncoderPocs( SpeexEncoder * SpeexEncoderPt, int16_t * PcmFramePt, uint8_t * SpeexFramePt, size_t SpeexFrameSz, size_t * SpeexFrameLenPt, int32_t * IsNeedTransPt );
-__SPEEX_DLLAPI__ int SpeexEncoderDstoy( SpeexEncoder * SpeexEncoderPt );
+__SPEEX_DLLAPI__ int SpeexEncdInit( SpeexEncd * * SpeexEncdPtPt, int32_t SmplRate, int32_t UseCbrOrVbr, int32_t Qualt, int32_t Cmplxt, int32_t PlcExptLossRate );
+__SPEEX_DLLAPI__ int SpeexEncdPocs( SpeexEncd * SpeexEncdPt, int16_t * PcmFrmPt, uint8_t * SpeexFrmPt, size_t SpeexFrmSz, size_t * SpeexFrmLenPt, int32_t * IsNeedTransPt );
+__SPEEX_DLLAPI__ int SpeexEncdDstoy( SpeexEncd * SpeexEncdPt );
 
-typedef struct SpeexDecoder SpeexDecoder;
+typedef struct SpeexDecd SpeexDecd;
 
-__SPEEX_DLLAPI__ int SpeexDecoderInit( SpeexDecoder * * SpeexDecoderPtPt, int32_t SamplingRate, int32_t IsUsePerceptualEnhancement );
-__SPEEX_DLLAPI__ int SpeexDecoderPocs( SpeexDecoder * SpeexDecoderPt, uint8_t * SpeexFramePt, size_t SpeexFrameLen, int16_t * PcmFramePt );
-__SPEEX_DLLAPI__ int SpeexDecoderDstoy( SpeexDecoder * SpeexDecoderPt );
+__SPEEX_DLLAPI__ int SpeexDecdInit( SpeexDecd * * SpeexDecdPtPt, int32_t SmplRate, int32_t IsUsePrcplEnhsmt );
+__SPEEX_DLLAPI__ int SpeexDecdPocs( SpeexDecd * SpeexDecdPt, uint8_t * SpeexFrmPt, size_t SpeexFrmLen, int16_t * PcmFrmPt );
+__SPEEX_DLLAPI__ int SpeexDecdDstoy( SpeexDecd * SpeexDecdPt );
 
 #ifdef __cplusplus
 }
