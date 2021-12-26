@@ -61,6 +61,7 @@ __FUNC_DLLAPI__ int VarStrInitByStr( VarStr * * VarStrPtPt, const char * StrPt, 
 #else
 __FUNC_DLLAPI__ int VarStrInitByStr( VarStr * * VarStrPtPt, const char * StrPt, size_t MaxCpyLen );
 #endif
+#define VarStrInitByVarStr( VarStrPtPt, VarStrPt ) VarStrInitByStr( VarStrPtPt, VarStrPt->m_StrPt, VarStrPt->m_StrLen )
 
 #ifdef __cplusplus
 __FUNC_DLLAPI__ int VarStrCpy( VarStr * VarStrPt, const char * StrPt, size_t MaxCpyLen = SIZE_MAX );
@@ -105,10 +106,11 @@ public:
 	VarStr * m_VarStrPt;
 
 	VarStrCls() { m_VarStrPt = NULL; }
-	~VarStrCls() { Dstoy( NULL ); }
+	~VarStrCls() { Dstoy(); }
 
 	int Init( size_t StrSz = sizeof( size_t ) ) { return VarStrInit( &m_VarStrPt, StrSz ); }
 	int InitByStr( const char * StrPt, size_t MaxCpyLen = SIZE_MAX ) { return VarStrInitByStr( &m_VarStrPt, StrPt, MaxCpyLen ); }
+	int InitByVarStr( VarStrCls * VarStrPt ) { return VarStrInitByVarStr( &m_VarStrPt, VarStrPt->m_VarStrPt ); }
 
 	int Cpy( const char * StrPt, size_t MaxCpyLen = SIZE_MAX ) { return VarStrCpy( m_VarStrPt, StrPt, MaxCpyLen ); }
 	int FmtCpy( const char * FmtStrPt, ... ) { va_list p_VaLst; va_start( p_VaLst, FmtStrPt ); int p_Rslt = VarStrVaFmtCpy( m_VarStrPt, FmtStrPt, p_VaLst ); va_end( p_VaLst ); return p_Rslt; }
@@ -128,7 +130,7 @@ public:
 
 	int ReSetLen() { return VarStrReSetLen( m_VarStrPt ); }
 
-	int Dstoy( VarStr * VarStrPt ) { int p_Rslt = VarStrDstoy( m_VarStrPt ); m_VarStrPt = NULL; return p_Rslt; }
+	int Dstoy() { int p_Rslt = VarStrDstoy( m_VarStrPt ); m_VarStrPt = NULL; return p_Rslt; }
 };
 #endif
 

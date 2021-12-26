@@ -25,7 +25,11 @@
 #### 特别注意：如果把两台设备放在同一房间里测试，有可能会出现啸叫、声音不完整、等问题，这是因为现在的麦克风都很灵敏了，一点小小的声音都会被录进去，两台设备会相互录音，导致软件无法正确识别回音，所以建议放在不同的房间里测试。如果实在要测试这种情况，就在设置里，Speex预处理器的其他功能设置里，关闭“使用自动增益控制”后再测试。
 
 # 移植
-#### 如果需要在自己的软件中使用本软件的音频功能，只需要将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中，然后实现UserInit、UserPocs、UserDstoy、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这八个回调函数即可。
+#### 如果需要在自己的软件中使用本软件的音视频功能，需要以下几个步骤：
+###### 1、将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。
+###### 2、实现UserInit、UserPocs、UserDstoy、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这八个回调函数。
+###### 3、调用MediaPocsThrdInit()函数创建并初始化媒体处理线程，然后调用媒体处理线程的相关设置函数，最后调用MediaPocsThrdStart()函数启动媒体处理线程即可。
+###### 4、当需要媒体处理线程退出时，调用MediaPocsThrdRqirExit()函数即可。
 #### 如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。
 #### 普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、Wave文件读取器、Wave文件写入器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。
 #### 高级收费功能包括：Speex声学回音消除器、WebRtc浮点版声学回音消除器、SpeexWebRtc三重声学回音消除器、RNNoise噪音抑制器、OpenH264编解码器、自己设计的自适应抖动缓冲器。

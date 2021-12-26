@@ -49,12 +49,12 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt );
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
-						 USER_INIT_FUNC_PT UserInitFuncPt, USER_POCS_FUNC_PT UserPocsFuncPt, USER_DSTOY_FUNC_PT UserDstoyFuncPt,
-						 USER_READ_AUDIO_VIDEO_INPUT_FRAME_FUNC_PT UserReadAdoVdoInptFrmFuncPt,
-						 USER_WRITE_AUDIO_OUTPUT_FRAME_FUNC_PT UserWriteAdoOtptFrmFuncPt, USER_GET_PCM_AUDIO_OUTPUT_FRAME_FUNC_PT UserGetPcmAdoOtptFrmFuncPt,
-						 USER_WRITE_VIDEO_OUTPUT_FRAME_FUNC_PT UserWriteVdoOtptFrmFuncPt, USER_GET_YU12_VIDEO_OUTPUT_FRAME_FUNC_PT UserGetYU12VdoOtptFrmFuncPt,
-						 VarStr * ErrInfoVarStrPt )
+int MediaPocsThrdInit( MediaPocsThrd ** MediaPocsThrdPtPt, void * UserDataPt,
+					   USER_INIT_FUNC_PT UserInitFuncPt, USER_POCS_FUNC_PT UserPocsFuncPt, USER_DSTOY_FUNC_PT UserDstoyFuncPt,
+					   USER_READ_ADO_VDO_INPT_FRM_FUNC_PT UserReadAdoVdoInptFrmFuncPt,
+					   USER_WRITE_ADO_OTPT_FRM_FUNC_PT UserWriteAdoOtptFrmFuncPt, USER_GET_PCM_ADO_OTPT_FRM_FUNC_PT UserGetPcmAdoOtptFrmFuncPt,
+					   USER_WRITE_VDO_OTPT_FRM_FUNC_PT UserWriteVdoOtptFrmFuncPt, USER_GET_YU12_VDO_OTPT_FRM_FUNC_PT UserGetYU12VdoOtptFrmFuncPt,
+					   VarStr * ErrInfoVarStrPt )
 {
 	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
 	MediaPocsThrd * p_MediaPocsThrdPt = NULL; //存放媒体处理线程的指针。
@@ -3046,8 +3046,8 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_AdoRsltFileFullPathVarStrPt->m_StrPt：%s\n", MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVarStrPt->m_StrPt );
 		fprintf( p_StngFileStreamPt, "\n" );
 		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_IsDrawAdoWavfmToWnd：%" PRId32 "\n", MediaPocsThrdPt->m_AdoInpt.m_IsDrawAdoWavfmToWnd );
-		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_AdoInptWavfmWndHdl：%p\n", MediaPocsThrdPt->m_AdoInpt.m_AdoInptWavfmPt );
-		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_AdoRsltWavfmWndHdl：%p\n", MediaPocsThrdPt->m_AdoInpt.m_AdoRsltWavfmWndHdl );
+		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_AdoInptWavfmWndHdl：0x%p\n", MediaPocsThrdPt->m_AdoInpt.m_AdoInptWavfmWndHdl );
+		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_AdoRsltWavfmWndHdl：0x%p\n", MediaPocsThrdPt->m_AdoInpt.m_AdoRsltWavfmWndHdl );
 		fprintf( p_StngFileStreamPt, "\n" );
 		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_AdoInptDvcID：%u\n", MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcID );
 		fprintf( p_StngFileStreamPt, "m_AdoInpt.m_AdoInptWaveHdrTotal：%" PRId32 "\n", MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrTotal );
@@ -3067,7 +3067,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 		fprintf( p_StngFileStreamPt, "m_AdoOtpt.m_AdoOtptFileFullPathVarStrPt->m_StrPt：%s\n", MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVarStrPt->m_StrPt );
 		fprintf( p_StngFileStreamPt, "\n" );
 		fprintf( p_StngFileStreamPt, "m_AdoOtpt.m_IsDrawAdoWavfmToWnd：%" PRId32 "\n", MediaPocsThrdPt->m_AdoOtpt.m_IsDrawAdoWavfmToWnd );
-		fprintf( p_StngFileStreamPt, "m_AdoOtpt.m_AdoOtptWavfmWndHdl：%p\n", MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWavfmWndHdl );
+		fprintf( p_StngFileStreamPt, "m_AdoOtpt.m_AdoOtptWavfmWndHdl：0x%p\n", MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWavfmWndHdl );
 		fprintf( p_StngFileStreamPt, "\n" );
 		fprintf( p_StngFileStreamPt, "m_AdoOtpt.m_AdoOtptDvcID：%u\n", MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcID );
 		fprintf( p_StngFileStreamPt, "m_AdoOtpt.m_AdoOtptWaveHdrTotal：%" PRId32 "\n", MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWaveHdrTotal );
@@ -3090,7 +3090,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 		fprintf( p_StngFileStreamPt, "\n" );
 		fprintf( p_StngFileStreamPt, "m_VdoInpt.m_VdoInptDvcID：%u\n", MediaPocsThrdPt->m_VdoInpt.m_VdoInptDvcID );
 		fprintf( p_StngFileStreamPt, "m_VdoInpt.m_VdoInptIsBlack：%" PRId32 "\n", MediaPocsThrdPt->m_VdoInpt.m_VdoInptIsBlack );
-		fprintf( p_StngFileStreamPt, "m_VdoInpt.m_VdoInptPrvwWndHdl：%p\n", MediaPocsThrdPt->m_VdoInpt.m_VdoInptPrvwWndHdl );
+		fprintf( p_StngFileStreamPt, "m_VdoInpt.m_VdoInptPrvwWndHdl：0x%p\n", MediaPocsThrdPt->m_VdoInpt.m_VdoInptPrvwWndHdl );
 		fprintf( p_StngFileStreamPt, "\n" );
 
 		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_IsUseVdoOtpt：%" PRId32 "\n", MediaPocsThrdPt->m_VdoOtpt.m_IsUseVdoOtpt );
@@ -3099,9 +3099,9 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 		fprintf( p_StngFileStreamPt, "\n" );
 		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_OpenH264DecdDecdThrdNum：%" PRId32 "\n", MediaPocsThrdPt->m_VdoOtpt.m_OpenH264DecdDecdThrdNum );
 		fprintf( p_StngFileStreamPt, "\n" );
-		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_VdoOtptDspyWndHdl：%p\n", MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptDspyWndHdl );
-		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_VdoOtptDspyScale：%p\n", MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptDspyScale );
-		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_VdoOtptIsBlack：%p\n", MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptIsBlack );
+		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_VdoOtptDspyWndHdl：0x%p\n", MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptDspyWndHdl );
+		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_VdoOtptDspyScale：%f\n", MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptDspyScale );
+		fprintf( p_StngFileStreamPt, "m_VdoOtpt.m_VdoOtptIsBlack：%" PRId32 "\n", MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptIsBlack );
 		fprintf( p_StngFileStreamPt, "\n" );
 
 		fclose( p_StngFileStreamPt );
