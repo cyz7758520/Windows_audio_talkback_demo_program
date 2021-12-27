@@ -269,7 +269,8 @@ __FUNC_DLLAPI__ int FuncStrVaFmtCpy( char * DstFullStrPt, int8_t IsWriteEnd, siz
 #define FuncStrFindChrs( StrPt, FindMemPt, FindPos, IsBelong, MemFindedChrPtPt, FindedChrTotalPt ) FuncMemFindChrs( StrPt, strlen( StrPt ), FindMemPt, strlen( FindMemPt ), FindPos, IsBelong, MemFindedChrPtPt, FindedChrTotalPt )
 __FUNC_DLLAPI__ int FuncMemFindChrs( const char * MemPt, size_t MemLen, const char * FindMemPt, size_t FindMemLen, char FindPos, int IsBelong, const char * * MemFindedChrPtPt, size_t * FindedChrTotalPt );
 #define FuncStrFindStr( StrPt, FindStrPt, FindPos, FindedChrTotalPt ) FuncMemFindMem( StrPt, strlen( StrPt ), FindStrPt, strlen( FindStrPt ), FindPos, FindedChrTotalPt )
-__FUNC_DLLAPI__ int FuncMemFindMem( const char * MemPt, uint64_t MemSz, const char * FindMemPt, uint64_t FindMemSz, const char * FindPos, size_t * FindedMemPosPt );
+__FUNC_DLLAPI__ int FuncMemFindMem( const char * MemPt, size_t MemSz, const char * FindMemPt, size_t FindMemSz, const char * FindPos, size_t * FindedMemPosPt );
+__FUNC_DLLAPI__ int FuncMemSum( const void * MemPt, size_t MemSz, uint64_t * SumPt );
 __FUNC_DLLAPI__ int FuncStrFindMatch( const char * SrcStrPt, const char * PatternStrPt, size_t * PatternStrPos );
 #ifdef __cplusplus
 __FUNC_DLLAPI__ int FuncStrFullMatch( const char * SrcStrPt, const char * PatternStrPt, int MatchCase = 1 );
