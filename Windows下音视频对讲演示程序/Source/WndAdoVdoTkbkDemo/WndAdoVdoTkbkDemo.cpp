@@ -61,14 +61,15 @@ typedef struct MediaInfo
     VarLenLnkLstCls m_RecvAdoOtptFrmLnkLst; //存放接收音频输出帧链表。
 	VarLenLnkLstCls m_RecvVdoOtptFrmLnkLst; //存放接收视频输出帧链表。
 
-    AAjb * m_AAjbPt; //存放音频自适应抖动缓冲器的指针。
-    int m_AAjbMinNeedBufFrmCnt; //存放音频自适应抖动缓冲器的最小需缓冲帧数量，单位个，必须大于0。
-    int m_AAjbMaxNeedBufFrmCnt; //存放音频自适应抖动缓冲器的最大需缓冲帧数量，单位个，必须大于最小需缓冲帧的数量。
-    float m_AAjbAdaptSensitivity; //存放音频自适应抖动缓冲器的自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]。
-    VAjb * m_VAjbPt; //存放视频自适应抖动缓冲器的指针。
-    int m_VAjbMinNeedBufFrmCnt; //存放视频自适应抖动缓冲器的最小需缓冲帧数量，单位个，必须大于0。
-    int m_VAjbMaxNeedBufFrmCnt; //存放视频自适应抖动缓冲器的最大需缓冲帧数量，单位个，必须大于最小需缓冲帧的数量。
-    float m_VAjbAdaptSensitivity; //存放视频自适应抖动缓冲器的自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]。
+	AAjb * m_AAjbPt; //存放音频自适应抖动缓冲器的指针。
+	int m_AAjbMinNeedBufFrmCnt; //存放音频自适应抖动缓冲器的最小需缓冲帧数量，单位个，必须大于0。
+	int m_AAjbMaxNeedBufFrmCnt; //存放音频自适应抖动缓冲器的最大需缓冲帧数量，单位个，必须大于最小需缓冲帧的数量。
+	int m_AAjbMaxCntuLostFrmCnt; //音频自适应抖动缓冲器的最大连续丢失帧的数量，单位为个帧，取值区间为[1,2147483647]，当连续丢失帧的数量超过最大时，认为是对方中途暂停发送。
+	float m_AAjbAdaptSensitivity; //存放音频自适应抖动缓冲器的自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]。
+	VAjb * m_VAjbPt; //存放视频自适应抖动缓冲器的指针。
+	int m_VAjbMinNeedBufFrmCnt; //存放视频自适应抖动缓冲器的最小需缓冲帧数量，单位个，必须大于0。
+	int m_VAjbMaxNeedBufFrmCnt; //存放视频自适应抖动缓冲器的最大需缓冲帧数量，单位个，必须大于最小需缓冲帧的数量。
+	float m_VAjbAdaptSensitivity; //存放视频自适应抖动缓冲器的自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]。
 
 	int8_t * m_TmpBytePt; //存放临时数据的指针。
 	size_t m_TmpByteSz; //存放临时数据的内存大小。
@@ -820,7 +821,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 	    case 1: //如果使用自适应抖动缓冲器。
 	    {
 			//初始化音频自适应抖动缓冲器。
-            if( AAjbInit( &g_MediaInfoPt->m_AAjbPt, MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen, 1, 1, 0, g_MediaInfoPt->m_AAjbMinNeedBufFrmCnt, g_MediaInfoPt->m_AAjbMaxNeedBufFrmCnt, g_MediaInfoPt->m_AAjbAdaptSensitivity, MediaPocsThrdPt->m_ErrInfoVarStrPt ) == 0 )
+            if( AAjbInit( &g_MediaInfoPt->m_AAjbPt, MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen, 1, 1, 0, g_MediaInfoPt->m_AAjbMinNeedBufFrmCnt, g_MediaInfoPt->m_AAjbMaxNeedBufFrmCnt, g_MediaInfoPt->m_AAjbMaxCntuLostFrmCnt, g_MediaInfoPt->m_AAjbAdaptSensitivity, MediaPocsThrdPt->m_ErrInfoVarStrPt ) == 0 )
             {
                 LOGI( "创建并初始化音频自适应抖动缓冲器成功。" );
             }
@@ -855,7 +856,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 	g_MediaInfoPt->m_LastSendAdoInptFrmTimeStamp = 0 - 1; //设置最后一个发送音频输入帧的时间戳为0的前一个，因为第一次发送音频输入帧时会递增一个步进。
     g_MediaInfoPt->m_LastSendVdoInptFrmTimeStamp = 0 - 1; //设置最后一个发送视频输入帧的时间戳为0的前一个，因为第一次发送视频输入帧时会递增一个步进。
 	
-	VarStrFmtCpy( MediaPocsThrdPt->m_ErrInfoVarStrPt, "开始进行对讲。" );
+	VarStrFmtCpy( MediaPocsThrdPt->m_ErrInfoVarStrPt, "开始对讲。" );
 	LOGI( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
 	{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 	FuncToast( NULL, 3000, NULL, MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
@@ -871,7 +872,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 }
 
 //用户定义的处理函数，在本线程运行时每隔1毫秒就回调一次，返回值表示是否成功，为0表示成功，为非0表示失败。
-int __cdecl MyMediaPocsThrdUserProcess( MediaPocsThrd * MediaPocsThrdPt )
+int __cdecl MyMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt )
 {
 	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
 	size_t p_TmpSz;
@@ -955,9 +956,10 @@ int __cdecl MyMediaPocsThrdUserProcess( MediaPocsThrd * MediaPocsThrdPt )
 							int32_t p_CurHaveBufFrmCnt; //存放当前已缓冲帧的数量。
 							int32_t p_MinNeedBufFrmCnt; //存放最小需缓冲帧的数量。
 							int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
+							int32_t p_MaxCntuLostFrmCnt; //存放最大连续丢失帧的数量。
 							int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
-							AAjbGetBufFrmCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
-							LOGFI( "音频自适应抖动缓冲器：有活动帧：%" PRIi32 "，无活动帧：%" PRIi32 "，帧：%" PRIi32 "，最小需帧：%" PRIi32 "，最大需帧：%" PRIi32 "，当前需帧：%" PRIi32 "。", p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
+							AAjbGetBufFrmCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_MaxCntuLostFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
+							LOGFI( "音频自适应抖动缓冲器：有活动帧：%" PRIi32 "，无活动帧：%" PRIi32 "，帧：%" PRIi32 "，最小需帧：%" PRIi32 "，最大需帧：%" PRIi32 "，最大丢帧：%" PRIi32 "，当前需帧：%" PRIi32 "。", p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_MaxCntuLostFrmCnt, p_CurNeedBufFrmCnt );
 
 							break;
 						}
@@ -1118,66 +1120,73 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 	
 	if( ( MediaPocsThrdPt->m_ExitFlag == 1 ) && ( ( g_MediaInfoPt->m_TcpClntSokt.m_TcpClntSoktPt != NULL ) || ( ( g_MediaInfoPt->m_UdpSokt.m_UdpSoktPt != NULL ) && ( g_MediaInfoPt->m_UdpSokt.GetRmtAddr( NULL, NULL, NULL, 0, NULL ) == 0 ) ) ) ) //如果本线程接收到退出请求，且本端TCP协议客户端套接字不为空或本端UDP协议套接字不为空且已连接远端。
     {
-        //发送退出包。
-        g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_EXIT; //设置退出包。
-        if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) != 0 ) ) ||
-            ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) != 0 ) ) )
-        {
-            VarStrIns( MediaPocsThrdPt->m_ErrInfoVarStrPt, 0, "发送一个退出包失败。原因：" );
-			LOGE( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
+		{
+			//发送退出包。
+			g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_EXIT; //设置退出包。
+			if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) != 0 ) ) ||
+				( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) != 0 ) ) )
+			{
+				VarStrIns( MediaPocsThrdPt->m_ErrInfoVarStrPt, 0, "发送一个退出包失败。原因：" );
+				LOGE( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
+				{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+				goto SendExitPkt;
+			}
+			
+			FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); //记录最后一个数据包的发送时间。
+
+			VarStrCpy( MediaPocsThrdPt->m_ErrInfoVarStrPt, "发送一个退出包成功。" );
+			LOGI( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
 			{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
-			goto SendExitPkt;
-        }
 
-        FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); //记录最后一个数据包的发送时间。
+			//接收退出包。
+			if( g_MediaInfoPt->m_IsRecvExitPkt == 0 ) //如果没有接收到退出包。
+			{
+				while( true ) //循环接收退出包。
+				{
+					if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.RecvPkt( g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 5000, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) == 0 ) ) ||
+						( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 5000, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) == 0 ) ) )
+					{
+						if( p_TmpSz != -1 ) //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包成功。
+						{
+							FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime ); //记录最后一个数据包的接收时间。
 
-		VarStrCpy( MediaPocsThrdPt->m_ErrInfoVarStrPt, "发送一个退出包成功。" );
-		LOGI( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
-		{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+							if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_EXIT ) ) //如果是退出包。
+							{
+								VarStrCpy( MediaPocsThrdPt->m_ErrInfoVarStrPt, "接收到一个退出包。" );
+								LOGI( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
+								{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+								goto SendExitPkt;
+							}
+							else //如果是其他包，继续接收。
+							{
 
-		//接收退出包。
-        if( g_MediaInfoPt->m_IsRecvExitPkt == 0 ) //如果没有接收到退出包。
-        {
-            while( true ) //循环接收退出包。
-            {
-                if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.RecvPkt( g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 5000, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) == 0 ) ) ||
-                    ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 5000, 0, MediaPocsThrdPt->m_ErrInfoVarStrPt ) == 0 ) ) )
-                {
-                    if( p_TmpSz != -1 ) //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包成功。
-                    {
-						FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime ); //记录最后一个数据包的接收时间。
-
-                        if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_EXIT ) ) //如果是退出包。
-                        {
-                            VarStrCpy( MediaPocsThrdPt->m_ErrInfoVarStrPt, "接收到一个退出包。" );
-							LOGI( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
+							}
+						}
+						else //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包超时。
+						{
+							VarStrIns( MediaPocsThrdPt->m_ErrInfoVarStrPt, 0, "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" );
+							LOGE( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
 							{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
-                            goto SendExitPkt;
-                        }
-						else //如果是其他包，继续接收。
-                        {
-
-                        }
-                    }
-                    else //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包超时。
-                    {
-                        VarStrIns( MediaPocsThrdPt->m_ErrInfoVarStrPt, 0, "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" );
+							goto SendExitPkt;
+						}
+					}
+					else //用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。
+					{
+						VarStrIns( MediaPocsThrdPt->m_ErrInfoVarStrPt, 0, "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" );
 						LOGE( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
 						{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
-                        goto SendExitPkt;
-                    }
-                }
-                else //用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。
-                {
-                    VarStrIns( MediaPocsThrdPt->m_ErrInfoVarStrPt, 0, "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" );
-					LOGE( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
-					{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
-                    goto SendExitPkt;
-                }
-            }
-        }
+						goto SendExitPkt;
+					}
+				}
+			}
+		}
+		SendExitPkt:;
+
+		VarStrFmtCpy( MediaPocsThrdPt->m_ErrInfoVarStrPt, "中断对讲。" );
+		LOGI( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
+		{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+		FuncToast( NULL, 3000, NULL, MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
     }
-	SendExitPkt:;
 
     //销毁本端TCP协议服务端套接字。
     if( g_MediaInfoPt->m_TcpSrvrSokt.m_TcpSrvrSoktPt != NULL )
@@ -1242,7 +1251,7 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 
 		LOGI( "销毁视频自适应抖动缓冲器成功。" );
     }
-
+	
     if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 1 ) //如果是创建服务端。
     {
         if( ( MediaPocsThrdPt->m_ExitFlag == 1 ) && ( g_MediaInfoPt->m_IsRecvExitPkt == 1 ) ) //如果本线程接收到退出请求，且接收到了退出包。
@@ -1529,15 +1538,16 @@ void __cdecl MyMediaPocsThrdUserWriteAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt
 					g_MediaInfoPt->m_LastGetAdoOtptFrmIsAct = 1; //设置最后一个取出的音频输出帧为有语音活动。
 					LOGFI( "从音频自适应抖动缓冲器取出一个丢失的音频输出帧。音频输出帧时间戳：%" PRIu32 "，视频输出帧时间戳：%" PRIu32 "，长度：%" PRIuPTR "。", p_AdoOtptFrmTimeStamp, g_MediaInfoPt->m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp, m_TmpSz );
 				}
-
+				
 				int32_t p_CurHaveBufActFrmCnt; //存放当前已缓冲有活动帧的数量。
 				int32_t p_CurHaveBufInactFrmCnt; //存放当前已缓冲无活动帧的数量。
 				int32_t p_CurHaveBufFrmCnt; //存放当前已缓冲帧的数量。
 				int32_t p_MinNeedBufFrmCnt; //存放最小需缓冲帧的数量。
 				int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
+				int32_t p_MaxCntuLostFrmCnt; //存放最大连续丢失帧的数量。
 				int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
-				AAjbGetBufFrmCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
-				LOGFI( "自适应抖动缓冲器：有活动帧：%" PRIi32 "，无活动帧：%" PRIi32 "，帧：%" PRIi32 "，最小需帧：%" PRIi32 "，最大需帧：%" PRIi32 "，当前需帧：%" PRIi32 "。", p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
+				AAjbGetBufFrmCnt( g_MediaInfoPt->m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_MaxCntuLostFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
+				LOGFI( "音频自适应抖动缓冲器：有活动帧：%" PRIi32 "，无活动帧：%" PRIi32 "，帧：%" PRIi32 "，最小需帧：%" PRIi32 "，最大需帧：%" PRIi32 "，最大丢帧：%" PRIi32 "，当前需帧：%" PRIi32 "。", p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_MaxCntuLostFrmCnt, p_CurNeedBufFrmCnt );
 
 				break;
 			}
@@ -2072,7 +2082,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						
 						//初始化媒体处理线程的指针。
 						if( g_MediaPocsThrd.Init( g_MediaInfoPt,
-												  MyMediaPocsThrdUserInit, MyMediaPocsThrdUserProcess, MyMediaPocsThrdUserDstoy,
+												  MyMediaPocsThrdUserInit, MyMediaPocsThrdUserPocs, MyMediaPocsThrdUserDstoy,
 												  MyMediaPocsThrdUserReadAdoVdoInptFrm,
 												  MyMediaPocsThrdUserWriteAdoOtptFrm, MyMediaPocsThrdUserGetPcmAdoOtptFrm,
 												  MyMediaPocsThrdUserWriteVdoOtptFrm, MyMediaPocsThrdUserGetYU12VdoOtptFrm,
@@ -2138,6 +2148,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							char p_TmpStrPt[100];
 							int p_AAjbMinNeedBufFrmCnt;
 							int p_AAjbMaxNeedBufFrmCnt;
+							int p_AAjbMaxCntuLostFrmCnt;
 							float p_AAjbAdaptSensitivity;
 							int p_VAjbMinNeedBufFrmCnt;
 							int p_VAjbMaxNeedBufFrmCnt;
@@ -2147,6 +2158,8 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							p_AAjbMinNeedBufFrmCnt = atoi( p_TmpStrPt );
 							GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
 							p_AAjbMaxNeedBufFrmCnt = atoi( p_TmpStrPt );
+							GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+							p_AAjbMaxCntuLostFrmCnt = atoi( p_TmpStrPt );
 							GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
 							p_AAjbAdaptSensitivity = atof( p_TmpStrPt );
 							GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
@@ -2159,6 +2172,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							g_MediaInfoPt->m_UseWhatRecvOtptFrm = 1;
 							g_MediaInfoPt->m_AAjbMinNeedBufFrmCnt = p_AAjbMinNeedBufFrmCnt;
 							g_MediaInfoPt->m_AAjbMaxNeedBufFrmCnt = p_AAjbMaxNeedBufFrmCnt;
+							g_MediaInfoPt->m_AAjbMaxCntuLostFrmCnt = p_AAjbMaxCntuLostFrmCnt;
 							g_MediaInfoPt->m_AAjbAdaptSensitivity = p_AAjbAdaptSensitivity;
 							g_MediaInfoPt->m_VAjbMinNeedBufFrmCnt = p_VAjbMinNeedBufFrmCnt;
 							g_MediaInfoPt->m_VAjbMaxNeedBufFrmCnt = p_VAjbMaxNeedBufFrmCnt;
@@ -3607,13 +3621,13 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	//判断应用程序可执行文件的名称是否为“Windows下音视频对讲演示程序.exe”。
 	{
 		HANDLE p_CurProcHdl;
-		char p_ProcessImageFileName[260];
+		char p_PocsImageFileName[260];
 		const char * p_AppFileNamePt;
 
 		//获取Windows应用程序的进程名字符串。
 		p_CurProcHdl = GetCurrentProcess();
-		GetProcessImageFileName( p_CurProcHdl, p_ProcessImageFileName, sizeof( p_ProcessImageFileName ) );
-		FuncPathFindFileName( p_ProcessImageFileName, &p_AppFileNamePt );
+		GetProcessImageFileName( p_CurProcHdl, p_PocsImageFileName, sizeof( p_PocsImageFileName ) );
+		FuncPathFindFileName( p_PocsImageFileName, &p_AppFileNamePt );
 		CloseHandle( p_CurProcHdl );
 		if( ( memcmp( p_AppFileNamePt, "Windows下音视频对讲演示程序.exe", strlen( "Windows下音视频对讲演示程序.exe" ) + 1 ) != 0 ) &&
 			( memcmp( p_AppFileNamePt, "WndAdoVdoTkbkDemo", strlen( "WndAdoVdoTkbkDemo" ) ) != 0 ) )
@@ -3717,6 +3731,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMinNeedBufFrmCntEdTxtId ), "5" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId ), "20" );
+		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId ), "20" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId ), "1.0" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId ), "1" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId ), "24" );

@@ -43,11 +43,13 @@
 extern "C"
 {
 #endif
+	
+__FUNC_DLLAPI__ int AdoInt16IncrDecr( int16_t * SrcInt16AdoPt, int16_t * DstInt16AdoPt, int SmplCnt, int16_t Qntt );
 
-__FUNC_DLLAPI__ int AdoInt16ToFlt32768( const int16_t * AdoInt16Pt, float * AdoFlt32768Pt, int SmplCnt, int Drct );
-__FUNC_DLLAPI__ int AdoInt16ToFlt1( const int16_t * AdoInt16Pt, float * AdoFlt1Pt, int SmplCnt, int Drct );
-__FUNC_DLLAPI__ int AdoFlt32768ToInt16( const float * AdoFlt32768Pt, int16_t * AdoInt16Pt, int SmplCnt, int Drct );
-__FUNC_DLLAPI__ int AdoFlt1ToInt16( const float * AdoFlt1Pt, int16_t * AdoInt16Pt, int SmplCnt, int Drct );
+__FUNC_DLLAPI__ int AdoInt16ToFlt32768( const int16_t * Int16AdoPt, float * Flt32768AdoPt, int SmplCnt, int Drct );
+__FUNC_DLLAPI__ int AdoInt16ToFlt1( const int16_t * Int16AdoPt, float * Flt1AdoPt, int SmplCnt, int Drct );
+__FUNC_DLLAPI__ int AdoFlt32768ToInt16( const float * Flt32768AdoPt, int16_t * Int16AdoPt, int SmplCnt, int Drct );
+__FUNC_DLLAPI__ int AdoFlt1ToInt16( const float * Flt1AdoPt, int16_t * Int16AdoPt, int SmplCnt, int Drct );
 
 __FUNC_DLLAPI__ void AdoOneBand32kInt16ToLHBand16kInt16( const int16_t OneBand32kInt16[320],
 														 int16_t LowBand16kInt16[160], int16_t HighBand16kInt16[160],

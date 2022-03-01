@@ -169,6 +169,9 @@ __SOKT_DLLAPI__ int UdpSetRecvBufSz( UdpSokt * UdpSoktPt, size_t RecvBufSz, int3
 __SOKT_DLLAPI__ int UdpGetRecvBufSz( UdpSokt * UdpSoktPt, size_t * RecvBufSzPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 __SOKT_DLLAPI__ int UdpGetRecvBufLen( UdpSokt * UdpSoktPt, size_t * RecvBufLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
+__SOKT_DLLAPI__ int UdpSend( UdpSokt * UdpSoktPt, int RmtNodeAddrFmly, const char * RmtNodeNamePt, const char * RmtNodeSrvcPt, const void * DataBufPt, size_t DataBufLen, uint16_t TimeOutMsec, uint32_t Times, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__SOKT_DLLAPI__ int UdpRecv( UdpSokt * UdpSoktPt, int * RmtNodeAddrFmlyPt, char * RmtNodeAddrPt, char * RmtNodePortPt, void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TimeOutMsec, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+
 __SOKT_DLLAPI__ int UdpSendPkt( UdpSokt * UdpSoktPt, int RmtNodeAddrFmly, const char * RmtNodeNamePt, const char * RmtNodeSrvcPt, const void * DataBufPt, size_t DataBufLen, uint16_t TimeOutMsec, uint32_t Times, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 __SOKT_DLLAPI__ int UdpRecvPkt( UdpSokt * UdpSoktPt, int * RmtNodeAddrFmlyPt, char * RmtNodeAddrPt, char * RmtNodePortPt, void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TimeOutMsec, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
@@ -204,6 +207,9 @@ public:
 	int SetRecvBufSz( size_t RecvBufSz, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpSetRecvBufSz( m_UdpSoktPt, RecvBufSz, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int GetRecvBufSz( size_t * RecvBufSzPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpGetRecvBufSz( m_UdpSoktPt, RecvBufSzPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int GetRecvBufLen( size_t * RecvBufLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpGetRecvBufLen( m_UdpSoktPt, RecvBufLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	
+	int Send( int RmtNodeAddrFmly, const char * RmtNodeNamePt, const char * RmtNodeSrvcPt, const void * DataBufPt, size_t DataBufLen, uint16_t TimeOutMsec, uint32_t Times, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpSend( m_UdpSoktPt, RmtNodeAddrFmly, RmtNodeNamePt, RmtNodeSrvcPt, DataBufPt, DataBufLen, TimeOutMsec, Times, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int Recv( int * RmtNodeAddrFmlyPt, char * RmtNodeAddrPt, char * RmtNodePortPt, void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TimeOutMsec, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpRecv( m_UdpSoktPt, RmtNodeAddrFmlyPt, RmtNodeAddrPt, RmtNodePortPt, DataBufPt, DataBufSz, DataBufLenPt, TimeOutMsec, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
 	int SendPkt( int RmtNodeAddrFmly, const char * RmtNodeNamePt, const char * RmtNodeSrvcPt, const void * DataBufPt, size_t DataBufLen, uint16_t TimeOutMsec, uint32_t Times, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpSendPkt( m_UdpSoktPt, RmtNodeAddrFmly, RmtNodeNamePt, RmtNodeSrvcPt, DataBufPt, DataBufLen, TimeOutMsec, Times, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int RecvPkt( int * RmtNodeAddrFmlyPt, char * RmtNodeAddrPt, char * RmtNodePortPt, void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TimeOutMsec, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return UdpRecvPkt( m_UdpSoktPt, RmtNodeAddrFmlyPt, RmtNodeAddrPt, RmtNodePortPt, DataBufPt, DataBufSz, DataBufLenPt, TimeOutMsec, IsAutoLockUnlock, ErrInfoVarStrPt ); }

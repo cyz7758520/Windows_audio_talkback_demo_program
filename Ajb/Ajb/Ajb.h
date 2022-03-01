@@ -45,7 +45,7 @@ extern "C"
 
 typedef struct AAjb AAjb;
 
-__AJB_DLLAPI__ int AAjbInit( AAjb * * AAjbPtPt, int32_t SmplRate, int32_t FrmLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbInit( AAjb * * AAjbPtPt, int32_t SmplRate, int32_t FrmLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt );
 
 __AJB_DLLAPI__ int AAjbLock( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
 __AJB_DLLAPI__ int AAjbUnlock( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
@@ -53,7 +53,7 @@ __AJB_DLLAPI__ int AAjbUnlock( AAjb * AAjbPt, VarStr * ErrInfoVarStrPt );
 __AJB_DLLAPI__ int AAjbPutOneFrm( AAjb * AAjbPt, uint32_t TimeStamp, const int8_t * FrmPt, size_t FrmLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 __AJB_DLLAPI__ int AAjbGetOneFrm( AAjb * AAjbPt, uint32_t * TimeStampPt, int8_t * FrmPt, size_t FrmSz, size_t * FrmLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
-__AJB_DLLAPI__ int AAjbGetBufFrmCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFrmCntPt, int32_t * CurHaveBufInactFrmCntPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__AJB_DLLAPI__ int AAjbGetBufFrmCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFrmCntPt, int32_t * CurHaveBufInactFrmCntPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * MaxCntuLostFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
 __AJB_DLLAPI__ int AAjbClear( AAjb * AAjbPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
 
@@ -72,7 +72,7 @@ public:
 	AAjbCls() { m_AAjbPt = NULL; }
 	~AAjbCls() { Dstoy( NULL ); }
 
-	int Init( int32_t SmplRate, int32_t FrmLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt ) { return AAjbInit( &m_AAjbPt, SmplRate, FrmLen, IsHaveTimeStamp, TimeStampStep, InactIsContPut, MinNeedBufFrmCnt, MaxNeedBufFrmCnt, AdaptSensitivity, ErrInfoVarStrPt ); }
+	int Init( int32_t SmplRate, int32_t FrmLen, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, VarStr * ErrInfoVarStrPt ) { return AAjbInit( &m_AAjbPt, SmplRate, FrmLen, IsHaveTimeStamp, TimeStampStep, InactIsContPut, MinNeedBufFrmCnt, MaxNeedBufFrmCnt, MaxCntuLostFrmCnt, AdaptSensitivity, ErrInfoVarStrPt ); }
 	
 	int Lock( VarStr * ErrInfoVarStrPt ) { return AAjbLock( m_AAjbPt, ErrInfoVarStrPt ); }
 	int Unlock( VarStr * ErrInfoVarStrPt ) { return AAjbUnlock( m_AAjbPt, ErrInfoVarStrPt ); }
@@ -80,7 +80,7 @@ public:
 	int PutOneFrm( uint32_t TimeStamp, const int8_t * FrmPt, size_t FrmLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbPutOneFrm( m_AAjbPt, TimeStamp, FrmPt, FrmLen, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 	int GetOneFrm( uint32_t * TimeStampPt, int8_t * FrmPt, size_t FrmSz, size_t * FrmLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbGetOneFrm( m_AAjbPt, TimeStampPt, FrmPt, FrmSz, FrmLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
-	int GetBufFrmCnt( int32_t * CurHaveBufActFrmCntPt, int32_t * CurHaveBufInactFrmCntPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbGetBufFrmCnt( m_AAjbPt, CurHaveBufActFrmCntPt, CurHaveBufInactFrmCntPt, CurHaveBufFrmCntPt, MinNeedBufFrmCntPt, MaxNeedBufFrmCntPt, CurNeedBufFrmCntPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int GetBufFrmCnt( int32_t * CurHaveBufActFrmCntPt, int32_t * CurHaveBufInactFrmCntPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * MaxCntuLostFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbGetBufFrmCnt( m_AAjbPt, CurHaveBufActFrmCntPt, CurHaveBufInactFrmCntPt, CurHaveBufFrmCntPt, MinNeedBufFrmCntPt, MaxNeedBufFrmCntPt, MaxCntuLostFrmCntPt, CurNeedBufFrmCntPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
 	int Clear( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return AAjbClear( m_AAjbPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
 
