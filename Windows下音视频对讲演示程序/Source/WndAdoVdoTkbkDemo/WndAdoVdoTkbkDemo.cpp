@@ -29,8 +29,10 @@ typedef struct MediaInfo
 
 	VarStr * m_IPAddrVarStrPt; //存放IP地址动态字符串的指针。
     VarStr * m_PortVarStrPt; //存放端口动态字符串的指针。
-	int m_UseWhatXfrPrtcl; //存放使用什么传输协议，为0表示TCP协议，为1表示UDP协议。
-    int m_MaxCnctTimes; //存放最大连接次数，取值区间为[1,2147483647]。
+	int m_XfrMode; //存放传输模式，为0表示实时半双工（一键通），为1表示实时全双工。
+	int m_PttBtnIsDown; //存放一键即按即通按钮是否按下，为0表示弹起，为1表示按下。
+	int m_MaxCnctTimes; //存放最大连接次数，取值区间为[1,2147483647]。
+    int m_UseWhatXfrPrtcl; //存放使用什么传输协议，为0表示TCP协议，为1表示UDP协议。
     int m_IsCreateSrvrOrClnt; //存放创建服务端或者客户端标记，为1表示创建服务端，为0表示创建客户端。
     TcpSrvrSoktCls m_TcpSrvrSokt; //存放本端TCP协议服务端套接字。
     TcpClntSoktCls m_TcpClntSokt; //存放本端TCP协议客户端套接字。
@@ -86,6 +88,8 @@ MediaPocsThrdCls g_MediaPocsThrd; //媒体处理线程的指针。
 MediaInfo * g_MediaInfoPt = NULL; //媒体信息的指针。
 HWND g_MainDlgWndHdl = NULL; //存放主对话框窗口的句柄。
 HWND g_RqstCnctDlgWndHdl = NULL; //存放请求连接对话框窗口的句柄。
+HWND g_PttDlgWndHdl = NULL; //存放一键即按即通对话框窗口的句柄。
+HWND g_PttBtnWndHdl = NULL; //存放一键即按即通按钮窗口的句柄。
 HWND g_XfrPrtclStngDlgWndHdl = NULL; //存放传输协议设置对话框窗口的句柄。
 HWND g_StngDlgWndHdl = NULL; //存放设置对话框窗口的句柄。
 HWND g_AjbStngDlgWndHdl = NULL; //存放自适应抖动缓冲器设置对话框窗口的句柄。
@@ -608,7 +612,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 	FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime );
 	if( ( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 1 ) && ( g_MediaInfoPt->m_IsAutoAllowCnct != 0 ) ) g_MediaInfoPt->m_RqstCnctRslt = 1;
 	else g_MediaInfoPt->m_RqstCnctRslt = 0;
-	{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, p_RmtNodeAddrPt ); PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_SHOW_RQST_CNCT_DIALOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
+	{VarStr * p_ErrInfoVarStrPt = NULL; VarStrInitByStr( &p_ErrInfoVarStrPt, p_RmtNodeAddrPt ); PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_SHOW_RQST_CNCT_DIALOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );} //向主界面发送显示请求连接对话框的消息。
 	while( true )
 	{
 		if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 1 ) //如果是服务端。
@@ -1105,6 +1109,42 @@ int __cdecl MyMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt )
 		LOGE( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt );
 		{VarStrCls * p_ErrInfoVarStrPt = new VarStrCls; p_ErrInfoVarStrPt->InitByStr( MediaPocsThrdPt->m_ErrInfoVarStrPt->m_StrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVarStrPt, 0 );}
 		goto Out;
+	}
+	
+	if( g_MediaInfoPt->m_XfrMode == 0 ) //如果传输模式为实时半双工（一键通）。
+	{
+		if( g_MediaInfoPt->m_PttBtnIsDown == 0 ) //如果一键即按即通按钮为弹起。
+		{
+			if( ( MediaPocsThrdPt->m_AdoInpt.m_IsUseAdoInpt != 0 ) && ( MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt == 0 ) ) //如果要使用音频输入，且不使用音频输出。
+			{
+				MediaPocsThrdPt->m_AdoInpt.m_IsUseAdoInpt = 0;
+				MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt = 1;
+				MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL ); //请求重启。
+			}
+
+			if( ( MediaPocsThrdPt->m_VdoInpt.m_IsUseVdoInpt != 0 ) && ( MediaPocsThrdPt->m_VdoOtpt.m_IsUseVdoOtpt == 0 ) ) //如果要使用视频输入，且不使用视频输出。
+			{
+				MediaPocsThrdPt->m_VdoInpt.m_IsUseVdoInpt = 0;
+				MediaPocsThrdPt->m_VdoOtpt.m_IsUseVdoOtpt = 1;
+				MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL ); //请求重启。
+			}
+		}
+		else //如果一键即按即通按钮为按下。
+		{
+			if( ( MediaPocsThrdPt->m_AdoInpt.m_IsUseAdoInpt == 0 ) && ( MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt != 0 ) ) //如果不使用音频输入，且要使用音频输出。
+			{
+				MediaPocsThrdPt->m_AdoInpt.m_IsUseAdoInpt = 1;
+				MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt = 0;
+				MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL ); //请求重启。
+			}
+
+			if( ( MediaPocsThrdPt->m_VdoInpt.m_IsUseVdoInpt == 0 ) && ( MediaPocsThrdPt->m_VdoOtpt.m_IsUseVdoOtpt != 0 ) ) //如果不使用视频输入，且要使用视频输出。
+			{
+				MediaPocsThrdPt->m_VdoInpt.m_IsUseVdoInpt = 1;
+				MediaPocsThrdPt->m_VdoOtpt.m_IsUseVdoOtpt = 0;
+				MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL ); //请求重启。
+			}
+		}
 	}
 
     p_Rslt = 0; //设置本函数执行成功。
@@ -2120,6 +2160,16 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							
 							//设置使用什么传输协议。
 							g_MediaInfoPt->m_UseWhatXfrPrtcl = ( IsDlgButtonChecked( g_MainDlgWndHdl, UseTcpPrtclRdBtnId ) == BST_CHECKED ) ? 0 : 1;
+							
+							//设置传输模式。
+							if( IsDlgButtonChecked( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId ) == BST_CHECKED )
+							{
+								g_MediaInfoPt->m_XfrMode = 0;
+							}
+							else
+							{
+								g_MediaInfoPt->m_XfrMode = 1;
+							}
 
 							//设置最大连接次数。
 							{
@@ -2190,8 +2240,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 																&g_ErrInfoVarStr );
 
 						//设置是否使用音频输入。
-						g_MediaPocsThrd.SetIsUseAdoInpt( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 :
-														   ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 : 0,
+						g_MediaPocsThrd.SetIsUseAdoInpt( ( g_MediaInfoPt->m_XfrMode == 0 ) ? 0 :
+														   ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 :
+														     ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 : 0,
 														 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId ) == BST_CHECKED ) ? 8000 :
 														   ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate16000RdBtnId ) == BST_CHECKED ) ? 16000 :
 														     ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate32000RdBtnId ) == BST_CHECKED ) ? 32000 :
@@ -2201,139 +2252,146 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 														     ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 0,
 														 &g_ErrInfoVarStr );
 
-						//设置音频输入是否不使用声学回音消除器。
-						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoAecRdBtnId ) == BST_CHECKED )
+						if( g_MediaInfoPt->m_XfrMode == 0 ) //如果传输模式为实时半双工。
 						{
 							g_MediaPocsThrd.SetAdoInptUseNoAec( &g_ErrInfoVarStr );
 						}
-
-						//设置音频输入是否使用Speex声学回音消除器。
-						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexAecRdBtnId ) == BST_CHECKED )
+						else //如果传输模式为实时全双工。
 						{
-							char p_TmpStrPt[100];
-							int32_t p_FilterLen;
-							int32_t p_IsUseRec;
-							float p_EchoMultiple;
-							float p_EchoCont;
-							int32_t p_EchoSupes;
-							int32_t p_EchoSupesAct;
-							int p_IsSaveMemFile;
-							
-							GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_FilterLen = atoi( p_TmpStrPt );
-							p_IsUseRec = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
-							GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_EchoMultiple = atof( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_EchoCont = atof( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_EchoSupes = atoi( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_EchoSupesAct = atoi( p_TmpStrPt );
-							p_IsSaveMemFile = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId ) == BST_CHECKED );
+							//设置音频输入是否不使用声学回音消除器。
+							if( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoAecRdBtnId ) == BST_CHECKED )
+							{
+								g_MediaPocsThrd.SetAdoInptUseNoAec( &g_ErrInfoVarStr );
+							}
 
-							g_MediaPocsThrd.SetAdoInptUseSpeexAec( p_FilterLen, p_IsUseRec, p_EchoMultiple, p_EchoCont, p_EchoSupes, p_EchoSupesAct, p_IsSaveMemFile, ".\\SpeexAecMem", &g_ErrInfoVarStr );
+							//设置音频输入是否使用Speex声学回音消除器。
+							if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexAecRdBtnId ) == BST_CHECKED )
+							{
+								char p_TmpStrPt[100];
+								int32_t p_FilterLen;
+								int32_t p_IsUseRec;
+								float p_EchoMultiple;
+								float p_EchoCont;
+								int32_t p_EchoSupes;
+								int32_t p_EchoSupesAct;
+								int p_IsSaveMemFile;
+
+								GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_FilterLen = atoi( p_TmpStrPt );
+								p_IsUseRec = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
+								GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_EchoMultiple = atof( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_EchoCont = atof( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_EchoSupes = atoi( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_EchoSupesAct = atoi( p_TmpStrPt );
+								p_IsSaveMemFile = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId ) == BST_CHECKED );
+
+								g_MediaPocsThrd.SetAdoInptUseSpeexAec( p_FilterLen, p_IsUseRec, p_EchoMultiple, p_EchoCont, p_EchoSupes, p_EchoSupesAct, p_IsSaveMemFile, ".\\SpeexAecMem", &g_ErrInfoVarStr );
+							}
+
+							//设置音频输入是否使用WebRtc定点版声学回音消除器。
+							if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecmRdBtnId ) == BST_CHECKED )
+							{
+								char p_TmpStrPt[100];
+								int32_t p_IsUseCNGMode;
+								int32_t p_EchoMode;
+								int32_t p_Delay;
+
+								p_IsUseCNGMode = ( IsDlgButtonChecked( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
+								GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_EchoMode = atoi( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_Delay = atoi( p_TmpStrPt );
+
+								g_MediaPocsThrd.SetAdoInptUseWebRtcAecm( p_IsUseCNGMode, p_EchoMode, p_Delay, &g_ErrInfoVarStr );
+							}
+
+							//设置音频输入是否使用WebRtc浮点版声学回音消除器。
+							if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecRdBtnId ) == BST_CHECKED )
+							{
+								char p_TmpStrPt[100];
+								int32_t p_EchoMode;
+								int32_t p_Delay;
+								int32_t p_IsUseDelayAgstcMode;
+								int32_t p_IsUseExtdFilterMode;
+								int32_t p_IsUseRefinedFilterAdaptAecMode;
+								int32_t p_IsUseAdaptAdjDelay;
+								int p_IsSaveMemFile;
+
+								GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_EchoMode = atoi( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_Delay = atoi( p_TmpStrPt );
+								p_IsUseDelayAgstcMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
+								p_IsUseExtdFilterMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
+								p_IsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
+								p_IsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
+								p_IsSaveMemFile = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId ) == BST_CHECKED );
+
+								g_MediaPocsThrd.SetAdoInptUseWebRtcAec( p_EchoMode, p_Delay, p_IsUseDelayAgstcMode, p_IsUseExtdFilterMode, p_IsUseRefinedFilterAdaptAecMode, p_IsUseAdaptAdjDelay, p_IsSaveMemFile, ".\\WebRtcAecMem", &g_ErrInfoVarStr );
+							}
+
+							//设置音频输入是否使用SpeexWebRtc三重声学回音消除器。
+							if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexWebRtcAecRdBtnId ) == BST_CHECKED )
+							{
+								char p_TmpStrPt[100];
+								int32_t p_WorkMode;
+								int32_t p_SpeexAecFilterLen;
+								int32_t p_SpeexAecIsUseRec;
+								float p_SpeexAecEchoMultiple;
+								float p_SpeexAecEchoCont;
+								int32_t p_SpeexAecEchoSupes;
+								int32_t p_SpeexAecEchoSupesAct;
+								int32_t p_WebRtcAecmIsUseCNGMode;
+								int32_t p_WebRtcAecmEchoMode;
+								int32_t p_WebRtcAecmDelay;
+								int32_t p_WebRtcAecEchoMode;
+								int32_t p_WebRtcAecDelay;
+								int32_t p_WebRtcAecIsUseDelayAgstcMode;
+								int32_t p_WebRtcAecIsUseExtdFilterMode;
+								int32_t p_WebRtcAecIsUseRefinedFilterAdaptAecMode;
+								int32_t p_WebRtcAecIsUseAdaptAdjDelay;
+								int32_t p_IsUseSameRoomAec;
+								int32_t p_SameRoomEchoMinDelay;
+
+								p_WorkMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? 1 :
+											   ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? 2 :
+												 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? 3 : 0;
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_SpeexAecFilterLen = atoi( p_TmpStrPt );
+								p_SpeexAecIsUseRec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_SpeexAecEchoMultiple = atof( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_SpeexAecEchoCont = atof( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_SpeexAecEchoSupes = atoi( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_SpeexAecEchoSupesAct = atoi( p_TmpStrPt );
+								p_WebRtcAecmIsUseCNGMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_WebRtcAecmEchoMode = atoi( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_WebRtcAecmDelay = atoi( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_WebRtcAecEchoMode = atoi( p_TmpStrPt );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_WebRtcAecDelay = atoi( p_TmpStrPt );
+								p_WebRtcAecIsUseDelayAgstcMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
+								p_WebRtcAecIsUseExtdFilterMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
+								p_WebRtcAecIsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
+								p_WebRtcAecIsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
+								p_IsUseSameRoomAec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId ) == BST_CHECKED );
+								GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
+								p_SameRoomEchoMinDelay = atoi( p_TmpStrPt );
+
+								g_MediaPocsThrd.SetAdoInptUseSpeexWebRtcAec( p_WorkMode, p_SpeexAecFilterLen, p_SpeexAecIsUseRec, p_SpeexAecEchoMultiple, p_SpeexAecEchoCont, p_SpeexAecEchoSupes, p_SpeexAecEchoSupesAct, p_WebRtcAecmIsUseCNGMode, p_WebRtcAecmEchoMode, p_WebRtcAecmDelay, p_WebRtcAecEchoMode, p_WebRtcAecDelay, p_WebRtcAecIsUseDelayAgstcMode, p_WebRtcAecIsUseExtdFilterMode, p_WebRtcAecIsUseRefinedFilterAdaptAecMode, p_WebRtcAecIsUseAdaptAdjDelay, p_IsUseSameRoomAec, p_SameRoomEchoMinDelay, &g_ErrInfoVarStr );
+							}
 						}
 
-						//设置音频输入是否使用WebRtc定点版声学回音消除器。
-						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecmRdBtnId ) == BST_CHECKED )
-						{
-							char p_TmpStrPt[100];
-							int32_t p_IsUseCNGMode;
-							int32_t p_EchoMode;
-							int32_t p_Delay;
-							
-							p_IsUseCNGMode = ( IsDlgButtonChecked( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
-							GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_EchoMode = atoi( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_Delay = atoi( p_TmpStrPt );
-							
-							g_MediaPocsThrd.SetAdoInptUseWebRtcAecm( p_IsUseCNGMode, p_EchoMode, p_Delay, &g_ErrInfoVarStr );
-						}
-						
-						//设置音频输入是否使用WebRtc浮点版声学回音消除器。
-						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecRdBtnId ) == BST_CHECKED )
-						{
-							char p_TmpStrPt[100];
-							int32_t p_EchoMode;
-							int32_t p_Delay;
-							int32_t p_IsUseDelayAgstcMode;
-							int32_t p_IsUseExtdFilterMode;
-							int32_t p_IsUseRefinedFilterAdaptAecMode;
-							int32_t p_IsUseAdaptAdjDelay;
-							int p_IsSaveMemFile;
-
-							GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_EchoMode = atoi( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_Delay = atoi( p_TmpStrPt );
-							p_IsUseDelayAgstcMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
-							p_IsUseExtdFilterMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
-							p_IsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
-							p_IsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
-							p_IsSaveMemFile = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId ) == BST_CHECKED );
-
-							g_MediaPocsThrd.SetAdoInptUseWebRtcAec( p_EchoMode, p_Delay, p_IsUseDelayAgstcMode, p_IsUseExtdFilterMode, p_IsUseRefinedFilterAdaptAecMode, p_IsUseAdaptAdjDelay, p_IsSaveMemFile, ".\\WebRtcAecMem", &g_ErrInfoVarStr );
-						}
-
-						//设置音频输入是否使用SpeexWebRtc三重声学回音消除器。
-						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexWebRtcAecRdBtnId ) == BST_CHECKED )
-						{
-							char p_TmpStrPt[100];
-							int32_t p_WorkMode;
-							int32_t p_SpeexAecFilterLen;
-							int32_t p_SpeexAecIsUseRec;
-							float p_SpeexAecEchoMultiple;
-							float p_SpeexAecEchoCont;
-							int32_t p_SpeexAecEchoSupes;
-							int32_t p_SpeexAecEchoSupesAct;
-							int32_t p_WebRtcAecmIsUseCNGMode;
-							int32_t p_WebRtcAecmEchoMode;
-							int32_t p_WebRtcAecmDelay;
-							int32_t p_WebRtcAecEchoMode;
-							int32_t p_WebRtcAecDelay;
-							int32_t p_WebRtcAecIsUseDelayAgstcMode;
-							int32_t p_WebRtcAecIsUseExtdFilterMode;
-							int32_t p_WebRtcAecIsUseRefinedFilterAdaptAecMode;
-							int32_t p_WebRtcAecIsUseAdaptAdjDelay;
-							int32_t p_IsUseSameRoomAec;
-							int32_t p_SameRoomEchoMinDelay;
-
-							p_WorkMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? 1 :
-										   ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? 2 :
-											 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? 3 : 0;
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_SpeexAecFilterLen = atoi( p_TmpStrPt );
-							p_SpeexAecIsUseRec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_SpeexAecEchoMultiple = atof( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_SpeexAecEchoCont = atof( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_SpeexAecEchoSupes = atoi( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_SpeexAecEchoSupesAct = atoi( p_TmpStrPt );
-							p_WebRtcAecmIsUseCNGMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_WebRtcAecmEchoMode = atoi( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_WebRtcAecmDelay = atoi( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_WebRtcAecEchoMode = atoi( p_TmpStrPt );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_WebRtcAecDelay = atoi( p_TmpStrPt );
-							p_WebRtcAecIsUseDelayAgstcMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
-							p_WebRtcAecIsUseExtdFilterMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
-							p_WebRtcAecIsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
-							p_WebRtcAecIsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
-							p_IsUseSameRoomAec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId ) == BST_CHECKED );
-							GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), p_TmpStrPt, sizeof( p_TmpStrPt ) );
-							p_SameRoomEchoMinDelay = atoi( p_TmpStrPt );
-
-							g_MediaPocsThrd.SetAdoInptUseSpeexWebRtcAec( p_WorkMode, p_SpeexAecFilterLen, p_SpeexAecIsUseRec, p_SpeexAecEchoMultiple, p_SpeexAecEchoCont, p_SpeexAecEchoSupes, p_SpeexAecEchoSupesAct, p_WebRtcAecmIsUseCNGMode, p_WebRtcAecmEchoMode, p_WebRtcAecmDelay, p_WebRtcAecEchoMode, p_WebRtcAecDelay, p_WebRtcAecIsUseDelayAgstcMode, p_WebRtcAecIsUseExtdFilterMode, p_WebRtcAecIsUseRefinedFilterAdaptAecMode, p_WebRtcAecIsUseAdaptAdjDelay, p_IsUseSameRoomAec, p_SameRoomEchoMinDelay, &g_ErrInfoVarStr );
-						}
-						
 						//设置音频输入是否不使用噪音抑制器。
 						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoNsRdBtnId ) == BST_CHECKED )
 						{
@@ -2521,8 +2579,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 														  &g_ErrInfoVarStr );
 						
 						//设置是否使用视频输入。
-						g_MediaPocsThrd.SetIsUseVdoInpt( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 :
-														   ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 : 0,
+						g_MediaPocsThrd.SetIsUseVdoInpt( ( g_MediaInfoPt->m_XfrMode == 0 ) ? 0 :
+														   ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 :
+														     ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? 1 : 0,
 														 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId ) == BST_CHECKED ) ? 12 :
 														   ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate15RdBtnId ) == BST_CHECKED ) ? 15 :
 														     ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate24RdBtnId ) == BST_CHECKED ) ? 24 :
@@ -3471,6 +3530,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				SetWindowText( GetDlgItem( hDlg, CreateSrvrBtnId ), "中断" ); //设置创建服务端控件的内容为“中断”。
 				EnableWindow( GetDlgItem( hDlg, CnctSrvrBtnId ), FALSE ); //设置连接服务端控件为不可用。
 				EnableWindow( GetDlgItem( hDlg, StngBtnId ), FALSE ); //设置设置控件为不可用。
+				if( ( g_MediaInfoPt != NULL ) && ( g_MediaInfoPt->m_XfrMode == 0 ) )
+				{
+					ShowWindow( g_PttDlgWndHdl, SW_SHOW ); //设置一键即按即通对话框为显示。
+				}
             }
             else //如果是创建客户端。
             {
@@ -3482,6 +3545,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				EnableWindow( GetDlgItem( hDlg, CreateSrvrBtnId ), FALSE ); //设置创建服务端控件为不可用。
 				SetWindowText( GetDlgItem( hDlg, CnctSrvrBtnId ), "中断" ); //设置连接服务端控件的内容为“中断”。
 				EnableWindow( GetDlgItem( hDlg, StngBtnId ), FALSE ); //设置设置控件为不可用。
+				if( ( g_MediaInfoPt != NULL ) && ( g_MediaInfoPt->m_XfrMode == 0 ) )
+				{
+					ShowWindow( g_PttDlgWndHdl, SW_SHOW ); //设置一键即按即通对话框为显示。
+				}
             }
 			return ( INT_PTR )TRUE;
 		}
@@ -3512,6 +3579,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			EnableWindow( GetDlgItem( hDlg, CnctSrvrBtnId ), TRUE ); //设置连接服务端控件为可用。
 			SetWindowText( GetDlgItem( hDlg, CnctSrvrBtnId ), "连接服务端" ); //设置连接服务端控件的内容为“连接服务端”。
 			EnableWindow( GetDlgItem( hDlg, StngBtnId ), TRUE ); //设置设置控件为可用。
+			ShowWindow( g_PttDlgWndHdl, SW_HIDE ); //设置一键即按即通对话框为隐藏。
 			return ( INT_PTR )TRUE;
 		}
 		case WM_SHOW_RQST_CNCT_DIALOG: //显示请求连接对话框的消息。
@@ -3644,6 +3712,8 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		g_MainDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( MainDlgId ), NULL, WndMsgPocsPocdr );
 
 		g_RqstCnctDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( RqstCnctDlgId ), g_MainDlgWndHdl, WndMsgPocsPocdr );
+		g_PttDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( PttDlgId ), g_MainDlgWndHdl, WndMsgPocsPocdr );
+		g_PttBtnWndHdl = GetDlgItem( g_PttDlgWndHdl, PttBtnId );
 		g_XfrPrtclStngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( XfrPrtclStngDlgId ), g_MainDlgWndHdl, WndMsgPocsPocdr );
 		g_StngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( StngDlgId ), g_MainDlgWndHdl, WndMsgPocsPocdr );
 
@@ -3674,6 +3744,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseUdpPrtclRdBtnId );
 
 	//设置传输协议。
+	CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
 	SetWindowText( GetDlgItem( g_XfrPrtclStngDlgWndHdl, MaxCnctTimesEdTxtId ), "5" );
 	CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_CHECKED );
 
@@ -3741,11 +3812,11 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	//获取视频输入预览文本框窗口和视频输出显示文本框窗口的句柄和位置。
 	g_VdoInptPrvwTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoInptPrvwTxtId );
 	GetWindowRect( g_VdoInptPrvwTxtWndHdl, &g_VdoInptPrvwTxtWndRect );
-	ScreenToClient( g_MainDlgWndHdl, ( LPPOINT )&g_VdoInptPrvwTxtWndRect );
+	ScreenToClient( g_MainDlgWndHdl, ( LPPOINT )&g_VdoInptPrvwTxtWndRect.left );
 	ScreenToClient( g_MainDlgWndHdl, ( LPPOINT )&g_VdoInptPrvwTxtWndRect.right );
 	g_VdoOtptDspyTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoOtptDspyTxtId );
 	GetWindowRect( g_VdoOtptDspyTxtWndHdl, &g_VdoOtptDspyTxtWndRect );
-	ScreenToClient( g_MainDlgWndHdl, ( LPPOINT )&g_VdoOtptDspyTxtWndRect );
+	ScreenToClient( g_MainDlgWndHdl, ( LPPOINT )&g_VdoOtptDspyTxtWndRect.left );
 	ScreenToClient( g_MainDlgWndHdl, ( LPPOINT )&g_VdoOtptDspyTxtWndRect.right );
 	
 	//打印当前进程活动目录的完整绝对路径到日志。
@@ -3759,6 +3830,19 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	MSG p_Msg;
 	while( GetMessage( &p_Msg, NULL, 0, 0 ) )
 	{
+		//判断一键即按即通按钮是否按下。
+		if( g_PttBtnWndHdl == p_Msg.hwnd )
+		{
+			if( p_Msg.message == WM_LBUTTONDOWN )
+			{
+				if( g_MediaInfoPt != NULL ) g_MediaInfoPt->m_PttBtnIsDown = 1;
+			}
+			else if( p_Msg.message == WM_LBUTTONUP )
+			{
+				if( g_MediaInfoPt != NULL ) g_MediaInfoPt->m_PttBtnIsDown = 0;
+			}
+		}
+		
 		//if( IsDialogMessage( p_Msg.hwnd, &p_Msg ) == 0 )
 		if( TranslateAccelerator( p_Msg.hwnd, NULL, &p_Msg ) == 0 )
 		{

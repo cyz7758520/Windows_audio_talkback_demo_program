@@ -4611,7 +4611,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					//从音频输入帧链表中取出第一个音频输入帧。
 					{
 						MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.Lock( NULL ); //音频输入帧链表的互斥锁加锁。
-						MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.GetHead( NULL, MediaPocsThrdPt->m_PcmAdoInptFrmPt, NULL, 0, NULL );
+						MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_PcmAdoInptFrmPt, NULL, 0, NULL );
 						MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.DelHead( 0, NULL );
 						MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.Unlock( NULL ); //音频输入帧链表的互斥锁解锁。
 					}
