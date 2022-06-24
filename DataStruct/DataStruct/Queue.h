@@ -51,25 +51,25 @@ extern "C"
 
 typedef struct ConstLenQueue ConstLenQueue;
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueInit( ConstLenQueue * * ConstLenQueuePtPt, size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueInit( ConstLenQueue * * ConstLenQueuePtPt, size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueLock( ConstLenQueue * ConstLenQueuePt, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueueUnlock( ConstLenQueue * ConstLenQueuePt, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueLocked( ConstLenQueue * ConstLenQueuePt, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueUnlock( ConstLenQueue * ConstLenQueuePt, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueuePutHead( ConstLenQueue * ConstLenQueuePt, const void * NewHeadElmDataPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueuePutTail( ConstLenQueue * ConstLenQueuePt, const void * NewTailElmDataPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueuePutHead( ConstLenQueue * ConstLenQueuePt, const void * NewHeadElmDataPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueuePutTail( ConstLenQueue * ConstLenQueuePt, const void * NewTailElmDataPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueGetHead( ConstLenQueue * ConstLenQueuePt, void * HeadElmDataPt, void * * HeadElmDataBufPtPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueueGetTail( ConstLenQueue * ConstLenQueuePt, void * TailElmDataPt, void * * TailElmDataBufPtPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueueGetByNum( ConstLenQueue * ConstLenQueuePt, size_t SpecElmNum, void * SpecElmDataPt, void * * SpecElmDataBufPtPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueueGetTotal( ConstLenQueue * ConstLenQueuePt, size_t * ElmTotalPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueGetHead( ConstLenQueue * ConstLenQueuePt, void * HeadElmDataPt, void * * HeadElmDataBufPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueGetTail( ConstLenQueue * ConstLenQueuePt, void * TailElmDataPt, void * * TailElmDataBufPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueGetByNum( ConstLenQueue * ConstLenQueuePt, size_t SpecElmNum, void * SpecElmDataPt, void * * SpecElmDataBufPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueGetTotal( ConstLenQueue * ConstLenQueuePt, size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueDelHead( ConstLenQueue * ConstLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueueDelTail( ConstLenQueue * ConstLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueueDelByNum( ConstLenQueue * ConstLenQueuePt, size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int ConstLenQueueDelAll( ConstLenQueue * ConstLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueDelHead( ConstLenQueue * ConstLenQueuePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueDelTail( ConstLenQueue * ConstLenQueuePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueDelByNum( ConstLenQueue * ConstLenQueuePt, size_t SpecElmNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueDelAll( ConstLenQueue * ConstLenQueuePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueDstoy( ConstLenQueue * ConstLenQueuePt, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueDstoy( ConstLenQueue * ConstLenQueuePt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
@@ -84,25 +84,25 @@ public:
 	ConstLenQueueCls() { m_ConstLenQueuePt = NULL; }
 	~ConstLenQueueCls() { Dstoy( NULL ); }
 
-	int Init( size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueInit( &m_ConstLenQueuePt, ElmDataLen, BufAutoAdjMeth, BufAutoAdjParm, ElmMinNum, ElmMaxNum, ErrInfoVarStrPt ); }
+	int Init( size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return ConstLenQueueInit( &m_ConstLenQueuePt, ElmDataLen, BufAutoAdjMeth, BufAutoAdjParm, ElmMinNum, ElmMaxNum, ErrInfoVstrPt ); }
 	
-	int Lock( VarStr * ErrInfoVarStrPt ) { return ConstLenQueueLock( m_ConstLenQueuePt, ErrInfoVarStrPt ); }
-	int Unlock( VarStr * ErrInfoVarStrPt ) { return ConstLenQueueUnlock( m_ConstLenQueuePt, ErrInfoVarStrPt ); }
+	int Locked( Vstr * ErrInfoVstrPt ) { return ConstLenQueueLocked( m_ConstLenQueuePt, ErrInfoVstrPt ); }
+	int Unlock( Vstr * ErrInfoVstrPt ) { return ConstLenQueueUnlock( m_ConstLenQueuePt, ErrInfoVstrPt ); }
 
-	int PutHead( const void * NewHeadElmDataPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueuePutHead( m_ConstLenQueuePt, NewHeadElmDataPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int PutTail( const void * NewTailElmDataPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueuePutTail( m_ConstLenQueuePt, NewTailElmDataPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int PutHead( const void * NewHeadElmDataPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueuePutHead( m_ConstLenQueuePt, NewHeadElmDataPt, IsAutoLock, ErrInfoVstrPt ); }
+	int PutTail( const void * NewTailElmDataPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueuePutTail( m_ConstLenQueuePt, NewTailElmDataPt, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int GetHead( void * HeadElmDataPt, void * * HeadElmDataBufPtPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueGetHead( m_ConstLenQueuePt, HeadElmDataPt, HeadElmDataBufPtPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int GetTail( void * TailElmDataPt, void * * TailElmDataBufPtPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueGetTail( m_ConstLenQueuePt, TailElmDataPt, TailElmDataBufPtPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int GetByNum( size_t SpecElmNum, void * SpecElmDataPt, void * * SpecElmDataBufPtPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueGetByNum( m_ConstLenQueuePt, SpecElmNum, SpecElmDataPt, SpecElmDataBufPtPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueGetTotal( m_ConstLenQueuePt, ElmTotalPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int GetHead( void * HeadElmDataPt, void * * HeadElmDataBufPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueGetHead( m_ConstLenQueuePt, HeadElmDataPt, HeadElmDataBufPtPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetTail( void * TailElmDataPt, void * * TailElmDataBufPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueGetTail( m_ConstLenQueuePt, TailElmDataPt, TailElmDataBufPtPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetByNum( size_t SpecElmNum, void * SpecElmDataPt, void * * SpecElmDataBufPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueGetByNum( m_ConstLenQueuePt, SpecElmNum, SpecElmDataPt, SpecElmDataBufPtPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueGetTotal( m_ConstLenQueuePt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int DelHead( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelHead( m_ConstLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int DelTail( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelTail( m_ConstLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int DelByNum( size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelByNum( m_ConstLenQueuePt, SpecElmNum, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int DelAll( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return ConstLenQueueDelAll( m_ConstLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int DelHead( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueDelHead( m_ConstLenQueuePt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelTail( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueDelTail( m_ConstLenQueuePt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelByNum( size_t SpecElmNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueDelByNum( m_ConstLenQueuePt, SpecElmNum, IsAutoLock, ErrInfoVstrPt ); }
+	int DelAll( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return ConstLenQueueDelAll( m_ConstLenQueuePt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Rslt = ConstLenQueueDstoy( m_ConstLenQueuePt, ErrInfoVarStrPt ); m_ConstLenQueuePt = NULL; return p_Rslt; }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = ConstLenQueueDstoy( m_ConstLenQueuePt, ErrInfoVstrPt ); m_ConstLenQueuePt = NULL; return p_Rslt; }
 };
 #endif
 
@@ -114,25 +114,25 @@ extern "C"
 
 typedef struct VarLenQueue VarLenQueue;
 	
-__DATASTRUCT_DLLAPI__ int VarLenQueueInit( VarLenQueue * * VarLenQueuePtPt, int BufAutoAdjMeth, float BufAutoAdjParm, size_t BufMinSz, size_t BufMaxSz, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueInit( VarLenQueue * * VarLenQueuePtPt, int BufAutoAdjMeth, float BufAutoAdjParm, size_t BufMinSz, size_t BufMaxSz, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int VarLenQueueLock( VarLenQueue * VarLenQueuePt, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueueUnlock( VarLenQueue * VarLenQueuePt, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueLocked( VarLenQueue * VarLenQueuePt, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueUnlock( VarLenQueue * VarLenQueuePt, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int VarLenQueuePutHead( VarLenQueue * VarLenQueuePt, const void * NewHeadElmDataPt, size_t NewHeadElmDataLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueuePutTail( VarLenQueue * VarLenQueuePt, const void * NewTailElmDataPt, size_t NewTailElmDataLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueuePutHead( VarLenQueue * VarLenQueuePt, const void * NewHeadElmDataPt, size_t NewHeadElmDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueuePutTail( VarLenQueue * VarLenQueuePt, const void * NewTailElmDataPt, size_t NewTailElmDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int VarLenQueueGetHead( VarLenQueue * VarLenQueuePt, void * HeadElmDataPt, size_t HeadElmDataSz, void * * HeadElmDataBufPtPt, size_t * HeadElmDataLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueueGetTail( VarLenQueue * VarLenQueuePt, void * TailElmDataPt, size_t TailElmDataSz, void * * TailElmDataBufPtPt, size_t * TailElmDataLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueueGetByNum( VarLenQueue * VarLenQueuePt, size_t SpecElmNum, void * SpecElmDataPt, size_t SpecElmDataSz, void * * SpecElmDataBufPtPt, size_t * SpecElmDataLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueueGetTotal( VarLenQueue * VarLenQueuePt, size_t * ElmTotalPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueGetHead( VarLenQueue * VarLenQueuePt, void * HeadElmDataPt, size_t HeadElmDataSz, void * * HeadElmDataBufPtPt, size_t * HeadElmDataLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueGetTail( VarLenQueue * VarLenQueuePt, void * TailElmDataPt, size_t TailElmDataSz, void * * TailElmDataBufPtPt, size_t * TailElmDataLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueGetByNum( VarLenQueue * VarLenQueuePt, size_t SpecElmNum, void * SpecElmDataPt, size_t SpecElmDataSz, void * * SpecElmDataBufPtPt, size_t * SpecElmDataLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueGetTotal( VarLenQueue * VarLenQueuePt, size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int VarLenQueueDelHead( VarLenQueue * VarLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueueDelTail( VarLenQueue * VarLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueueDelByNum( VarLenQueue * VarLenQueuePt, size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
-__DATASTRUCT_DLLAPI__ int VarLenQueueDelAll( VarLenQueue * VarLenQueuePt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueDelHead( VarLenQueue * VarLenQueuePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueDelTail( VarLenQueue * VarLenQueuePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueDelByNum( VarLenQueue * VarLenQueuePt, size_t SpecElmNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueDelAll( VarLenQueue * VarLenQueuePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int VarLenQueueDstoy( VarLenQueue * VarLenQueuePt, VarStr * ErrInfoVarStrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueDstoy( VarLenQueue * VarLenQueuePt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
@@ -147,25 +147,25 @@ public:
 	VarLenQueueCls() { m_VarLenQueuePt = NULL; }
 	~VarLenQueueCls() { Dstoy( NULL ); }
 
-	int Init( int BufAutoAdjMeth, float BufAutoAdjParm, size_t BufMinSz, size_t BufMaxSz, VarStr * ErrInfoVarStrPt ) { return VarLenQueueInit( &m_VarLenQueuePt, BufAutoAdjMeth, BufAutoAdjParm, BufMinSz, BufMaxSz, ErrInfoVarStrPt ); }
+	int Init( int BufAutoAdjMeth, float BufAutoAdjParm, size_t BufMinSz, size_t BufMaxSz, Vstr * ErrInfoVstrPt ) { return VarLenQueueInit( &m_VarLenQueuePt, BufAutoAdjMeth, BufAutoAdjParm, BufMinSz, BufMaxSz, ErrInfoVstrPt ); }
 	
-	int Lock( VarStr * ErrInfoVarStrPt ) { return VarLenQueueLock( m_VarLenQueuePt, ErrInfoVarStrPt ); }
-	int Unlock( VarStr * ErrInfoVarStrPt ) { return VarLenQueueUnlock( m_VarLenQueuePt, ErrInfoVarStrPt ); }
+	int Locked( Vstr * ErrInfoVstrPt ) { return VarLenQueueLocked( m_VarLenQueuePt, ErrInfoVstrPt ); }
+	int Unlock( Vstr * ErrInfoVstrPt ) { return VarLenQueueUnlock( m_VarLenQueuePt, ErrInfoVstrPt ); }
 
-	int PutHead( const void * NewHeadElmDataPt, size_t NewHeadElmDataLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueuePutHead( m_VarLenQueuePt, NewHeadElmDataPt, NewHeadElmDataLen, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int PutTail( const void * NewTailElmDataPt, size_t NewTailElmDataLen, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueuePutTail( m_VarLenQueuePt, NewTailElmDataPt, NewTailElmDataLen, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int PutHead( const void * NewHeadElmDataPt, size_t NewHeadElmDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueuePutHead( m_VarLenQueuePt, NewHeadElmDataPt, NewHeadElmDataLen, IsAutoLock, ErrInfoVstrPt ); }
+	int PutTail( const void * NewTailElmDataPt, size_t NewTailElmDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueuePutTail( m_VarLenQueuePt, NewTailElmDataPt, NewTailElmDataLen, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int GetHead( void * HeadElmDataPt, size_t HeadElmDataSz, void * * HeadElmDataBufPtPt, size_t * HeadElmDataLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueGetHead( m_VarLenQueuePt, HeadElmDataPt, HeadElmDataSz, HeadElmDataBufPtPt, HeadElmDataLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int GetTail( void * TailElmDataPt, size_t TailElmDataSz, void * * TailElmDataBufPtPt, size_t * TailElmDataLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueGetTail( m_VarLenQueuePt, TailElmDataPt, TailElmDataSz, TailElmDataBufPtPt, TailElmDataLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int GetByNum( size_t SpecElmNum, void * SpecElmDataPt, size_t SpecElmDataSz, void * * SpecElmDataBufPtPt, size_t * SpecElmDataLenPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueGetByNum( m_VarLenQueuePt, SpecElmNum, SpecElmDataPt, SpecElmDataSz, SpecElmDataBufPtPt, SpecElmDataLenPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueGetTotal( m_VarLenQueuePt, ElmTotalPt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int GetHead( void * HeadElmDataPt, size_t HeadElmDataSz, void * * HeadElmDataBufPtPt, size_t * HeadElmDataLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueGetHead( m_VarLenQueuePt, HeadElmDataPt, HeadElmDataSz, HeadElmDataBufPtPt, HeadElmDataLenPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetTail( void * TailElmDataPt, size_t TailElmDataSz, void * * TailElmDataBufPtPt, size_t * TailElmDataLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueGetTail( m_VarLenQueuePt, TailElmDataPt, TailElmDataSz, TailElmDataBufPtPt, TailElmDataLenPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetByNum( size_t SpecElmNum, void * SpecElmDataPt, size_t SpecElmDataSz, void * * SpecElmDataBufPtPt, size_t * SpecElmDataLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueGetByNum( m_VarLenQueuePt, SpecElmNum, SpecElmDataPt, SpecElmDataSz, SpecElmDataBufPtPt, SpecElmDataLenPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueGetTotal( m_VarLenQueuePt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int DelHead( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelHead( m_VarLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int DelTail( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelTail( m_VarLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int DelByNum( size_t SpecElmNum, int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelByNum( m_VarLenQueuePt, SpecElmNum, IsAutoLockUnlock, ErrInfoVarStrPt ); }
-	int DelAll( int32_t IsAutoLockUnlock, VarStr * ErrInfoVarStrPt ) { return VarLenQueueDelAll( m_VarLenQueuePt, IsAutoLockUnlock, ErrInfoVarStrPt ); }
+	int DelHead( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueDelHead( m_VarLenQueuePt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelTail( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueDelTail( m_VarLenQueuePt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelByNum( size_t SpecElmNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueDelByNum( m_VarLenQueuePt, SpecElmNum, IsAutoLock, ErrInfoVstrPt ); }
+	int DelAll( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VarLenQueueDelAll( m_VarLenQueuePt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int Dstoy( VarStr * ErrInfoVarStrPt ) { int p_Rslt = VarLenQueueDstoy( m_VarLenQueuePt, ErrInfoVarStrPt ); m_VarLenQueuePt = NULL; return p_Rslt; }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VarLenQueueDstoy( m_VarLenQueuePt, ErrInfoVstrPt ); m_VarLenQueuePt = NULL; return p_Rslt; }
 };
 #endif
 

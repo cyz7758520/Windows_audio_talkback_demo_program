@@ -11,6 +11,7 @@
 #include <errno.h>                        //errno
 #include <string.h>                       //memchr、memcmp、memcpy、memmove、memset、strcat、strncat、strchr、strcmp、strncmp、strcoll、strcpy、strncpy、strcspn、strerror、strlen、strpbrk、strrchr、strspn、strstr、strtok、strxfrm
 #include <inttypes.h>                     //PRId*、PRIi*、PRIu*、PRIo*、PRIx*、PRIX*、SCNd*、SCNi*、SCNu*、SCNo*、SCNx*
+#include <locale.h>                       //setlocale
 
 #ifdef __cplusplus
 #include <thread>                         //std::thread
@@ -18,41 +19,57 @@
 #include <list>                           //std::list
 #include <map>                            //std::map
 #include <atomic>                         //std::atomic
+#include <cfloat>                         //FLT_MAX、DBL_MAX
 #endif
 
 #if( defined __MS_VCXX__ )
 #include <winsdkver.h>                    //包含Windows SDK支持的最高版本Windows的相关宏
-#define _WIN32_WINNT  _WIN32_WINNT_MAXVER //设置_WIN32_WINNT宏为最高版本Windows
-#define WINVER        WINVER_MAXVER       //设置WINVER宏为最高版本Windows
-#define NTDDI_VERSION NTDDI_MAXVER        //设置NTDDI_VERSION宏为最高版本Windows
-#define _WIN32_IE     _WIN32_IE_MAXVER    //设置_WIN32_IE宏为最高版本IE
+#define _WIN32_WINNT     0xFFFF           //设置_WIN32_WINNT宏为最高版本Windows
+#define WINVER           0xFFFF           //设置WINVER宏为最高版本Windows
+#define NTDDI_VERSION    0xFFFFFFFF       //设置NTDDI_VERSION宏为最高版本Windows
+#define _WIN32_IE        0xFFFF           //设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
 #include <windows.h>                      //包含整个Windows SDK支持的API
 #include <tchar.h>                        //_tmain、_tWinMain、TCHAR
 #include <process.h>                      //
 #include <psapi.h>                        //GetProcessImageFileName
 #include <shellapi.h>                     //ShellExecute
+#include <lmerr.h>                        //NERR_BASE、MAX_NERR
+#include <wininet.h>                      //INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
+#include <pdhmsg.h>                       //PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
 #include <Ws2tcpip.h>                     //Windows套接字相关
 #include <Dshow.h>                        //waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
+#include <mmsystem.h>                     //MMRESULT
+#include <conio.h>                        //getch、getche
 
-#include <sys/types.h>                    //
-#include <sys/stat.h>                     //struct stat、fstat
+#include <io.h>                           //_open、_wopen
+#include <sys/stat.h>                     //struct stat、fstat、_stat64、_wstat64
+#include <sys/types.h>                    //ino_t、dev_t、off_t
+#include <fcntl.h>                        //O_RDONLY、O_WRONLY、O_Rd_Wr、O_APPEND、O_CREAT、O_TRUNC、O_EXCL、O_TEXT、O_BINARY、O_RAW、O_TEMPORARY、O_NOINHERIT、O_SEQUENTIAL、O_RANDOM
+
+#undef StrCpy
+#undef StrToInt
+
 #endif
 
 #if( defined __CYGWIN_GCC__ )
 #include <winsdkver.h>                    //包含Windows SDK支持的最高版本Windows的相关宏
-#define _WIN32_WINNT  _WIN32_WINNT_MAXVER //设置_WIN32_WINNT宏为最高版本Windows
-#define WINVER        WINVER_MAXVER       //设置WINVER宏为最高版本Windows
-#define NTDDI_VERSION NTDDI_MAXVER        //设置NTDDI_VERSION宏为最高版本Windows
-#define _WIN32_IE     _WIN32_IE_MAXVER    //设置_WIN32_IE宏为最高版本IE
+#define _WIN32_WINNT     0xFFFF           //设置_WIN32_WINNT宏为最高版本Windows
+#define WINVER           0xFFFF           //设置WINVER宏为最高版本Windows
+#define NTDDI_VERSION    0xFFFFFFFF       //设置NTDDI_VERSION宏为最高版本Windows
+#define _WIN32_IE        0xFFFF           //设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
 #include <windows.h>                      //包含整个Windows SDK支持的API
 #include <tchar.h>                        //_tmain、_tWinMain、TCHAR
 #include <process.h>                      //
 #include <psapi.h>                        //GetProcessImageFileName
 #include <shellapi.h>                     //ShellExecute
+#include <lmerr.h>                        //NERR_BASE、MAX_NERR
+#include <wininet.h>                      //INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
+#include <pdhmsg.h>                       //PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
 //#include <Ws2tcpip.h>                   //不包含该头文件，因为会与Linux套接字相关声明相冲突
 //#include <Dshow.h>                      //不包含该头文件，因为会编译报错
+#include <mmsystem.h>                     //MMRESULT
 
 #include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
 #include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
@@ -65,6 +82,7 @@
 #include <unistd.h>                       //getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <curses.h>                       //getch
 
 typedef int SOCKET;
 #define INVALID_SOCKET (-1)
@@ -84,6 +102,7 @@ typedef int SOCKET;
 #include <unistd.h>                       //getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <curses.h>                       //getch
 
 #define gettid() ( pid_t )syscall( SYS_gettid )
 
@@ -120,15 +139,72 @@ typedef int HANDLE;
 #include <android/native_window_jni.h>
 #endif
 
-#include "VarStr.h"
-#include "Log.h"
-#include "ThreadLock.h"
-#include "Ado.h"
-
 //线程局部变量宏。
 #if( defined __MS_VCXX__ )
 #define __thread __declspec( thread )
 #endif
+
+//交换两个指针变量的值。
+#define SWAPPT( Type, Pt1, Pt2 ) ( Pt1 = ( Type )( ( size_t )Pt1 ^ ( size_t )Pt2 ), Pt2 = ( Type )( ( size_t )Pt1 ^ ( size_t )Pt2 ), Pt1 = ( Type )( ( size_t )Pt1 ^ ( size_t )Pt2 ) )
+
+//函数默认参数。
+#define DEFARG( Type, Name, DefVal ) ( ( #Name[0] ) ? ( Type )( Name + 0 ) : ( DefVal ) )
+
+//设置结束指针。
+#define SetEndPt( Type, StartPt, Sz, EndPt ) \
+{ \
+	if( ( ( SIZE_MAX - ( size_t )( StartPt ) ) / sizeof( Type ) ) > ( Sz ) ) EndPt = ( Type * )( StartPt )+( Sz ); /*不会溢出。*/\
+	else EndPt = ( Type * )( SIZE_MAX / sizeof( Type ) ); /*会溢出。*/ \
+}
+
+//获取数组的大小。
+#define SzOfArr( Arr ) ( sizeof( Arr ) / sizeof( *( Arr ) ) )
+
+//字符串字符集。
+#if( defined __MS_VCXX__ ) //MSVC++编译器要使用UTF-16字符集，不要使用多字节字符集，因为国际间不通用。
+#define L( Str ) L ## Str
+#elif( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) //GCC编译器要使用UTF-8字符集，不要使用UTF-32字符集，因为UTF-32字符集太占空间。
+#define L( Str ) L ## Str
+#endif
+
+//计算最大值和最小值。
+#ifndef __cplusplus
+#ifndef max
+#define max( a, b ) ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
+#endif
+#ifndef min
+#define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
+#endif
+#endif
+
+//方向。
+typedef enum Drct_t
+{
+	NoDrct,    //没有方向。
+	LftToRit,  //从左向右。
+	RitToLft   //从右向左。
+}Drct_t;
+
+//位置。
+typedef enum Pos_t
+{
+	NoPos = 0,                    //没有位置。
+	Lft = 1,                      //左边。
+	Mid = 2,                      //中间。
+	Rit = 4,                      //右边。
+	LftRit = Lft | Rit,           //左边和右边。
+	LftMidRit = Lft | Mid | Rit,  //左边、中间和右边。
+}Pos_t;
+
+//字符集。
+typedef enum ChrSet
+{
+	Utf8 = 1,   //Utf8字符集。
+	Utf16 = 2,  //Utf16字符集。
+	Utf32 = 4   //Utf32字符集。
+}ChrSet;
+//检查字符集参数是否不正确。
+#define CHKCHRSET( ChrSet ) ( ( ChrSet != Utf8 ) && ( ChrSet != Utf16 ) && ( ChrSet != Utf32 ) )
 
 //Func项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_FUNC__ ) //如果正在编译Func项目。
@@ -165,29 +241,14 @@ typedef int HANDLE;
 	#endif
 #endif
 	
-//交换两个指针变量的值。
-#define SWAPPT( type, pt1, pt2 ) ( pt1 = ( type )( ( size_t )pt1 ^ ( size_t )pt2 ), pt2 = ( type )( ( size_t )pt1 ^ ( size_t )pt2 ), pt1 = ( type )( ( size_t )pt1 ^ ( size_t )pt2 ) )
-
-//计算最大值和最小值。
-#ifndef __cplusplus
-#ifndef max
-#define max( a, b ) ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
-#endif
-#ifndef min
-#define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
-#endif
-#endif
-
-//定义方向宏。
-#define DRCT_L_TO_R        1   //方向为从左向右。
-#define DRCT_R_TO_L        2   //方向为从右向左。
-
-//定义位置宏。
-#define POS_L              1   //位置为左边。
-#define POS_M              2   //位置为中间。
-#define POS_R              4   //位置为右边。
-#define POS_LR             ( POS_LEFT | POS_RIGHT )   //位置为左右两边。
-#define POS_LMR            ( POS_LEFT | POS_MID | POS_RIGHT )   //位置为左中右三边。
+#include "Vstr.h"
+#include "Log.h"
+#include "ThreadLock.h"
+#include "Ado.h"
+#include "Utf.h"
+#include "DateTime.h"
+#include "ChrStrMem.h"
+#include "File.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -196,101 +257,8 @@ extern "C"
 
 //进程线程函数。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-__FUNC_DLLAPI__ int FuncGetCurProcId();
-__FUNC_DLLAPI__ int FuncGetCurThrdId();
-#endif
-
-//日期时间函数。
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-__FUNC_DLLAPI__ int FuncGetTimeAsSec( uint64_t * SecPt );
-__FUNC_DLLAPI__ int FuncGetTimeAsMsec( uint64_t * MsecPt );
-__FUNC_DLLAPI__ int FuncGetTimeAsLclDateTime( int * YearPt, int * MonPt, int * DayPt, int * HourPt, int * MinPt, int * SecPt, int * MsecPt );
-__FUNC_DLLAPI__ int FuncSecToLclDateTime( uint64_t Sec, int * YearPt, int * MonPt, int * DayPt, int * HourPt, int * MinPt, int * SecPt );
-__FUNC_DLLAPI__ int FuncMsecToLclDateTime( uint64_t Msec, int * YearPt, int * MonPt, int * DayPt, int * HourPt, int * MinPt, int * SecPt, int * MsecPt );
-__FUNC_DLLAPI__ int FuncLclDateTimeToSec( int Year, int Mon, int Day, int Hour, int Min, int Sec, uint64_t * SecPt );
-__FUNC_DLLAPI__ int FuncLclDateTimeToMsec( int Year, int Mon, int Day, int Hour, int Min, int Sec, int Msec, uint64_t * MsecPt );
-#endif
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__FUNC_DLLAPI__ int FuncFileTimeToSec( const FILETIME * FileTimePt, uint64_t * SecPt );
-__FUNC_DLLAPI__ int FuncFileTimeToMsec( const FILETIME * FileTimePt, uint64_t * MsecPt );
-__FUNC_DLLAPI__ int FuncFileTimeToLclDateTime( const FILETIME * FileTimePt, int * YearPt, int * MonPt, int * DayPt, int * HourPt, int * MinPt, int * SecPt, int * MsecPt );
-__FUNC_DLLAPI__ int FuncLclSysTimeToSec( const SYSTEMTIME * LclSysTimePt, uint64_t * SecPt );
-__FUNC_DLLAPI__ int FuncLclSysTimeToMsec( const SYSTEMTIME * LclSysTimePt, uint64_t * MsecPt );
-__FUNC_DLLAPI__ int FuncLclSysTimeToLclDateTime( const SYSTEMTIME * LclSysTimePt, int * YearPt, int * MonPt, int * DayPt, int * HourPt, int * MinPt, int * SecPt, int * MsecPt );
-#endif
-
-//文件函数。
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-__FUNC_DLLAPI__ int FuncGetFileSzByPath( const char * FullPathStrPt, uint64_t * FileSzPt, VarStr * ErrInfoVarStrPt );
-__FUNC_DLLAPI__ int FuncGetFileSzByFileStream( FILE * FileStreamPt, uint64_t * FileSzPt, VarStr * ErrInfoVarStrPt );
-#endif
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__FUNC_DLLAPI__ int FuncGetFileSzByHdl( HANDLE FileHdl, uint64_t * FileSzPt, VarStr * ErrInfoVarStrPt );
-#endif
-
-//字符、字符串函数。
-__FUNC_DLLAPI__ int FuncIsBlank( char Chr );
-__FUNC_DLLAPI__ int FuncIsNum( char Chr );
-__FUNC_DLLAPI__ int FuncPathFindFileName( const char * PathStrPt, const char * * FileNameStrPtPt );
-__FUNC_DLLAPI__ int FuncPathRmvFileName( char * PathStrPt );
-#ifdef __cplusplus
-__FUNC_DLLAPI__ int FuncStrToInt( const char * IntStrPt, void * IntValPt, size_t IntValSz, size_t * IntStrLenPt, size_t MaxReadFigure = SIZE_MAX, size_t MinReadFigure = 0 );
-#else
-__FUNC_DLLAPI__ int FuncStrToInt( const char * IntStrPt, void * IntValPt, size_t IntValSz, size_t * IntStrLenPt, size_t MaxReadFigure, size_t MinReadFigure );
-#endif
-#ifdef __cplusplus
-__FUNC_DLLAPI__ int FuncIntToStr( int64_t IntVal, char * IntStrPt, size_t IntStrSz, size_t * IntStrLenPt = NULL, int8_t IsSigned = 1, int8_t System = 10, size_t MinWriteLen = 0, char Aligned = 'R', char FillChr = ' ', int8_t IsWriteEnd = 1 );
-#else
-__FUNC_DLLAPI__ int FuncIntToStr( int64_t IntVal, char * IntStrPt, size_t IntStrSz, size_t * IntStrLenPt, int8_t IsSigned, int8_t System, size_t MinWriteLen, char Aligned, char FillChr, int8_t IsWriteEnd );
-#endif
-__FUNC_DLLAPI__ int FuncMemInsMem( char * DstMemPt, size_t DstMemLen, size_t DstMemSz, size_t InsPos, const char * InsMemPt, size_t InsMemLen, size_t * DstMemNewLenPt );
-__FUNC_DLLAPI__ int FuncStrInsStr( char * DstStrPt, size_t DstStrSz, size_t InsPos, const char * InsStrPt, size_t * DstStrNewLenPt );
-__FUNC_DLLAPI__ int FuncMemTrim( char * SrcMemPt, size_t SrcMemLen, const char * TrimMemPt, size_t TrimMemLen, char TrimPos, char * AfterMemPt, size_t AfterMemSz, size_t * AfterMemLenPt );
-__FUNC_DLLAPI__ int FuncStrTrim( char * SrcStrPt, const char * TrimStrPt, char TrimPos, char * AfterStrPt, size_t AfterStrSz, size_t * AfterStrLenPt );
-//__FUNC_DLLAPI__ int FuncMemCmp( const void * Buf1Pt, const void * Buf2Pt, size_t MemSz );
-__FUNC_DLLAPI__ void * FuncMemCpy( void * DstPt, const void * SrcPt, size_t MemSz );
-//__FUNC_DLLAPI__ void * FuncMemCpy_inline( void * DstPt, const void * SrcPt, size_t MemSz );
-
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-#ifdef __cplusplus
-__FUNC_DLLAPI__ const char * FuncGetErrInfo( uint32_t ErrNum, char ErrType = 'G' );
-#else
-__FUNC_DLLAPI__ const char * FuncGetErrInfo( uint32_t ErrNum, char ErrType );
-#endif
-#endif
-
-#define FuncStrFmtRead( SrcStrPt, ReadCntPt, FmtStrPt, ... )  FuncStrLenFmtRead( SrcStrPt, SIZE_MAX, ReadCntPt, FmtStrPt, __VA_ARGS__ )
-__FUNC_DLLAPI__ void FuncStrLenFmtRead( const char * SrcStrPt, size_t SrcStrLen, unsigned int * ReadCntPt, const char * FmtStrPt, ... );
-__FUNC_DLLAPI__ int FuncGetFmtLen( size_t * FullStrLenPt, const char * FmtStrPt, ... );
-__FUNC_DLLAPI__ int FuncGetVaFmtLen( size_t * FullStrLenPt, const char * FmtStrPt, va_list VaLst );
-__FUNC_DLLAPI__ int FuncStrCpy( char * DstStrPt, size_t DstStrSz, int8_t IsWriteEnd, size_t * DstStrLenPt, const char * SrcStrPt );
-__FUNC_DLLAPI__ int FuncStrFmtCpy( char * DstFullStrPt, int8_t IsWriteEnd, size_t * DstFullStrLenPt, const char * FmtStrPt, ... );
-__FUNC_DLLAPI__ int FuncStrVaFmtCpy( char * DstFullStrPt, int8_t IsWriteEnd, size_t * DstFullStrLenPt, const char * FmtStrPt, va_list VaLst );
-#define FuncStrFindChrs( StrPt, FindMemPt, FindPos, IsBelong, MemFindedChrPtPt, FindedChrTotalPt ) FuncMemFindChrs( StrPt, strlen( StrPt ), FindMemPt, strlen( FindMemPt ), FindPos, IsBelong, MemFindedChrPtPt, FindedChrTotalPt )
-__FUNC_DLLAPI__ int FuncMemFindChrs( const char * MemPt, size_t MemLen, const char * FindMemPt, size_t FindMemLen, char FindPos, int IsBelong, const char * * MemFindedChrPtPt, size_t * FindedChrTotalPt );
-#define FuncStrFindStr( StrPt, FindStrPt, FindPos, FindedChrTotalPt ) FuncMemFindMem( StrPt, strlen( StrPt ), FindStrPt, strlen( FindStrPt ), FindPos, FindedChrTotalPt )
-__FUNC_DLLAPI__ int FuncMemFindMem( const char * MemPt, size_t MemSz, const char * FindMemPt, size_t FindMemSz, const char * FindPos, size_t * FindedMemPosPt );
-__FUNC_DLLAPI__ int FuncMemSum( const void * MemPt, size_t MemSz, uint64_t * SumPt );
-__FUNC_DLLAPI__ int FuncStrFindMatch( const char * SrcStrPt, const char * PatternStrPt, size_t * PatternStrPos );
-#ifdef __cplusplus
-__FUNC_DLLAPI__ int FuncStrFullMatch( const char * SrcStrPt, const char * PatternStrPt, int MatchCase = 1 );
-#else
-__FUNC_DLLAPI__ int FuncStrFullMatch( const char * SrcStrPt, const char * PatternStrPt, int MatchCase );
-#endif
-#ifdef __cplusplus
-__FUNC_DLLAPI__ int FuncStrMultiFullMatch( const char * SrcStrPt, const char * PatternStrPt, int MatchLogic = 1, int MatchCase = 1 );
-#else
-__FUNC_DLLAPI__ int FuncStrMultiFullMatch( const char * SrcStrPt, const char * PatternStrPt, int MatchLogic, int MatchCase );
-#endif
-#ifdef __cplusplus
-__FUNC_DLLAPI__ int FuncStrUpperCase( char * SrcStrPt, char * DstStrPt = NULL, size_t SrcStrMaxLen = SIZE_MAX, size_t SrcStrMinLen = 0 );
-#else
-__FUNC_DLLAPI__ int FuncStrUpperCase( char * SrcStrPt, char * DstStrPt, size_t SrcStrMaxLen, size_t SrcStrMinLen );
-#endif
-#ifdef __cplusplus
-__FUNC_DLLAPI__ int FuncStrLowerCase( char * SrcStrPt, char * DstStrPt = NULL, size_t SrcStrMaxLen = SIZE_MAX, size_t SrcStrMinLen = 0 );
-#else
-__FUNC_DLLAPI__ int FuncStrLowerCase( char * SrcStrPt, char * DstStrPt, size_t SrcStrMaxLen, size_t SrcStrMinLen );
+__FUNC_DLLAPI__ uint64_t FuncGetCurProcId();
+__FUNC_DLLAPI__ uint64_t FuncGetCurThrdId();
 #endif
 
 //获取函数。
@@ -299,13 +267,13 @@ __FUNC_DLLAPI__ int FuncGetPrivateProfileStringFromSectionMem( const char * KeyN
 #endif
 
 //设置函数。
-__FUNC_DLLAPI__ int FuncGetCurExePath( char * FullAbsPathStrPt, size_t FullAbsPathStrSz, size_t * FullAbsPathStrLenPt, VarStr * ErrInfoVarStrPt );
-__FUNC_DLLAPI__ int FuncSetCurActPath( const char * PathStrPt, VarStr * ErrInfoVarStrPt );
-__FUNC_DLLAPI__ int FuncGetCurActPath( char * FullAbsPathStrPt, size_t FullAbsPathStrSz, size_t * FullAbsPathStrLenPt, VarStr * ErrInfoVarStrPt );
+__FUNC_DLLAPI__ int FuncGetCurExePath( Vstr * FullAbsPathVstrPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FuncSetCurActPath( const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FuncGetCurActPath( Vstr * FullAbsPathVstrPt, Vstr * ErrInfoVstrPt );
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__FUNC_DLLAPI__ int FuncSetWndCenter( HWND SpecWndHdl, HWND OtherWndHdl, VarStr * ErrInfoVarStrPt );
-__FUNC_DLLAPI__ int FuncToast( HWND SpecWndHdl, uint64_t TimeOutMesc, VarStr * ErrInfoVarStrPt, const char * TextPt );
-__FUNC_DLLAPI__ int FuncToastFmt( HWND SpecWndHdl, uint64_t TimeOutMesc, VarStr * ErrInfoVarStrPt, const char * FmtStrPt, ... );
+__FUNC_DLLAPI__ int FuncSetWndCenter( HWND SpecWndHdl, HWND OtherWndHdl, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FuncToast( HWND SpecWndHdl, uint64_t TimeOutMesc, Vstr * ErrInfoVstrPt, const Vstr * TextVstrPt );
+__FUNC_DLLAPI__ int FuncToastFmt( HWND SpecWndHdl, uint64_t TimeOutMesc, Vstr * ErrInfoVstrPt, const Vstr * FmtVstrPt, ... );
 #endif
 
 //判断函数。

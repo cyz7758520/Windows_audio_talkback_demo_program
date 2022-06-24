@@ -45,23 +45,23 @@ extern "C"
 
 typedef struct OpenH264Encd OpenH264Encd;
 
-__OPENH264_DLLAPI__ int OpenH264EncdInit( OpenH264Encd * * OpenH264EncdPtPt, int32_t EncdPictrWidth, int32_t EncdPictrHeight, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t MaxFrmRate, int32_t IDRFrmIntvlFrmCnt, int32_t Cmplxt, VarStr * ErrInfoVarStrPt );
-__OPENH264_DLLAPI__ int OpenH264EncdSetEncdBitrate( OpenH264Encd * OpenH264EncdPt, int32_t EncdBitrate, VarStr * ErrInfoVarStrPt );
-__OPENH264_DLLAPI__ int OpenH264EncdGetEncdBitrate( OpenH264Encd * OpenH264EncdPt, int32_t * EncdBitratePt, VarStr * ErrInfoVarStrPt );
+__OPENH264_DLLAPI__ int OpenH264EncdInit( OpenH264Encd * * OpenH264EncdPtPt, int32_t EncdPictrWidth, int32_t EncdPictrHeight, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t MaxFrmRate, int32_t IDRFrmIntvlFrmCnt, int32_t Cmplxt, Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264EncdSetEncdBitrate( OpenH264Encd * OpenH264EncdPt, int32_t EncdBitrate, Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264EncdGetEncdBitrate( OpenH264Encd * OpenH264EncdPt, int32_t * EncdBitratePt, Vstr * ErrInfoVstrPt );
 __OPENH264_DLLAPI__ int OpenH264EncdPocs( OpenH264Encd * OpenH264EncdPt,
 										  uint8_t * YU12FrmPt, int32_t YU12FrmWidth, int32_t YU12FrmHeight, uint64_t YU12FrmTimeStampMsec,
 										  uint8_t * H264FrmPt, size_t H264FrmSz, size_t * H264FrmLenPt,
-										  VarStr * ErrInfoVarStrPt );
-__OPENH264_DLLAPI__ int OpenH264EncdDstoy( OpenH264Encd * OpenH264EncdPt, VarStr * ErrInfoVarStrPt );
+										  Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264EncdDstoy( OpenH264Encd * OpenH264EncdPt, Vstr * ErrInfoVstrPt );
 
 typedef struct OpenH264Decd OpenH264Decd;
 
-__OPENH264_DLLAPI__ int OpenH264DecdInit( OpenH264Decd ** OpenH264DecdPtPt, int32_t DecdThrdNum, VarStr * ErrInfoVarStrPt );
+__OPENH264_DLLAPI__ int OpenH264DecdInit( OpenH264Decd ** OpenH264DecdPtPt, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt );
 __OPENH264_DLLAPI__ int OpenH264DecdPocs( OpenH264Decd * OpenH264DecdPt,
 										  uint8_t * H264FrmPt, size_t H264FrmLen,
 										  uint8_t * YU12FrmPt, size_t YU12FrmSz, int32_t * YU12FrmWidthPt, int32_t * YU12FrmHeightPt,
-										  VarStr * ErrInfoVarStrPt );
-__OPENH264_DLLAPI__ int OpenH264DecdDstoy( OpenH264Decd * OpenH264DecdPt, VarStr * ErrInfoVarStrPt );
+										  Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264DecdDstoy( OpenH264Decd * OpenH264DecdPt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }

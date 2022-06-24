@@ -75,7 +75,7 @@ enum RotateDegree
 __LIBYUV_DLLAPI__ int LibYUVPictrCrop( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 									   int32_t CropX, int32_t CropY, int32_t CropWidth, int32_t CropHeight,
 									   uint8_t * DstPictrPt, size_t DstPictrSz, size_t * DstPictrLenPt, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
-									   VarStr * ErrInfoVarStrPt );
+									   Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrCropWithStride( const uint8_t * SrcPictrPlane1Pt, int32_t SrcPictrPlane1Stride,
 												 const uint8_t * SrcPictrPlane2Pt, int32_t SrcPictrPlane2Stride,
 												 const uint8_t * SrcPictrPlane3Pt, int32_t SrcPictrPlane3Stride,
@@ -88,11 +88,11 @@ __LIBYUV_DLLAPI__ int LibYUVPictrCropWithStride( const uint8_t * SrcPictrPlane1P
 												 uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3Sz, int32_t DstPictrPlane3Stride, size_t * DstPictrPlane3LenPt,
 												 int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 
-												 VarStr * ErrInfoVarStrPt );
+												 Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrMirror( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										 int32_t HorizontalOrVertical,
 										 uint8_t * DstPictrPt, size_t DstPictrSz, size_t * DstPictrLenPt, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
-										 VarStr * ErrInfoVarStrPt );
+										 Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrMirrorWithStride( const uint8_t * SrcPictrPlane1Pt, int32_t SrcPictrPlane1Stride,
 												   const uint8_t * SrcPictrPlane2Pt, int32_t SrcPictrPlane2Stride,
 												   const uint8_t * SrcPictrPlane3Pt, int32_t SrcPictrPlane3Stride,
@@ -105,18 +105,18 @@ __LIBYUV_DLLAPI__ int LibYUVPictrMirrorWithStride( const uint8_t * SrcPictrPlane
 												   uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3Sz, int32_t DstPictrPlane3Stride, size_t * DstPictrPlane3LenPt,
 												   int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 
-												   VarStr * ErrInfoVarStrPt );
+												   Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrRotate( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										 int32_t RotateDegree,
 										 uint8_t * DstPictrPt, size_t DstPictrSz, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
-										 VarStr * ErrInfoVarStrPt );
+										 Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrScale( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										int32_t Quality,
 										uint8_t * DstPictrPt, size_t DstPictrSz, size_t * DstPictrLenPt, int32_t DstPictrWidth, int32_t DstPictrHeight,
-										VarStr * ErrInfoVarStrPt );
+										Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrt( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										   uint8_t * DstPictrPt, size_t DstPictrSz, size_t * DstPictrLenPt, int32_t DstPictrFmt,
-										   VarStr * ErrInfoVarStrPt );
+										   Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrtWithStride( const uint8_t * SrcPictrPlane1Pt, int32_t SrcPictrPlane1Stride,
 													 const uint8_t * SrcPictrPlane2Pt, int32_t SrcPictrPlane2Stride,
 													 const uint8_t * SrcPictrPlane3Pt, int32_t SrcPictrPlane3Stride,
@@ -127,12 +127,12 @@ __LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrtWithStride( const uint8_t * SrcPictrPla
 													 uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3Sz, int32_t DstPictrPlane3Stride, size_t * DstPictrPlane3LenPt,
 													 int32_t DstPictrFmt,
 
-													 VarStr * ErrInfoVarStrPt );
+													 Vstr * ErrInfoVstrPt );
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __LIBYUV_DLLAPI__ int LibYUVPictrDrawToWnd( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 											int32_t CenterOrStretch,
 											HWND DstWndHdl,
-											VarStr * ErrInfoVarStrPt );
+											Vstr * ErrInfoVstrPt );
 #endif
 #ifdef __cplusplus
 }

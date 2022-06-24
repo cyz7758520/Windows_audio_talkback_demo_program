@@ -5,6 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
+	  <AdditionalOptions>/execution-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>..\..\..\Func\Func;..\..\..\Sokt\Sokt;..\..\..\DataStruct\DataStruct;..\..\..\SpeexDsp\SpeexDsp;..\..\..\WebRtc\WebRtc;..\..\..\SpeexWebRtcAec\SpeexWebRtcAec;..\..\..\RNNoise\RNNoise;..\..\..\Speex\Speex;..\..\..\WaveFile\WaveFile;..\..\..\AdoWavfm\AdoWavfm;..\..\..\LibYUV\LibYUV;..\..\..\OpenH264\OpenH264;..\..\..\Ajb\Ajb;$(UCRTContentRoot)\Include\10.0.17763.0\um;$(UCRTContentRoot)\Include\10.0.17763.0\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4995;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
