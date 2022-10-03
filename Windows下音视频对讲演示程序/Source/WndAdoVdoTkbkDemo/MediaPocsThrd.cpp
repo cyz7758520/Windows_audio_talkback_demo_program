@@ -33,7 +33,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdInit
- * 功能说明：创建并初始化媒体处理线程。
+ * 功能说明：初始化媒体处理线程。
  * 参数说明：MediaPocsThrdPtPt：[输出]，存放用于存放媒体处理线程指针的指针，不能为NULL。
 			 UserDataPt：[输入]，存放用户数据的指针，可以为NULL。
 			 UserInitFuncPt：[输入]，存放用户定义的初始化函数的指针，不能为NULL。
@@ -113,64 +113,67 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并清空媒体处理线程的内存块失败。" ) );
 		goto Out;
 	}
+	
+	//设置最小计时器分辨率为1毫秒，可以防止Sleep()函数休眠时间过长。放在这里是防止下面的代码初始化失败导致跳过设置最小计时器分辨率，从而在调用销毁函数时多取消了一次最小计时器分辨率。
+	if( timeBeginPeriod( 1 ) != TIMERR_NOERROR )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置最小计时器分辨率失败。" ) );
+		goto Out;
+	}
+	
+	//初始化COM库。
+	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY );
 
 	p_MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcID = WAVE_MAPPER; //设置音频输入设备的标识符。
 	p_MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcID = WAVE_MAPPER; //设置音频输出设备的标识符。
 	p_MediaPocsThrdPt->m_VdoInpt.m_VdoInptDvcID = WAVE_MAPPER; //设置视频输入设备的标识符。
 	
-	//创建并初始化设置文件的完整路径动态字符串。
+	//初始化设置文件的完整路径动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_StngFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并初始化设置文件的完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化设置文件的完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 	
-	//创建并初始化Speex声学回音消除器的内存块文件完整路径动态字符串。
+	//初始化Speex声学回音消除器的内存块文件完整路径动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_SpeexAecMemFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并初始化Speex声学回音消除器的内存块文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化Speex声学回音消除器的内存块文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 	
-	//创建并初始化WebRtc浮点版声学回音消除器的内存块文件完整路径动态字符串。
+	//初始化WebRtc浮点版声学回音消除器的内存块文件完整路径动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecMemFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并初始化WebRtc浮点版声学回音消除器的内存块文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化WebRtc浮点版声学回音消除器的内存块文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 
-	//创建并初始化音频输入文件完整路径动态字符串。
+	//初始化音频输入文件完整路径动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_AdoInptFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并初始化音频输入文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 
-	//创建并初始化音频结果文件完整路径动态字符串。
+	//初始化音频结果文件完整路径动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并初始化音频结果文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频结果文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 
-	//创建并初始化音频输出文件完整路径动态字符串。
+	//初始化音频输出文件完整路径动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并初始化音频输出文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输出文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 
-	//创建并初始化错误信息动态字符串。
+	//初始化错误信息动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_ErrInfoVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并初始化错误信息动态字符串失败。" ) );
-		goto Out;
-	}
-
-	//设置最小计时器分辨率为1毫秒，可以防止Sleep()函数休眠时间过长。
-	if( timeBeginPeriod( 1 ) != TIMERR_NOERROR )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置最小计时器分辨率失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化错误信息动态字符串失败。" ) );
 		goto Out;
 	}
 
@@ -466,7 +469,7 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY );
 
 	//创建系统设备枚举器。
-	if( CoCreateInstance( CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC, IID_ICreateDevEnum, ( void ** )&p_CreateDevEnumPt ) != S_OK )
+	if( CoCreateInstance( CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER, IID_ICreateDevEnum, ( void ** )&p_CreateDevEnumPt ) != S_OK )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建系统设备枚举器失败。" ) );
 		goto Out; //本函数返回失败。
@@ -520,6 +523,7 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 	{
 		MediaPocsThrdDstoyDvcName( p_VdoInptDvcNameArrPtPt, p_VdoInptDvcTotal, NULL );
 	}
+	CoUninitialize(); //销毁COM库。
 	return p_Rslt;
 }
 
@@ -1463,9 +1467,10 @@ int MediaPocsThrdSetIsUseAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUse
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：MediaPocsThrdSetAdoOtptUsePcm
- * 功能说明：设置音频输出要使用PCM原始数据。
- * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
+ * 函数名称：MediaPocsThrdAddAdoOtptStrm
+ * 功能说明：添加音频输出流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+             AdoOtptStrmIdx：[输入]，存放音频输出流索引。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -1473,9 +1478,10 @@ int MediaPocsThrdSetIsUseAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUse
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSetAdoOtptUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAddAdoOtptStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+	MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo * p_AdoOtptStrmInfoPt; //存放音频输出流信息的指针。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1484,7 +1490,35 @@ int MediaPocsThrdSetAdoOtptUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrIn
 		goto Out; //本函数返回失败。
 	}
 
-	MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd = 0;
+	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.m_ConstLenLnkLstPt == NULL )
+	{
+		if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.Init( sizeof( MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo ), LNKLST_BUF_AUTO_ADJ_METH_FREENUMBER, 1, 0, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+		{
+			VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化音频输出流信息链表失败。原因：" ) );
+			goto Out; //本函数返回失败。
+		}
+	}
+	else
+	{
+		//查找音频输出流索引是否已经存在。
+		for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void * * )&p_AdoOtptStrmInfoPt, 0, NULL ) == 0; )
+		{
+			if( p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx == AdoOtptStrmIdx )
+			{
+				goto Out;
+			}
+		}
+	}
+
+	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.PutTail( NULL, 0, ErrInfoVstrPt ) != 0 )
+	{
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入音频输出流信息到链表失败。原因：" ) );
+		goto Out; //本函数返回失败。
+	}
+	MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetTail( NULL, NULL, ( void * * )&p_AdoOtptStrmInfoPt, 0, NULL );
+
+	p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx = AdoOtptStrmIdx;
+	p_AdoOtptStrmInfoPt->m_UseWhatDecd = 0;
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -1497,8 +1531,56 @@ int MediaPocsThrdSetAdoOtptUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrIn
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：MediaPocsThrdSetAdoOtptUseSpeexDecd
- * 功能说明：设置音频输出要使用Speex解码器。
+ * 函数名称：MediaPocsThrdSetAdoOtptStrmUsePcm
+ * 功能说明：设置音频输出流要使用PCM原始数据。
+ * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 返回说明：0：成功。
+			 非0：失败。
+ * 线程安全：是 或 否
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+int MediaPocsThrdSetAdoOtptStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+	MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo * p_AdoOtptStrmInfoPt; //存放音频输出流信息的指针。
+
+	//判断各个变量是否正确。
+	if( MediaPocsThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		goto Out; //本函数返回失败。
+	}
+	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.m_ConstLenLnkLstPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出流信息链表不正确。" ) );
+		goto Out; //本函数返回失败。
+	}
+
+	//查找音频输出流索引。
+	for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void * * )&p_AdoOtptStrmInfoPt, 0, NULL ) == 0; )
+	{
+		if( p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx == AdoOtptStrmIdx )
+		{
+			p_AdoOtptStrmInfoPt->m_UseWhatDecd = 0;
+			break;
+		}
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+
+	}
+	return p_Rslt;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * 函数名称：MediaPocsThrdSetAdoOtptStrmUseSpeexDecd
+ * 功能说明：设置音频输出流要使用Speex解码器。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
              IsUsePrcplEnhsmt：[输出]，存放Speex解码器是否使用知觉增强，为非0表示要使用，为0表示不使用。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -1508,9 +1590,10 @@ int MediaPocsThrdSetAdoOtptUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrIn
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSetAdoOtptUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdSetAdoOtptStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+	MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo * p_AdoOtptStrmInfoPt; //存放音频输出流信息的指针。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1518,9 +1601,22 @@ int MediaPocsThrdSetAdoOtptUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
 		goto Out; //本函数返回失败。
 	}
-
-	MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd = 1;
-    MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdIsUsePrcplEnhsmt = IsUsePrcplEnhsmt;
+	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.m_ConstLenLnkLstPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出流信息链表不正确。" ) );
+		goto Out; //本函数返回失败。
+	}
+	
+	//查找音频输出流索引。
+	for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void * * )&p_AdoOtptStrmInfoPt, 0, NULL ) == 0; )
+	{
+		if( p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx == AdoOtptStrmIdx )
+		{
+			p_AdoOtptStrmInfoPt->m_UseWhatDecd = 1;
+			p_AdoOtptStrmInfoPt->m_SpeexDecdIsUsePrcplEnhsmt = IsUsePrcplEnhsmt;
+			break;
+		}
+	}
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -1533,8 +1629,8 @@ int MediaPocsThrdSetAdoOtptUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：MediaPocsThrdSetAdoOtptUseOpusDecd
- * 功能说明：设置音频输出要使用Opus解码器。
+ * 函数名称：MediaPocsThrdSetAdoOtptStrmUseOpusDecd
+ * 功能说明：设置音频输出流要使用Opus解码器。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
@@ -1543,9 +1639,10 @@ int MediaPocsThrdSetAdoOtptUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSetAdoOtptUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdSetAdoOtptStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+	MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo * p_AdoOtptStrmInfoPt; //存放音频输出流信息的指针。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1553,9 +1650,73 @@ int MediaPocsThrdSetAdoOtptUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, Vstr * 
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
 		goto Out; //本函数返回失败。
 	}
+	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.m_ConstLenLnkLstPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出流信息链表不正确。" ) );
+		goto Out; //本函数返回失败。
+	}
+	
+	//查找音频输出流索引。
+	for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void * * )&p_AdoOtptStrmInfoPt, 0, NULL ) == 0; )
+	{
+		if( p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx == AdoOtptStrmIdx )
+		{
+			p_AdoOtptStrmInfoPt->m_UseWhatDecd = 2;
+			break;
+		}
+	}
 
-	MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd = 2;
+	p_Rslt = 0; //设置本函数执行成功。
 
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+
+	}
+	return p_Rslt;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * 函数名称：MediaPocsThrdDelAdoOtptStrm
+ * 功能说明：删除音频输出流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+             AdoOtptStrmIdx：[输入]，存放音频输出流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 返回说明：0：成功。
+			 非0：失败。
+ * 线程安全：是 或 否
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+int MediaPocsThrdDelAdoOtptStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+	MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo * p_AdoOtptStrmInfoPt; //存放音频输出流信息的指针。
+
+	//判断各个变量是否正确。
+	if( MediaPocsThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		goto Out; //本函数返回失败。
+	}
+	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.m_ConstLenLnkLstPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出流信息链表不正确。" ) );
+		goto Out; //本函数返回失败。
+	}
+
+	//查找音频输出流索引。
+	for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void * * )&p_AdoOtptStrmInfoPt, 0, NULL ) == 0; )
+	{
+		if( p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx == AdoOtptStrmIdx )
+		{
+			MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.DelByIdx( p_AdoOtptStrmInfoIdx, 0, NULL );
+			goto Sucs;
+		}
+	}
+	goto Out;
+
+	Sucs:
 	p_Rslt = 0; //设置本函数执行成功。
 
 	Out:
@@ -2266,6 +2427,12 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVstrPt = NULL;
 	}
 	
+	//销毁音频输出流信息链表。
+	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.m_ConstLenLnkLstPt != NULL )
+	{
+		MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.Dstoy( NULL );
+	}
+
 	//销毁音频输出文件完整路径动态字符串。
 	if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt != NULL )
 	{
@@ -2279,12 +2446,15 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		VstrDstoy( MediaPocsThrdPt->m_ErrInfoVstrPt );
 		MediaPocsThrdPt->m_ErrInfoVstrPt = NULL;
 	}
-
-	//销毁媒体处理线程的内存块。
-	free( MediaPocsThrdPt );
+	
+	//销毁COM库。
+	CoUninitialize();
 
 	//取消最小计时器分辨率。
 	timeEndPeriod( 1 );
+
+	//销毁媒体处理线程的内存块。
+	free( MediaPocsThrdPt );
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -2311,78 +2481,85 @@ DWORD WINAPI AdoInptThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 	LOGI( Cu8vstr( "音频输入线程：开始准备音频输入。" ) );
 
 	//开始音频输入循环。
-	while( GetMessage( &MediaPocsThrdPt->m_AdoInpt.m_Msg, NULL, 0, 0 ) != 0 )
+	while( true )
 	{
-		if( MediaPocsThrdPt->m_AdoInpt.m_Msg.message == WIM_DATA ) //如果是音频输入缓冲区块读取完毕消息。
+		if( PeekMessage( &MediaPocsThrdPt->m_AdoInpt.m_Msg, NULL, 0, 0, PM_REMOVE ) != 0 ) //如果从消息队列获取消息成功。
 		{
-			if( ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam )->dwBytesRecorded != MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) ) //如果本次音频输入帧的长度不等于帧的长度，就表示本次音频输入帧不完整，丢弃。
+			if( MediaPocsThrdPt->m_AdoInpt.m_Msg.message == WIM_DATA ) //如果是音频输入缓冲区块读取完毕消息。
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "本次音频输入帧的长度不等于帧的长度，就表示本次音频输入帧不完整，丢弃。" ) );
-				waveInAddBuffer( MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcHdl, ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam, sizeof( WAVEHDR ) ); //将已准备的音频输入缓冲区块添加到音频输入设备上。
-				continue;
-			}
-
-			//获取一个音频输入空闲帧。
-			MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.GetTotal( &MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLstElmTotal, 1, NULL ); //获取音频输入空闲帧链表的元素总数。
-			if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLstElmTotal > 0 ) //如果音频输入空闲帧链表中有音频输入空闲帧。
-			{
-				//从音频输入空闲帧链表中取出第一个音频输入空闲帧。
+				if( ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam )->dwBytesRecorded != MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) ) //如果本次音频输入帧的长度不等于帧的长度，就表示本次音频输入帧不完整，丢弃。
 				{
-					MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.Locked( NULL ); //音频输入空闲帧链表的互斥锁加锁。
-					MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt, NULL, 0, NULL );
-					MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.DelHead( 0, NULL );
-					MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.Unlock( NULL ); //音频输入空闲帧链表的互斥锁解锁。
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "本次音频输入帧的长度不等于帧的长度，就表示本次音频输入帧不完整，丢弃。" ) );
+					waveInAddBuffer( MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcHdl, ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam, sizeof( WAVEHDR ) ); //将已准备的音频输入缓冲区块添加到音频输入设备上。
+					continue;
 				}
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从音频输入空闲帧链表中取出第一个音频输入空闲帧，音频输入空闲帧链表元素个数：%uzd。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLstElmTotal );
-			}
-			else //如果音频输入空闲帧链表中没有音频输入空闲帧。
-			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：音频输入空闲帧链表中没有音频输入空闲帧，本次音频输入帧丢弃。" ) );
-			}
 
-			//追加本次音频输入帧到音频输入帧链表。
-			if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt != NULL ) //如果获取了一个音频输入空闲帧。
-			{
-				memcpy( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt, ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam )->lpData, MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) );
-				MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.PutTail( &MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt, 1, NULL );
-				MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt = NULL;
+				//获取一个音频输入空闲帧。
+				MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.GetTotal( &MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLstElmTotal, 1, NULL ); //获取音频输入空闲帧链表的元素总数。
+				if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLstElmTotal > 0 ) //如果音频输入空闲帧链表中有音频输入空闲帧。
+				{
+					//从音频输入空闲帧链表中取出第一个音频输入空闲帧。
+					{
+						MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.Locked( NULL ); //音频输入空闲帧链表的互斥锁加锁。
+						MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt, NULL, 0, NULL );
+						MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.DelHead( 0, NULL );
+						MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.Unlock( NULL ); //音频输入空闲帧链表的互斥锁解锁。
+					}
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从音频输入空闲帧链表中取出第一个音频输入空闲帧，音频输入空闲帧链表元素个数：%uzd。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLstElmTotal );
+				}
+				else //如果音频输入空闲帧链表中没有音频输入空闲帧。
+				{
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：音频输入空闲帧链表中没有音频输入空闲帧，本次音频输入帧丢弃。" ) );
+				}
+
+				//追加本次音频输入帧到音频输入帧链表。
+				if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt != NULL ) //如果获取了一个音频输入空闲帧。
+				{
+					memcpy( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt, ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam )->lpData, MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) );
+					MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.PutTail( &MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt, 1, NULL );
+					MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmPt = NULL;
+				}
+
+				waveInAddBuffer( MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcHdl, ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam, sizeof( WAVEHDR ) ); //将已准备的音频输入缓冲区块添加到音频输入设备上。
+
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 )
+				{
+					FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoInpt.m_NowTimeMsec );
+					LOGFI( Cu8vstr( "音频输入线程：本次音频输入帧读取完毕，耗时 %uz64d 毫秒。" ), MediaPocsThrdPt->m_AdoInpt.m_NowTimeMsec - MediaPocsThrdPt->m_AdoInpt.m_LastTimeMsec );
+					MediaPocsThrdPt->m_AdoInpt.m_LastTimeMsec = MediaPocsThrdPt->m_AdoInpt.m_NowTimeMsec;
+				}
 			}
-
-			waveInAddBuffer( MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcHdl, ( WAVEHDR * )MediaPocsThrdPt->m_AdoInpt.m_Msg.lParam, sizeof( WAVEHDR ) ); //将已准备的音频输入缓冲区块添加到音频输入设备上。
-
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 )
+			else if( MediaPocsThrdPt->m_AdoInpt.m_Msg.message == WIM_OPEN ) //如果是音频输入设备打开消息。
 			{
-				FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoInpt.m_NowTimeMsec );
-				LOGFI( Cu8vstr( "音频输入线程：本次音频输入帧读取完毕，耗时 %uz64d 毫秒。" ), MediaPocsThrdPt->m_AdoInpt.m_NowTimeMsec - MediaPocsThrdPt->m_AdoInpt.m_LastTimeMsec );
-				MediaPocsThrdPt->m_AdoInpt.m_LastTimeMsec = MediaPocsThrdPt->m_AdoInpt.m_NowTimeMsec;
+				SetThreadPriority( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl, THREAD_PRIORITY_ABOVE_NORMAL ); //设置本线程优先级。
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 )
+				{
+					FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoInpt.m_LastTimeMsec );
+					LOGI( Cu8vstr( "音频输入线程：本线程接收到音频输入设备打开消息。" ) );
+				}
+			}
+			else if( MediaPocsThrdPt->m_AdoInpt.m_Msg.message == WIM_CLOSE ) //如果是音频输入设备关闭消息。
+			{
+				MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcIsClos = 1; //设置音频输入设备已经关闭。
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：本线程接收到音频输入设备关闭消息。" ) );
+				break;
+			}
+			else //如果是其他消息。
+			{
+				LOGFI( Cu8vstr( "音频输入线程：获取到其他消息 %#uX。" ), MediaPocsThrdPt->m_AdoInpt.m_Msg.message );
 			}
 		}
-		else if( MediaPocsThrdPt->m_AdoInpt.m_Msg.message == WIM_OPEN ) //如果是音频输入设备打开消息。
-		{
-			SetThreadPriority( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl, THREAD_PRIORITY_ABOVE_NORMAL ); //设置本线程优先级。
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 )
-			{
-				FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoInpt.m_LastTimeMsec );
-				LOGI( Cu8vstr( "音频输入线程：本线程接收到音频输入设备打开消息。" ) );
-			}
-		}
-		else if( MediaPocsThrdPt->m_AdoInpt.m_Msg.message == WIM_CLOSE ) //如果是音频输入设备关闭消息。
-		{
-			MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcID = WAVE_MAPPER; //设置音频输入设备的标识符为默认的音频输入设备。
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：本线程接收到设备关闭消息，开始准备退出，并切换到默认的音频输入设备。" ) );
-			break;
-		}
-		else //如果是其他消息。
-		{
-			LOGFI( Cu8vstr( "音频输入线程：获取到其他消息 %#uX。" ), MediaPocsThrdPt->m_AdoInpt.m_Msg.message );
-		}
-	}
 
-	if( MediaPocsThrdPt->m_AdoInpt.m_Msg.message == WM_QUIT )
-	{
-		if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：本线程接收到退出请求，开始准备退出。" ) );
-	}
+		if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdExitFlag == 1 ) //如果退出标记为请求退出。
+        {
+            if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：本线程接收到退出请求，开始准备退出。" ) );
+            goto OutAdoInptLoop;
+        }
 
+		Sleep( 1 ); //暂停一下，避免CPU使用率过高。
+	} //音频输入循环完毕。
+	OutAdoInptLoop:;
+	
 	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：本线程已退出。" ) );
 	return 0;
 }
@@ -2402,113 +2579,186 @@ DWORD WINAPI AdoOtptThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 	LOGI( Cu8vstr( "音频输出线程：开始准备音频输出。" ) );
 
 	//开始音频输出循环。
-	while( GetMessage( &MediaPocsThrdPt->m_AdoOtpt.m_Msg, NULL, 0, 0 ) != 0 )
+	while( true )
 	{
-		if( MediaPocsThrdPt->m_AdoOtpt.m_Msg.message == WOM_DONE ) //如果是音频输出缓冲区块写入完毕消息。
+		if( PeekMessage( &MediaPocsThrdPt->m_AdoOtpt.m_Msg, NULL, 0, 0, PM_REMOVE ) != 0 ) //如果从消息队列获取消息成功。
 		{
-			//调用用户定义的写入音频输出帧函数，并解码成PCM原始数据。
-			switch( MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd ) //使用什么解码器。
+			if( MediaPocsThrdPt->m_AdoOtpt.m_Msg.message == WOM_DONE ) //如果是音频输出缓冲区块写入完毕消息。
 			{
-				case 0: //如果使用PCM原始数据。
+				//调用用户定义的写入音频输出帧函数，并解码成PCM原始数据，最后混音。
 				{
-					//调用用户定义的写入音频输出帧函数。
-					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->dwBufferLength;
-					MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( MediaPocsThrdPt, ( int16_t * )( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->lpData, NULL, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen );
-					break;
-				}
-				case 1: //如果使用Speex编解码器。
-				{
-					//调用用户定义的写入音频输出帧函数。
-					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz;
-					MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( MediaPocsThrdPt, NULL, MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen );
-
-					//使用Speex解码器。
-					if( SpeexDecdPocs( MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdPt, MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen, ( int16_t * )( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->lpData ) == 0 )
+					size_t p_AdoOtptStrmDataIdx = SIZE_MAX;
+					MediaPocsThrd::AdoOtpt::AdoOtptStrmData * p_AdoOtptStrmDataPt; //存放音频输出流数据的指针。
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt = ( int16_t * )( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->lpData;
+					if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.GetNextByIdx( p_AdoOtptStrmDataIdx, &p_AdoOtptStrmDataIdx, NULL, ( void * * )&p_AdoOtptStrmDataPt, 0, NULL ) == 0 ) //如果有一条音频输出流。
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：使用Speex解码器成功。" ) );
+						switch( p_AdoOtptStrmDataPt->m_UseWhatDecd ) //使用什么解码器。
+						{
+							case 0: //如果使用PCM原始数据。
+							{
+								//调用用户定义的写入音频输出帧函数。
+								MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = MediaPocsThrdPt->m_AdoOtpt.m_FrmLen;
+								MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( MediaPocsThrdPt, p_AdoOtptStrmDataPt->m_AdoOtptStrmIdx, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, NULL, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen );
+								break;
+							}
+							case 1: //如果使用Speex编解码器。
+							{
+								//调用用户定义的写入音频输出帧函数。
+								MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz;
+								MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( MediaPocsThrdPt, p_AdoOtptStrmDataPt->m_AdoOtptStrmIdx, NULL, MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen );
+
+								//使用Speex解码器。
+								if( SpeexDecdPocs( p_AdoOtptStrmDataPt->m_SpeexDecdPt, MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt ) == 0 )
+								{
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：使用Speex解码器成功。" ) );
+								}
+								else
+								{
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：使用Speex解码器失败。" ) );
+								}
+								break;
+							}
+							case 2: //如果使用Opus编解码器。
+							{
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：暂不支持使用Opus解码器。" ) );
+							}
+						}
+						
+						//调用用户定义的获取PCM格式音频输出帧函数。
+						MediaPocsThrdPt->m_UserGetPcmAdoOtptFrmFuncPt( MediaPocsThrdPt, p_AdoOtptStrmDataPt->m_AdoOtptStrmIdx, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen );
+
+						if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.GetNextByIdx( p_AdoOtptStrmDataIdx, &p_AdoOtptStrmDataIdx, NULL, ( void * * )&p_AdoOtptStrmDataPt, 0, NULL ) == 0 ) //如果还有多条音频输出流。
+						{
+							for( int p_TmpInt = 0; p_TmpInt < MediaPocsThrdPt->m_AdoOtpt.m_FrmLen; p_TmpInt++ ) //将第一个音频输出流的音频输出帧复制到音频输出混音帧。
+							{
+								MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt[ p_TmpInt ] = MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt[ p_TmpInt ];
+							}
+
+							do
+							{
+								switch( p_AdoOtptStrmDataPt->m_UseWhatDecd ) //使用什么解码器。
+								{
+									case 0: //如果使用PCM原始数据。
+									{
+										//调用用户定义的写入音频输出帧函数。
+										MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = MediaPocsThrdPt->m_AdoOtpt.m_FrmLen;
+										MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( MediaPocsThrdPt, p_AdoOtptStrmDataPt->m_AdoOtptStrmIdx, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, NULL, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen );
+										break;
+									}
+									case 1: //如果使用Speex编解码器。
+									{
+										//调用用户定义的写入音频输出帧函数。
+										MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz;
+										MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( MediaPocsThrdPt, p_AdoOtptStrmDataPt->m_AdoOtptStrmIdx, NULL, MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen );
+
+										//使用Speex解码器。
+										if( SpeexDecdPocs( p_AdoOtptStrmDataPt->m_SpeexDecdPt, MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt ) == 0 )
+										{
+											if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：使用Speex解码器成功。" ) );
+										}
+										else
+										{
+											if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：使用Speex解码器失败。" ) );
+										}
+										break;
+									}
+									case 2: //如果使用Opus编解码器。
+									{
+										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：暂不支持使用Opus解码器。" ) );
+									}
+								}
+
+								//调用用户定义的获取PCM格式音频输出帧函数。
+								MediaPocsThrdPt->m_UserGetPcmAdoOtptFrmFuncPt( MediaPocsThrdPt, p_AdoOtptStrmDataPt->m_AdoOtptStrmIdx, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen );
+
+								for( int p_TmpInt = 0; p_TmpInt < MediaPocsThrdPt->m_AdoOtpt.m_FrmLen; p_TmpInt++ ) //混音。
+								{
+									MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt[ p_TmpInt ] = MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt[ p_TmpInt ] + MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt[ p_TmpInt ] - ( ( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt[ p_TmpInt ] * MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt[ p_TmpInt ] ) >> 0x10 );
+								}
+							} while( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.GetNextByIdx( p_AdoOtptStrmDataIdx, &p_AdoOtptStrmDataIdx, NULL, ( void * * )&p_AdoOtptStrmDataPt, 0, NULL ) == 0 );
+
+							for( int p_TmpInt = 0; p_TmpInt < MediaPocsThrdPt->m_AdoOtpt.m_FrmLen; p_TmpInt++ ) //将第一个音频输出流的音频输出帧复制到音频输出混音帧。
+							{
+								if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt[ p_TmpInt ] > 32767 ) MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt[ p_TmpInt ] = 32767;
+								else if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt[ p_TmpInt ] < -32768 ) MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt[ p_TmpInt ] = -32768;
+								else MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt[ p_TmpInt ] = ( int16_t ) MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt[ p_TmpInt ];
+							}
+						}
 					}
-					else
+				}
+
+				//判断音频输出是否静音。在音频处理完后再设置静音，这样可以保证音频处理器的连续性。
+				if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIsMute != 0 )
+				{
+					memset( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, 0, ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->dwBufferLength );
+				}
+
+				//写入本次音频输出帧到音频输出设备。
+				waveOutWrite( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcHdl, ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam, sizeof( WAVEHDR ) );
+
+				//获取一个音频输出空闲帧。
+				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.GetTotal( &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal, 1, NULL );
+				if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal > 0 ) //如果音频输出空闲帧链表中有音频输出空闲帧。
+				{
+					//从音频输出空闲帧链表中取出第一个音频输出空闲帧。
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：使用Speex解码器失败。" ) );
+						MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.Locked( NULL ); //音频输出空闲帧链表的互斥锁加锁。
+						MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, NULL, 0, NULL );
+						MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.DelHead( 0, NULL );
+						MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.Unlock( NULL ); //音频输出空闲帧链表的互斥锁解锁。
 					}
-					break;
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：从音频输出空闲帧链表中取出第一个音频输出空闲帧，音频输出空闲帧链表元素个数：%uzd。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal );
 				}
-				case 2: //如果使用Opus编解码器。
+				else //如果音频输出空闲帧链表中没有音频输出空闲帧。
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：暂不支持使用Opus解码器。" ) );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出空闲帧链表中没有音频输出空闲帧，本次音频输出帧丢弃。" ) );
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt = NULL;
 				}
-			}
-			
-			//判断音频输出是否静音。在音频处理完后再设置静音，这样可以保证音频处理器的连续性。
-            if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIsMute != 0 )
-            {
-				memset( ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->lpData, 0, ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->dwBufferLength );
-            }
 
-			//写入本次音频输出帧到音频输出设备。
-			waveOutWrite( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcHdl, ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam, sizeof( WAVEHDR ) );
-			
-			//调用用户定义的获取PCM格式音频输出帧函数。
-			MediaPocsThrdPt->m_UserGetPcmAdoOtptFrmFuncPt( MediaPocsThrdPt, ( int16_t * )( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->lpData, ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->dwBufferLength );
-
-			//获取一个音频输出空闲帧。
-			MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.GetTotal( &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal, 1, NULL );
-			if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal > 0 ) //如果音频输出空闲帧链表中有音频输出空闲帧。
-			{
-				//从音频输出空闲帧链表中取出第一个音频输出空闲帧。
+				//追加本次音频输出帧到音频输出帧链表。
+				if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt != NULL )
 				{
-					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.Locked( NULL ); //音频输出空闲帧链表的互斥锁加锁。
-					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, NULL, 0, NULL );
-					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.DelHead( 0, NULL );
-					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.Unlock( NULL ); //音频输出空闲帧链表的互斥锁解锁。
+					memcpy( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->lpData, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ) );
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLst.PutTail( &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, 1, NULL );
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt = NULL;
 				}
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：从音频输出空闲帧链表中取出第一个音频输出空闲帧，音频输出空闲帧链表元素个数：%uzd。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal );
-			}
-			else //如果音频输出空闲帧链表中没有音频输出空闲帧。
-			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出空闲帧链表中没有音频输出空闲帧，本次音频输出帧丢弃。" ) );
-			}
 
-			//追加本次音频输出帧到音频输出帧链表。
-			if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt != NULL )
-			{
-				memcpy( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, ( ( WAVEHDR * )MediaPocsThrdPt->m_AdoOtpt.m_Msg.lParam )->lpData, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ) );
-				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLst.PutTail( &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt, 1, NULL );
-				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt = NULL;
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 )
+				{
+					FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec );
+					LOGFI( Cu8vstr( "音频输出线程：本次音频输出帧写入完毕，耗时 %uz64d 毫秒。" ), MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec - MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec );
+					MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec = MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec;
+				}
 			}
+			else if( MediaPocsThrdPt->m_AdoOtpt.m_Msg.message == WOM_OPEN ) //如果是音频输出设备打开消息。
+			{
+				SetThreadPriority( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl, THREAD_PRIORITY_ABOVE_NORMAL ); //设置本线程优先级。
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 )
+				{
+					FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec );
+					LOGI( Cu8vstr( "音频输出线程：本线程接收到音频输出设备打开消息。" ) );
+				}
+			}
+			else if( MediaPocsThrdPt->m_AdoOtpt.m_Msg.message == WOM_CLOSE ) //如果是音频输出设备关闭消息。
+			{
+				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcIsClos = 1; //设置音频输出设备已经关闭。
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：本线程接收到音频输出设备关闭消息。" ) );
+			}
+			else //如果是其他消息。
+			{
+				LOGFI( Cu8vstr( "音频输出线程：获取到其他消息 %#uX。" ), MediaPocsThrdPt->m_AdoInpt.m_Msg.message );
+			}
+		}
+		
+		if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdExitFlag == 1 ) //如果退出标记为请求退出。
+        {
+            if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：本线程接收到退出请求，开始准备退出。" ) );
+            goto OutAdoOtptLoop;
+        }
 
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 )
-			{
-				FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec );
-				LOGFI( Cu8vstr( "音频输出线程：本次音频输出帧写入完毕，耗时 %uz64d 毫秒。" ), MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec - MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec );
-				MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec = MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec;
-			}
-		}
-		else if( MediaPocsThrdPt->m_AdoOtpt.m_Msg.message == WOM_OPEN ) //如果是音频输出设备打开消息。
-		{
-			SetThreadPriority( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl, THREAD_PRIORITY_ABOVE_NORMAL ); //设置本线程优先级。
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 )
-			{
-				FuncGetTimeAsMsec( &MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec );
-				LOGI( Cu8vstr( "音频输出线程：本线程接收到音频输出设备打开消息。" ) );
-			}
-		}
-		else if( MediaPocsThrdPt->m_AdoOtpt.m_Msg.message == WOM_CLOSE ) //如果是音频输出设备关闭消息。
-		{
-			MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcID = WAVE_MAPPER; //设置音频输出设备的标识符为默认的音频输出设备。
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：本线程接收到设备关闭消息，开始准备退出，并切换到默认的音频输出设备。" ) );
-			break;
-		}
-		else //如果是其他消息。
-		{
-			LOGFI( Cu8vstr( "音频输出线程：获取到其他消息 %#uX。" ), MediaPocsThrdPt->m_AdoInpt.m_Msg.message );
-		}
-	}
-
-	if( MediaPocsThrdPt->m_AdoOtpt.m_Msg.message == WM_QUIT )
-	{
-		if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：本线程接收到退出请求，开始准备退出。" ) );
-	}
+		Sleep( 1 ); //暂停一下，避免CPU使用率过高。
+	} //音频输出循环完毕。
+	OutAdoOtptLoop:;
 
 	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：本线程已退出。" ) );
 	return 0;
@@ -3070,10 +3320,16 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_SmplRate );
 				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLen：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLen );
 				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_UseWhatDecd：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd );
-				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SpeexDecdIsUsePrcplEnhsmt：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdIsUsePrcplEnhsmt );
-				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+				{
+					MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo * p_AdoOtptStrmInfoPt; //存放音频输出流信息的指针。
+					for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void ** )&p_AdoOtptStrmInfoPt, 0, NULL ) == 0; )
+					{
+						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_AdoOtptStrmIdx：%z32d\n" ), p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx );
+						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_UseWhatDecd：%z32d\n" ), p_AdoOtptStrmInfoPt->m_UseWhatDecd );
+						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SpeexDecdIsUsePrcplEnhsmt：%z32d\n" ), p_AdoOtptStrmInfoPt->m_SpeexDecdIsUsePrcplEnhsmt );
+						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					}
+				}
 				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsSaveAdoToFile：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsSaveAdoToFile );
 				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_AdoOtptFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt );
 				FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
@@ -3122,7 +3378,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 			//初始化音频输入。
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsUseAdoInpt != 0 )
 			{
-				//创建并初始化声学回音消除器。
+				//初始化声学回音消除器。
 				if( MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec != 0 ) //如果要使用声学回音消除器。
 				{
 					if( MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt == 0 )
@@ -3154,22 +3410,22 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							if( SpeexAecInitByMemFile( &MediaPocsThrdPt->m_AdoInpt.m_SpeexAecPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecFilterLen, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecIsUseRec, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoMutp, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoCntu, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoSupes, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoSupesAct, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecMemFileFullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：根据Speex声学回音消除器内存块文件 %vs 来创建并初始化Speex声学回音消除器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAecMemFileFullPathVstrPt );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：根据Speex声学回音消除器内存块文件 %vs 来初始化Speex声学回音消除器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAecMemFileFullPathVstrPt );
 							}
 							else
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：根据Speex声学回音消除器内存块文件 %vs 来创建并初始化Speex声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAecMemFileFullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：根据Speex声学回音消除器内存块文件 %vs 来初始化Speex声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAecMemFileFullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
 							}
 						}
 						if( MediaPocsThrdPt->m_AdoInpt.m_SpeexAecPt == NULL )
 						{
 							if( SpeexAecInit( &MediaPocsThrdPt->m_AdoInpt.m_SpeexAecPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecFilterLen, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecIsUseRec, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoMutp, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoCntu, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoSupes, MediaPocsThrdPt->m_AdoInpt.m_SpeexAecEchoSupesAct, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化Speex声学回音消除器成功。" ) );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化Speex声学回音消除器成功。" ) );
 							}
 							else
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化Speex声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化Speex声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 								goto OutMediaInitAndPocs;
 							}
 						}
@@ -3179,11 +3435,11 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						if( WebRtcAecmInit( &MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecmPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecmIsUseCNGMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecmEchoMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecmDelay, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化WebRtc定点版声学回音消除器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化WebRtc定点版声学回音消除器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化WebRtc定点版声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化WebRtc定点版声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaInitAndPocs;
 						}
 						break;
@@ -3194,22 +3450,22 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							if( WebRtcAecInitByMemFile( &MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecEchoMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecDelay, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseDelayAgstcMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseExtdFilterMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseRefinedFilterAdaptAecMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseAdaptAdjDelay, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecMemFileFullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：根据WebRtc浮点版声学回音消除器内存块文件 %vs 来创建并初始化WebRtc浮点版声学回音消除器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecMemFileFullPathVstrPt );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：根据WebRtc浮点版声学回音消除器内存块文件 %vs 来初始化WebRtc浮点版声学回音消除器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecMemFileFullPathVstrPt );
 							}
 							else
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：根据WebRtc浮点版声学回音消除器内存块文件 %vs 来创建并初始化WebRtc浮点版声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecMemFileFullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：根据WebRtc浮点版声学回音消除器内存块文件 %vs 来初始化WebRtc浮点版声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecMemFileFullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
 							}
 						}
 						if( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecPt == NULL )
 						{
 							if( WebRtcAecInit( &MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecEchoMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecDelay, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseDelayAgstcMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseExtdFilterMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseRefinedFilterAdaptAecMode, MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecIsUseAdaptAdjDelay, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化WebRtc浮点版声学回音消除器成功。" ) );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化WebRtc浮点版声学回音消除器成功。" ) );
 							}
 							else
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化WebRtc浮点版声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化WebRtc浮点版声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 								goto OutMediaInitAndPocs;
 							}
 						}
@@ -3219,18 +3475,18 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						if( SpeexWebRtcAecInit( &MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWorkMode, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecSpeexAecFilterLen, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecSpeexAecIsUseRec, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecSpeexAecEchoMutp, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecSpeexAecEchoCntu, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecSpeexAecEchoSupes, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecSpeexAecEchoSupesAct, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecmIsUseCNGMode, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecmEchoMode, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecmDelay, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecEchoMode, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecDelay, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecIsUseDelayAgstcMode, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecIsUseExtdFilterMode, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecMode, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelay, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecIsUseSameRoomAec, MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAecSameRoomEchoMinDelay, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化SpeexWebRtc三重声学回音消除器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化SpeexWebRtc三重声学回音消除器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化SpeexWebRtc三重声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化SpeexWebRtc三重声学回音消除器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaInitAndPocs;
 						}
 						break;
 					}
 				}
 
-				//创建并初始化噪音抑制器。
+				//初始化噪音抑制器。
 				switch( MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs )
 				{
 					case 0: //如果不使用噪音抑制器。
@@ -3247,11 +3503,11 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						if( WebRtcNsxInit( &MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsxPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsxPolicyMode, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化WebRtc定点版噪音抑制器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化WebRtc定点版噪音抑制器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化WebRtc定点版噪音抑制器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化WebRtc定点版噪音抑制器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaInitAndPocs;
 						}
 						break;
@@ -3260,11 +3516,11 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						if( WebRtcNsInit( &MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsPolicyMode, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化WebRtc浮点版噪音抑制器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化WebRtc浮点版噪音抑制器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化WebRtc浮点版噪音抑制器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化WebRtc浮点版噪音抑制器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaInitAndPocs;
 						}
 						break;
@@ -3273,18 +3529,18 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						if( RNNoiseInit( &MediaPocsThrdPt->m_AdoInpt.m_RNNoisePt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化RNNoise噪音抑制器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化RNNoise噪音抑制器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化RNNoise噪音抑制器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化RNNoise噪音抑制器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaInitAndPocs;
 						}
 						break;
 					}
 				}
 
-				//创建并初始化Speex预处理器。
+				//初始化Speex预处理器。
 				if( ( MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs == 1 ) || ( MediaPocsThrdPt->m_AdoInpt.m_IsUseSpeexPrpocsOther != 0 ) )
 				{
 					if( MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs != 1 )
@@ -3299,16 +3555,16 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 					if( SpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_FrmLen, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsIsUseNs, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNoiseSupes, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsIsUseDereverb, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsIsUseVad, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsVadProbStart, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsVadProbCntu, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsIsUseAgc, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsAgcLevel, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsAgcIncrement, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsAgcDecrement, MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsAgcMaxGain, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化Speex预处理器成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化Speex预处理器成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化Speex预处理器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化Speex预处理器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs;
 					}
 				}
 
-				//创建并初始化编码器。
+				//初始化编码器。
 				switch( MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd )
 				{
 					case 0: //如果使用PCM原始数据。
@@ -3325,11 +3581,11 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						}
 						if( SpeexEncdInit( &MediaPocsThrdPt->m_AdoInpt.m_SpeexEncdPt, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, MediaPocsThrdPt->m_AdoInpt.m_SpeexEncdUseCbrOrVbr, MediaPocsThrdPt->m_AdoInpt.m_SpeexEncdQualt, MediaPocsThrdPt->m_AdoInpt.m_SpeexEncdCmplxt, MediaPocsThrdPt->m_AdoInpt.m_SpeexEncdPlcExptLossRate ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化Speex编码器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化Speex编码器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化Speex编码器失败。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化Speex编码器失败。" ) );
 							goto OutMediaInitAndPocs;
 						}
 						break;
@@ -3341,82 +3597,82 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 				}
 
-				//创建并初始化音频输入Wave文件写入器、音频结果Wave文件写入器。
+				//初始化音频输入Wave文件写入器、音频结果Wave文件写入器。
 				if( MediaPocsThrdPt->m_AdoInpt.m_IsSaveAdoToFile != 0 )
 				{
 					if( WaveFileWriterInit( &MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveFileWriterPt, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFileFullPathVstrPt, 1, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, 16 ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输入文件 %vs 的Wave文件写入器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptFileFullPathVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入文件 %vs 的Wave文件写入器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptFileFullPathVstrPt );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输入文件 %vs 的Wave文件写入器失败。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptFileFullPathVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输入文件 %vs 的Wave文件写入器失败。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptFileFullPathVstrPt );
 						goto OutMediaInitAndPocs;
 					}
 					if( WaveFileWriterInit( &MediaPocsThrdPt->m_AdoInpt.m_AdoRsltWaveFileWriterPt, MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVstrPt, 1, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, 16 ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频结果文件 %vs 的Wave文件写入器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频结果文件 %vs 的Wave文件写入器成功。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVstrPt );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频结果文件 %vs 的Wave文件写入器失败。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频结果文件 %vs 的Wave文件写入器失败。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoRsltFileFullPathVstrPt );
 						goto OutMediaInitAndPocs;
 					}
 				}
 
-				//创建并初始化音频输入波形器、音频结果波形器。
+				//初始化音频输入波形器、音频结果波形器。
 				if( MediaPocsThrdPt->m_AdoInpt.m_IsDrawAdoWavfmToWnd != 0 )
 				{
 					if( AdoWavfmInit( &MediaPocsThrdPt->m_AdoInpt.m_AdoInptWavfmPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输入波形器成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入波形器成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输入波形器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输入波形器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs;
 					}
 					if( AdoWavfmInit( &MediaPocsThrdPt->m_AdoInpt.m_AdoRsltWavfmPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频结果波形器成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频结果波形器成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频结果波形器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频结果波形器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs;
 					}
 				}
 
-				//创建并初始化音频输入帧链表、音频输入空闲帧链表。
+				//初始化音频输入帧链表、音频输入空闲帧链表。
 				{
 					MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal = 6; //音频输入帧链表最多只存储几帧，避免因为音频设备有变化导致卡顿并积累大量音频输入帧，从而导致不同步。音频输入空闲帧链表最多存储总数与音频输入帧链表一致。
-					if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+					if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, 0, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输入帧链表成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入帧链表成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输入帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输入帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs; //本函数返回失败。
 					}
 
-					if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+					if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, 0, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输入帧链表成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入帧链表成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输入帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输入帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs; //本函数返回失败。
 					}
 
-					//创建并初始化音频输入空闲帧，并追加到音频输入空闲帧链表。
+					//初始化音频输入空闲帧，并追加到音频输入空闲帧链表。
 					for( p_TmpInt322 = 0; p_TmpInt322 < MediaPocsThrdPt->m_AdoInpt.m_AdoInptFrmElmTotal; p_TmpInt322++ )
 					{
 						MediaPocsThrdPt->m_PcmAdoInptFrmPt = ( int16_t * )malloc( MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) );
 						if( MediaPocsThrdPt->m_PcmAdoInptFrmPt == NULL )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：创建并初始化音频输入空闲帧失败。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：初始化音频输入空闲帧失败。" ) );
 							goto OutMediaInitAndPocs; //本函数返回失败。
 						}
 						if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptIdleFrmLnkLst.PutTail( &MediaPocsThrdPt->m_PcmAdoInptFrmPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -3442,6 +3698,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 				//创建并启动音频输入线程。必须在初始化音频输入设备前初始化音频输入线程，因为音频输入设备会使用音频输入线程ID。
 				{
+					MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdExitFlag = 0; //设置音频输入线程退出标记为0表示保持运行。
 					MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl = CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )AdoInptThrdRun, MediaPocsThrdPt, 0, &MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdId );
 					if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl != NULL )
 					{
@@ -3454,7 +3711,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 				}
 
-				//创建并初始化音频输入缓冲区块数组。
+				//初始化音频输入缓冲区块数组。
 				{
 					MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrTotal = 2; //音频输入缓冲区块数组的元素总数固定为2。
 					MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrPt = ( WAVEHDR * )calloc( 1, MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrTotal * sizeof( WAVEHDR ) ); //创建并清空音频输入缓冲区块数组的内存块。
@@ -3474,10 +3731,10 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 							goto OutMediaInitAndPocs; //本函数返回失败。
 						}
 					}
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输入缓冲区块数组成功。" ) );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入缓冲区块数组成功。" ) );
 				}
 
-				//创建并初始化音频输入设备。
+				//初始化音频输入设备。
 				{
 					WAVEFORMATEX WaveFormatEx;
 					WaveFormatEx.wFormatTag = WAVE_FORMAT_PCM;
@@ -3509,104 +3766,129 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 							goto OutMediaInitAndPocs;
 						}
 					}
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输入设备成功。音频输入缓冲区大小：%d * %d。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrPt[0].dwBufferLength, MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrTotal );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入设备成功。音频输入缓冲区大小：%d * %d。" ), MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrPt[0].dwBufferLength, MediaPocsThrdPt->m_AdoInpt.m_AdoInptWaveHdrTotal );
 				}
 			} //初始化音频输入完毕。
 
 			//初始化音频输出。
 			if( MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt != 0 )
 			{
-				//创建并初始化解码器。
-				switch( MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd )
+				//初始化音频输出流数据链表。
 				{
-					case 0: //如果使用PCM原始数据。
+					if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.Init( sizeof( MediaPocsThrd::AdoOtpt::AdoOtptStrmData ), LNKLST_BUF_AUTO_ADJ_METH_FREENUMBER, 1, 0, 1, SIZE_MAX, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用PCM原始数据。" ) );
-						break;
-					}
-					case 1: //如果使用Speex解码器。
-					{
-						if( MediaPocsThrdPt->m_AdoOtpt.m_FrmLen != MediaPocsThrdPt->m_AdoOtpt.m_SmplRate / 1000 * 20 )
-						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：帧的长度不为20毫秒不能使用Speex解码器。" ) );
-							goto OutMediaInitAndPocs;
-						}
-						if( SpeexDecdInit( &MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdPt, MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdIsUsePrcplEnhsmt ) == 0 )
-						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化Speex解码器成功。" ) );
-						}
-						else
-						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化Speex解码器失败。" ) );
-							goto OutMediaInitAndPocs;
-						}
-						break;
-					}
-					case 2: //如果使用Opus解码器。
-					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：暂不支持使用Opus解码器。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输出流数据链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs;
 					}
-				}
 
-				//创建并初始化音频输出Wave文件写入器。
+					MediaPocsThrd::AdoOtpt::AdoOtptStrmInfo * p_AdoOtptStrmInfoPt; //存放音频输出流信息的指针。
+					MediaPocsThrd::AdoOtpt::AdoOtptStrmData p_AdoOtptStrmData; //存放音频输出流数据。
+					for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmInfoLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void * * )&p_AdoOtptStrmInfoPt, 0, NULL ) == 0; )
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：开始初始化音频输出流索引 %z32d 。" ), p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx );
+
+						p_AdoOtptStrmData.m_AdoOtptStrmIdx = p_AdoOtptStrmInfoPt->m_AdoOtptStrmIdx;
+
+						p_AdoOtptStrmData.m_UseWhatDecd = p_AdoOtptStrmInfoPt->m_UseWhatDecd;
+
+						switch( p_AdoOtptStrmData.m_UseWhatDecd ) //初始化解码器。
+						{
+							case 0: //如果使用PCM原始数据。
+							{
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用PCM原始数据。" ) );
+								break;
+							}
+							case 1: //如果使用Speex解码器。
+							{
+								if( MediaPocsThrdPt->m_AdoOtpt.m_FrmLen != MediaPocsThrdPt->m_AdoOtpt.m_SmplRate / 1000 * 20 )
+								{
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：帧的长度不为20毫秒不能使用Speex解码器。" ) );
+									goto OutMediaInitAndPocs;
+								}
+								if( SpeexDecdInit( &p_AdoOtptStrmData.m_SpeexDecdPt, MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, p_AdoOtptStrmInfoPt->m_SpeexDecdIsUsePrcplEnhsmt ) == 0 )
+								{
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化Speex解码器成功。" ) );
+								}
+								else
+								{
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化Speex解码器失败。" ) );
+									goto OutMediaInitAndPocs;
+								}
+								break;
+							}
+							case 2: //如果使用Opus解码器。
+							{
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：暂不支持使用Opus解码器。" ) );
+								goto OutMediaInitAndPocs;
+							}
+						}
+
+						if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.PutTail( &p_AdoOtptStrmData, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						{
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：放入音频输出流数据到链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							goto OutMediaInitAndPocs;
+						}
+					}
+				}
+				
+				//初始化音频输出Wave文件写入器。
 				if( MediaPocsThrdPt->m_AdoOtpt.m_IsSaveAdoToFile != 0 )
 				{
 					if( WaveFileWriterInit( &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWaveFileWriterPt, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt, 1, MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, 16 ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输出文件 %vs 的Wave文件写入器成功。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输出文件 %vs 的Wave文件写入器成功。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输出文件 %vs 的Wave文件写入器失败。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输出文件 %vs 的Wave文件写入器失败。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFileFullPathVstrPt );
 						goto OutMediaInitAndPocs;
 					}
 				}
 
-				//创建并初始化音频输入波形器、音频结果波形器。
+				//初始化音频输入波形器、音频结果波形器。
 				if( MediaPocsThrdPt->m_AdoOtpt.m_IsDrawAdoWavfmToWnd != 0 )
 				{
 					if( AdoWavfmInit( &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWavfmPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输出波形器成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输出波形器成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输出波形器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输出波形器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs;
 					}
 				}
 
-				//创建并初始化音频输出帧链表、音频输出空闲帧链表。
+				//初始化音频输出帧链表、音频输出空闲帧链表。
 				{
 					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal = 6; //音频输出帧链表最多只存储几帧，避免因为音频设备有变化导致卡顿并积累大量音频输出帧，从而导致不同步。音频输出空闲帧链表最多存储总数与音频输出帧链表一致。
-					if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+					if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, 0, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输出帧链表成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输出帧链表成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输出帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输出帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs; //本函数返回失败。
 					}
 
-					if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+					if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.Init( sizeof( int16_t * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, 0, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输出空闲帧链表成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输出空闲帧链表成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化音频输出空闲帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输出空闲帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs; //本函数返回失败。
 					}
 
-					//创建并初始化音频输出空闲帧，并追加到音频输出空闲帧链表。
+					//初始化音频输出空闲帧，并追加到音频输出空闲帧链表。
 					for( p_TmpInt322 = 0; p_TmpInt322 < MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmElmTotal; p_TmpInt322++ )
 					{
 						MediaPocsThrdPt->m_PcmAdoOtptFrmPt = ( int16_t * )malloc( MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ) );
 						if( MediaPocsThrdPt->m_PcmAdoOtptFrmPt == NULL )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：创建并初始化音频输出空闲帧失败。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：初始化音频输出空闲帧失败。" ) );
 							goto OutMediaInitAndPocs; //本函数返回失败。
 						}
 						if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptIdleFrmLnkLst.PutTail( &MediaPocsThrdPt->m_PcmAdoOtptFrmPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -3619,27 +3901,33 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						MediaPocsThrdPt->m_PcmAdoOtptFrmPt = NULL;
 					}
 				}
-		
+
 				//初始化音频输出线程的临时变量。
 				{
 					MediaPocsThrdPt->m_AdoOtpt.m_Msg = { 0 }; //初始化消息。
 					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt = NULL; //初始化音频输出帧的指针。
-					if( MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd != 0 )
 					{
-						MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt = ( uint8_t * )malloc( MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ) ); //初始化已编码格式音频输出帧的指针。
-						if( MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt == NULL )
+						size_t p_AdoOtptStrmDataTotal;
+						MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.GetTotal( &p_AdoOtptStrmDataTotal, 0, NULL );
+						if( p_AdoOtptStrmDataTotal > 1 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建已编码格式音频输出帧的内存块失败。" ) );
-							goto OutMediaInitAndPocs;
+							MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt = ( int32_t * )malloc( MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int32_t ) ); //初始化音频输出混音帧的指针。
+							if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt == NULL )
+							{
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建音频输出混音帧的内存块失败。" ) );
+								goto OutMediaInitAndPocs;
+							}
+							MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmSz = MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int32_t ); //初始化音频输出混音帧的内存大小，单位为字节。
 						}
-						MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz = MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ); //初始化已编码格式音频输出帧的内存大小，单位字节。
 					}
-					else
+					MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt = ( uint8_t * )malloc( MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int8_t ) ); //初始化已编码格式音频输出帧的指针。
+					if( MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt == NULL )
 					{
-						MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt = NULL; //初始化已编码格式音频输出帧的指针。
-						MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz = 0; //初始化已编码格式音频输出帧的内存大小，单位字节。
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建已编码格式音频输出帧的内存块失败。" ) );
+						goto OutMediaInitAndPocs;
 					}
-					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = 0; //初始化音频输出帧的长度，单位字节。
+					MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz = MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int8_t ); //初始化已编码格式音频输出帧的内存大小，单位为字节。
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = 0; //初始化音频输出帧的长度，单位为字节。
 					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal = 0; //初始化音频输出帧链表的元数总数。
 					MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec = 0; //初始化上次时间的毫秒数。
 					MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec = 0; //初始化本次时间的毫秒数。
@@ -3647,18 +3935,21 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				}
 
 				//创建并启动音频输出线程。必须在初始化音频输出设备前初始化音频输出线程，因为音频输出设备会使用音频输出线程ID。
-				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl = CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )AdoOtptThrdRun, MediaPocsThrdPt, 0, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdId );
-				if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl != NULL )
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并启动音频输出线程成功。" ) );
-				}
-				else
-				{
-					if( MediaPocsThrdPt->m_IsPrintLog != NULL ) LOGFE( Cu8vstr( "媒体处理线程：创建并启动音频输出线程失败。原因：%vs" ), GetLastErrInfo( , MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto OutMediaInitAndPocs; //本函数返回失败。
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdExitFlag = 0; //设置音频输出线程退出标记为0表示保持运行。
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl = CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )AdoOtptThrdRun, MediaPocsThrdPt, 0, &MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdId );
+					if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl != NULL )
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并启动音频输出线程成功。" ) );
+					}
+					else
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != NULL ) LOGFE( Cu8vstr( "媒体处理线程：创建并启动音频输出线程失败。原因：%vs" ), GetLastErrInfo( , MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutMediaInitAndPocs; //本函数返回失败。
+					}
 				}
 
-				//创建并初始化音频输出缓冲区块数组。
+				//初始化音频输出缓冲区块数组。
 				{
 					if( MediaPocsThrdPt->m_AdoOtpt.m_FrmLen / ( MediaPocsThrdPt->m_AdoOtpt.m_SmplRate / 1000 ) == 10 ) //如果帧的长度为10毫秒。
 					{
@@ -3688,10 +3979,10 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 							goto OutMediaInitAndPocs; //本函数返回失败。
 						}
 					}
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输出缓冲区块成功。" ) );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输出缓冲区块成功。" ) );
 				}
 
-				//创建并初始化音频输出设备。
+				//初始化音频输出设备。
 				{
 					WAVEFORMATEX WaveFormatEx;
 					WaveFormatEx.wFormatTag = WAVE_FORMAT_PCM;
@@ -3717,7 +4008,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 							goto OutMediaInitAndPocs;
 						}
 					}
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化音频输出设备成功。音频输出缓冲区大小：%d * %d。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWaveHdrPt[0].dwBufferLength, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWaveHdrTotal );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输出设备成功。音频输出缓冲区大小：%d * %d。" ), MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWaveHdrPt[0].dwBufferLength, MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWaveHdrTotal );
 				}
 			} //初始化音频输出完毕。
 
@@ -3779,21 +4070,21 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 			//初始化视频输入。
 			if( MediaPocsThrdPt->m_VdoInpt.m_IsUseVdoInpt != 0 )
 			{
-				//创建并初始化视频输入线程。必须在初始化视频输入设备前初始化视频输入线程，因为视频输入设备会使用视频输入线程的指针。
+				//初始化视频输入线程。必须在初始化视频输入设备前初始化视频输入线程，因为视频输入设备会使用视频输入线程的指针。
 				{
 					MediaPocsThrdPt->m_VdoInpt.m_VdoInptThrdPt = new VdoInptThrd( MediaPocsThrdPt );
 					if( MediaPocsThrdPt->m_VdoInpt.m_VdoInptThrdPt != NULL )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化视频输入线程成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化视频输入线程成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化视频输入线程失败。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化视频输入线程失败。" ) );
 						goto OutMediaInitAndPocs;
 					}
 				}
 
-				//创建并初始化视频输入设备。
+				//初始化视频输入设备。
 				{
 					int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
 					ICreateDevEnum * p_CreateDevEnumPt = NULL;
@@ -3817,37 +4108,36 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					IBaseFilter * p_DecFilterPt = NULL;
 					IPin * p_DecFilterInptPinPt = NULL;
 					IPin * p_DecFilterOtptPinPt = NULL;
-			
+
 					IBaseFilter * p_SmplGrabberFilterPt = NULL;
 					ISampleGrabber * p_SmplGrabberInterfacePt = NULL;
 					IPin * p_SmplGrabberFilterInptPinPt = NULL;
 					IPin * p_SmplGrabberFilterOtptPinPt = NULL;
 					AM_MEDIA_TYPE p_TmpAmMediaType = { 0 };
 
-					//初始化COM库。
-					CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY );
-
 					//创建视频输入过滤器图管理器。
-					if( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC, IID_IGraphBuilder, ( void ** )&MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerPt ) != S_OK )
+					if( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, ( void ** )&MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerPt ) != S_OK )
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建视频输入过滤器图管理器失败。" ) );
 						goto OutInitVdoInptDvc;
 					}
-			
-					if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerPt->QueryInterface( IID_IMediaEvent, ( LPVOID * )&MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaEventPt ) != S_OK )
+
+					//获取视频输入过滤器图媒体事件器。
+					if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerPt->QueryInterface( IID_IMediaEvent, ( LPVOID * )&MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaEventPt ) != S_OK )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建视频输入过滤器图管理器媒体事件器失败。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：获取视频输入过滤器图媒体事件器失败。" ) );
 						goto OutInitVdoInptDvc;
 					}
 
-					if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerPt->QueryInterface( IID_IMediaControl, ( LPVOID * )&MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaCtrlPt ) != S_OK )
+					//获取视频输入过滤器图媒体控制器。
+					if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerPt->QueryInterface( IID_IMediaControl, ( LPVOID * )&MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaCtrlPt ) != S_OK )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建视频输入过滤器图管理器媒体控制器失败。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：获取视频输入过滤器图媒体控制器失败。" ) );
 						goto OutInitVdoInptDvc;
 					}
 
 					//创建系统设备枚举器。
-					if( CoCreateInstance( CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC, IID_ICreateDevEnum, ( void ** )&p_CreateDevEnumPt ) != S_OK )
+					if( CoCreateInstance( CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER, IID_ICreateDevEnum, ( void ** )&p_CreateDevEnumPt ) != S_OK )
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建系统设备枚举器失败。" ) );
 						goto OutInitVdoInptDvc;
@@ -4132,7 +4422,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					//创建视频输入设备过滤器上选择的引脚和媒体类型对应的解码过滤器，并连接引脚。
 					if( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_MJPG )
 					{
-						if( CoCreateInstance( CLSID_MjpegDec, NULL, CLSCTX_INPROC, IID_IBaseFilter, ( void ** )&p_DecFilterPt ) != S_OK )
+						if( CoCreateInstance( CLSID_MjpegDec, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, ( void ** )&p_DecFilterPt ) != S_OK )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建MJPG解码过滤器失败。" ) );
 							goto OutInitVdoInptDvc;
@@ -4140,7 +4430,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 					else if( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 )
 					{
-						if( CoCreateInstance( CLSID_AVIDec, NULL, CLSCTX_INPROC, IID_IBaseFilter, ( void ** )&p_DecFilterPt ) != S_OK )
+						if( CoCreateInstance( CLSID_AVIDec, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, ( void ** )&p_DecFilterPt ) != S_OK )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建AVI解码过滤器失败。" ) );
 							goto OutInitVdoInptDvc;
@@ -4179,7 +4469,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 
 					//创建采样抓取过滤器，并连接引脚。
-					if( CoCreateInstance( CLSID_SampleGrabber, NULL, CLSCTX_INPROC, IID_IBaseFilter, ( void * * )&p_SmplGrabberFilterPt ) != S_OK )
+					if( CoCreateInstance( CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, ( void * * )&p_SmplGrabberFilterPt ) != S_OK )
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建采样抓取过滤器失败。" ) );
 						goto OutInitVdoInptDvc;
@@ -4232,7 +4522,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						goto OutInitVdoInptDvc;
 					}
 
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化视频输入设备成功。" ) );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化视频输入设备成功。" ) );
 
 					p_Rslt = 0; //设置本函数执行成功。
 
@@ -4291,7 +4581,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						goto OutMediaInitAndPocs;
 					}
-				} //创建并初始化视频输入设备完毕。
+				} //初始化视频输入设备完毕。
 		
 				//初始化视频输入线程的临时变量。
 				{
@@ -4338,47 +4628,47 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						if( OpenH264EncdInit( &MediaPocsThrdPt->m_VdoInpt.m_OpenH264EncdPt, MediaPocsThrdPt->m_VdoInpt.m_FrmWidth, MediaPocsThrdPt->m_VdoInpt.m_FrmHeight, MediaPocsThrdPt->m_VdoInpt.m_OpenH264EncdVdoType, MediaPocsThrdPt->m_VdoInpt.m_OpenH264EncdEncdBitrate, MediaPocsThrdPt->m_VdoInpt.m_OpenH264EncdBitrateCtrlMode, MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate, MediaPocsThrdPt->m_VdoInpt.m_OpenH264EncdIDRFrmIntvl, MediaPocsThrdPt->m_VdoInpt.m_OpenH264EncdCmplxt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：创建并初始化OpenH264编码器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：初始化OpenH264编码器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化OpenH264编码器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化OpenH264编码器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaInitAndPocs;
 						}
 						break;
 					}
 				}
 
-				//创建并初始化视频输入帧链表、视频输入空闲帧链表。
+				//初始化视频输入帧链表、视频输入空闲帧链表。
 				{
 					MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal = 2; //视频输入帧链表最多只存储2帧，避免因为视频设备有变化导致卡顿并积累大量视频输入帧，从而导致不及时。视频输入空闲帧链表最多存储总数与视频输入帧链表一致。
-					if( MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmLnkLst.Init( sizeof( MediaPocsThrd::VdoInpt::VdoInptFrmElm * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+					if( MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmLnkLst.Init( sizeof( MediaPocsThrd::VdoInpt::VdoInptFrmElm * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, 0, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化视频输入帧链表成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化视频输入帧链表成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化视频输入帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化视频输入帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs; //本函数返回失败。
 					}
 
-					if( MediaPocsThrdPt->m_VdoInpt.m_VdoInptIdleFrmLnkLst.Init( sizeof( MediaPocsThrd::VdoInpt::VdoInptFrmElm * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+					if( MediaPocsThrdPt->m_VdoInpt.m_VdoInptIdleFrmLnkLst.Init( sizeof( MediaPocsThrd::VdoInpt::VdoInptFrmElm * ), LNKLST_BUF_AUTO_ADJ_METH_NONE, 0, 0, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：创建并初始化视频输入空闲帧链表成功。" ) );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化视频输入空闲帧链表成功。" ) );
 					}
 					else
 					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化视频输入空闲帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化视频输入空闲帧链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto OutMediaInitAndPocs; //本函数返回失败。
 					}
 
-					//创建并初始化视频输入空闲帧，并追加到视频输入空闲帧链表。
+					//初始化视频输入空闲帧，并追加到视频输入空闲帧链表。
 					for( p_TmpInt322 = 0; p_TmpInt322 < MediaPocsThrdPt->m_VdoInpt.m_VdoInptFrmElmTotal; p_TmpInt322++ )
 					{
 						MediaPocsThrdPt->m_VdoInptFrmPt = ( MediaPocsThrd::VdoInpt::VdoInptFrmElm * )malloc( sizeof( MediaPocsThrd::VdoInpt::VdoInptFrmElm ) );
 						if( MediaPocsThrdPt->m_VdoInptFrmPt == NULL )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：创建并初始化视频输入空闲帧失败。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：初始化视频输入空闲帧失败。" ) );
 							goto OutMediaInitAndPocs; //本函数返回失败。
 						}
 						MediaPocsThrdPt->m_VdoInptFrmPt->m_YU12VdoInptFrmPt = ( uint8_t * )malloc( MediaPocsThrdPt->m_VdoInpt.m_FrmWidth * MediaPocsThrdPt->m_VdoInpt.m_FrmHeight * 3 / 2 );
@@ -4386,7 +4676,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							free( MediaPocsThrdPt->m_VdoInptFrmPt );
 							MediaPocsThrdPt->m_VdoInptFrmPt = NULL;
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：创建并初始化视频输入空闲帧失败。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：初始化视频输入空闲帧失败。" ) );
 							goto OutMediaInitAndPocs; //本函数返回失败。
 						}
 						if( MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd != 0 )
@@ -4398,7 +4688,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 								MediaPocsThrdPt->m_VdoInptFrmPt->m_YU12VdoInptFrmPt = NULL;
 								free( MediaPocsThrdPt->m_VdoInptFrmPt );
 								MediaPocsThrdPt->m_VdoInptFrmPt = NULL;
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：创建并初始化视频输入空闲帧失败。" ) );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：初始化视频输入空闲帧失败。" ) );
 								goto OutMediaInitAndPocs; //本函数返回失败。
 							}
 							MediaPocsThrdPt->m_VdoInptFrmPt->m_EncdVdoInptFrmLen = 0;
@@ -4441,11 +4731,11 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					{
 						if( OpenH264DecdInit( &MediaPocsThrdPt->m_VdoOtpt.m_OpenH264DecdPt, MediaPocsThrdPt->m_VdoOtpt.m_OpenH264DecdDecdThrdNum, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：创建并初始化OpenH264解码器成功。" ) );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：初始化OpenH264解码器成功。" ) );
 						}
 						else
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建并初始化OpenH264解码器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化OpenH264解码器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaInitAndPocs;
 						}
 						break;
@@ -4537,7 +4827,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					MediaPocsThrdPt->m_EncdAdoInptFrmPt = NULL;
 					MediaPocsThrdPt->m_EncdAdoInptFrmSz = 0;
 				}
-				MediaPocsThrdPt->m_EncdAdoInptFrmLen = 0; //初始化已编码格式音频输入帧的长度，单位字节。
+				MediaPocsThrdPt->m_EncdAdoInptFrmLen = 0; //初始化已编码格式音频输入帧的长度，单位为字节。
 				MediaPocsThrdPt->m_EncdAdoInptFrmIsNeedTrans = 1; //初始化已编码格式音频输入帧是否需要传输预设为1，为了让在不使用非连续传输的情况下永远都是需要传输。
 				MediaPocsThrdPt->m_VdoInptFrmPt = NULL; //初始化视频输入帧的指针。
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化媒体处理线程的临时变量成功。" ) );
@@ -4556,7 +4846,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			if( MediaPocsThrdPt->m_VdoInpt.m_IsUseVdoInpt != 0 ) //如果要使用视频输入。
 			{
-				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaCtrlPt->Run(); //让视频输入过滤器图管理器开始运行。
+				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaCtrlPt->Run(); //让视频输入过滤器图管理器开始运行。
 			}
 
 			if( MediaPocsThrdPt->m_IsPrintLog != 0 )
@@ -4895,7 +5185,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						}
 					}
 				}
-		
+
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 )
 				{
 					FuncGetTimeAsMsec( &p_NowMsec );
@@ -4961,34 +5251,28 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					MediaPocsThrdPt->m_VdoInptFrmPt = NULL;
 				}
 
-				//如果音频输入线程因为设备关闭而退出了，就重启媒体处理线程。
-				if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl != NULL )
+				//如果音频输入设备已经关闭，就切换到默认的音频输入设备，并重启媒体处理线程。
+				if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcIsClos != 0 )
 				{
-					GetExitCodeThread( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl, ( LPDWORD )&p_TmpInt321 );
-					if( p_TmpInt321 != STILL_ACTIVE )
-					{
-						LOGFI( Cu8vstr( "媒体处理线程：音频输入线程因为设备关闭而退出了，准备重启媒体处理线程。" ) );
-						MediaPocsThrdPt->m_ExitFlag = 3;
-					}
+					MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcID = WAVE_MAPPER; //设置音频输入设备的标识符为默认的音频输入设备。
+					LOGFI( Cu8vstr( "媒体处理线程：音频输入设备已经关闭，切换到默认的音频输入设备，并重启媒体处理线程。" ) );
+					MediaPocsThrdPt->m_ExitFlag = 3;
 				}
 
-				//如果音频输出线程因为设备关闭而退出了，就重启媒体处理线程。
-				if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl != NULL )
+				//如果音频输出设备已经关闭，就切换到默认的音频输出设备，并重启媒体处理线程。
+				if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcIsClos != 0 )
 				{
-					GetExitCodeThread( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl, ( LPDWORD )&p_TmpInt321 );
-					if( p_TmpInt321 != STILL_ACTIVE )
-					{
-						LOGFI( Cu8vstr( "媒体处理线程：音频输出线程因为设备关闭而退出了，准备重启媒体处理线程。" ) );
-						MediaPocsThrdPt->m_ExitFlag = 3;
-					}
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcID = WAVE_MAPPER; //设置音频输出设备的标识符为默认的音频输出设备。
+					LOGFI( Cu8vstr( "媒体处理线程：音频输出设备已经关闭，切换到默认的音频输出设备，并重启媒体处理线程。" ) );
+					MediaPocsThrdPt->m_ExitFlag = 3;
 				}
 
 				//如果视频输入线程因为设备关闭而退出了，就重启媒体处理线程。
-				if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaEventPt != NULL )
+				if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaEventPt != NULL )
 				{
 					long p_EventCode;
 					LONG_PTR p_EventParam1, p_EventParam2;
-					MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaEventPt->GetEvent( &p_EventCode, &p_EventParam1, &p_EventParam2, 0 );
+					MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaEventPt->GetEvent( &p_EventCode, &p_EventParam1, &p_EventParam2, 0 );
 					if( p_EventCode == EC_DEVICE_LOST )
 					{
 						LOGFI( Cu8vstr( "媒体处理线程：视频输入线程因为设备关闭而退出了，准备重启媒体处理线程。" ) );
@@ -5012,20 +5296,8 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 		if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：本线程开始退出。" ) );
 
 		//请求音视频输入输出线程退出。必须在销毁音视频输入输出前退出，因为音视频输入输出线程会使用音视频输入输出相关变量。
-		if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl != NULL )
-			while( PostThreadMessage( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdId, WM_QUIT, NULL, NULL ) == 0 ) //循环发送请求音频输入线程退出，直到线程消息发送成功。不要使用退出标记，因为音频输入设备可能会打开失败，导致音频输入线程不会进入消息循环。
-			{
-				GetExitCodeThread( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl, ( LPDWORD )&p_TmpInt321 );
-				if( p_TmpInt321 == STILL_ACTIVE ) Sleep( 0 ); //如果音频输入线程还在运行，说明是音频输入线程刚开始运行时还来不及创建消息队列导致发送请求失败，就重新发送请求。
-				else break; //如果音频输入线程已经退出，则不需要再发送请求。
-			}
-		if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl != NULL )
-			while( PostThreadMessage( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdId, WM_QUIT, NULL, NULL ) == 0 ) //循环发送请求音频输出线程退出，直到线程消息发送成功。不要使用退出标记，因为音频输出设备可能会打开失败，导致音频输出线程不会进入消息循环。
-			{
-				GetExitCodeThread( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl, ( LPDWORD )&p_TmpInt321 );
-				if( p_TmpInt321 == STILL_ACTIVE ) Sleep( 0 ); //如果音频输出线程还在运行，说明是音频输出线程刚开始运行时还来不及创建消息队列导致发送请求失败，就重新发送请求。
-				else break; //如果音频输出线程已经退出，则不需要再发送请求。
-			}
+		if( MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdHdl != NULL ) MediaPocsThrdPt->m_AdoInpt.m_AdoInptThrdExitFlag = 1; //请求音频输入线程退出。
+		if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdHdl != NULL ) MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptThrdExitFlag = 1; //请求音频输出线程退出。
 		if( MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptThrdHdl != NULL ) MediaPocsThrdPt->m_VdoOtpt.m_VdoOtptThrdExitFlag = 1; //请求视频输出线程退出。
 
 		//销毁音频输入。
@@ -5099,6 +5371,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				waveInReset( MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcHdl );
 				waveInClose( MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcHdl );
 				MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcHdl = NULL;
+				MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcIsClos = 0;
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：销毁音频输入设备成功。" ) );
 			}
 
@@ -5388,13 +5661,19 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				MediaPocsThrdPt->m_AdoOtpt.m_Msg = { 0 }; //销毁消息。
 				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmPt = NULL; //销毁音频输出帧的指针。
+				if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt != NULL ) //销毁音频输出混音帧的指针。
+				{
+					free( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt );
+					MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmPt = NULL;
+				}
+				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptMixFrmSz = 0; //销毁音频输出混音帧的内存大小，单位为字节。
 				if( MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt != NULL ) //销毁已编码格式音频输出帧的指针。
 				{
 					free( MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt );
 					MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmPt = NULL;
 				}
-				MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz = 0; //销毁已编码格式音频输出帧的内存大小，单位字节。
-				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = 0; //销毁音频输出帧的长度，单位字节。
+				MediaPocsThrdPt->m_AdoOtpt.m_EncdAdoOtptFrmSz = 0; //销毁已编码格式音频输出帧的内存大小，单位为字节。
+				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLen = 0; //销毁音频输出帧的长度，单位为字节。
 				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptFrmLnkLstElmTotal = 0; //销毁音频输出帧链表的元数总数。
 				MediaPocsThrdPt->m_AdoOtpt.m_LastTimeMsec = 0; //销毁上次时间的毫秒数。
 				MediaPocsThrdPt->m_AdoOtpt.m_NowTimeMsec = 0; //销毁本次时间的毫秒数。
@@ -5450,6 +5729,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				waveOutReset( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcHdl );
 				waveOutClose( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcHdl );
 				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcHdl = NULL;
+				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptDvcIsClos = 0;
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：销毁音频输出设备成功。" ) );
 			}
 
@@ -5498,49 +5778,61 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptWaveFileWriterPt = NULL;
 			}
 
-			//销毁解码器。
-			switch( MediaPocsThrdPt->m_AdoOtpt.m_UseWhatDecd )
+			//销毁音频输出流数据链表。
+			if( MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.m_ConstLenLnkLstPt != NULL )
 			{
-				case 0: //如果使用PCM原始数据。
+				MediaPocsThrd::AdoOtpt::AdoOtptStrmData * p_AdoOtptStrmDataPt; //存放音频输出流数据的指针。
+				for( size_t p_AdoOtptStrmDataIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.GetNextByIdx( p_AdoOtptStrmDataIdx, &p_AdoOtptStrmDataIdx, NULL, ( void * * )&p_AdoOtptStrmDataPt, 0, NULL ) == 0; )
 				{
-					break;
-				}
-				case 1: //如果使用Speex解码器。
-				{
-					if( MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdPt != NULL )
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：开始销毁音频输出流索引 %z32d 。" ), p_AdoOtptStrmDataPt->m_AdoOtptStrmIdx );
+
+					//销毁解码器。
+					switch( p_AdoOtptStrmDataPt->m_UseWhatDecd )
 					{
-						if( SpeexDecdDstoy( MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdPt ) == 0 )
+						case 0: //如果使用PCM原始数据。
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：销毁Speex解码器成功。" ) );
+							break;
 						}
-						else
+						case 1: //如果使用Speex解码器。
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：销毁Speex解码器失败。" ) );
+							if( p_AdoOtptStrmDataPt->m_SpeexDecdPt != NULL )
+							{
+								if( SpeexDecdDstoy( p_AdoOtptStrmDataPt->m_SpeexDecdPt ) == 0 )
+								{
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：销毁Speex解码器成功。" ) );
+								}
+								else
+								{
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：销毁Speex解码器失败。" ) );
+								}
+								p_AdoOtptStrmDataPt->m_SpeexDecdPt = NULL;
+							}
+							break;
 						}
-						MediaPocsThrdPt->m_AdoOtpt.m_SpeexDecdPt = NULL;
+						case 2: //如果使用Opus编码器。
+						{
+							break;
+						}
 					}
-					break;
 				}
-				case 2: //如果使用Opus编码器。
-				{
-					break;
-				}
+				MediaPocsThrdPt->m_AdoOtpt.m_AdoOtptStrmDataLnkLst.Dstoy( NULL );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：销毁音频输出流数据链表成功。" ) );
 			}
 		} //销毁音频输出完毕。
 
 		//销毁视频输入。
 		{
 			//销毁视频输入设备。
-			if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaCtrlPt != NULL )
+			if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaCtrlPt != NULL )
 			{
-				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaCtrlPt->Stop(); //让视频输入过滤器图管理器停止运行。
-				p_TmpSz1 = MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaCtrlPt->Release();
-				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaCtrlPt = NULL;
+				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaCtrlPt->Stop(); //让视频输入过滤器图管理器停止运行。
+				p_TmpSz1 = MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaCtrlPt->Release();
+				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaCtrlPt = NULL;
 			}
-			if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaEventPt != NULL )
+			if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaEventPt != NULL )
 			{
-				p_TmpSz1 = MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaEventPt->Release();
-				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerMediaEventPt = NULL;
+				p_TmpSz1 = MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaEventPt->Release();
+				MediaPocsThrdPt->m_VdoInpt.m_FilterGraphMediaEventPt = NULL;
 			}
 			if( MediaPocsThrdPt->m_VdoInpt.m_FilterGraphManagerPt != NULL )
 			{
@@ -5771,7 +6063,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 			MediaPocsThrdPt->m_UserDstoyFuncPt( MediaPocsThrdPt ); //调用用户定义的销毁函数。
 			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的销毁函数成功。" ) );
 		}
-	
+
 		MediaPocsThrdPt->m_RunFlag = RUN_FLAG_END; //设置本线程运行标记为销毁完毕。
 
 		if( ( MediaPocsThrdPt->m_ExitFlag == 0 ) || ( MediaPocsThrdPt->m_ExitFlag == 1 ) ) //如果用户需要直接退出。

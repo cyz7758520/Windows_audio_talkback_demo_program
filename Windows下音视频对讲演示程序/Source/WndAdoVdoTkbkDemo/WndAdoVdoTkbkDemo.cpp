@@ -36,17 +36,13 @@ typedef struct MediaInfo
     int m_IsCreateSrvrOrClnt; //存放创建服务端或者客户端标记，为1表示创建服务端，为0表示创建客户端。
     TcpSrvrSoktCls m_TcpSrvrSokt; //存放本端TCP协议服务端套接字。
     TcpClntSoktCls m_TcpClntSokt; //存放本端TCP协议客户端套接字。
-	UdpSoktCls m_UdpSokt; //存放本端UDP协议套接字。
-    uint64_t m_LastPktSendTime; //存放最后一个数据包的发送时间，用于判断连接是否中断。
-    uint64_t m_LastPktRecvTime; //存放最后一个数据包的接收时间，用于判断连接是否中断。
-	#define PKT_TYP_RQST_CNCT   1 //数据包类型：请求连接包。
-	#define PKT_TYP_CNCT_ACK    2 //数据包类型：连接应答包。
-	#define PKT_TYP_ALLOW_CNCT  3 //数据包类型：允许连接包。
-	#define PKT_TYP_REFUSE_CNCT 4 //数据包类型：拒绝连接包。
-	#define PKT_TYP_ADO_FRM     5 //数据包类型：音频输入输出帧。
-	#define PKT_TYP_VDO_FRM     6 //数据包类型：视频输入输出帧。
-	#define PKT_TYP_HTBT        7 //数据包类型：心跳包。
-	#define PKT_TYP_EXIT        8 //数据包类型：退出包。
+	AudpSoktCls m_AudpSokt; //存放本端高级UDP协议套接字。
+	size_t m_AudpCnctIdx; //存放本端高级UDP协议连接索引。
+	#define PKT_TYP_ALLOW_CNCT  1 //数据包类型：允许连接包。
+	#define PKT_TYP_REFUSE_CNCT 2 //数据包类型：拒绝连接包。
+	#define PKT_TYP_ADO_FRM     3 //数据包类型：音频输入输出帧。
+	#define PKT_TYP_VDO_FRM     4 //数据包类型：视频输入输出帧。
+	#define PKT_TYP_EXIT        5 //数据包类型：退出包。
 	
 	int m_IsAutoAllowCnct; //存放是否自动允许连接，为0表示手动，为1表示自动。
 	int m_RqstCnctRslt; //存放请求连接的结果，为0表示没有选择，为1表示允许，为2表示拒绝。
@@ -82,10 +78,10 @@ typedef struct MediaInfo
 }MediaInfo;
 
 //全局变量。
-HINSTANCE g_IstnsHdl; //当前实例的句柄。
+HINSTANCE g_IstnsHdl; //存放当前实例的句柄。
 VstrCls g_ErrInfoVstr; //存放错误信息动态字符串的指针。
-MediaPocsThrdCls g_MediaPocsThrd; //媒体处理线程的指针。
-MediaInfo * g_MediaInfoPt = NULL; //媒体信息的指针。
+MediaPocsThrdCls g_MediaPocsThrd; //存放媒体处理线程的指针。
+MediaInfo * g_MediaInfoPt = NULL; //存放媒体信息的指针。
 HWND g_MainDlgWndHdl = NULL; //存放主对话框窗口的句柄。
 HWND g_RqstCnctDlgWndHdl = NULL; //存放请求连接对话框窗口的句柄。
 HWND g_PttDlgWndHdl = NULL; //存放一键即按即通对话框窗口的句柄。
@@ -198,23 +194,23 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 	{
 		if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 1 ) //如果是创建本端TCP协议服务端套接字接受远端TCP协议客户端套接字的连接。
 		{
-			if( g_MediaInfoPt->m_TcpSrvrSokt.Init( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, 1, 1, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果创建并初始化已监听的本端TCP协议服务端套接字成功。
+			if( g_MediaInfoPt->m_TcpSrvrSokt.Init( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, 1, 1, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议服务端套接字成功。
 			{
-				if( g_MediaInfoPt->m_TcpSrvrSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取已监听的本端TCP协议服务端套接字绑定的本地节点地址和端口失败。
+				if( g_MediaInfoPt->m_TcpSrvrSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取本端TCP协议服务端套接字绑定的本地节点地址和端口失败。
 				{
-					VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取已监听的本端TCP协议服务端套接字绑定的本地节点地址和端口失败。原因：" ) );
+					VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端TCP协议服务端套接字绑定的本地节点地址和端口失败。原因：" ) );
 					LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 					goto Out;
 				}
 
-				VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "创建并初始化已监听的本端TCP协议服务端套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt );
+				VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "初始化本端TCP协议服务端套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt );
 				LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 			}
 			else
 			{
-				VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化已监听的本端TCP协议服务端套接字[%vs:%vs]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
+				VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化本端TCP协议服务端套接字[%vs:%vs]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 				goto Out;
@@ -222,25 +218,25 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 
 			while( true ) //循环接受远端TCP协议客户端套接字的连接。
 			{
-				if( g_MediaInfoPt->m_TcpSrvrSokt.Accept( NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 1, &g_MediaInfoPt->m_TcpClntSokt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+				if( g_MediaInfoPt->m_TcpSrvrSokt.Acpt( &g_MediaInfoPt->m_TcpClntSokt, NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
-					if( g_MediaInfoPt->m_TcpClntSokt.m_TcpClntSoktPt != NULL ) //如果用已监听的本端TCP协议服务端套接字接受远端TCP协议客户端套接字的连接成功。
+					if( g_MediaInfoPt->m_TcpClntSokt.m_TcpClntSoktPt != NULL ) //如果用本端TCP协议服务端套接字接受远端TCP协议客户端套接字的连接成功。
 					{
 						g_MediaInfoPt->m_TcpSrvrSokt.Dstoy( NULL ); //关闭并销毁已创建的本端TCP协议服务端套接字，防止还有其他远端TCP协议客户端套接字继续连接。
 
-						VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用已监听的本端TCP协议服务端套接字接受远端TCP协议客户端套接字[%vs:%vs]的连接成功。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
+						VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端TCP协议服务端套接字接受远端TCP协议客户端套接字[%vs:%vs]的连接成功。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
 						LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
 						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 						break;
 					}
-					else //如果用已监听的本端TCP协议服务端套接字接受远端TCP协议客户端套接字的连接超时，就重新接受。
+					else //如果用本端TCP协议服务端套接字接受远端TCP协议客户端套接字的连接超时，就重新接受。
 					{
 
 					}
 				}
 				else
 				{
-					VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端TCP协议服务端套接字接受远端TCP协议客户端套接字的连接失败。原因：" ) );
+					VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用本端TCP协议服务端套接字接受远端TCP协议客户端套接字的连接失败。原因：" ) );
 					LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 					goto Out;
@@ -260,7 +256,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 			WinExec( ( char * )g_MediaInfoPt->m_IPAddrVstrPt->m_StrPt, SW_HIDE );
 
 			int p_CurCnctTimes = 1;
-			while( true ) //循环连接已监听的远端TCP协议服务端套接字。
+			while( true ) //循环连接远端TCP协议服务端套接字。
 			{
 				//连接远端
 				{
@@ -270,42 +266,36 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 					}
 
-					if( g_MediaInfoPt->m_TcpClntSokt.Init( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, NULL, NULL, 5000, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果创建并初始化本端TCP协议客户端套接字，并连接已监听的远端TCP协议服务端套接字成功。
+					if( g_MediaInfoPt->m_TcpClntSokt.Init( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, NULL, NULL, 5000, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议客户端套接字，并连接远端TCP协议服务端套接字成功。
 					{
 						if( g_MediaInfoPt->m_TcpClntSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
-							VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取已连接的本端TCP协议客户端套接字绑定的本地节点地址和端口失败。原因：" ) );
+							VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端TCP协议客户端套接字绑定的本地节点地址和端口失败。原因：" ) );
 							LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 							{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 							goto Out;
 						}
 						if( g_MediaInfoPt->m_TcpClntSokt.GetRmtAddr( NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
-							VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取已连接的本端TCP协议客户端套接字连接的远端TCP协议客户端套接字绑定的远程节点地址和端口失败。原因：" ) );
+							VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端TCP协议客户端套接字连接的远端TCP协议客户端套接字绑定的远程节点地址和端口失败。原因：" ) );
 							LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 							{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 							goto Out;
 						}
 
-						VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "创建并初始化本端TCP协议客户端套接字[%vs:%vs]，并连接已监听的远端TCP协议服务端套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
+						VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "初始化本端TCP协议客户端套接字[%vs:%vs]，并连接远端TCP协议服务端套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
 						LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
 						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 						break; //跳出重连。
 					}
 					else
 					{
-						VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化本端TCP协议客户端套接字，并连接已监听的远端TCP协议服务端套接字[%vs:%vs]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
+						VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化本端TCP协议客户端套接字，并连接远端TCP协议服务端套接字[%vs:%vs]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
 						LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 					}
 				}
-
-				if( MediaPocsThrdPt->m_ExitFlag != 0 ) //如果本线程接收到退出请求。
-				{
-					LOGI( Cu8vstr( "本线程接收到退出请求，开始准备退出。" ) );
-					goto Out;
-				}
-
+				
 				p_CurCnctTimes++;
 				if( p_CurCnctTimes > g_MediaInfoPt->m_MaxCnctTimes )
 				{
@@ -314,28 +304,42 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 					goto Out;
 				}
+
+				if( MediaPocsThrdPt->m_ExitFlag != 0 ) //如果本线程接收到退出请求。
+				{
+					LOGI( Cu8vstr( "本线程接收到退出请求，开始准备退出。" ) );
+					goto Out;
+				}
 			}
 		}
 
-		if( g_MediaInfoPt->m_TcpClntSokt.SetNoDelay( 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置已连接的本端TCP协议客户端套接字的Nagle延迟算法状态为禁用失败。
+		if( g_MediaInfoPt->m_TcpClntSokt.SetNoDelay( 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端TCP协议客户端套接字的Nagle延迟算法状态为禁用失败。
 		{
-			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置已连接的本端TCP协议客户端套接字的Nagle延迟算法状态为禁用失败。原因：" ) );
+			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置本端TCP协议客户端套接字的Nagle延迟算法状态为禁用失败。原因：" ) );
 			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 			goto Out;
 		}
 
-		if( g_MediaInfoPt->m_TcpClntSokt.SetSendBufSz( 128 * 1024, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置已连接的本端TCP协议客户端套接字的发送缓冲区大小失败。
+		if( g_MediaInfoPt->m_TcpClntSokt.SetSendBufSz( 1024 * 1024, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端TCP协议客户端套接字的发送缓冲区大小失败。
         {
-			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置已连接的本端TCP协议客户端套接字的发送缓冲区大小失败。原因：" ) );
+			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置本端TCP协议客户端套接字的发送缓冲区大小失败。原因：" ) );
 			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
             goto Out;
         }
 
-		if( g_MediaInfoPt->m_TcpClntSokt.SetRecvBufSz( 128 * 1024, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置已连接的本端TCP协议客户端套接字的接收缓冲区大小失败。
+		if( g_MediaInfoPt->m_TcpClntSokt.SetRecvBufSz( 1024 * 1024, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端TCP协议客户端套接字的接收缓冲区大小失败。
         {
-			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置已连接的本端TCP协议客户端套接字的接收缓冲区大小失败。原因：" ) );
+			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置本端TCP协议客户端套接字的接收缓冲区大小失败。原因：" ) );
+			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
+			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
+            goto Out;
+        }
+		
+		if( g_MediaInfoPt->m_TcpClntSokt.SetKeepAlive( 1, 1, 1, 5, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端TCP协议客户端套接字的保活机制失败。
+        {
+			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置本端TCP协议客户端套接字的保活机制失败。原因：" ) );
 			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
             goto Out;
@@ -343,126 +347,53 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 	}
 	else //如果使用UDP协议。
     {
-        if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 1 ) //如果是创建本端UDP协议套接字接受远端UDP协议套接字的连接。
+        if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 1 ) //如果是创建本端高级UDP协议套接字接受远端高级UDP协议套接字的连接。
         {
-            if( g_MediaInfoPt->m_UdpSokt.Init( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果创建并初始化已监听的本端UDP协议套接字成功。
+            if( g_MediaInfoPt->m_AudpSokt.Init( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, 1, 5000, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级UDP协议套接字成功。
             {
-                if( g_MediaInfoPt->m_UdpSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取已监听的本端UDP协议套接字绑定的本地节点地址和端口失败。
+                if( g_MediaInfoPt->m_AudpSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取本端高级UDP协议套接字绑定的本地节点地址和端口失败。
                 {
-					VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取已监听的本端UDP协议套接字绑定的本地节点地址和端口失败。原因：" ) );
+					VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端高级UDP协议套接字绑定的本地节点地址和端口失败。原因：" ) );
 					LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
                     goto Out;
                 }
 
-				VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "创建并初始化已监听的本端UDP协议套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt );
+				VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "初始化本端高级UDP协议套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt );
 				LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
             }
-            else //如果创建并初始化已监听的本端UDP协议套接字失败。
+            else //如果初始化本端高级UDP协议套接字失败。
             {
-				VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化已监听的本端UDP协议套接字[%s:%s]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
+				VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化本端高级UDP协议套接字[%s:%s]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
                 goto Out;
             }
 
-            while( true ) //循环接受远端UDP协议套接字的连接。
+            while( true ) //循环接受远端高级UDP协议套接字的连接。
             {
-                if( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
-                {
-                    if( p_TmpSz != -1 ) //如果用已监听的本端UDP协议套接字接收一个远端UDP协议套接字发送的数据包成功。
-                    {
-                        if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_RQST_CNCT ) ) //如果是请求连接包。
-                        {
-                            g_MediaInfoPt->m_UdpSokt.Connect( 4, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 0, NULL ); //用已监听的本端UDP协议套接字连接已监听的远端UDP协议套接字，已连接的本端UDP协议套接字只能接收连接的远端UDP协议套接字发送的数据包。
+				if( g_MediaInfoPt->m_AudpSokt.Acpt( &g_MediaInfoPt->m_AudpCnctIdx, NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 1, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+				{
+					if( g_MediaInfoPt->m_AudpCnctIdx != SIZE_MAX ) //如果用本端高级UDP协议套接字接受远端高级UDP协议套接字的连接成功。
+					{
+						VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字接受远端高级UDP协议套接字[%vs:%vs]的连接成功。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
+						LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
+						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
+						break;
+					}
+					else //如果用本端高级UDP协议套接字接受远端高级UDP协议套接字的连接超时，就重新接受。
+					{
 
-							//连接远端。
-                            {
-                                g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_RQST_CNCT; //设置请求连接包。
-                                if( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-                                {
-									VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字接受远端UDP协议套接字[%vs:%vs]的连接失败。原因：" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-									LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-									{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-                                    goto UdpSrvrCnctRmt;
-                                }
-
-								//接收连接应答包。
-								FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime );
-                                while( true )
-                                {
-                                    if( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
-                                    {
-                                        if( p_TmpSz != -1 ) //如果用已监听的本端UDP协议套接字接收一个远端UDP协议套接字发送的数据包成功。
-                                        {
-                                            if( ( p_TmpSz >= 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] != PKT_TYP_RQST_CNCT ) ) //如果不是请求连接包。
-                                            {
-												//就表示连接已经成功建立。
-                                                goto UdpSrvrReAccept; //跳出连接循环。
-                                            }
-                                            else //如果是请求连接包。
-                                            {
-												//就重新接收连接应答包。
-                                            }
-                                        }
-                                        else //如果用已监听的本端UDP协议套接字接收一个远端UDP协议套接字发送的数据包超时。
-                                        {
-                                            //就重新接收连接应答包。
-                                        }
-                                    }
-                                    else
-                                    {
-										g_MediaInfoPt->m_UdpSokt.Disconnect( 0, NULL ); //将已连接的本端UDP协议套接字断开连接的远端UDP协议套接字，已连接的本端UDP协议套接字将变成已监听的本端UDP协议套接字。
-
-                                        VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字接受远端UDP协议套接字的连接失败。原因：" ) );
-										LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-										{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-										goto UdpSrvrCnctRmt;
-									}
-
-									FuncGetTimeAsMsec( &p_TmpUint64 );
-									if( p_TmpUint64 - g_MediaInfoPt->m_LastPktRecvTime > 5000 )
-									{
-										VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字接收已监听的远端UDP协议套接字[%vs:%vs]发送的请求连接包失败。原因：接收超时。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-										LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-										{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-										goto UdpSrvrCnctRmt;
-									}
-
-									if( MediaPocsThrdPt->m_ExitFlag != 0 ) //如果本线程接收到退出请求。
-									{
-										g_MediaInfoPt->m_UdpSokt.Disconnect( 0, NULL ); //将已连接的本端UDP协议套接字断开连接的远端UDP协议套接字，已连接的本端UDP协议套接字将变成已监听的本端UDP协议套接字。
-
-										LOGI( Cu8vstr( "本线程接收到退出请求，开始准备退出。" ) );
-										goto Out;
-									}
-								}
-                            }
-							UdpSrvrCnctRmt:
-							g_MediaInfoPt->m_UdpSokt.Disconnect( 0, NULL ); //将已连接的本端UDP协议套接字断开连接的远端UDP协议套接字，已连接的本端UDP协议套接字将变成已监听的本端UDP协议套接字。
-
-							VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "本端UDP协议套接字继续保持监听来接受连接。" ) );
-							LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
-							{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-                        }
-                        else //如果是其他包，就不管。
-                        {
-
-                        }
-                    }
-                    else //如果用已监听的本端UDP协议套接字接受到远端UDP协议套接字的连接请求超时。
-                    {
-
-                    }
-                }
-                else
-                {
-                    VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字接受远端UDP协议套接字的连接失败。原因：" ) );
+					}
+				}
+				else
+				{
+					VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用本端高级UDP协议套接字接受远端高级UDP协议套接字的连接失败。原因：" ) );
 					LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-                    goto Out;
-                }
+					goto Out;
+				}
 
 				if( MediaPocsThrdPt->m_ExitFlag != 0 ) //如果本线程接收到退出请求。
 				{
@@ -470,60 +401,38 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 					goto Out;
 				}
             }
-			UdpSrvrReAccept:
-
-			VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用已监听的本端UDP协议套接字接受远端UDP协议套接字[%vs:%vs]的连接成功。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-			LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
-			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
         }
-        else if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 0 ) //如果是创建本端UDP协议套接字连接远端UDP协议套接字。
+        else if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 0 ) //如果是创建本端高级UDP协议套接字连接远端高级UDP协议套接字。
         {
 			//Ping一下远程节点地址，这样可以快速获取ARP条目。
 			VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "ping -n 1 -w 1 %vs" ), g_MediaInfoPt->m_IPAddrVstrPt );
 			WinExec( ( char * )g_MediaInfoPt->m_IPAddrVstrPt->m_StrPt, SW_HIDE );
 
-            if( g_MediaInfoPt->m_UdpSokt.Init( 4, NULL, NULL, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果创建并初始化已监听的本端UDP协议套接字成功。
+            if( g_MediaInfoPt->m_AudpSokt.Init( 4, NULL, NULL, 0, 5000, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级UDP协议套接字成功。
             {
-                if( g_MediaInfoPt->m_UdpSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取已监听的本端UDP协议套接字绑定的本地节点地址和端口失败。
+                if( g_MediaInfoPt->m_AudpSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取本端高级UDP协议套接字绑定的本地节点地址和端口失败。
                 {
-                    VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取已监听的本端UDP协议套接字绑定的本地节点地址和端口失败。原因：" ) );
+					VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端高级UDP协议套接字绑定的本地节点地址和端口失败。原因：" ) );
 					LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
                     goto Out;
                 }
 
-				VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "创建并初始化已监听的本端UDP协议套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt );
+				VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "初始化本端高级UDP协议套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt );
 				LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
             }
-            else //如果创建并初始化已监听的本端UDP协议套接字失败。
+            else //如果初始化本端高级UDP协议套接字失败。
             {
-                VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化已监听的本端UDP协议套接字失败。原因：" ) );
+				VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化本端高级UDP协议套接字失败。原因：" ) );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
                 goto Out;
             }
-
-            if( g_MediaInfoPt->m_UdpSokt.Connect( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-            {
-				VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字连接已监听的远端UDP协议套接字[%vs:%vs]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
-				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-                goto Out;
-            }
-
-            if( g_MediaInfoPt->m_UdpSokt.GetRmtAddr( NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-            {
-                g_MediaInfoPt->m_UdpSokt.Disconnect( 0, NULL );
-                VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取已连接的本端UDP协议套接字连接的远端UDP协议套接字绑定的远程节点地址和端口失败。原因：" ) );
-				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-                goto Out;
-            }
-
-            int p_CurCnctTimes = 1;
-            while( true ) //循环连接已监听的远端UDP协议套接字。
-            {
+			
+			int p_CurCnctTimes = 1;
+			while( true ) //循环连接远端高级UDP协议服务端套接字。
+			{
 				//连接远端。
 				{
 					{
@@ -532,107 +441,82 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 					}
 
-					//发送请求连接包。
-					g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_RQST_CNCT; //设置请求连接包。
-					if( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+					if( g_MediaInfoPt->m_AudpSokt.Cnct( 4, g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt, &g_MediaInfoPt->m_AudpCnctIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果连接远端高级UDP协议套接字成功。
 					{
-						VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字连接已监听的远端UDP协议套接字[%vs:%vs]失败。原因：" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
+						AudpCnctSts p_AudpCnctSts;
+
+						if( g_MediaInfoPt->m_AudpSokt.WaitCnct( g_MediaInfoPt->m_AudpCnctIdx, UINT16_MAX, &p_AudpCnctSts, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果等待本端高级UDP协议套接字连接远端是否成功成功。
+						{
+							if( p_AudpCnctSts == AudpCnctStsCnct ) //如果连接成功。
+							{
+								if( g_MediaInfoPt->m_AudpSokt.GetRmtAddr( g_MediaInfoPt->m_AudpCnctIdx, NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								{
+									VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端高级UDP协议客户端套接字连接的远端高级UDP协议客户端套接字绑定的远程节点地址和端口失败。原因：" ) );
+									LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
+									{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
+									goto Out;
+								}
+
+								VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]成功。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
+								LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
+								{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
+								break; //跳出重连。
+							}
+							else //如果连接失败。
+							{
+								if( p_AudpCnctSts == AudpCnctStsTmot ) //如果连接超时。
+								{
+									VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]失败。原因：连接超时。" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
+									LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
+									{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
+								}
+								else //如果连接断开。
+								{
+									VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]失败。原因：连接断开。" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
+									LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
+									{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
+								}
+							}
+						}
+
+						g_MediaInfoPt->m_AudpSokt.ClosCnct( g_MediaInfoPt->m_AudpCnctIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ); //关闭连接，等待重连。
+					}
+					else
+					{
+						VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]失败。原因：" ), g_MediaInfoPt->m_IPAddrVstrPt, g_MediaInfoPt->m_PortVstrPt );
 						LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-						goto UdpClntCnctRmt;
 					}
-
-					//接收请求连接包。
-					FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime );
-					while( true )
-					{
-						if( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
-						{
-							if( p_TmpSz != -1 ) //如果用已连接的本端UDP协议套接字接收一个远端UDP协议套接字发送的数据包成功。
-							{
-								if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_RQST_CNCT ) ) //如果是请求连接包。
-								{
-									//发送连接应答包。
-									g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_CNCT_ACK; //设置连接应答包。
-									if( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-									{
-										VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字连接已监听的远端UDP协议套接字[%vs:%vs]失败。原因：" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-										LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-										{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-										goto UdpClntCnctRmt;
-									}
-									break;
-								}
-								else //如果不是请求连接包。
-								{
-									//就重新接收请求连接包。
-								}
-							}
-							else //如果用已连接的本端UDP协议套接字接收一个远端UDP协议套接字发送的数据包超时。
-							{
-								//就重新接收请求连接包。
-							}
-						}
-						else
-						{
-							g_MediaInfoPt->m_UdpSokt.Disconnect( 0, NULL ); //将已连接的本端UDP协议套接字断开连接的远端UDP协议套接字，已连接的本端UDP协议套接字将变成已监听的本端UDP协议套接字。
-							
-							VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字连接已监听的远端UDP协议套接字[%vs:%vs]失败。原因：" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-							LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-							{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-							goto Out;
-						}
-						
-						FuncGetTimeAsMsec( &p_TmpUint64 );
-						if( p_TmpUint64 - g_MediaInfoPt->m_LastPktRecvTime > 5000 )
-						{
-							VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已监听的本端UDP协议套接字接收已监听的远端UDP协议套接字[%vs:%vs]发送的请求连接包失败。原因：接收超时。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-							LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-							{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-							goto UdpClntCnctRmt;
-						}
-
-						if( MediaPocsThrdPt->m_ExitFlag != 0 ) //如果本线程接收到退出请求。
-						{
-							g_MediaInfoPt->m_UdpSokt.Disconnect( 0, NULL ); //将已连接的本端UDP协议套接字断开连接的远端UDP协议套接字，已连接的本端UDP协议套接字将变成已监听的本端UDP协议套接字。
-
-							LOGI( Cu8vstr( "本线程接收到退出请求，开始准备退出。" ) );
-							goto Out;
-						}
-					}
-
-					VstrFmtCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用已监听的本端UDP协议套接字连接已监听的远端UDP协议套接字[%vs:%vs]成功。" ), p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-					LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
-					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-					goto UdpClntLoopCnct;
 				}
-				UdpClntCnctRmt:;
 				
 				p_CurCnctTimes++;
 				if( p_CurCnctTimes > g_MediaInfoPt->m_MaxCnctTimes )
 				{
-					g_MediaInfoPt->m_UdpSokt.Disconnect( 0, NULL ); //将已连接的本端UDP协议套接字断开连接的远端UDP协议套接字，已连接的本端UDP协议套接字将变成已监听的本端UDP协议套接字。
-
 					VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "达到最大连接次数，中断连接。" ) );
 					LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 					goto Out;
 				}
-            }
-			UdpClntLoopCnct:;
+
+				if( MediaPocsThrdPt->m_ExitFlag != 0 ) //如果本线程接收到退出请求。
+				{
+					LOGI( Cu8vstr( "本线程接收到退出请求，开始准备退出。" ) );
+					goto Out;
+				}
+			}
         }
 		
-		if( g_MediaInfoPt->m_UdpSokt.SetSendBufSz( 128 * 1024, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置已监听的本端UDP协议套接字的发送缓冲区大小失败。
+		if( g_MediaInfoPt->m_AudpSokt.SetSendBufSz( 1024 * 1024, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的发送缓冲区大小失败。
         {
-			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置已监听的本端UDP协议套接字的发送缓冲区大小失败。原因：" ) );
+			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置本端高级UDP协议套接字的发送缓冲区大小失败。原因：" ) );
 			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
             goto Out;
         }
 
-		if( g_MediaInfoPt->m_UdpSokt.SetRecvBufSz( 128 * 1024, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置已监听的本端UDP协议套接字的接收缓冲区大小失败。
+		if( g_MediaInfoPt->m_AudpSokt.SetRecvBufSz( 1024 * 1024, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的接收缓冲区大小失败。
         {
-			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置已监听的本端UDP协议套接字的接收缓冲区大小失败。原因：" ) );
+			VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "设置本端高级UDP协议套接字的接收缓冲区大小失败。原因：" ) );
 			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
             goto Out;
@@ -640,8 +524,6 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
     } //协议连接结束。
 
 	//等待允许连接。
-	FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); g_MediaInfoPt->m_LastPktSendTime -= 100;
-	FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime );
 	if( ( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 1 ) && ( g_MediaInfoPt->m_IsAutoAllowCnct != 0 ) ) g_MediaInfoPt->m_RqstCnctRslt = 1;
 	else g_MediaInfoPt->m_RqstCnctRslt = 0;
 	{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_RmtNodeAddrVstrPt ); PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_SHOW_RQST_CNCT_DIALOG, ( WPARAM )p_ErrInfoVstrPt, 0 );} //向主界面发送显示请求连接对话框的消息。
@@ -653,7 +535,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_ALLOW_CNCT; //设置允许连接包。
 				if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-					( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.SendPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, 1, 10, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
 					PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_DSTRY_RQST_CNCT_DIALOG, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
@@ -677,7 +559,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_REFUSE_CNCT; //设置拒绝连接包。
 				if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-					( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.SendPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, 1, 10, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
 					PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_DSTRY_RQST_CNCT_DIALOG, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
@@ -704,7 +586,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_REFUSE_CNCT; //设置拒绝连接包。
 				if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-					( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.SendPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, 1, 10, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
 					PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_DSTRY_RQST_CNCT_DIALOG, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
@@ -726,44 +608,18 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 			}
 		}
 		
-		//发送心跳包。
-		FuncGetTimeAsMsec( &p_TmpUint64 );
-		if( p_TmpUint64 - g_MediaInfoPt->m_LastPktSendTime >= 100 )
-		{
-			g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_HTBT; //设置心跳包。
-			if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-				( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
-			{
-				g_MediaInfoPt->m_LastPktSendTime = p_TmpUint64; //记录最后一个数据包的发送时间。
-				LOGI( Cu8vstr( "发送一个心跳包成功。" ) );
-			}
-			else
-			{
-				VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个心跳包失败。原因：" ) );
-				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-				goto Out;
-			}
-		}
-
 		//接收一个远端发送的数据包。
 		if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.RecvPkt( g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 0, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-			( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 0, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+			( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.RecvPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 		{
-			if( p_TmpSz != -1 ) //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包成功。
+			if( p_TmpSz != -1 ) //如果用本端套接字接收一个连接的远端套接字发送的数据包成功。
 			{
-				FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime ); //记录最后一个数据包的接收时间。
-
-				if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_HTBT ) ) //如果是心跳包。
-				{
-					LOGI( Cu8vstr( "接收到一个心跳包。" ) );
-				}
-				else if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_ALLOW_CNCT ) ) //如果是允许连接包。
+				if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_ALLOW_CNCT ) ) //如果是允许连接包。
 				{
 					if( g_MediaInfoPt->m_IsCreateSrvrOrClnt == 0 ) //如果是客户端。
 					{
 						g_MediaInfoPt->m_RqstCnctRslt = 1;
-
+						
 						PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_DSTRY_RQST_CNCT_DIALOG, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
 						VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "接收到一个允许连接包。" ) );
@@ -780,7 +636,7 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 				else if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_REFUSE_CNCT ) ) //如果是拒绝连接包。
 				{
 					g_MediaInfoPt->m_RqstCnctRslt = 2;
-
+					
 					PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_DSTRY_RQST_CNCT_DIALOG, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
 					VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "接收到一个拒绝连接包。" ) );
@@ -794,28 +650,16 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 					//就重新接收。
 				}
 			}
-			else //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包超时。
+			else //如果用本端套接字接收一个连接的远端套接字发送的数据包超时。
 			{
 				//就重新接收。
 			}
 		}
-		else //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。
+		else //如果用本端套接字接收一个连接的远端套接字发送的数据包失败。
 		{
 			PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_DSTRY_RQST_CNCT_DIALOG, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
-			VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
-			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-			goto Out;
-		}
-
-		//判断套接字连接是否中断。
-		FuncGetTimeAsMsec( &p_TmpUint64 );
-		if( p_TmpUint64 - g_MediaInfoPt->m_LastPktRecvTime > 5000 ) //如果超过5000毫秒没有接收任何数据包，就判定连接已经断开了。
-		{
-			PostMessage( g_MediaInfoPt->m_MainDlgWndHdl, WM_DSTRY_RQST_CNCT_DIALOG, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
-
-			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "5000毫秒没有接收任何数据包，判定套接字连接已经断开了。" ) );
+			VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
 			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 			goto Out;
@@ -827,27 +671,27 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 	{
 	    case 0: //如果使用链表。
 	    {
-			//创建并初始化接收音频输出帧链表。
-			if( g_MediaInfoPt->m_RecvAdoOtptFrmLnkLst.Init( LNKLST_BUF_AUTO_ADJ_METH_FREENUMBER, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, SIZE_MAX, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			//初始化接收音频输出帧链表。
+			if( g_MediaInfoPt->m_RecvAdoOtptFrmLnkLst.Init( LNKLST_BUF_AUTO_ADJ_METH_FREENUMBER, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, 0, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, SIZE_MAX, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
-				LOGI( Cu8vstr( "创建并初始化接收音频输出帧链表成功。" ) );
+				LOGI( Cu8vstr( "初始化接收音频输出帧链表成功。" ) );
 			}
 			else
 			{
-				VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化接收音频输出帧链表失败。原因：" ) );
+				VstrFmtIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化接收音频输出帧链表失败。原因：" ) );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 				goto Out;
 			}
 
-			//创建并初始化接收视频输出帧链表。
-			if( g_MediaInfoPt->m_RecvVdoOtptFrmLnkLst.Init( LNKLST_BUF_AUTO_ADJ_METH_FREENUMBER, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, SIZE_MAX, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			//初始化接收视频输出帧链表。
+			if( g_MediaInfoPt->m_RecvVdoOtptFrmLnkLst.Init( LNKLST_BUF_AUTO_ADJ_METH_FREENUMBER, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, 0, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * 2, SIZE_MAX, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
-				LOGI( Cu8vstr( "创建并初始化接收视频输出帧链表成功。" ) );
+				LOGI( Cu8vstr( "初始化接收视频输出帧链表成功。" ) );
 			}
 			else
 			{
-				VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化接收视频输出帧链表失败。原因：" ) );
+				VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化接收视频输出帧链表失败。原因：" ) );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 				goto Out;
@@ -859,11 +703,11 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 			//初始化音频自适应抖动缓冲器。
             if( AAjbInit( &g_MediaInfoPt->m_AAjbPt, MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, MediaPocsThrdPt->m_AdoOtpt.m_FrmLen, 1, 1, 0, g_MediaInfoPt->m_AAjbMinNeedBufFrmCnt, g_MediaInfoPt->m_AAjbMaxNeedBufFrmCnt, g_MediaInfoPt->m_AAjbMaxCntuLostFrmCnt, g_MediaInfoPt->m_AAjbAdaptSensitivity, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
             {
-                LOGI( Cu8vstr( "创建并初始化音频自适应抖动缓冲器成功。" ) );
+                LOGI( Cu8vstr( "初始化音频自适应抖动缓冲器成功。" ) );
             }
             else
             {
-                VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化音频自适应抖动缓冲器失败。原因：" ) );
+                VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化音频自适应抖动缓冲器失败。原因：" ) );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 	            goto Out;
@@ -872,11 +716,11 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
             //初始化视频自适应抖动缓冲器。
             if( VAjbInit( &g_MediaInfoPt->m_VAjbPt, 1, g_MediaInfoPt->m_VAjbMinNeedBufFrmCnt, g_MediaInfoPt->m_VAjbMaxNeedBufFrmCnt, g_MediaInfoPt->m_VAjbAdaptSensitivity, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
             {
-                LOGI( Cu8vstr( "创建并初始化视频自适应抖动缓冲器成功。" ) );
+                LOGI( Cu8vstr( "初始化视频自适应抖动缓冲器成功。" ) );
             }
             else
             {
-                VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "创建并初始化视频自适应抖动缓冲器失败。原因：" ) );
+                VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化视频自适应抖动缓冲器失败。原因：" ) );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 	            goto Out;
@@ -884,9 +728,6 @@ int __cdecl MyMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt )
 	        break;
 	    }
 	}
-
-	FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); //设置最后一个数据包的发送时间为当前时间。
-	g_MediaInfoPt->m_LastPktRecvTime = g_MediaInfoPt->m_LastPktSendTime; //设置最后一个数据包的接收时间为当前时间。
 
 	g_MediaInfoPt->m_LastSendAdoInptFrmIsAct = 0; //设置最后发送的一个音频输入帧为无语音活动。
 	g_MediaInfoPt->m_LastSendAdoInptFrmTimeStamp = 0 - 1; //设置最后一个发送音频输入帧的时间戳为0的前一个，因为第一次发送音频输入帧时会递增一个步进。
@@ -921,27 +762,15 @@ int __cdecl MyMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt )
 
     //接收远端发送过来的一个数据包。
 	if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.RecvPkt( g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 0, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-        ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 0, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+        ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.RecvPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
     {
-		if( p_TmpSz != -1 ) //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包成功。
+		if( p_TmpSz != -1 ) //如果用本端套接字接收一个连接的远端套接字发送的数据包成功。
 		{
-			FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime ); //记录最后一个数据包的接收时间。
-
 			if( p_TmpSz == 0 ) //如果数据包的长度为0。
 			{
 				LOGFE( Cu8vstr( "接收到一个数据包的数据长度为%uzd，表示没有数据，无法继续接收。" ), p_TmpSz );
                 goto Out;
 			}
-			else if( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_HTBT ) //如果是心跳包。
-            {
-                if( p_TmpSz > 1 ) //如果心跳包的长度大于1。
-                {
-                    LOGFE( Cu8vstr( "接收到心跳包的长度为%uzd大于1，表示还有其他数据，无法继续接收。" ), p_TmpSz );
-                    goto Out;
-                }
-
-                LOGI( Cu8vstr( "接收到一个心跳包。" ) );
-            }
 			else if( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_ADO_FRM ) //如果是音频输出帧包。
 			{
 				if( p_TmpSz < 1 + 4 ) //如果音频输出帧包的长度小于1 + 4，表示没有音频输出帧时间戳。
@@ -982,12 +811,12 @@ int __cdecl MyMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							if( p_TmpSz > 1 + 4 ) //如果该音频输出帧为有语音活动。
                             {
-                                AAjbPutOneFrm( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, 1, NULL );
+                                AAjbPutFrm( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, 1, NULL );
                                 LOGFI( Cu8vstr( "接收到一个有语音活动的音频输出帧包，并放入音频自适应抖动缓冲器成功。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
                             }
                             else //如果该音频输出帧为无语音活动。
                             {
-								AAjbPutOneFrm( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, 0, 1, NULL );
+								AAjbPutFrm( g_MediaInfoPt->m_AAjbPt, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, 0, 1, NULL );
                                 LOGFI( Cu8vstr( "接收到一个无语音活动的音频输出帧包，并放入音频自适应抖动缓冲器成功。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
                             }
 
@@ -1057,7 +886,9 @@ int __cdecl MyMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt )
                         {
 							if( p_TmpSz > 1 + 4 ) //如果该视频输出帧为有图像活动。
                             {
-                                VAjbPutOneFrm( g_MediaInfoPt->m_VAjbPt, g_MediaInfoPt->m_LastPktRecvTime, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, 1, NULL );
+								uint64_t p_CurTime;
+								FuncGetTimeAsMsec( &p_CurTime );
+                                VAjbPutFrm( g_MediaInfoPt->m_VAjbPt, p_CurTime, p_TmpUint32, g_MediaInfoPt->m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, 1, NULL );
                                 LOGFI( Cu8vstr( "接收到一个有图像活动的视频输出帧包，并放入视频自适应抖动缓冲器成功。视频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
                             }
                             else //如果该视频输出帧为无图像活动。
@@ -1104,49 +935,19 @@ int __cdecl MyMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt )
 				if( MediaPocsThrdPt->m_IsShowToast != 0 ) FuncToast( NULL, 3000, NULL, MediaPocsThrdPt->m_ErrInfoVstrPt );
             }
 		}
-		else //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包超时。
+		else //如果用本端套接字接收一个连接的远端套接字发送的数据包超时。
         {
 			
         }
 	}
-	else //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。
+	else //如果用本端套接字接收一个连接的远端套接字发送的数据包失败。
 	{
-		VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
+		VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
 		LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 		{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 		goto Out;
 	}
 
-    //发送心跳包。
-	FuncGetTimeAsMsec( &p_TmpUint64 );
-    if( p_TmpUint64 - g_MediaInfoPt->m_LastPktSendTime >= 100 ) //如果超过100毫秒没有发送任何数据包，就发送一个心跳包。
-    {
-		g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_HTBT; //设置心跳包。
-        if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-            ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
-        {
-			g_MediaInfoPt->m_LastPktSendTime = p_TmpUint64; //记录最后一个数据包的发送时间。
-			LOGI( Cu8vstr( "发送一个心跳包成功。" ) );
-		}
-		else
-		{
-			VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个心跳包失败。原因：" ) );
-			LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-			goto Out;
-		}
-    }
-
-    //判断套接字连接是否中断。
-	FuncGetTimeAsMsec( &p_TmpUint64 );
-	if( p_TmpUint64 - g_MediaInfoPt->m_LastPktRecvTime > 5000 ) //如果超过5000毫秒没有接收任何数据包，就判定连接已经断开了。
-	{
-		VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "超过5000毫秒没有接收任何数据包，判定连接已经断开了。" ) );
-		LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
-		{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
-		goto Out;
-	}
-	
 	if( g_MediaInfoPt->m_XfrMode == 0 ) //如果传输模式为实时半双工（一键通）。
 	{
 		if( g_MediaInfoPt->m_PttBtnIsDown == 0 ) //如果一键即按即通按钮为弹起。
@@ -1194,13 +995,13 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 {
 	size_t p_TmpSz;
 	
-	if( ( MediaPocsThrdPt->m_ExitFlag == 1 ) && ( ( g_MediaInfoPt->m_TcpClntSokt.m_TcpClntSoktPt != NULL ) || ( ( g_MediaInfoPt->m_UdpSokt.m_UdpSoktPt != NULL ) && ( g_MediaInfoPt->m_UdpSokt.GetRmtAddr( NULL, NULL, NULL, 0, NULL ) == 0 ) ) ) ) //如果本线程接收到退出请求，且本端TCP协议客户端套接字不为空或本端UDP协议套接字不为空且已连接远端。
+	if( ( MediaPocsThrdPt->m_ExitFlag == 1 ) && ( ( g_MediaInfoPt->m_TcpClntSokt.m_TcpClntSoktPt != NULL ) || ( ( g_MediaInfoPt->m_AudpSokt.m_AudpSoktPt != NULL ) && ( g_MediaInfoPt->m_AudpSokt.GetRmtAddr( g_MediaInfoPt->m_AudpCnctIdx, NULL, NULL, NULL, NULL ) == 0 ) ) ) ) //如果本线程接收到退出请求，且本端TCP协议客户端套接字不为空或本端UDP协议套接字不为空且已连接远端。
     {
 		{
 			//发送退出包。
 			g_MediaInfoPt->m_TmpBytePt[0] = PKT_TYP_EXIT; //设置退出包。
 			if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, 1, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) ||
-				( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, 1, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) )
+				( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.SendPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, 1, 10, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) )
 			{
 				VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个退出包失败。原因：" ) );
 				LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -1208,8 +1009,6 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 				goto SendExitPkt;
 			}
 			
-			FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); //记录最后一个数据包的发送时间。
-
 			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "发送一个退出包成功。" ) );
 			LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
@@ -1220,12 +1019,10 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 				while( true ) //循环接收退出包。
 				{
 					if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.RecvPkt( g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 5000, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-						( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.RecvPkt( NULL, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 5000, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+						( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.RecvPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, g_MediaInfoPt->m_TmpByteSz, &p_TmpSz, 5000, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 					{
-						if( p_TmpSz != -1 ) //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包成功。
+						if( p_TmpSz != -1 ) //如果用本端套接字接收一个连接的远端套接字发送的数据包成功。
 						{
-							FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktRecvTime ); //记录最后一个数据包的接收时间。
-
 							if( ( p_TmpSz == 1 ) && ( g_MediaInfoPt->m_TmpBytePt[0] == PKT_TYP_EXIT ) ) //如果是退出包。
 							{
 								VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "接收到一个退出包。" ) );
@@ -1238,17 +1035,17 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 
 							}
 						}
-						else //如果用已连接的本端套接字接收一个连接的远端套接字发送的数据包超时。
+						else //如果用本端套接字接收一个连接的远端套接字发送的数据包超时。
 						{
-							VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
+							VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
 							LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 							{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 							goto SendExitPkt;
 						}
 					}
-					else //用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。
+					else //用本端套接字接收一个连接的远端套接字发送的数据包失败。
 					{
-						VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用已连接的本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
+						VstrIns( MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "用本端套接字接收一个连接的远端套接字发送的数据包失败。原因：" ) );
 						LOGE( MediaPocsThrdPt->m_ErrInfoVstrPt );
 						{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
 						goto SendExitPkt;
@@ -1284,12 +1081,12 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 		{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
     }
 	
-    //销毁本端UDP协议套接字。
-    if( g_MediaInfoPt->m_UdpSokt.m_UdpSoktPt != NULL )
+    //销毁本端高级UDP协议套接字。
+    if( g_MediaInfoPt->m_AudpSokt.m_AudpSoktPt != NULL )
     {
-        g_MediaInfoPt->m_UdpSokt.Dstoy( NULL ); //关闭并销毁已创建的本端UDP协议套接字。
+        g_MediaInfoPt->m_AudpSokt.Dstoy( NULL ); //关闭并销毁已创建的本端高级UDP协议套接字。
 
-		VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "关闭并销毁已创建的本端UDP协议套接字成功。" ) );
+		VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "关闭并销毁本端高级UDP协议套接字成功。" ) );
 		LOGI( MediaPocsThrdPt->m_ErrInfoVstrPt );
 		{Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( g_MainDlgWndHdl, WM_SHOW_LOG, ( WPARAM )p_ErrInfoVstrPt, 0 );}
     }
@@ -1385,7 +1182,7 @@ void __cdecl MyMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt )
 void __cdecl MyMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsThrdPt, int16_t * PcmAdoInptFrmPt, int16_t * PcmAdoRsltFrmPt, int32_t VoiceActSts, uint8_t * EncdAdoInptFrmPt, size_t EncdAdoInptFrmLen, int32_t EncdAdoInptFrmIsNeedTrans, uint8_t * YU12VdoInptFrmPt, int32_t YU12VdoInptFrmWidth, int32_t YU12VdoInptFrmHeight, uint8_t * EncdVdoInptFrmPt, size_t EncdVdoInptFrmLen )
 {
     int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
-	int p_FrmPktLen = 0; //存放输入输出帧数据包的长度，单位字节。
+	int p_FrmPktLen = 0; //存放输入输出帧数据包的长度，单位为字节。
 
     //发送音频输入帧。
 	if( PcmAdoInptFrmPt != NULL ) //如果要使用音频输入。
@@ -1433,9 +1230,8 @@ void __cdecl MyMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsThrd
             g_MediaInfoPt->m_TmpBytePt[8] = ( int8_t ) ( ( g_MediaInfoPt->m_LastSendVdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
 
             if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-                ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+                ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.SendPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 1, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
             {
-				FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); //设置最后一个数据包的发送时间。
 				LOGFI( Cu8vstr( "发送一个有语音活动的音频输入帧包成功。音频输入帧时间戳：%uz32d，视频输入帧时间戳：%uz32d，总长度：%d。" ), g_MediaInfoPt->m_LastSendAdoInptFrmTimeStamp, g_MediaInfoPt->m_LastSendVdoInptFrmTimeStamp, p_FrmPktLen );
 			}
 			else
@@ -1461,9 +1257,8 @@ void __cdecl MyMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsThrd
             g_MediaInfoPt->m_TmpBytePt[4] = ( int8_t ) ( ( g_MediaInfoPt->m_LastSendAdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
 
             if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-                ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 0, 10, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+                ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.SendPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 10, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
             {
-                FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); //设置最后一个数据包的发送时间。
                 LOGFI( Cu8vstr( "发送一个无语音活动的音频输入帧包成功。音频输入帧时间戳：%uz32d，总长度：%d。" ), g_MediaInfoPt->m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen );
             }
             else
@@ -1533,9 +1328,8 @@ void __cdecl MyMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsThrd
             g_MediaInfoPt->m_TmpBytePt[8] = ( int8_t ) ( ( g_MediaInfoPt->m_LastSendAdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
 
             if( ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 0 ) && ( g_MediaInfoPt->m_TcpClntSokt.SendPkt( g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-                ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_UdpSokt.SendPkt( 4, NULL, NULL, g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 0, 1, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+                ( ( g_MediaInfoPt->m_UseWhatXfrPrtcl == 1 ) && ( g_MediaInfoPt->m_AudpSokt.SendPkt( g_MediaInfoPt->m_AudpCnctIdx, g_MediaInfoPt->m_TmpBytePt, p_FrmPktLen, 1, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
             {
-                FuncGetTimeAsMsec( &g_MediaInfoPt->m_LastPktSendTime ); //设置最后一个数据包的发送时间。
 				LOGFI( Cu8vstr( "发送一个有图像活动的视频输入帧包成功。视频输入帧时间戳：%uz32d，音频输入帧时间戳：%uz32d，总长度：%d，类型：%d。" ), g_MediaInfoPt->m_LastSendVdoInptFrmTimeStamp, g_MediaInfoPt->m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen, g_MediaInfoPt->m_TmpBytePt[13] & 0xff );
             }
             else
@@ -1559,9 +1353,8 @@ void __cdecl MyMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsThrd
 }
 
 //用户定义的写入音频输出帧函数，在需要写入一个音频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。
-void __cdecl MyMediaPocsThrdUserWriteAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, int16_t * PcmAdoOtptFrmPt, uint8_t * EncdAdoOtptFrmPt, size_t * AdoOtptFrmLenPt  )
+void __cdecl MyMediaPocsThrdUserWriteAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, int16_t * PcmAdoOtptFrmPt, uint8_t * EncdAdoOtptFrmPt, size_t * AdoOtptFrmLenPt )
 {
-	int32_t m_TmpInt32;
 	size_t m_TmpSz = 0;
 
 	//取出并写入音频输出帧。
@@ -1595,8 +1388,8 @@ void __cdecl MyMediaPocsThrdUserWriteAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt
 			{
 				uint32_t p_AdoOtptFrmTimeStamp; //存放音频输出帧的时间戳。
 
-				//从音频自适应抖动缓冲器取出一个音频输出帧。
-				AAjbGetOneFrm( g_MediaInfoPt->m_AAjbPt, &p_AdoOtptFrmTimeStamp, g_MediaInfoPt->m_TmpByte2Pt, g_MediaInfoPt->m_TmpByte2Sz, &m_TmpSz, 1, NULL );
+				//从音频自适应抖动缓冲器取出音频输出帧。
+				AAjbGetFrm( g_MediaInfoPt->m_AAjbPt, &p_AdoOtptFrmTimeStamp, g_MediaInfoPt->m_TmpByte2Pt, g_MediaInfoPt->m_TmpByte2Sz, &m_TmpSz, 1, NULL );
 				
 				if( ( m_TmpSz > 0 ) && ( m_TmpSz != SIZE_MAX ) ) //如果音频输出帧为有语音活动。
 				{
@@ -1684,12 +1477,11 @@ void __cdecl MyMediaPocsThrdUserWriteAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt
 		}
 	}
 
-	Out:
 	return;
 }
 
 //用户定义的获取PCM格式音频输出帧函数，在解码完一个已编码音频输出帧时回调一次。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。
-void __cdecl MyMediaPocsThrdUserGetPcmAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLen )
+void __cdecl MyMediaPocsThrdUserGetPcmAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLen )
 {
 	
 }
@@ -1739,15 +1531,15 @@ void __cdecl MyMediaPocsThrdUserWriteVdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt
 			{
 				LOGFI( Cu8vstr( "视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
 
-				//从视频自适应抖动缓冲器取出一个视频输出帧。
+				//从视频自适应抖动缓冲器取出视频输出帧。
 				FuncGetTimeAsMsec( &p_NowTimeMesc );
 				if( MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt != 0 && g_MediaInfoPt->m_LastGetAdoOtptFrmIsAct != 0 ) //如果要使用音频输出，且最后一个取出的音频输出帧为有语音活动，就根据最后一个取出的音频输出帧对应视频输出帧的时间戳来取出。
 				{
-					VAjbGetOneFrmWantTimeStamp( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, g_MediaInfoPt->m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp, &p_VdoOtptFrmTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz, 1, NULL );
+					VAjbGetFrmWantTimeStamp( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, g_MediaInfoPt->m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp, &p_VdoOtptFrmTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz, 1, NULL );
 				}
 				else //如果最后一个取出的音频输出帧为无语音活动，就根据直接取出。
 				{
-					VAjbGetOneFrm( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, &p_VdoOtptFrmTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz, 1, NULL );
+					VAjbGetFrm( g_MediaInfoPt->m_VAjbPt, p_NowTimeMesc, &p_VdoOtptFrmTimeStamp, g_MediaInfoPt->m_TmpByte3Pt, g_MediaInfoPt->m_TmpByte3Sz, &m_TmpSz, 1, NULL );
 				}
 
 				if( m_TmpSz != 0 ) //如果视频输出帧为有图像活动。
@@ -1868,7 +1660,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			wchar_t * p_CurAdoOtptDvcNamePt = NULL;
 			wchar_t * p_CurVdoInptDvcNamePt = NULL;
 			long p_TmpInt;
-			size_t p_TmpSz;
 
 			//获取音频输入设备、音频输出设备、视频输入设备的名称。
 			if( MediaPocsThrdGetAdoInptDvcName( &p_AdoInptDvcNameVstrArrPt, &p_AdoInptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
@@ -2577,11 +2368,12 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 														   ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen20msRdBtnId ) == BST_CHECKED ) ? 20 :
 														     ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 0,
 														 &g_ErrInfoVstr );
+						g_MediaPocsThrd.AddAdoOtptStrm( 0, &g_ErrInfoVstr );
 						
 						//设置音频输出是否使用PCM原始数据。
 						if( IsDlgButtonChecked( g_StngDlgWndHdl, UsePcmRdBtnId ) == BST_CHECKED )
 						{
-							g_MediaPocsThrd.SetAdoInptUsePcm( &g_ErrInfoVstr );
+							g_MediaPocsThrd.SetAdoOtptStrmUsePcm( 0, &g_ErrInfoVstr );
 						}
 						
 						//设置音频输出是否使用Speex解码器。
@@ -2591,13 +2383,13 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 							p_DecdIsUsePrcplEnhsmt = ( IsDlgButtonChecked( g_SpeexCodecStngDlgWndHdl, SpeexDecdIsUsePrcplEnhsmtCkBoxId ) == BST_CHECKED );
 
-							g_MediaPocsThrd.SetAdoOtptUseSpeexDecd( p_DecdIsUsePrcplEnhsmt, &g_ErrInfoVstr );
+							g_MediaPocsThrd.SetAdoOtptStrmUseSpeexDecd( 0, p_DecdIsUsePrcplEnhsmt, &g_ErrInfoVstr );
 						}
 
 						//设置音频输出是否使用Opus解码器。
 						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseOpusCodecRdBtnId ) == BST_CHECKED )
 						{
-							g_MediaPocsThrd.SetAdoOtptUseOpusDecd( &g_ErrInfoVstr );
+							g_MediaPocsThrd.SetAdoOtptStrmUseOpusDecd( 0, &g_ErrInfoVstr );
 						}
 						
 						//设置音频输出是否保存音频到文件。
@@ -2836,10 +2628,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId ), L"95" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId ), L"95" );
 					CheckDlgButton( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_UNCHECKED );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"30000" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"20000" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId ), L"10" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-30000" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"25" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-200" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"20" );
 
 					CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseCbrRdBtnId );
 					SetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId ), L"1" );
@@ -2919,10 +2711,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId ), L"95" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId ), L"95" );
 					CheckDlgButton( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_CHECKED );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"30000" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"20000" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId ), L"10" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-30000" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"25" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-200" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"20" );
 
 					CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseCbrRdBtnId );
 					SetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId ), L"4" );
@@ -3002,10 +2794,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId ), L"95" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId ), L"95" );
 					CheckDlgButton( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_CHECKED );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"30000" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"20000" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId ), L"10" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-30000" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"25" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-200" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"20" );
 
 					CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseVbrRdBtnId );
 					SetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId ), L"8" );
@@ -3085,10 +2877,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId ), L"95" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId ), L"95" );
 					CheckDlgButton( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_CHECKED );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"30000" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"20000" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId ), L"10" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-30000" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"25" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-200" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"20" );
 
 					CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseVbrRdBtnId );
 					SetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId ), L"10" );
@@ -3168,10 +2960,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId ), L"95" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId ), L"95" );
 					CheckDlgButton( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_CHECKED );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"30000" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), L"20000" );
 					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId ), L"10" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-30000" );
-					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"25" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), L"-200" );
+					SetWindowText( GetDlgItem( g_SpeexPrpocsOtherStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), L"20" );
 
 					CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseVbrRdBtnId );
 					SetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId ), L"10" );
@@ -3666,7 +3458,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				//显示日志。
 				{
 					SYSTEMTIME p_SystemTime;
-					
+
 					GetLocalTime( &p_SystemTime );
 					VstrFmtIns( p_LogVstrPt, 0, Cu8vstr( "%02.2d:%02.2d:%02.2d %03.3d：" ), p_SystemTime.wHour, p_SystemTime.wMinute, p_SystemTime.wSecond, p_SystemTime.wMilliseconds );
 					p_LogU16strTmpPt = ( uint16_t * )alloca( ( p_LogVstrPt->m_StrLen + 1 ) * 2 );
@@ -3714,14 +3506,14 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	// TODO: 在此处放置代码。
 	#ifdef __DEBUG__
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	//_CrtSetBreakAlloc( 674 );
+	//_CrtSetBreakAlloc( 514 );
 	#endif
 
 	g_IstnsHdl = hInstance; //设置当前实例的句柄。
 	
 	FuncSetCurActPath( NULL, NULL ); //设置当前进程活动目录的路径为为当前进程可执行文件的上级路径。
 	
-	//创建并初始化错误信息动态字符串。
+	//初始化错误信息动态字符串。
 	g_ErrInfoVstr.Init();
 
 	//初始化日志。

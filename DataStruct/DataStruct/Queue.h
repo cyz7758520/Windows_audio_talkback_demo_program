@@ -51,7 +51,7 @@ extern "C"
 
 typedef struct ConstLenQueue ConstLenQueue;
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueInit( ConstLenQueue * * ConstLenQueuePtPt, size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueInit( ConstLenQueue * * ConstLenQueuePtPt, size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int ConstLenQueueLocked( ConstLenQueue * ConstLenQueuePt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int ConstLenQueueUnlock( ConstLenQueue * ConstLenQueuePt, Vstr * ErrInfoVstrPt );
@@ -84,7 +84,7 @@ public:
 	ConstLenQueueCls() { m_ConstLenQueuePt = NULL; }
 	~ConstLenQueueCls() { Dstoy( NULL ); }
 
-	int Init( size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return ConstLenQueueInit( &m_ConstLenQueuePt, ElmDataLen, BufAutoAdjMeth, BufAutoAdjParm, ElmMinNum, ElmMaxNum, ErrInfoVstrPt ); }
+	int Init( size_t ElmDataLen, int BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return ConstLenQueueInit( &m_ConstLenQueuePt, ElmDataLen, BufAutoAdjMeth, BufAutoAdjParm, BufAutoAdjIsAllowShrink, ElmMinNum, ElmMaxNum, ErrInfoVstrPt ); }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return ConstLenQueueLocked( m_ConstLenQueuePt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return ConstLenQueueUnlock( m_ConstLenQueuePt, ErrInfoVstrPt ); }
@@ -114,7 +114,7 @@ extern "C"
 
 typedef struct VarLenQueue VarLenQueue;
 	
-__DATASTRUCT_DLLAPI__ int VarLenQueueInit( VarLenQueue * * VarLenQueuePtPt, int BufAutoAdjMeth, float BufAutoAdjParm, size_t BufMinSz, size_t BufMaxSz, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VarLenQueueInit( VarLenQueue * * VarLenQueuePtPt, int BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t BufMinSz, size_t BufMaxSz, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int VarLenQueueLocked( VarLenQueue * VarLenQueuePt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int VarLenQueueUnlock( VarLenQueue * VarLenQueuePt, Vstr * ErrInfoVstrPt );
@@ -147,7 +147,7 @@ public:
 	VarLenQueueCls() { m_VarLenQueuePt = NULL; }
 	~VarLenQueueCls() { Dstoy( NULL ); }
 
-	int Init( int BufAutoAdjMeth, float BufAutoAdjParm, size_t BufMinSz, size_t BufMaxSz, Vstr * ErrInfoVstrPt ) { return VarLenQueueInit( &m_VarLenQueuePt, BufAutoAdjMeth, BufAutoAdjParm, BufMinSz, BufMaxSz, ErrInfoVstrPt ); }
+	int Init( int BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t BufMinSz, size_t BufMaxSz, Vstr * ErrInfoVstrPt ) { return VarLenQueueInit( &m_VarLenQueuePt, BufAutoAdjMeth, BufAutoAdjParm, BufAutoAdjIsAllowShrink, BufMinSz, BufMaxSz, ErrInfoVstrPt ); }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return VarLenQueueLocked( m_VarLenQueuePt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return VarLenQueueUnlock( m_VarLenQueuePt, ErrInfoVstrPt ); }

@@ -54,6 +54,9 @@ __FUNC_DLLAPI__ int VstrSetSz( Vstr * VstrPt, size_t StrSz );
 __FUNC_DLLAPI__ int VstrGetSz( Vstr * VstrPt, size_t * StrSzPt );
 
 
+__FUNC_DLLAPI__ int VstrCmp( Vstr * VstrPt, const Vstr * CmpVstrPt, int * CmpRsltPt );
+
+
 __FUNC_DLLAPI__ int VstrDstoy( Vstr * VstrPt );
 
 #ifdef __cplusplus

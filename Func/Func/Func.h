@@ -41,6 +41,10 @@
 #include <Dshow.h>                        //waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
 #include <mmsystem.h>                     //MMRESULT
 #include <conio.h>                        //getch、getche
+#include <mmdeviceapi.h>                  //IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
+#include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient
+#include <Functiondiscoverykeys_devpkey.h>//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
+#include <Objbase.h>                      //CoInitialize、CoInitializeEx
 
 #include <io.h>                           //_open、_wopen
 #include <sys/stat.h>                     //struct stat、fstat、_stat64、_wstat64
@@ -70,6 +74,7 @@
 //#include <Ws2tcpip.h>                   //不包含该头文件，因为会与Linux套接字相关声明相冲突
 //#include <Dshow.h>                      //不包含该头文件，因为会编译报错
 #include <mmsystem.h>                     //MMRESULT
+#include <Objbase.h>                      //CoInitialize、CoInitializeEx
 
 #include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
 #include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
@@ -82,11 +87,7 @@
 #include <unistd.h>                       //getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <curses.h>                       //getch
-
-typedef int SOCKET;
-#define INVALID_SOCKET (-1)
-#define SOCKET_ERROR (-1)
+#include <pthread.h>                      //pthread_create、pthread_join
 #endif
 
 #if( defined __LINUX_GCC__ )
@@ -102,15 +103,13 @@ typedef int SOCKET;
 #include <unistd.h>                       //getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <curses.h>                       //getch
+#include <pthread.h>                      //pthread_create、pthread_join
 
 #define gettid() ( pid_t )syscall( SYS_gettid )
 
-typedef int SOCKET;
-#define INVALID_SOCKET (-1)
-#define SOCKET_ERROR (-1)
 typedef int HANDLE;
 #define MAX_PATH PATH_MAX
+#define Sleep( Msec ) usleep( ( Msec ) * 1000 )
 #endif
 
 #if( defined __ANDROID_GCC__ )
@@ -125,12 +124,11 @@ typedef int HANDLE;
 #include <unistd.h>                       //getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <pthread.h>                      //pthread_create、pthread_join
 
-typedef int SOCKET;
-#define INVALID_SOCKET (-1)
-#define SOCKET_ERROR (-1)
 typedef int HANDLE;
 #define MAX_PATH PATH_MAX
+#define Sleep( Msec ) usleep( ( Msec ) * 1000 )
 
 #include <jni.h>
 #include <android/log.h>
@@ -149,6 +147,10 @@ typedef int HANDLE;
 
 //函数默认参数。
 #define DEFARG( Type, Name, DefVal ) ( ( #Name[0] ) ? ( Type )( Name + 0 ) : ( DefVal ) )
+
+//计算字节对齐。
+#define ALIGNUP( Val, ByteAlign ) ( ( ( ( Val ) & ~( ( ByteAlign ) - 1 ) ) != ( ~( ( ByteAlign ) - 1 ) ) ) ? ( ( ( Val ) + ( ByteAlign ) - 1 ) & ( ~( ( ByteAlign ) - 1 ) ) ) : ( ~( ( ByteAlign ) - 1 ) ) ) //向上字节对齐。
+#define ALIGNDOWN( Val, ByteAlign ) ( ( Val ) & ~( ( ByteAlign ) - 1 ) ) //向下字节对齐。
 
 //设置结束指针。
 #define SetEndPt( Type, StartPt, Sz, EndPt ) \
@@ -249,16 +251,11 @@ typedef enum ChrSet
 #include "DateTime.h"
 #include "ChrStrMem.h"
 #include "File.h"
+#include "PocsThrd.h"
 
 #ifdef __cplusplus
 extern "C"
 {
-#endif
-
-//进程线程函数。
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-__FUNC_DLLAPI__ uint64_t FuncGetCurProcId();
-__FUNC_DLLAPI__ uint64_t FuncGetCurThrdId();
 #endif
 
 //获取函数。
@@ -290,51 +287,49 @@ __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
 
 //JNI函数。
 #if( defined __ANDROID_GCC__ )
-__FUNC_DLLAPI__ int FuncGetJavaCls( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, jclass * ClsPt );
+__FUNC_DLLAPI__ int GetJavaCls( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, jclass * ClsPt );
 
-__FUNC_DLLAPI__ int FuncGetJavaClsMbrVarFieldID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, jfieldID * FieldIDPt );
-__FUNC_DLLAPI__ int FuncGetJavaClsMbrFuncMethodID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrFuncNameStrPt, const char * MbrFuncDataTypeSignStrPt, jmethodID * MethodIDPt );
+__FUNC_DLLAPI__ int GetJavaClsMbrVarFieldID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, jfieldID * FieldIDPt );
+__FUNC_DLLAPI__ int GetJavaClsMbrFuncMethodID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrFuncNameStrPt, const char * MbrFuncDataTypeSignStrPt, jmethodID * MethodIDPt );
 
-__FUNC_DLLAPI__ int FuncSetJavaClsObjMbrVarVal( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, const void * ValPt );
-__FUNC_DLLAPI__ int FuncGetJavaClsObjMbrVarVal( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, void * ValPt );
+__FUNC_DLLAPI__ int SetJavaClsObjMbrVarVal( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, const void * ValPt );
+__FUNC_DLLAPI__ int GetJavaClsObjMbrVarVal( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, void * ValPt );
 
-__FUNC_DLLAPI__ int FuncCallJavaClsObjMbrFunc( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrFuncNameStrPt, const char * MbrFuncDataTypeSignStrPt, void * RtnValPt, ... );
+__FUNC_DLLAPI__ int CallJavaClsObjMbrFunc( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrFuncNameStrPt, const char * MbrFuncDataTypeSignStrPt, void * RtnValPt, ... );
 
-__FUNC_DLLAPI__ int FuncNewJavaStringClsObjByUTF8CharArr( JNIEnv * env, const char * UTF8CharArrPt, jstring * StringClsObjPtPt );
+__FUNC_DLLAPI__ int NewJavaStringClsObjByU8str( JNIEnv * env, const char * U8strPt, jstring * StringClsObjPtPt );
 
-#define FuncSetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) FuncSetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", ShortValPt )
-#define FuncGetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) FuncGetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", ShortValPt )
-#define FuncSetJavaHTIntClsObjVal( env, HTIntClsObj, IntValPt ) FuncSetJavaClsObjMbrVarVal( env, HTIntClsObj, NULL, 0, "m_Val", "I", IntValPt )
-#define FuncGetJavaHTIntClsObjVal( env, HTIntClsObj, IntValPt ) FuncGetJavaClsObjMbrVarVal( env, HTIntClsObj, NULL, 0, "m_Val", "I", IntValPt )
-#define FuncSetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) FuncSetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", LongValPt )
-#define FuncGetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) FuncGetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", LongValPt )
-#define FuncSetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) FuncSetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
-#define FuncGetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) FuncGetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
+#define SetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) SetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", ShortValPt )
+#define GetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) GetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", ShortValPt )
+#define SetJavaHTIntClsObjVal( env, HTIntClsObj, IntValPt ) SetJavaClsObjMbrVarVal( env, HTIntClsObj, NULL, 0, "m_Val", "I", IntValPt )
+#define GetJavaHTIntClsObjVal( env, HTIntClsObj, IntValPt ) GetJavaClsObjMbrVarVal( env, HTIntClsObj, NULL, 0, "m_Val", "I", IntValPt )
+#define SetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) SetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", LongValPt )
+#define GetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) GetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", LongValPt )
+#define SetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) SetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
+#define GetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) GetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
 
-__FUNC_DLLAPI__ int FuncGetJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * * ByteArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * ByteArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * * ShortArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * ShortArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * * IntArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * IntArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * * LongArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * LongArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * * FloatArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * FloatArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * * DoubleArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * DoubleArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * * BooleanArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * BooleanArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * * CharArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * CharArrPt );
-//__FUNC_DLLAPI__ int FuncGetJavaStringClsObjByteArr( JNIEnv * env, jstring StringClsObj, const jbyte * * ByteArrPtPt );
-//__FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjByteArr( JNIEnv * env, jstring StringClsObj, const jbyte * ByteArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * * CharArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * CharArrPt );
-__FUNC_DLLAPI__ int FuncGetJavaStringClsObjUTF8CharArr( JNIEnv * env, jstring StringClsObj, const char * * UTF8CharArrPtPt );
-__FUNC_DLLAPI__ int FuncDstoyJavaStringClsObjUTF8CharArr( JNIEnv * env, jstring StringClsObj, const char * UTF8CharArrPt );
+__FUNC_DLLAPI__ int GetJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * * ByteArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * ByteArrPt );
+__FUNC_DLLAPI__ int GetJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * * ShortArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * ShortArrPt );
+__FUNC_DLLAPI__ int GetJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * * IntArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * IntArrPt );
+__FUNC_DLLAPI__ int GetJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * * LongArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * LongArrPt );
+__FUNC_DLLAPI__ int GetJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * * FloatArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * FloatArrPt );
+__FUNC_DLLAPI__ int GetJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * * DoubleArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * DoubleArrPt );
+__FUNC_DLLAPI__ int GetJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * * BooleanArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * BooleanArrPt );
+__FUNC_DLLAPI__ int GetJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * * CharArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * CharArrPt );
+__FUNC_DLLAPI__ int GetJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * * CharArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * CharArrPt );
+__FUNC_DLLAPI__ int GetJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const char * * U8strPtPt );
+__FUNC_DLLAPI__ int DstoyJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const char * U8strPt );
 
-__FUNC_DLLAPI__ int FuncGetAndrdPkgName( JNIEnv * env, char * PkgNameStrPt, size_t PkgNameStrSz, size_t * PkgNameStrLenPt );
+__FUNC_DLLAPI__ int GetAndrdPkgName( JNIEnv * env, char * PkgNameStrPt, size_t PkgNameStrSz, size_t * PkgNameStrLenPt );
 #endif
 
 #ifdef __cplusplus

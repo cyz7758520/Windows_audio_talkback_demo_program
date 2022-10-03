@@ -29,9 +29,9 @@ typedef void( __cdecl * USER_DSTOY_FUNC_PT )( MediaPocsThrd * MediaPocsThrdPt );
 typedef void( __cdecl * USER_READ_ADO_VDO_INPT_FRM_FUNC_PT )( MediaPocsThrd * MediaPocsThrdPt, int16_t * PcmAdoInptFrmPt, int16_t * PcmAdoRsltFrmPt, int32_t VoiceActSts, uint8_t * EncdAdoInptFrmPt, size_t EncdAdoInptFrmLen, int32_t EncdAdoInptFrmIsNeedTrans,
 															  uint8_t * YU12VdoInptFrmPt, int32_t YU12VdoInptFrmWidth, int32_t YU12VdoInptFrmHeight, uint8_t * EncdVdoInptFrmPt, size_t EncdVdoInptFrmLen );
 
-typedef void( __cdecl * USER_WRITE_ADO_OTPT_FRM_FUNC_PT )( MediaPocsThrd * MediaPocsThrdPt, int16_t * PcmAdoOtptFrmPt, uint8_t * EncdAdoOtptFrmPt, size_t * AdoOtptFrmLenPt );
+typedef void( __cdecl * USER_WRITE_ADO_OTPT_FRM_FUNC_PT )( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, int16_t * PcmAdoOtptFrmPt, uint8_t * EncdAdoOtptFrmPt, size_t * AdoOtptFrmLenPt );
 
-typedef void( __cdecl * USER_GET_PCM_ADO_OTPT_FRM_FUNC_PT )( MediaPocsThrd * MediaPocsThrdPt, int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLen );
+typedef void( __cdecl * USER_GET_PCM_ADO_OTPT_FRM_FUNC_PT )( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLen );
 
 typedef void( __cdecl * USER_WRITE_VDO_OTPT_FRM_FUNC_PT )( MediaPocsThrd * MediaPocsThrdPt, uint8_t * YU12VdoOtptFrmPt, int32_t * YU12VdoOtptFrmWidthPt, int32_t * YU12VdoOtptFrmHeightPt, uint8_t * EncdVdoOtptFrmPt, size_t * VdoOtptFrmLenPt );
 
@@ -156,6 +156,7 @@ typedef struct MediaPocsThrd
 
 		UINT m_AdoInptDvcID; //存放音频输入设备的标识符。
 		HWAVEIN m_AdoInptDvcHdl; //存放音频输入设备的句柄。
+		int32_t m_AdoInptDvcIsClos; //存放音频输入设备是否关闭，为0表示正常，为非0表示关闭。
 		WAVEHDR * m_AdoInptWaveHdrPt; //存放音频输入缓冲区块数组的指针。
 		int32_t m_AdoInptWaveHdrTotal; //存放音频输入缓冲区块数组的元素总数。
 		int32_t m_AdoInptIsMute; //存放音频输入是否静音，为0表示有声音，为非0表示静音。
@@ -173,6 +174,7 @@ typedef struct MediaPocsThrd
 
 		HANDLE m_AdoInptThrdHdl; //存放音频输入线程的句柄。
 		DWORD m_AdoInptThrdId; //存放音频输入线程的标识符。
+		int m_AdoInptThrdExitFlag; //存放音频输入线程退出标记，0表示保持运行，1表示请求退出。
 	} AdoInpt;
 
 	AdoInpt m_AdoInpt; //存放音频输入。
@@ -183,12 +185,26 @@ typedef struct MediaPocsThrd
 
 		int32_t m_SmplRate; //存放采样频率，单位赫兹，取值只能为8000、16000、32000。
 		int32_t m_FrmLen; //存放帧的长度，单位采样数据，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
-
-		int32_t m_UseWhatDecd; //存放使用什么解码器，为0表示PCM原始数据，为1表示Speex解码器，为2表示Opus解码器。
-
-		SpeexDecd * m_SpeexDecdPt; //存放Speex解码器的指针。
-		int32_t m_SpeexDecdIsUsePrcplEnhsmt; //存放Speex解码器是否使用知觉增强，为非0表示要使用，为0表示不使用。
 		
+		typedef struct AdoOtptStrmInfo //音频输出流信息。
+		{
+			int32_t m_AdoOtptStrmIdx; //存放音频输出流索引。
+
+			int32_t m_UseWhatDecd; //存放使用什么解码器，为0表示PCM原始数据，为1表示Speex解码器，为2表示Opus解码器。
+
+			int32_t m_SpeexDecdIsUsePrcplEnhsmt; //存放Speex解码器是否使用知觉增强，为非0表示要使用，为0表示不使用。
+		} AdoOtptStrmInfo;
+		ConstLenLnkLstCls m_AdoOtptStrmInfoLnkLst; //存放音频输出流信息链表。
+		typedef struct AdoOtptStrmData //音频输出流数据。
+		{
+			int32_t m_AdoOtptStrmIdx; //存放音频输出流索引。
+
+			int32_t m_UseWhatDecd; //存放使用什么解码器，为0表示PCM原始数据，为1表示Speex解码器，为2表示Opus解码器。
+
+			SpeexDecd * m_SpeexDecdPt; //存放Speex解码器的指针。
+		} AdoOtptStrmData;
+		ConstLenLnkLstCls m_AdoOtptStrmDataLnkLst; //存放音频输出流数据链表。
+
 		int32_t m_IsSaveAdoToFile; //存放是否保存音频到文件，非0表示要使用，0表示不使用。
 		WaveFileWriter * m_AdoOtptWaveFileWriterPt; //存放音频输出Wave文件写入器的指针。
 		Vstr * m_AdoOtptFileFullPathVstrPt; //存放音频输出文件完整路径动态字符串的指针。
@@ -199,6 +215,7 @@ typedef struct MediaPocsThrd
 
 		UINT m_AdoOtptDvcID; //存放音频输出设备的标识符。
 		HWAVEOUT m_AdoOtptDvcHdl; //存放音频输出设备的句柄。
+		int32_t m_AdoOtptDvcIsClos; //存放音频输出设备是否关闭，为0表示正常，为非0表示关闭。
 		WAVEHDR * m_AdoOtptWaveHdrPt; //存放音频缓冲区块数组的指针。
 		int32_t m_AdoOtptWaveHdrTotal; //存放音频输出缓冲区块数组的元素总数。
 		int32_t m_AdoOtptIsMute; //存放音频输出是否静音，为0表示有声音，为非0表示静音。
@@ -210,15 +227,18 @@ typedef struct MediaPocsThrd
 		//音频输出线程的临时变量。
 		MSG m_Msg; //存放消息。
 		int16_t * m_AdoOtptFrmPt; //存放音频输出帧的指针。
+		int32_t * m_AdoOtptMixFrmPt; //存放音频输出混音帧的指针。
+		size_t m_AdoOtptMixFrmSz; //存放音频输出混音帧的大小，单位为字节。
 		uint8_t * m_EncdAdoOtptFrmPt; //存放已编码格式音频输出帧的指针。
-		size_t m_EncdAdoOtptFrmSz; //存放已编码格式音频输出帧的大小，单位字节。
-		size_t m_AdoOtptFrmLen; //存放音频输出帧的长度，单位字节。
+		size_t m_EncdAdoOtptFrmSz; //存放已编码格式音频输出帧的大小，单位为字节。
+		size_t m_AdoOtptFrmLen; //存放音频输出帧的长度，单位为字节。
 		size_t m_AdoOtptFrmLnkLstElmTotal; //存放音频输出帧链表的元数总数。
 		uint64_t m_LastTimeMsec; //存放上次时间的毫秒数。
 		uint64_t m_NowTimeMsec; //存放本次时间的毫秒数。
 
 		HANDLE m_AdoOtptThrdHdl; //存放音频输出线程的句柄。
 		DWORD m_AdoOtptThrdId; //存放音频输出线程的标识符。
+		int m_AdoOtptThrdExitFlag; //存放音频输出线程退出标记，0表示保持运行，1表示请求退出。
 	} AdoOtpt;
 
 	AdoOtpt m_AdoOtpt; //存放音频输出。
@@ -242,8 +262,8 @@ typedef struct MediaPocsThrd
 
 		UINT m_VdoInptDvcID; //存放视频输入设备的标识符。
 		IGraphBuilder * m_FilterGraphManagerPt; //存放视频输入过滤器图管理器的指针。
-		IMediaEventEx * m_FilterGraphManagerMediaEventPt; //存放视频输入过滤器图管理器媒体事件器的指针。
-		IMediaControl * m_FilterGraphManagerMediaCtrlPt; //存放视频输入过滤器图管理器媒体控制器的指针。
+		IMediaEventEx * m_FilterGraphMediaEventPt; //存放视频输入过滤器图媒体事件器的指针。
+		IMediaControl * m_FilterGraphMediaCtrlPt; //存放视频输入过滤器图媒体控制器的指针。
 		int32_t m_VdoInptDvcMaxSmplRate; //存放视频输入设备的最大采样频率。
 		int32_t m_VdoInptDvcFrmWidth; //存放视频输入设备帧的宽度，单位为像素。
         int32_t m_VdoInptDvcFrmHeight; //存放视频输入设备帧的高度，单位为像素。
@@ -262,7 +282,7 @@ typedef struct MediaPocsThrd
 		{
 			uint8_t * m_YU12VdoInptFrmPt; //存放YU12格式视频输入帧的指针，大小为m_FrmWidth * m_FrmHeight * 3 / 2。
 			uint8_t * m_EncdVdoInptFrmPt; //存放已编码格式视频输入帧的指针，大小为m_FrmWidth * m_FrmHeight * 3 / 2。
-			size_t m_EncdVdoInptFrmLen; //存放已编码格式视频输入帧的长度，单位字节。
+			size_t m_EncdVdoInptFrmLen; //存放已编码格式视频输入帧的长度，单位为字节。
 		}VdoInptFrmElm;
 		ConstLenLnkLstCls m_VdoInptFrmLnkLst; //存放视频输入帧链表。
 		ConstLenLnkLstCls m_VdoInptIdleFrmLnkLst; //存放视频输入空闲帧链表。
@@ -274,8 +294,8 @@ typedef struct MediaPocsThrd
 		uint8_t * m_VdoInptRsltFrmPt; //存放视频输入结果帧的指针。
 		uint8_t * m_VdoInptTmpFrmPt; //存放视频输入临时帧的指针。
 		uint8_t * m_VdoInptSwapFrmPt; //存放视频输入交换帧的指针。
-		size_t m_VdoInptRsltFrmSz; //存放视频输入结果帧的大小，单位字节。
-		size_t m_VdoInptRsltFrmLen; //存放视频输入结果帧的长度，单位字节。
+		size_t m_VdoInptRsltFrmSz; //存放视频输入结果帧的大小，单位为字节。
+		size_t m_VdoInptRsltFrmLen; //存放视频输入结果帧的长度，单位为字节。
 		VdoInptFrmElm * m_VdoInptFrmElmPt; //存放视频输入帧元素的指针。
 		size_t m_VdoInptFrmLnkLstElmTotal; //存放视频输入帧链表的元数总数。
 		uint64_t m_LastTimeMsec; //存放上次时间的毫秒数。
@@ -302,8 +322,8 @@ typedef struct MediaPocsThrd
 		uint8_t * m_VdoOtptRsltFrmPt; //存放视频输出结果帧的指针。
 		uint8_t * m_VdoOtptTmpFrmPt; //存放视频输出临时帧的指针。
 		uint8_t * m_VdoOtptSwapFrmPt; //存放视频输出交换帧的指针。
-		size_t m_VdoOtptRsltFrmSz; //存放视频输出结果帧的大小，单位字节。
-		size_t m_VdoOtptRsltFrmLen; //存放视频输出结果帧的长度，单位字节。
+		size_t m_VdoOtptRsltFrmSz; //存放视频输出结果帧的大小，单位为字节。
+		size_t m_VdoOtptRsltFrmLen; //存放视频输出结果帧的长度，单位为字节。
 		int32_t m_VdoOtptFrmWidth; //存放视频输出帧的宽度，单位为像素。
         int32_t m_VdoOtptFrmHeight; //存放视频输出帧的高度，单位为像素。
 		uint64_t m_LastTimeMsec; //存放上次时间的毫秒数。
@@ -324,8 +344,8 @@ typedef struct MediaPocsThrd
 	int16_t * m_PcmAdoSwapFrmPt; //存放PCM格式音频交换帧的指针。
 	int32_t m_VoiceActSts; //存放语音活动状态，为1表示有语音活动，为0表示无语音活动。
 	uint8_t * m_EncdAdoInptFrmPt; //存放已编码格式音频输入帧的指针。
-	size_t m_EncdAdoInptFrmSz; //存放已编码格式音频输入帧的大小，单位字节。
-    size_t m_EncdAdoInptFrmLen; //存放已编码格式音频输入帧的长度，单位字节。
+	size_t m_EncdAdoInptFrmSz; //存放已编码格式音频输入帧的大小，单位为字节。
+    size_t m_EncdAdoInptFrmLen; //存放已编码格式音频输入帧的长度，单位为字节。
     int32_t m_EncdAdoInptFrmIsNeedTrans; //存放已编码格式音频输入帧是否需要传输，为1表示需要传输，为0表示不需要传输。
 	VdoInpt::VdoInptFrmElm * m_VdoInptFrmPt; //存放视频输入帧的指针。
 
@@ -411,9 +431,11 @@ int MediaPocsThrdSetAdoInptIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMu
 
 int MediaPocsThrdSetIsUseAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUseAdoOtpt, int32_t SmplRate, int32_t FrmLenMsec, Vstr * ErrInfoVstrPt );
 
-int MediaPocsThrdSetAdoOtptUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdSetAdoOtptUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdSetAdoOtptUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdAddAdoOtptStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdSetAdoOtptStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdSetAdoOtptStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdSetAdoOtptStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdDelAdoOtptStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdSetAdoOtptIsSaveAdoToFile( MediaPocsThrd * MediaPocsThrdPt, int32_t IsSaveAdoToFile, const Vstr * AdoOtptFileFullPathVstrPt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdSetAdoOtptIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsDrawAdoWavfmToWnd, HWND AdoOtptWavfmWndHdl, Vstr * ErrInfoVstrPt );
@@ -503,10 +525,12 @@ public:
 	int SetAdoInptIsMute( int32_t IsMute, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoInptIsMute( m_MediaPocsThrdPt, IsMute, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int SetIsUseAdoOtpt( int32_t IsUseAdoOtpt, int32_t SmplRate, int32_t FrmLenMsec, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetIsUseAdoOtpt( m_MediaPocsThrdPt, IsUseAdoOtpt, SmplRate, FrmLenMsec, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-
-	int SetAdoOtptUsePcm( VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptUsePcm( m_MediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SetAdoOtptUseSpeexDecd( int32_t IsUsePrcplEnhsmt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptUseSpeexDecd( m_MediaPocsThrdPt, IsUsePrcplEnhsmt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SetAdoOtptUseOpusDecd( VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptUseOpusDecd( m_MediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	
+	int AddAdoOtptStrm( int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAddAdoOtptStrm( m_MediaPocsThrdPt, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SetAdoOtptStrmUsePcm( int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptStrmUsePcm( m_MediaPocsThrdPt, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SetAdoOtptStrmUseSpeexDecd( int32_t AdoOtptStrmIdx, int32_t IsUsePrcplEnhsmt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptStrmUseSpeexDecd( m_MediaPocsThrdPt, AdoOtptStrmIdx, IsUsePrcplEnhsmt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SetAdoOtptStrmUseOpusDecd( int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptStrmUseOpusDecd( m_MediaPocsThrdPt, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int DelAdoOtptStrm( int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt )  { return MediaPocsThrdDelAdoOtptStrm( m_MediaPocsThrdPt, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int SetAdoOtptIsSaveAdoToFile( int32_t IsSaveAdoToFile, const Vstr * AdoOtptFileFullPathVstrPt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptIsSaveAdoToFile( m_MediaPocsThrdPt, IsSaveAdoToFile, AdoOtptFileFullPathVstrPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SetAdoOtptIsDrawAdoWavfmToWnd( int32_t IsDrawAdoWavfmToWnd, HWND AdoOtptWavfmWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtptIsDrawAdoWavfmToWnd( m_MediaPocsThrdPt, IsDrawAdoWavfmToWnd, AdoOtptWavfmWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }

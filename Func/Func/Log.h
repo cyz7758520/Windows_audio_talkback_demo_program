@@ -33,8 +33,8 @@ typedef enum LogHeadItem
 	LogHeadTime = 2,  //日志打印时间。
 	LogHeadLvl = 3,	  //日志级别。
 	LogHeadFile = 4,  //源文件、函数和行号。
-	LogHeadPid = 5,	  //进程PID。
-	LogHeadTid = 6,	  //线程TID。
+	LogHeadPid = 5,	  //进程ID。
+	LogHeadTid = 6,	  //线程ID。
 	LogHeadIntvl = 7, //距上次打印日志的间隔时间。
 	LogHeadEnd = 0    //日志头列表结束。
 }LogHeadItem;
