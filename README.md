@@ -30,12 +30,12 @@
 
 # 移植
 &emsp;&emsp;如果需要在自己的软件中使用本软件的音视频功能，需要以下几个步骤：  
-&emsp;&emsp;**C语言：**
+&emsp;&emsp;**C语言：**  
 &emsp;&emsp;1、将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
 &emsp;&emsp;2、实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这九个回调函数。  
 &emsp;&emsp;3、调用MediaPocsThrdInit()函数创建并初始化媒体处理线程，然后调用媒体处理线程的相关设置函数，最后调用MediaPocsThrdStart()函数启动媒体处理线程即可。  
 &emsp;&emsp;4、当需要媒体处理线程退出时，调用MediaPocsThrdRqirExit()函数即可。  
-&emsp;&emsp;**C++语言：**
+&emsp;&emsp;**C++语言：**  
 &emsp;&emsp;1、将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
 &emsp;&emsp;2、继承MediaPocsThrd媒体处理线程类，实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这九个回调成员函数。  
 &emsp;&emsp;3、new这个继承的类，然后调用类的相关设置成员函数，最后调用start()成员函数启动媒体处理线程即可。  
