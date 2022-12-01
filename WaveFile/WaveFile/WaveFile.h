@@ -38,25 +38,7 @@
 	#endif
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-typedef struct WaveFileWriter WaveFileWriter;
-
-__WAVEFILE_DLLAPI__ int WaveFileWriterInit( WaveFileWriter * * WaveFileWriterPtPt, const Vstr * WaveFileFullPathVstrPt, int16_t NumChanl, int32_t SmplRate, int32_t SmplBit );
-__WAVEFILE_DLLAPI__ int WaveFileWriterWriteData( WaveFileWriter * WaveFileWriterPt, const char * DataPt, size_t DataLen );
-__WAVEFILE_DLLAPI__ int WaveFileWriterDstoy( WaveFileWriter * WaveFileWriterPt );
-
-typedef struct WaveFileReader WaveFileReader;
-
-__WAVEFILE_DLLAPI__ int WaveFileReaderInit( WaveFileReader * * WaveFileReaderPtPt, const Vstr * WaveFileFullPathVstrPt, int16_t * NumChanlPt, int32_t * SmplRatePt, int32_t * SmplBitPt );
-__WAVEFILE_DLLAPI__ int WaveFileReaderReadData( WaveFileReader * WaveFileReaderPt, char * DataPt, size_t DataSz, size_t * DataLenPt );
-__WAVEFILE_DLLAPI__ int WaveFileReaderDstoy( WaveFileReader * WaveFileReaderPt );
-
-#ifdef __cplusplus
-}
-#endif
+#include "WaveFileWriter.h"
+#include "WaveFileReader.h"
 
 #endif

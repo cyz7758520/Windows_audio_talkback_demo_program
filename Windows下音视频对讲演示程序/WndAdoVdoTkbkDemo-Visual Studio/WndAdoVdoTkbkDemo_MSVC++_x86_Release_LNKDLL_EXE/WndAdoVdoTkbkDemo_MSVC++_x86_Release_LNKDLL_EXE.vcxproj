@@ -61,13 +61,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\AdoInpt.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\AdoOtpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MediaPocsThrd.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\qedit.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\resource.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoInpt.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoOtpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MediaPocsThrd.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.cpp" />
   </ItemGroup>
   <ItemGroup>

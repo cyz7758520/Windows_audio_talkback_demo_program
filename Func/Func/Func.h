@@ -42,7 +42,7 @@
 #include <mmsystem.h>                     //MMRESULT
 #include <conio.h>                        //getch、getche
 #include <mmdeviceapi.h>                  //IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
-#include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient
+#include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
 #include <Functiondiscoverykeys_devpkey.h>//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
 #include <Objbase.h>                      //CoInitialize、CoInitializeEx
 
@@ -108,7 +108,6 @@
 #define gettid() ( pid_t )syscall( SYS_gettid )
 
 typedef int HANDLE;
-#define MAX_PATH PATH_MAX
 #define Sleep( Msec ) usleep( ( Msec ) * 1000 )
 #endif
 
@@ -127,7 +126,6 @@ typedef int HANDLE;
 #include <pthread.h>                      //pthread_create、pthread_join
 
 typedef int HANDLE;
-#define MAX_PATH PATH_MAX
 #define Sleep( Msec ) usleep( ( Msec ) * 1000 )
 
 #include <jni.h>
@@ -136,6 +134,12 @@ typedef int HANDLE;
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #endif
+
+//路径字符串最大长度。
+#undef MAX_PATH
+#undef PATH_MAX
+#define MAX_PATH PATH_MAX
+#define PATH_MAX 1024
 
 //线程局部变量宏。
 #if( defined __MS_VCXX__ )
@@ -184,7 +188,7 @@ typedef enum Drct_t
 {
 	NoDrct,    //没有方向。
 	LftToRit,  //从左向右。
-	RitToLft   //从右向左。
+	RitToLft,  //从右向左。
 }Drct_t;
 
 //位置。
@@ -201,12 +205,20 @@ typedef enum Pos_t
 //字符集。
 typedef enum ChrSet
 {
-	Utf8 = 1,   //Utf8字符集。
+	Utf8  = 1,  //Utf8字符集。
 	Utf16 = 2,  //Utf16字符集。
-	Utf32 = 4   //Utf32字符集。
+	Utf32 = 4,  //Utf32字符集。
 }ChrSet;
 //检查字符集参数是否不正确。
 #define CHKCHRSET( ChrSet ) ( ( ChrSet != Utf8 ) && ( ChrSet != Utf16 ) && ( ChrSet != Utf32 ) )
+
+//缓冲区自动调整方式。
+typedef enum BufAutoAdjMeth
+{
+	BufAutoAdjMethNone,        //缓冲区不自动调整。
+	BufAutoAdjMethFreeAtio,    //缓冲区按空闲与已用的比率自动调整。
+	BufAutoAdjMethFreeNumber,  //缓冲区按空闲的个数自动调整。
+}BufAutoAdjMeth;
 
 //Func项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_FUNC__ ) //如果正在编译Func项目。
@@ -252,6 +264,8 @@ typedef enum ChrSet
 #include "ChrStrMem.h"
 #include "File.h"
 #include "PocsThrd.h"
+#include "JavaNtvIntfc.h"
+#include "Toast.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -269,8 +283,6 @@ __FUNC_DLLAPI__ int FuncSetCurActPath( const Vstr * FullPathVstrPt, Vstr * ErrIn
 __FUNC_DLLAPI__ int FuncGetCurActPath( Vstr * FullAbsPathVstrPt, Vstr * ErrInfoVstrPt );
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __FUNC_DLLAPI__ int FuncSetWndCenter( HWND SpecWndHdl, HWND OtherWndHdl, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int FuncToast( HWND SpecWndHdl, uint64_t TimeOutMesc, Vstr * ErrInfoVstrPt, const Vstr * TextVstrPt );
-__FUNC_DLLAPI__ int FuncToastFmt( HWND SpecWndHdl, uint64_t TimeOutMesc, Vstr * ErrInfoVstrPt, const Vstr * FmtVstrPt, ... );
 #endif
 
 //判断函数。
@@ -283,53 +295,6 @@ __FUNC_DLLAPI__ int FuncIsForegroundFullscreen();
 __FUNC_DLLAPI__ int FuncCreatePipe( HANDLE * PipeReadHdl, HANDLE * PipeWriteHdl, LPVOID * SecurityDescriptor, BOOL InheritHdl, DWORD BufSz );
 __FUNC_DLLAPI__ int FuncReadPipe( HANDLE PipeReadHdl, char * * BufPtPt, size_t * BufSzPt, size_t * BufLenPt, const char * EndMemPt, size_t EndMemLen, int IsAllowRealloc, uint64_t TimeOutMsec );
 __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
-#endif
-
-//JNI函数。
-#if( defined __ANDROID_GCC__ )
-__FUNC_DLLAPI__ int GetJavaCls( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, jclass * ClsPt );
-
-__FUNC_DLLAPI__ int GetJavaClsMbrVarFieldID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, jfieldID * FieldIDPt );
-__FUNC_DLLAPI__ int GetJavaClsMbrFuncMethodID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrFuncNameStrPt, const char * MbrFuncDataTypeSignStrPt, jmethodID * MethodIDPt );
-
-__FUNC_DLLAPI__ int SetJavaClsObjMbrVarVal( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, const void * ValPt );
-__FUNC_DLLAPI__ int GetJavaClsObjMbrVarVal( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, void * ValPt );
-
-__FUNC_DLLAPI__ int CallJavaClsObjMbrFunc( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrFuncNameStrPt, const char * MbrFuncDataTypeSignStrPt, void * RtnValPt, ... );
-
-__FUNC_DLLAPI__ int NewJavaStringClsObjByU8str( JNIEnv * env, const char * U8strPt, jstring * StringClsObjPtPt );
-
-#define SetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) SetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", ShortValPt )
-#define GetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) GetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", ShortValPt )
-#define SetJavaHTIntClsObjVal( env, HTIntClsObj, IntValPt ) SetJavaClsObjMbrVarVal( env, HTIntClsObj, NULL, 0, "m_Val", "I", IntValPt )
-#define GetJavaHTIntClsObjVal( env, HTIntClsObj, IntValPt ) GetJavaClsObjMbrVarVal( env, HTIntClsObj, NULL, 0, "m_Val", "I", IntValPt )
-#define SetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) SetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", LongValPt )
-#define GetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) GetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", LongValPt )
-#define SetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) SetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
-#define GetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) GetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
-
-__FUNC_DLLAPI__ int GetJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * * ByteArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * ByteArrPt );
-__FUNC_DLLAPI__ int GetJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * * ShortArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaShortArrClsObj( JNIEnv * env, jshortArray ShortArrClsObj, jshort * ShortArrPt );
-__FUNC_DLLAPI__ int GetJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * * IntArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaIntArrClsObj( JNIEnv * env, jintArray IntArrClsObj, jint * IntArrPt );
-__FUNC_DLLAPI__ int GetJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * * LongArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaLongArrClsObj( JNIEnv * env, jlongArray LongArrClsObj, jlong * LongArrPt );
-__FUNC_DLLAPI__ int GetJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * * FloatArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaFloatArrClsObj( JNIEnv * env, jfloatArray FloatArrClsObj, jfloat * FloatArrPt );
-__FUNC_DLLAPI__ int GetJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * * DoubleArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaDoubleArrClsObj( JNIEnv * env, jdoubleArray DoubleArrClsObj, jdouble * DoubleArrPt );
-__FUNC_DLLAPI__ int GetJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * * BooleanArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * BooleanArrPt );
-__FUNC_DLLAPI__ int GetJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * * CharArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * CharArrPt );
-__FUNC_DLLAPI__ int GetJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * * CharArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * CharArrPt );
-__FUNC_DLLAPI__ int GetJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const char * * U8strPtPt );
-__FUNC_DLLAPI__ int DstoyJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const char * U8strPt );
-
-__FUNC_DLLAPI__ int GetAndrdPkgName( JNIEnv * env, char * PkgNameStrPt, size_t PkgNameStrSz, size_t * PkgNameStrLenPt );
 #endif
 
 #ifdef __cplusplus

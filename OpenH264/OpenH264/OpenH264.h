@@ -56,7 +56,7 @@ __OPENH264_DLLAPI__ int OpenH264EncdDstoy( OpenH264Encd * OpenH264EncdPt, Vstr *
 
 typedef struct OpenH264Decd OpenH264Decd;
 
-__OPENH264_DLLAPI__ int OpenH264DecdInit( OpenH264Decd ** OpenH264DecdPtPt, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264DecdInit( OpenH264Decd * * OpenH264DecdPtPt, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt );
 __OPENH264_DLLAPI__ int OpenH264DecdPocs( OpenH264Decd * OpenH264DecdPt,
 										  uint8_t * H264FrmPt, size_t H264FrmLen,
 										  uint8_t * YU12FrmPt, size_t YU12FrmSz, int32_t * YU12FrmWidthPt, int32_t * YU12FrmHeightPt,

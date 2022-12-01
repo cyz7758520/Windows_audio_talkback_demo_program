@@ -77,15 +77,33 @@ __FUNC_DLLAPI__ int StrTrim( char * SrcStrPt, const char * TrimStrPt, char TrimP
 __FUNC_DLLAPI__ void * MemCpy( void * DstPt, const void * SrcPt, size_t MemSz );
 //__FUNC_DLLAPI__ void * MemCpy_inline( void * DstPt, const void * SrcPt, size_t MemSz );
 
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__FUNC_DLLAPI__ Vstr * _GetLastErrInfo( uint32_t ErrNum, Vstr * InfoVstrPt );
-#define GetLastErrInfo( ErrNum, InfoVstrPt ) _GetLastErrInfo( DEFARG( uint32_t, ErrNum, GetLastError() ), InfoVstrPt )
-__FUNC_DLLAPI__ Vstr * GetNtStatuesInfo( uint32_t ErrNum, Vstr * InfoVstrPt );
-__FUNC_DLLAPI__ Vstr * GetWinMMErrInfo( uint32_t ErrNum, Vstr * InfoVstrPt );
-#endif
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-__FUNC_DLLAPI__ Vstr * _GetErrnoInfo( uint32_t ErrNum, Vstr * InfoVstrPt );
-#define GetErrnoInfo( ErrNum, InfoVstrPt ) _GetErrnoInfo( DEFARG( uint32_t, ErrNum, errno ), InfoVstrPt )
+typedef enum
+{
+    ErrTypeErrno,
+    #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
+    ErrTypeWinSys,
+    ErrTypeWinNetMsg,
+    ErrTypeWinINet,
+    ErrTypeWinPdh,
+    ErrTypeWinNtDll,
+    ErrTypeWinMM,
+    #endif
+    ErrTypeEnd
+}ErrType;
+__FUNC_DLLAPI__ Vstr * GetErrInfo( uint32_t ErrNum, Vstr * InfoVstrPt, ... );
+
+#define GetErrnoInfo( ErrNum, InfoVstrPt ) GetErrInfo( DEFARG( uint32_t, ErrNum, errno ), InfoVstrPt, ErrTypeErrno, ErrTypeEnd )
+#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
+#define GetWinLastErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( DEFARG( uint32_t, ErrNum, GetLastError() ), InfoVstrPt, ErrTypeWinSys, ErrTypeEnd )
+#define GetWinSysErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinSys, ErrTypeEnd )
+#define GetWinNetMsgErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinNetMsg, ErrTypeEnd )
+#define GetWinINetErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinINet, ErrTypeEnd )
+#define GetWinPdhErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinPdh, ErrTypeEnd )
+#define GetWinNtDllErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinNtDll, ErrTypeEnd )
+#define GetWinMMErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinMM, ErrTypeEnd )
+#endif
+
 #endif
 
 //获取字符串的长度。

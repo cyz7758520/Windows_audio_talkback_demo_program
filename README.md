@@ -30,9 +30,15 @@
 
 # 移植
 &emsp;&emsp;如果需要在自己的软件中使用本软件的音视频功能，需要以下几个步骤：  
+&emsp;&emsp;**C语言：**
 &emsp;&emsp;1、将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
-&emsp;&emsp;2、实现UserInit、UserPocs、UserDstoy、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这八个回调函数。  
+&emsp;&emsp;2、实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这九个回调函数。  
 &emsp;&emsp;3、调用MediaPocsThrdInit()函数创建并初始化媒体处理线程，然后调用媒体处理线程的相关设置函数，最后调用MediaPocsThrdStart()函数启动媒体处理线程即可。  
+&emsp;&emsp;4、当需要媒体处理线程退出时，调用MediaPocsThrdRqirExit()函数即可。  
+&emsp;&emsp;**C++语言：**
+&emsp;&emsp;1、将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
+&emsp;&emsp;2、继承MediaPocsThrd媒体处理线程类，实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetPcmAdoOtptFrm、UserWriteVdoOtptFrm、UserGetYU12VdoOtptFrm这九个回调成员函数。  
+&emsp;&emsp;3、new这个继承的类，然后调用类的相关设置成员函数，最后调用start()成员函数启动媒体处理线程即可。  
 &emsp;&emsp;4、当需要媒体处理线程退出时，调用MediaPocsThrdRqirExit()函数即可。  
 
 &emsp;&emsp;如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。  
@@ -48,14 +54,16 @@
 &emsp;&emsp;某些Windows设备的软硬件环境可能存在问题，从而可能会导致声学回音消除失败，这种情况必须要先解决这些问题。  
 
 # 其他
-&emsp;&emsp;本软件采用了Speex的1.2.1版本、SpeexDsp的1.2.1版本、WebRtc的2019年7月份版本、OpenH264的2.3.0版本为基础，并进行了大量优化。  
+&emsp;&emsp;本软件采用了Speex的1.2.1版本、SpeexDsp的1.2.1版本、WebRtc的2019年7月份版本、OpenH264的2.3.1版本为基础，并进行了大量优化。  
 &emsp;&emsp;讨论QQ群：511046632    欢迎大家参与测试和讨论！  
 &emsp;&emsp;本人QQ号：280604597    赤勇玄心行天道  
 &emsp;&emsp;本人博客：http://www.cnblogs.com/gaoyaguo  
 &emsp;&emsp;Windows版源代码：https://github.com/cyz7758520/Windows_audio_talkback_demo_program  
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitee.com/chen_yi_ze/Windows_audio_talkback_demo_program  
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitcode.net/cyz7758520/Windows_audio_talkback_demo_program  
 &emsp;&emsp;Android版源代码：https://github.com/cyz7758520/Android_audio_talkback_demo_program  
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitee.com/chen_yi_ze/Android_audio_talkback_demo_program  
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitcode.net/cyz7758520/Android_audio_talkback_demo_program  
 
 # 版权
 &emsp;&emsp;Speex：https://gitlab.xiph.org/xiph/speex/-/blob/master/COPYING  
@@ -68,7 +76,7 @@
 &emsp;&emsp;感谢 WELEN、善书、陈国福 对 Speex、WebRTC 的指点！  
 
 # 函数
-### 八个回调函数
+### 九个回调函数
 ___
 函数名称：UserInit  
 功能说明：用户定义的初始化函数，在本线程刚启动时回调一次。  
@@ -85,6 +93,12 @@ ___
 函数名称：UserDstoy  
 功能说明：用户定义的销毁函数，在本线程退出时回调一次。  
 参数说明：MediaPocsThrdPt：\[输入\]，存放媒体处理线程的指针。  
+返回说明：无。  
+___
+函数名称：UserMsg  
+功能说明：用户定义的消息函数，在接收到用户消息时回调一次。  
+参数说明：MediaPocsThrdPt：\[输入\]，存放媒体处理线程的指针。  
+&emsp;&emsp;&emsp;&emsp;&emsp;MsgArgPt：\[输入\]，存放消息参数的指针。如果没有消息参数，则本参数为NULL。  
 返回说明：无。  
 ___
 函数名称：UserReadAdoVdoInptFrm  

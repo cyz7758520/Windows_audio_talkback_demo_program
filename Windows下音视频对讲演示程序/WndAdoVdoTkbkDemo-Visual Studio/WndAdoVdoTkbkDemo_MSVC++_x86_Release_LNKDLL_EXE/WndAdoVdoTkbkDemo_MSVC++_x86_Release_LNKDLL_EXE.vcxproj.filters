@@ -27,12 +27,36 @@
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\qedit.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\AdoInpt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\AdoOtpt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MediaPocsThrd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoInpt.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoOtpt.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
