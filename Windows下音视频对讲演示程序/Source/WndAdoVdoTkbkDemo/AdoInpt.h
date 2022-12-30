@@ -127,7 +127,6 @@ typedef struct AdoInpt //音频输入。
 
 	ConstLenLnkLstCls m_AdoInptFrmLnkLst; //存放音频输入帧链表。
 	ConstLenLnkLstCls m_AdoInptIdleFrmLnkLst; //存放音频输入空闲帧链表。
-	size_t m_AdoInptFrmElmTotal; //存放音频输入帧元素的总数。
 
 	int32_t m_IsInitAdoInptThrdTmpVar; //存放是否初始化音频输入线程的临时变量。
 	int16_t * m_AdoInptFrmPt; //存放音频输入帧的指针。

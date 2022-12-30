@@ -55,7 +55,6 @@ typedef struct AdoOtpt //音频输出。
 
 	ConstLenLnkLstCls m_AdoOtptFrmLnkLst; //存放音频输出帧链表。
 	ConstLenLnkLstCls m_AdoOtptIdleFrmLnkLst; //存放音频输出空闲帧链表。
-	size_t m_AdoOtptFrmElmTotal; //存放音频输出帧元素的总数。
 	
 	int32_t m_IsInitAdoOtptThrdTmpVar; //存放是否初始化音频输出线程的临时变量。
 	int16_t * m_AdoOtptFrmPt; //存放音频输出帧的指针。

@@ -103,7 +103,6 @@ __AJB_DLLAPI__ int VAjbUnlock( VAjb * VAjbPt, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int VAjbPutFrm( VAjb * VAjbPt, uint64_t CurTime, uint32_t TimeStamp, const int8_t * FrmPt, size_t FrmLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __AJB_DLLAPI__ int VAjbGetFrm( VAjb * VAjbPt, uint64_t CurTime, uint32_t * TimeStampPt, int8_t * FrmPt, size_t FrmSz, size_t * FrmLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__AJB_DLLAPI__ int VAjbGetFrmWantTimeStamp( VAjb * VAjbPt, uint64_t CurTime, uint32_t WantTimeStamp, uint32_t * TimeStampPt, int8_t * FrmPt, size_t FrmSz, size_t * FrmLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int VAjbGetBufFrmCnt( VAjb * VAjbPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
@@ -131,8 +130,7 @@ public:
 	
 	int PutFrm( uint64_t CurTime, uint32_t TimeStamp, const int8_t * FrmPt, size_t FrmLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VAjbPutFrm( m_VAjbPt, CurTime, TimeStamp, FrmPt, FrmLen, IsAutoLock, ErrInfoVstrPt ); }
 	int GetFrm( uint64_t CurTime, uint32_t * TimeStampPt, int8_t * FrmPt, size_t FrmSz, size_t * FrmLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VAjbGetFrm( m_VAjbPt, CurTime, TimeStampPt, FrmPt, FrmSz, FrmLenPt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetFrmWantTimeStamp( uint64_t CurTime, uint32_t WantTimeStamp, uint32_t * TimeStampPt, int8_t * FrmPt, size_t FrmSz, size_t * FrmLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VAjbGetFrmWantTimeStamp( m_VAjbPt, CurTime, WantTimeStamp, TimeStampPt, FrmPt, FrmSz, FrmLenPt, IsAutoLock, ErrInfoVstrPt ); }
-
+	
 	int GetBufFrmCnt( int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VAjbGetBufFrmCnt( m_VAjbPt, CurHaveBufFrmCntPt, MinNeedBufFrmCntPt, MaxNeedBufFrmCntPt, CurNeedBufFrmCntPt, IsAutoLock, ErrInfoVstrPt ); }
 
 	int Clear( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VAjbClear( m_VAjbPt, IsAutoLock, ErrInfoVstrPt ); }

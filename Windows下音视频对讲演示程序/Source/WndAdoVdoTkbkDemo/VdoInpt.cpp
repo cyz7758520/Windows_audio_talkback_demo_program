@@ -978,9 +978,9 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 	p_Rslt = 0; //设置本函数执行成功。
 	
 	Out:
-	//if( p_Rslt != 0 ) //如果本函数执行失败。
+	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		
+		VdoInptDstoy( VdoInptPt );
 	}
 	return p_Rslt;
 }

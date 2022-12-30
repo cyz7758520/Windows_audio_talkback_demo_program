@@ -923,7 +923,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 		}
 
 		AdoInptPt->m_AdoInptDvcFrmSz = ( AdoInptPt->m_FrmLen * 1000 / AdoInptPt->m_SmplRate ) * AdoInptPt->m_AdoInptDvcWaveFmtExPt->nSamplesPerSec / 1000; //设置音频输入设备帧的大小。
-		if( AdoInptPt->m_AdoInptDvcBufQueue.Init( BufAutoAdjMethFreeNumber, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), 0, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ) * 10, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+		if( AdoInptPt->m_AdoInptDvcBufQueue.Init( BufAutoAdjMethFreeNumber, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), 0, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ) * 50, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "初始化音频输入设备缓冲区队列失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			goto Out;
@@ -946,8 +946,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	}
 
 	//初始化音频输入帧链表。
-	AdoInptPt->m_AdoInptFrmElmTotal = 6; //音频输入帧链表最多只存储几帧，避免因为音频设备有变化导致卡顿并积累大量音频输入帧，从而导致不同步。音频输入空闲帧链表最多存储总数与音频输入帧链表一致。
-	if( AdoInptPt->m_AdoInptFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethNone, 0, 0, AdoInptPt->m_AdoInptFrmElmTotal, AdoInptPt->m_AdoInptFrmElmTotal, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( AdoInptPt->m_AdoInptFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入帧链表成功。" ) );
 	}
@@ -958,35 +957,14 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	}
 
 	//初始化音频输入空闲帧链表。
+	if( AdoInptPt->m_AdoInptIdleFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
-		if( AdoInptPt->m_AdoInptIdleFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethNone, 0, 0, AdoInptPt->m_AdoInptFrmElmTotal, AdoInptPt->m_AdoInptFrmElmTotal, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
-		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入空闲帧链表成功。" ) );
-		}
-		else
-		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输入空闲帧链表失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-			goto Out;
-		}
-
-		//初始化音频输入空闲帧，并追加到音频输入空闲帧链表。
-		for( int p_TmpInt = 0; p_TmpInt < AdoInptPt->m_AdoInptFrmElmTotal; p_TmpInt++ )
-		{
-			AdoInptPt->m_MediaPocsThrdPt->m_PcmAdoInptFrmPt = ( int16_t * )calloc( AdoInptPt->m_FrmLen * sizeof( int16_t ), 1 );
-			if( AdoInptPt->m_MediaPocsThrdPt->m_PcmAdoInptFrmPt == NULL )
-			{
-				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：初始化音频输入空闲帧失败。" ) );
-				goto Out;
-			}
-			if( AdoInptPt->m_AdoInptIdleFrmLnkLst.PutTail( &AdoInptPt->m_MediaPocsThrdPt->m_PcmAdoInptFrmPt, 0, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-			{
-				free( AdoInptPt->m_MediaPocsThrdPt->m_PcmAdoInptFrmPt );
-				AdoInptPt->m_MediaPocsThrdPt->m_PcmAdoInptFrmPt = NULL;
-				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：追加音频输入空闲帧到音频输入空闲帧链表失败。" ) );
-				goto Out;
-			}
-			AdoInptPt->m_MediaPocsThrdPt->m_PcmAdoInptFrmPt = NULL;
-		}
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音频输入空闲帧链表成功。" ) );
+	}
+	else
+	{
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音频输入空闲帧链表失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		goto Out;
 	}
 
 	//初始化音频输入线程的临时变量。
@@ -1334,16 +1312,18 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 	}
 
 	//音频输入循环开始。
+	if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) FuncGetTimeAsMsec( &AdoInptPt->m_LastTimeMsec );
 	while( 1 )
 	{
+		//获取音频输入设备的缓冲区，并将音频输入数据放入音频输入设备缓冲区队列。
 		p_HRslt = p_AdoInptDvcCptrClntPt->GetBuffer( ( BYTE * * )&p_AdoInptDvcBufPt, &p_AdoInptDvcBufLen, &p_AdoInptDvcBufFlag, NULL, NULL ); //获取音频输入设备的缓冲区。
-		if( p_HRslt == S_OK )
+		if( p_HRslt == S_OK ) //如果获取音频输入设备的缓冲区成功。
 		{
-			//LOGFE( Cu8vstr( "音频输入线程：AdoInpt %uz64d %uz32d %z32d" ), FuncGetTimeAsMsec( NULL ), p_AdoInptDvcBufLen, p_AdoInptDvcBufFlag );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：AdoInptDvcBufLen：%uz32d，AdoInptDvcBufFlag：%uz32d。" ), p_AdoInptDvcBufLen, p_AdoInptDvcBufFlag );
 
 			if( p_AdoInptDvcBufFlag & AUDCLNT_BUFFERFLAGS_SILENT ) //如果本次音频输入设备的缓冲区为静音。
 			{
-				//LOGI( Cu8vstr( "音频输入线程：AUDCLNT_BUFFERFLAGS_SILENT" ) );
+				//if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：AUDCLNT_BUFFERFLAGS_SILENT。" ) );
 				memset( p_AdoInptDvcBufPt, 0, p_AdoInptDvcBufLen * sizeof( int16_t ) );
 			}
 
@@ -1358,48 +1338,6 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 
 			p_AdoInptDvcCptrClntPt->ReleaseBuffer( p_AdoInptDvcBufLen ); //释放音频输入设备的缓冲区。
 
-			AdoInptPt->m_AdoInptDvcBufQueue.GetLen( &p_TmpSz, 0, NULL ); //获取音频输入设备缓冲区队列的长度。
-
-			if( p_TmpSz >= AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ) ) //如果音频输入设备缓冲区队列的长度够一个音频输入设备帧的长度。
-			{
-				//获取一个音频输入空闲帧。
-				AdoInptPt->m_AdoInptIdleFrmLnkLst.GetTotal( &AdoInptPt->m_AdoInptFrmLnkLstElmTotal, 1, NULL ); //获取音频输入空闲帧链表的元素总数。
-				if( AdoInptPt->m_AdoInptFrmLnkLstElmTotal > 0 ) //如果音频输入空闲帧链表中有音频输入空闲帧。
-				{
-					//从音频输入空闲帧链表中取出第一个音频输入空闲帧。
-					{
-						AdoInptPt->m_AdoInptIdleFrmLnkLst.Locked( NULL ); //音频输入空闲帧链表的互斥锁加锁。
-						AdoInptPt->m_AdoInptIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_AdoInptFrmPt, NULL, 0, NULL );
-						AdoInptPt->m_AdoInptIdleFrmLnkLst.DelHead( 0, NULL );
-						AdoInptPt->m_AdoInptIdleFrmLnkLst.Unlock( NULL ); //音频输入空闲帧链表的互斥锁解锁。
-					}
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从音频输入空闲帧链表中取出第一个音频输入空闲帧，音频输入空闲帧链表元素个数：%uzd。" ), AdoInptPt->m_AdoInptFrmLnkLstElmTotal );
-				}
-				else //如果音频输入空闲帧链表中没有音频输入空闲帧。
-				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：音频输入空闲帧链表中没有音频输入空闲帧，不能再获取一个音频输入空闲帧。" ) );
-					Sleep( 1 ); //暂停一下，避免CPU使用率过高。
-				}
-
-				//追加本次音频输入帧到音频输入帧链表。
-				if( AdoInptPt->m_AdoInptFrmPt != NULL ) //如果获取了一个音频输入空闲帧。
-				{
-					int32_t p_TmpInt;
-					AdoInptPt->m_AdoInptDvcBufQueue.GetHead( AdoInptPt->m_AdoInptDvcFrmPt, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), NULL, 1, 0, NULL );
-					//fwrite( AdoInptPt->m_AdoInptDvcFrmPt, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), 1, AdoInptFile2Pt );
-					SpeexResamplerPocs( AdoInptPt->m_AdoInptDvcSpeexResamplerPt, AdoInptPt->m_AdoInptDvcFrmPt, AdoInptPt->m_AdoInptDvcFrmSz, AdoInptPt->m_AdoInptFrmPt, AdoInptPt->m_FrmLen, &p_TmpInt );
-					//fwrite( AdoInptPt->m_AdoInptFrmPt, p_TmpInt * 2, 1, AdoInptFile3Pt );
-					AdoInptPt->m_AdoInptFrmLnkLst.PutTail( &AdoInptPt->m_AdoInptFrmPt, 1, NULL );
-					AdoInptPt->m_AdoInptFrmPt = NULL;
-
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
-					{
-						FuncGetTimeAsMsec( &AdoInptPt->m_NowTimeMsec );
-						LOGFI( Cu8vstr( "音频输入线程：本次音频输入帧读取完毕，耗时 %uz64d 毫秒。" ), AdoInptPt->m_NowTimeMsec - AdoInptPt->m_LastTimeMsec );
-						AdoInptPt->m_LastTimeMsec = AdoInptPt->m_NowTimeMsec;
-					}
-				}
-			}
 		}
 		else if( p_HRslt == AUDCLNT_E_DEVICE_INVALIDATED ) //如果音频输入设备已经关闭。
 		{
@@ -1411,32 +1349,90 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		}
 		else if( p_HRslt == AUDCLNT_S_BUFFER_EMPTY ) //如果音频输入设备的缓冲区当前为空，表示还需要等待。
 		{
-			//LOGE( Cu8vstr( "音频输入线程：AUDCLNT_S_BUFFER_EMPTY" ) );
+			//if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_S_BUFFER_EMPTY。" ) );
 			Sleep( 1 ); //暂停一下，避免CPU使用率过高。
 		}
 		else if( p_HRslt == AUDCLNT_E_BUFFER_ERROR )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_BUFFER_ERROR" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_BUFFER_ERROR。" ) );
 		}
 		else if( p_HRslt == AUDCLNT_E_OUT_OF_ORDER )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_OUT_OF_ORDER" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_OUT_OF_ORDER。" ) );
 		}
 		else if( p_HRslt == AUDCLNT_E_BUFFER_OPERATION_PENDING )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_BUFFER_OPERATION_PENDING" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_BUFFER_OPERATION_PENDING。" ) );
 		}
 		else if( p_HRslt == AUDCLNT_E_SERVICE_NOT_RUNNING )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_SERVICE_NOT_RUNNING" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_E_SERVICE_NOT_RUNNING。" ) );
 		}
 		else if( p_HRslt == E_POINTER )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：E_POINTER" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：E_POINTER。" ) );
 		}
 		else
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：p_HRslt:%ld" ), p_HRslt );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：p_HRslt:%ld。" ), p_HRslt );
+		}
+
+		AdoInptPt->m_AdoInptDvcBufQueue.GetLen( &p_TmpSz, 0, NULL ); //获取音频输入设备缓冲区队列的长度。
+		if( p_TmpSz >= AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ) ) //如果音频输入设备缓冲区队列的长度够一个音频输入设备帧的长度。
+		{
+			//获取一个音频输入空闲帧。
+			AdoInptPt->m_AdoInptIdleFrmLnkLst.GetTotal( &AdoInptPt->m_AdoInptFrmLnkLstElmTotal, 1, NULL ); //获取音频输入空闲帧链表的元素总数。
+			if( AdoInptPt->m_AdoInptFrmLnkLstElmTotal > 0 ) //如果音频输入空闲帧链表中有音频输入空闲帧。
+			{
+				//从音频输入空闲帧链表中取出第一个音频输入空闲帧。
+				{
+					AdoInptPt->m_AdoInptIdleFrmLnkLst.Locked( NULL ); //音频输入空闲帧链表的互斥锁加锁。
+					AdoInptPt->m_AdoInptIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_AdoInptFrmPt, NULL, 0, NULL );
+					AdoInptPt->m_AdoInptIdleFrmLnkLst.DelHead( 0, NULL );
+					AdoInptPt->m_AdoInptIdleFrmLnkLst.Unlock( NULL ); //音频输入空闲帧链表的互斥锁解锁。
+				}
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从音频输入空闲帧链表中取出第一个音频输入空闲帧，音频输入空闲帧链表元素个数：%uzd。" ), AdoInptPt->m_AdoInptFrmLnkLstElmTotal );
+			}
+			else //如果音频输入空闲帧链表中没有音频输入空闲帧。
+			{
+				AdoInptPt->m_AdoInptFrmLnkLst.GetTotal( &AdoInptPt->m_AdoInptFrmLnkLstElmTotal, 1, NULL ); //获取音频输入帧链表的元素总数。
+				if( AdoInptPt->m_AdoInptFrmLnkLstElmTotal <= 50 )
+				{
+					AdoInptPt->m_AdoInptFrmPt = ( int16_t * )calloc( AdoInptPt->m_FrmLen * sizeof( int16_t ), 1 ); //创建一个音频输入空闲帧。
+					if( AdoInptPt->m_AdoInptFrmPt == NULL )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：音频输入空闲帧链表中没有音频输入空闲帧，创建一个音频输入空闲帧失败。" ) );
+					}
+					else
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：音频输入空闲帧链表中没有音频输入空闲帧，创建一个音频输入空闲帧。" ) );
+					}
+				}
+				else
+				{
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：音频输入帧链表中音频输入帧数量为%uzd已经超过上限50，不再创建一个音频输入空闲帧。" ), AdoInptPt->m_AdoInptFrmLnkLstElmTotal );
+					Sleep( 1 ); //暂停一下，避免CPU使用率过高。
+				}
+			}
+
+			//追加本次音频输入帧到音频输入帧链表。
+			if( AdoInptPt->m_AdoInptFrmPt != NULL ) //如果获取了一个音频输入空闲帧。
+			{
+				int32_t p_TmpInt;
+				AdoInptPt->m_AdoInptDvcBufQueue.GetHead( AdoInptPt->m_AdoInptDvcFrmPt, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), NULL, 1, 0, NULL );
+				//fwrite( AdoInptPt->m_AdoInptDvcFrmPt, AdoInptPt->m_AdoInptDvcFrmSz * sizeof( int16_t ), 1, AdoInptFile2Pt );
+				SpeexResamplerPocs( AdoInptPt->m_AdoInptDvcSpeexResamplerPt, AdoInptPt->m_AdoInptDvcFrmPt, AdoInptPt->m_AdoInptDvcFrmSz, AdoInptPt->m_AdoInptFrmPt, AdoInptPt->m_FrmLen, &p_TmpInt );
+				//fwrite( AdoInptPt->m_AdoInptFrmPt, p_TmpInt * 2, 1, AdoInptFile3Pt );
+				AdoInptPt->m_AdoInptFrmLnkLst.PutTail( &AdoInptPt->m_AdoInptFrmPt, 1, NULL );
+				AdoInptPt->m_AdoInptFrmPt = NULL;
+
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
+				{
+					FuncGetTimeAsMsec( &AdoInptPt->m_NowTimeMsec );
+					LOGFI( Cu8vstr( "音频输入线程：本次音频输入帧读取完毕，耗时 %uz64d 毫秒。" ), AdoInptPt->m_NowTimeMsec - AdoInptPt->m_LastTimeMsec );
+					AdoInptPt->m_LastTimeMsec = AdoInptPt->m_NowTimeMsec;
+				}
+			}
 		}
 
 		if( AdoInptPt->m_AdoInptThrdExitFlag == 1 ) //如果退出标记为请求退出。

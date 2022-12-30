@@ -78,8 +78,6 @@ public:
     int8_t m_IsRecvExitPkt; //存放是否接收到退出包，为0表示否，为1表示是。
 
     int m_UseWhatRecvOtptFrm; //存放使用什么接收输出帧，为0表示链表，为1表示自适应抖动缓冲器。
-    int m_LastGetAdoOtptFrmIsAct; //存放最后一个取出的音频输出帧是否为有语音活动，为0表示否，为非0表示是。
-    uint32_t m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp; //存放最后一个取出的音频输出帧对应视频输出帧的时间戳。
 
     VarLenLnkLstCls m_RecvAdoOtptFrmLnkLst; //存放接收音频输出帧链表。
 	VarLenLnkLstCls m_RecvVdoOtptFrmLnkLst; //存放接收视频输出帧链表。
@@ -702,9 +700,6 @@ public:
 		m_LastSendAdoInptFrmTimeStamp = 0 - 1; //设置最后一个发送音频输入帧的时间戳为0的前一个，因为第一次发送音频输入帧时会递增一个步进。
 		m_LastSendVdoInptFrmTimeStamp = 0 - 1; //设置最后一个发送视频输入帧的时间戳为0的前一个，因为第一次发送视频输入帧时会递增一个步进。
 		
-		m_LastGetAdoOtptFrmIsAct = 0; //设置最后一个取出的音频输出帧为无语音活动，因为如果不使用音频输出，只使用视频输出时，可以保证视频正常输出。
-		m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp = 0; //设置最后一个取出的音频输出帧对应视频输出帧的时间戳为0。
-
 		switch( m_UseWhatRecvOtptFrm ) //使用什么接收输出帧。
 		{
 			case 0: //如果使用链表。
@@ -1418,8 +1413,8 @@ public:
 			{
 				if( VoiceActSts != 0 && EncdAdoInptFrmIsNeedTrans != 0 ) //如果本次音频输入帧为有语音活动，且需要传输。
 				{
-					memcpy( m_TmpBytePt + 1 + 4 + 4, EncdAdoInptFrmPt, EncdAdoInptFrmLen ); //设置音频输入输出帧。
-					p_FrmPktLen = 1 + 4 + 4 + EncdAdoInptFrmLen; //数据包长度 = 数据包类型 + 音频输入帧时间戳 + 视频输入帧时间戳 + 已编码格式音频输入帧。
+					memcpy( m_TmpBytePt + 1 + 4, EncdAdoInptFrmPt, EncdAdoInptFrmLen ); //设置音频输入输出帧。
+					p_FrmPktLen = 1 + 4 + EncdAdoInptFrmLen; //数据包长度 = 数据包类型 + 音频输入帧时间戳 + 已编码格式音频输入帧。
 				}
 				else //如果本次音频输入帧为无语音活动，或不需要传输。
 				{
@@ -1430,8 +1425,8 @@ public:
 			{
 				if( VoiceActSts != 0 ) //如果本次音频输入帧为有语音活动。
 				{
-					memcpy( m_TmpBytePt + 1 + 4 + 4, PcmAdoRsltFrmPt, m_MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) ); //设置音频输入输出帧。
-					p_FrmPktLen = 1 + 4 + 4 + m_MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ); //数据包长度 = 数据包类型 + 音频输入帧时间戳 + 视频输入帧时间戳 + PCM格式音频输入帧。
+					memcpy( m_TmpBytePt + 1 + 4, PcmAdoRsltFrmPt, m_MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) ); //设置音频输入输出帧。
+					p_FrmPktLen = 1 + 4 + m_MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ); //数据包长度 = 数据包类型 + 音频输入帧时间戳 + PCM格式音频输入帧。
 				}
 				else //如果本次音频输入帧为无语音活动，或不需要传输。
 				{
@@ -1450,16 +1445,11 @@ public:
 				m_TmpBytePt[2] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF00 ) >> 8 );
 				m_TmpBytePt[3] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
 				m_TmpBytePt[4] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
-				//设置视频输入帧时间戳。
-				m_TmpBytePt[5] = ( int8_t ) ( m_LastSendVdoInptFrmTimeStamp & 0xFF );
-				m_TmpBytePt[6] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF00 ) >> 8 );
-				m_TmpBytePt[7] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
-				m_TmpBytePt[8] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
 
 				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
-					LOGFI( Cu8vstr( "发送一个有语音活动的音频输入帧包成功。音频输入帧时间戳：%uz32d，视频输入帧时间戳：%uz32d，总长度：%d。" ), m_LastSendAdoInptFrmTimeStamp, m_LastSendVdoInptFrmTimeStamp, p_FrmPktLen );
+					LOGFI( Cu8vstr( "发送一个有语音活动的音频输入帧包成功。音频输入帧时间戳：%uz32d，总长度：%d。" ), m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen );
 				}
 				else
 				{
@@ -1509,8 +1499,8 @@ public:
 			{
 				if( EncdVdoInptFrmLen != 0 ) //如果本次视频输入帧为有图像活动。
 				{
-					memcpy( m_TmpBytePt + 1 + 4 + 4, EncdVdoInptFrmPt, EncdVdoInptFrmLen ); //设置视频输入输出帧。
-					p_FrmPktLen = 1 + 4 + 4 + EncdVdoInptFrmLen; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 音频输入帧时间戳 + 已编码格式视频输入帧。
+					memcpy( m_TmpBytePt + 1 + 4, EncdVdoInptFrmPt, EncdVdoInptFrmLen ); //设置视频输入输出帧。
+					p_FrmPktLen = 1 + 4 + EncdVdoInptFrmLen; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 已编码格式视频输入帧。
 				}
 				else
 				{
@@ -1520,18 +1510,18 @@ public:
 			else //如果要使用YU12格式视频输入帧。
 			{
 				//设置视频输入帧宽度。
-				m_TmpBytePt[9] = ( int8_t ) ( YU12VdoInptFrmWidth & 0xFF );
-				m_TmpBytePt[10] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF00 ) >> 8 );
-				m_TmpBytePt[11] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF0000 ) >> 16 );
-				m_TmpBytePt[12] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF000000 ) >> 24 );
+				m_TmpBytePt[5] = ( int8_t ) ( YU12VdoInptFrmWidth & 0xFF );
+				m_TmpBytePt[6] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF00 ) >> 8 );
+				m_TmpBytePt[7] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF0000 ) >> 16 );
+				m_TmpBytePt[8] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF000000 ) >> 24 );
 				//设置视频输入帧高度。
-				m_TmpBytePt[13] = ( int8_t ) ( YU12VdoInptFrmHeight & 0xFF );
-				m_TmpBytePt[14] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF00 ) >> 8 );
-				m_TmpBytePt[15] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF0000 ) >> 16 );
-				m_TmpBytePt[16] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF000000 ) >> 24 );
+				m_TmpBytePt[9] = ( int8_t ) ( YU12VdoInptFrmHeight & 0xFF );
+				m_TmpBytePt[10] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF00 ) >> 8 );
+				m_TmpBytePt[11] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF0000 ) >> 16 );
+				m_TmpBytePt[12] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF000000 ) >> 24 );
 
-				memcpy( m_TmpBytePt + 1 + 4 + 4 + 4 + 4, YU12VdoInptFrmPt, YU12VdoInptFrmWidth * YU12VdoInptFrmHeight * 3 / 2 ); //设置视频输入输出帧。
-				p_FrmPktLen = 1 + 4 + 4 + 4 + 4 + YU12VdoInptFrmWidth * YU12VdoInptFrmHeight * 3 / 2; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 音频输入帧时间戳 + 视频输入帧宽度 + 视频输入帧高度 + YU12格式视频输入帧。
+				memcpy( m_TmpBytePt + 1 + 4 + 4 + 4, YU12VdoInptFrmPt, YU12VdoInptFrmWidth * YU12VdoInptFrmHeight * 3 / 2 ); //设置视频输入输出帧。
+				p_FrmPktLen = 1 + 4 + 4 + 4 + YU12VdoInptFrmWidth * YU12VdoInptFrmHeight * 3 / 2; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 视频输入帧宽度 + 视频输入帧高度 + YU12格式视频输入帧。
 			}
 
 			//发送视频输入帧数据包。
@@ -1546,20 +1536,15 @@ public:
 				m_TmpBytePt[2] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF00 ) >> 8 );
 				m_TmpBytePt[3] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
 				m_TmpBytePt[4] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
-				//设置音频输入帧时间戳。
-				m_TmpBytePt[5] = ( int8_t ) ( m_LastSendAdoInptFrmTimeStamp & 0xFF );
-				m_TmpBytePt[6] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF00 ) >> 8 );
-				m_TmpBytePt[7] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
-				m_TmpBytePt[8] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
 
 				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
-					LOGFI( Cu8vstr( "发送一个有图像活动的视频输入帧包成功。视频输入帧时间戳：%uz32d，音频输入帧时间戳：%uz32d，总长度：%d，类型：%d。" ), m_LastSendVdoInptFrmTimeStamp, m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen, m_TmpBytePt[13] & 0xff );
+					LOGFI( Cu8vstr( "发送一个有图像活动的视频输入帧包成功。视频输入帧时间戳：%uz32d，总长度：%d，类型：%d。" ), m_LastSendVdoInptFrmTimeStamp, p_FrmPktLen, m_TmpBytePt[13] & 0xff );
 				}
 				else
 				{
-					VstrFmtIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个有图像活动的视频输入帧包失败。视频输入帧时间戳：%uz32d，音频输入帧时间戳：%uz32d，总长度：%d，类型：%d。原因：" ), m_LastSendVdoInptFrmTimeStamp, m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen, m_TmpBytePt[13] & 0xff );
+					VstrFmtIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个有图像活动的视频输入帧包失败。视频输入帧时间戳：%uz32d，总长度：%d，类型：%d。原因：" ), m_LastSendVdoInptFrmTimeStamp, p_FrmPktLen, m_TmpBytePt[13] & 0xff );
 					LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, WinMsg::ShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 				}
@@ -1605,28 +1590,6 @@ public:
 				}
 				case 1: //如果使用自适应抖动缓冲器。
 				{
-					uint32_t p_AdoOtptFrmTimeStamp; //存放音频输出帧的时间戳。
-
-					//从音频自适应抖动缓冲器取出音频输出帧。
-					AAjbGetFrm( m_AAjbPt, &p_AdoOtptFrmTimeStamp, m_TmpByte2Pt, m_TmpByte2Sz, &m_TmpSz, 1, NULL );
-				
-					if( ( m_TmpSz > 0 ) && ( m_TmpSz != SIZE_MAX ) ) //如果音频输出帧为有语音活动。
-					{
-						m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp = ( m_TmpByte2Pt[0] & 0xFF ) + ( ( m_TmpByte2Pt[1] & 0xFF ) << 8 ) + ( ( m_TmpByte2Pt[2] & 0xFF ) << 16 ) + ( ( m_TmpByte2Pt[3] & 0xFF ) << 24 ); //设置最后一个取出的音频输出帧对应视频输出帧的时间戳。
-						m_LastGetAdoOtptFrmIsAct = 1; //设置最后一个取出的音频输出帧为有语音活动。
-						LOGFI( Cu8vstr( "从音频自适应抖动缓冲器取出一个有语音活动的音频输出帧。音频输出帧时间戳：%uz32d，视频输出帧时间戳：%uz32d，长度：%uzd。" ), p_AdoOtptFrmTimeStamp, m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp, m_TmpSz );
-					}
-					else if( m_TmpSz == 0 ) //如果音频输出帧为无语音活动。
-					{
-						m_LastGetAdoOtptFrmIsAct = 0; //设置最后一个取出的音频输出帧为无语音活动。
-						LOGFI( Cu8vstr( "从音频自适应抖动缓冲器取出一个无语音活动的音频输出帧。音频输出帧时间戳：%uz32d，长度：%uzd。" ), p_AdoOtptFrmTimeStamp, m_TmpSz );
-					}
-					else //如果音频输出帧为丢失。
-					{
-						m_LastGetAdoOtptFrmIsAct = 1; //设置最后一个取出的音频输出帧为有语音活动。
-						LOGFI( Cu8vstr( "从音频自适应抖动缓冲器取出一个丢失的音频输出帧。音频输出帧时间戳：%uz32d，视频输出帧时间戳：%uz32d，长度：%uzd。" ), p_AdoOtptFrmTimeStamp, m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp, m_TmpSz );
-					}
-				
 					int32_t p_CurHaveBufActFrmCnt; //存放当前已缓冲有活动帧的数量。
 					int32_t p_CurHaveBufInactFrmCnt; //存放当前已缓冲无活动帧的数量。
 					int32_t p_CurHaveBufFrmCnt; //存放当前已缓冲帧的数量。
@@ -1637,6 +1600,24 @@ public:
 					AAjbGetBufFrmCnt( m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_MaxCntuLostFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
 					LOGFI( Cu8vstr( "音频自适应抖动缓冲器：有活动帧：%z32d，无活动帧：%z32d，帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，最大丢帧：%z32d，当前需帧：%z32d。" ), p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_MaxCntuLostFrmCnt, p_CurNeedBufFrmCnt );
 
+					uint32_t p_AdoOtptFrmTimeStamp; //存放音频输出帧的时间戳。
+
+					//从音频自适应抖动缓冲器取出音频输出帧。
+					AAjbGetFrm( m_AAjbPt, &p_AdoOtptFrmTimeStamp, m_TmpByte2Pt, m_TmpByte2Sz, &m_TmpSz, 1, NULL );
+
+					if( ( m_TmpSz > 0 ) && ( m_TmpSz != SIZE_MAX ) ) //如果音频输出帧为有语音活动。
+					{
+						LOGFI( Cu8vstr( "从音频自适应抖动缓冲器取出一个有语音活动的音频输出帧。音频输出帧时间戳：%uz32d，长度：%uzd。" ), p_AdoOtptFrmTimeStamp, m_TmpSz );
+					}
+					else if( m_TmpSz == 0 ) //如果音频输出帧为无语音活动。
+					{
+						LOGFI( Cu8vstr( "从音频自适应抖动缓冲器取出一个无语音活动的音频输出帧。音频输出帧时间戳：%uz32d，长度：%uzd。" ), p_AdoOtptFrmTimeStamp, m_TmpSz );
+					}
+					else //如果音频输出帧为丢失。
+					{
+						LOGFI( Cu8vstr( "从音频自适应抖动缓冲器取出一个丢失的音频输出帧。音频输出帧时间戳：%uz32d，长度：%uzd。" ), p_AdoOtptFrmTimeStamp, m_TmpSz );
+					}
+
 					break;
 				}
 			}
@@ -1646,29 +1627,29 @@ public:
 			{
 				if( PcmAdoOtptFrmPt != NULL ) //如果要使用PCM格式音频输出帧。
 				{
-					if( m_TmpSz - 4 != *AdoOtptFrmLenPt * sizeof( int16_t ) )
+					if( m_TmpSz != *AdoOtptFrmLenPt * sizeof( int16_t ) )
 					{
 						memset( PcmAdoOtptFrmPt, 0, *AdoOtptFrmLenPt * sizeof( int16_t ) );
-						LOGFE( Cu8vstr( "音频输出帧的长度不等于PCM格式的长度。音频输出帧：%uzd，PCM格式：%z32d。" ), m_TmpSz - 4, *AdoOtptFrmLenPt * sizeof( int16_t ) );
+						LOGFE( Cu8vstr( "音频输出帧的长度不等于PCM格式的长度。音频输出帧：%uzd，PCM格式：%z32d。" ), m_TmpSz, *AdoOtptFrmLenPt * sizeof( int16_t ) );
 					}
 					else
 					{
 						//写入PCM格式音频输出帧。
-						memcpy( PcmAdoOtptFrmPt, m_TmpByte2Pt + 4, *AdoOtptFrmLenPt * sizeof( int16_t ) );
+						memcpy( PcmAdoOtptFrmPt, m_TmpByte2Pt, *AdoOtptFrmLenPt * sizeof( int16_t ) );
 					}
 				}
 				else //如果要使用已编码格式音频输出帧。
 				{
-					if( m_TmpSz - 4 > *AdoOtptFrmLenPt )
+					if( m_TmpSz > *AdoOtptFrmLenPt )
 					{
-						LOGFE( Cu8vstr( "音频输出帧的长度已超过已编码格式的长度。音频输出帧：%uzd，已编码格式：%uzd。" ), m_TmpSz - 4, *AdoOtptFrmLenPt );
+						LOGFE( Cu8vstr( "音频输出帧的长度已超过已编码格式的长度。音频输出帧：%uzd，已编码格式：%uzd。" ), m_TmpSz, *AdoOtptFrmLenPt );
 						*AdoOtptFrmLenPt = 0;
 					}
 					else
 					{
 						//写入已编码格式音频输出帧。
-						*AdoOtptFrmLenPt = m_TmpSz - 4;
-						memcpy( EncdAdoOtptFrmPt, m_TmpByte2Pt + 4, *AdoOtptFrmLenPt );
+						*AdoOtptFrmLenPt = m_TmpSz;
+						memcpy( EncdAdoOtptFrmPt, m_TmpByte2Pt, *AdoOtptFrmLenPt );
 					}
 				}
 			}
@@ -1708,9 +1689,6 @@ public:
 	//用户定义的写入视频输出帧函数。
 	void UserWriteVdoOtptFrm( int32_t VdoOtptStrmIdx, uint8_t * YU12VdoOtptFrmPt, int32_t * YU12VdoOtptFrmWidthPt, int32_t * YU12VdoOtptFrmHeightPt, uint8_t * EncdVdoOtptFrmPt, size_t * EncdVdoOtptFrmLenPt )
 	{
-		uint32_t p_VdoOtptFrmTimeStamp;
-		uint32_t p_VdoOtptFrmAdoOtptFrmTimeStamp;
-		uint64_t p_NowTimeMesc;
 		size_t m_TmpSz = 0;
 
 		//从链表或自适应抖动缓冲器取出一个视频输出帧。
@@ -1745,21 +1723,15 @@ public:
 				int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
 				int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
 				VAjbGetBufFrmCnt( m_VAjbPt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
-			
+
 				if( p_CurHaveBufFrmCnt != 0 ) //如果视频自适应抖动缓冲器不为空。
 				{
 					LOGFI( Cu8vstr( "视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
 
+					uint32_t p_VdoOtptFrmTimeStamp;
+
 					//从视频自适应抖动缓冲器取出视频输出帧。
-					FuncGetTimeAsMsec( &p_NowTimeMesc );
-					if( m_MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt != 0 && m_LastGetAdoOtptFrmIsAct != 0 ) //如果要使用音频输出，且最后一个取出的音频输出帧为有语音活动，就根据最后一个取出的音频输出帧对应视频输出帧的时间戳来取出。
-					{
-						VAjbGetFrmWantTimeStamp( m_VAjbPt, p_NowTimeMesc, m_LastGetAdoOtptFrmVdoOtptFrmTimeStamp, &p_VdoOtptFrmTimeStamp, m_TmpByte3Pt, m_TmpByte3Sz, &m_TmpSz, 1, NULL );
-					}
-					else //如果最后一个取出的音频输出帧为无语音活动，就根据直接取出。
-					{
-						VAjbGetFrm( m_VAjbPt, p_NowTimeMesc, &p_VdoOtptFrmTimeStamp, m_TmpByte3Pt, m_TmpByte3Sz, &m_TmpSz, 1, NULL );
-					}
+					VAjbGetFrm( m_VAjbPt, FuncGetTimeAsMsec( NULL ), &p_VdoOtptFrmTimeStamp, m_TmpByte3Pt, m_TmpByte3Sz, &m_TmpSz, 1, NULL );
 
 					if( m_TmpSz != 0 ) //如果视频输出帧为有图像活动。
 					{
@@ -1777,37 +1749,34 @@ public:
 		//写入视频输出帧。
 		if( m_TmpSz > 0 ) //如果视频输出帧为有图像活动。
 		{
-			//读取视频输出帧对应音频输出帧的时间戳。
-			p_VdoOtptFrmAdoOtptFrmTimeStamp = ( m_TmpByte3Pt[0] & 0xFF ) + ( ( m_TmpByte3Pt[1] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[2] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[3] & 0xFF ) << 24 );
-
 			if( YU12VdoOtptFrmPt != NULL ) //如果要使用YU12格式视频输出帧。
 			{
-				*YU12VdoOtptFrmWidthPt = ( m_TmpByte3Pt[4] & 0xFF ) + ( ( m_TmpByte3Pt[5] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[6] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[7] & 0xFF ) << 24 );
-				*YU12VdoOtptFrmHeightPt = ( m_TmpByte3Pt[8] & 0xFF ) + ( ( m_TmpByte3Pt[9] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[10] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[11] & 0xFF ) << 24 );
+				*YU12VdoOtptFrmWidthPt = ( m_TmpByte3Pt[0] & 0xFF ) + ( ( m_TmpByte3Pt[1] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[2] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[3] & 0xFF ) << 24 );
+				*YU12VdoOtptFrmHeightPt = ( m_TmpByte3Pt[4] & 0xFF ) + ( ( m_TmpByte3Pt[5] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[6] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[17] & 0xFF ) << 24 );
 
-				if( m_TmpSz - 4 - 4 - 4 != *YU12VdoOtptFrmWidthPt * *YU12VdoOtptFrmHeightPt * 3 / 2 )
+				if( m_TmpSz - 4 - 4 != *YU12VdoOtptFrmWidthPt * *YU12VdoOtptFrmHeightPt * 3 / 2 )
 				{
-					LOGFE( Cu8vstr( "视频输出帧的长度不等于YU12格式的长度。视频输出帧：%uzd，YU12格式：%z32d。" ), m_TmpSz - 4 - 4 - 4, *EncdVdoOtptFrmLenPt );
+					LOGFE( Cu8vstr( "视频输出帧的长度不等于YU12格式的长度。视频输出帧：%uzd，YU12格式：%z32d。" ), m_TmpSz - 4 - 4, *EncdVdoOtptFrmLenPt );
 					*YU12VdoOtptFrmWidthPt = 0;
 					*YU12VdoOtptFrmHeightPt = 0;
 					return;
 				}
 
 				//写入YU12格式视频输出帧。
-				memcpy( YU12VdoOtptFrmPt, m_TmpByte3Pt + 4 + 4 + 4, m_TmpSz - 4 - 4 - 4 );
+				memcpy( YU12VdoOtptFrmPt, m_TmpByte3Pt + 4 + 4, m_TmpSz - 4 - 4 );
 			}
 			else //如果要使用已编码格式视频输出帧。
 			{
-				if( m_TmpSz - 4 > *EncdVdoOtptFrmLenPt )
+				if( m_TmpSz > *EncdVdoOtptFrmLenPt )
 				{
 					*EncdVdoOtptFrmLenPt = 0;
-					LOGFE( Cu8vstr( "视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz - 4, *EncdVdoOtptFrmLenPt );
+					LOGFE( Cu8vstr( "视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz, *EncdVdoOtptFrmLenPt );
 					return;
 				}
 
 				//写入已编码格式视频输出帧。
-				memcpy( EncdVdoOtptFrmPt, m_TmpByte3Pt + 4, m_TmpSz - 4 );
-				*EncdVdoOtptFrmLenPt = m_TmpSz - 4;
+				memcpy( EncdVdoOtptFrmPt, m_TmpByte3Pt, m_TmpSz );
+				*EncdVdoOtptFrmLenPt = m_TmpSz;
 			}
 		}
 		else if( m_TmpSz == 0 ) //如果视频输出帧为无图像活动。
@@ -3827,7 +3796,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId ), L"20" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId ), L"20" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId ), L"1.0" );
-		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId ), L"1" );
+		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId ), L"3" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId ), L"24" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId ), L"1.0" );
 	}
