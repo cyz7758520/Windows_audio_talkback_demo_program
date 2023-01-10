@@ -4150,6 +4150,24 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						if( MediaPocsThrdPt->m_AdoInpt.m_IsInitAdoInpt != 0 ) if( AdoInptWavfmInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
 						break;
 					}
+					case MsgTyp::SetAdoInptUseDvc:
+					{
+						MediaMsgSetAdoInptUseDvc * p_MediaMsgSetAdoInptUseDvcPt = ( MediaMsgSetAdoInptUseDvc * )&p_MediaMsg;
+						if( MediaPocsThrdPt->m_AdoInpt.m_IsInitAdoInpt != 0 )
+						{
+							AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInitAdoOtpt != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
+						}
+
+						MediaPocsThrdPt->m_AdoInpt.m_AdoInptDvcID = p_MediaMsgSetAdoInptUseDvcPt->m_AdoInptDvcID;
+
+						if( MediaPocsThrdPt->m_AdoInpt.m_IsInitAdoInpt != 0 )
+						{
+							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInitAdoOtpt != 0 ) if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+							if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
+						}
+						break;
+					}
 					case MsgTyp::SetAdoInptIsMute:
 					{
 						MediaMsgSetAdoInptIsMute * p_MediaMsgSetAdoInptIsMutePt = ( MediaMsgSetAdoInptIsMute * )&p_MediaMsg;
