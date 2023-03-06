@@ -1564,7 +1564,7 @@ public:
 	//用户定义的写入音频输出帧函数。
 	void UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
 							  int16_t * PcmAdoOtptSrcFrmPt, size_t PcmAdoOtptFrmLenUnit,
-							  uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmSzByt, size_t * EncdAdoOtptSrcFrmLenByt )
+							  uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmSzByt, size_t * EncdAdoOtptSrcFrmLenBytPt )
 	{
 		size_t m_TmpSz = 0;
 
@@ -1650,12 +1650,12 @@ public:
 					if( m_TmpSz > EncdAdoOtptSrcFrmSzByt )
 					{
 						LOGFE( Cu8vstr( "音频输出帧的长度已超过已编码格式的长度。音频输出帧：%uzd，已编码格式：%uzd。" ), m_TmpSz, EncdAdoOtptSrcFrmSzByt );
-						*EncdAdoOtptSrcFrmLenByt = 0;
+						*EncdAdoOtptSrcFrmLenBytPt = 0;
 					}
 					else
 					{
 						//写入已编码格式音频输出帧。
-						*EncdAdoOtptSrcFrmLenByt = m_TmpSz;
+						*EncdAdoOtptSrcFrmLenBytPt = m_TmpSz;
 						memcpy( EncdAdoOtptSrcFrmPt, m_TmpByte2Pt, m_TmpSz );
 					}
 				}
@@ -1668,7 +1668,7 @@ public:
 				}
 				else //如果要使用已编码格式音频输出帧。
 				{
-					*EncdAdoOtptSrcFrmLenByt = 0;
+					*EncdAdoOtptSrcFrmLenBytPt = 0;
 				}
 			}
 			else //如果音频输出帧为丢失。
@@ -1679,7 +1679,7 @@ public:
 				}
 				else //如果要使用已编码格式音频输出帧。
 				{
-					*EncdAdoOtptSrcFrmLenByt = m_TmpSz;
+					*EncdAdoOtptSrcFrmLenBytPt = m_TmpSz;
 				}
 			}
 		}
@@ -1689,7 +1689,7 @@ public:
 
 	//用户定义的获取音频输出帧函数。
 	void UserGetAdoOtptFrm( int32_t AdoOtptStrmIdx,
-							int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLenUnit,
+							int16_t * PcmAdoOtptSrcFrmPt, size_t PcmAdoOtptFrmLenUnit,
 							uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmLenByt )
 	{
 		
@@ -1697,8 +1697,8 @@ public:
 
 	//用户定义的写入视频输出帧函数。
 	void UserWriteVdoOtptFrm( uint32_t VdoOtptStrmIdx,
-							  uint8_t * YU12VdoOtptFrmPt, int32_t * YU12VdoOtptFrmWidthPt, int32_t * YU12VdoOtptFrmHeightPt,
-							  uint8_t * EncdVdoOtptFrmPt, size_t EncdVdoOtptFrmSzByt, size_t * EncdVdoOtptFrmLenBytPt )
+							  uint8_t * YU12VdoOtptSrcFrmPt, int32_t * YU12VdoOtptSrcFrmWidthPt, int32_t * YU12VdoOtptSrcFrmHeightPt,
+							  uint8_t * EncdVdoOtptSrcFrmPt, size_t EncdVdoOtptSrcFrmSzByt, size_t * EncdVdoOtptSrcFrmLenBytPt )
 	{
 		size_t m_TmpSz = 0;
 
@@ -1760,53 +1760,53 @@ public:
 		//写入视频输出帧。
 		if( m_TmpSz > 0 ) //如果视频输出帧为有图像活动。
 		{
-			if( YU12VdoOtptFrmPt != NULL ) //如果要使用YU12格式视频输出帧。
+			if( YU12VdoOtptSrcFrmPt != NULL ) //如果要使用YU12格式视频输出帧。
 			{
-				*YU12VdoOtptFrmWidthPt = ( m_TmpByte3Pt[0] & 0xFF ) + ( ( m_TmpByte3Pt[1] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[2] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[3] & 0xFF ) << 24 );
-				*YU12VdoOtptFrmHeightPt = ( m_TmpByte3Pt[4] & 0xFF ) + ( ( m_TmpByte3Pt[5] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[6] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[7] & 0xFF ) << 24 );
+				*YU12VdoOtptSrcFrmWidthPt = ( m_TmpByte3Pt[0] & 0xFF ) + ( ( m_TmpByte3Pt[1] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[2] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[3] & 0xFF ) << 24 );
+				*YU12VdoOtptSrcFrmHeightPt = ( m_TmpByte3Pt[4] & 0xFF ) + ( ( m_TmpByte3Pt[5] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[6] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[7] & 0xFF ) << 24 );
 
-				if( m_TmpSz - 4 - 4 != *YU12VdoOtptFrmWidthPt * *YU12VdoOtptFrmHeightPt * 3 / 2 )
+				if( m_TmpSz - 4 - 4 != *YU12VdoOtptSrcFrmWidthPt * *YU12VdoOtptSrcFrmHeightPt * 3 / 2 )
 				{
-					LOGFE( Cu8vstr( "视频输出帧的长度不等于YU12格式的长度。视频输出帧：%uzd，YU12格式：%z32d。" ), m_TmpSz - 4 - 4, *YU12VdoOtptFrmWidthPt * *YU12VdoOtptFrmHeightPt * 3 / 2 );
-					*YU12VdoOtptFrmWidthPt = 0;
-					*YU12VdoOtptFrmHeightPt = 0;
+					LOGFE( Cu8vstr( "视频输出帧的长度不等于YU12格式的长度。视频输出帧：%uzd，YU12格式：%z32d。" ), m_TmpSz - 4 - 4, *YU12VdoOtptSrcFrmWidthPt * *YU12VdoOtptSrcFrmHeightPt * 3 / 2 );
+					*YU12VdoOtptSrcFrmWidthPt = 0;
+					*YU12VdoOtptSrcFrmHeightPt = 0;
 					return;
 				}
 
 				//写入YU12格式视频输出帧。
-				memcpy( YU12VdoOtptFrmPt, m_TmpByte3Pt + 4 + 4, m_TmpSz - 4 - 4 );
+				memcpy( YU12VdoOtptSrcFrmPt, m_TmpByte3Pt + 4 + 4, m_TmpSz - 4 - 4 );
 			}
 			else //如果要使用已编码格式视频输出帧。
 			{
-				if( m_TmpSz > EncdVdoOtptFrmSzByt )
+				if( m_TmpSz > EncdVdoOtptSrcFrmSzByt )
 				{
-					*EncdVdoOtptFrmLenBytPt = 0;
-					LOGFE( Cu8vstr( "视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz, EncdVdoOtptFrmSzByt );
+					*EncdVdoOtptSrcFrmLenBytPt = 0;
+					LOGFE( Cu8vstr( "视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz, EncdVdoOtptSrcFrmSzByt );
 					return;
 				}
 
 				//写入已编码格式视频输出帧。
-				memcpy( EncdVdoOtptFrmPt, m_TmpByte3Pt, m_TmpSz );
-				*EncdVdoOtptFrmLenBytPt = m_TmpSz;
+				memcpy( EncdVdoOtptSrcFrmPt, m_TmpByte3Pt, m_TmpSz );
+				*EncdVdoOtptSrcFrmLenBytPt = m_TmpSz;
 			}
 		}
 		else if( m_TmpSz == 0 ) //如果视频输出帧为无图像活动。
 		{
-			if( YU12VdoOtptFrmPt != NULL ) //如果要使用YU12格式视频输出帧。
+			if( YU12VdoOtptSrcFrmPt != NULL ) //如果要使用YU12格式视频输出帧。
 			{
 				
 			}
 			else //如果要使用已编码格式视频输出帧。
 			{
-				*EncdVdoOtptFrmLenBytPt = 0;
+				*EncdVdoOtptSrcFrmLenBytPt = 0;
 			}
 		}
 	}
 
 	//用户定义的获取视频输出帧函数。
 	void UserGetVdoOtptFrm( uint32_t VdoOtptStrmIdx,
-							uint8_t * YU12VdoOtptFrmPt, int32_t YU12VdoOtptFrmWidth, int32_t YU12VdoOtptFrmHeight,
-							uint8_t * EncdVdoOtptFrmPt, size_t EncdVdoOtptFrmLenBytPt )
+							uint8_t * YU12VdoOtptSrcFrmPt, int32_t YU12VdoOtptSrcFrmWidth, int32_t YU12VdoOtptSrcFrmHeight,
+							uint8_t * EncdVdoOtptSrcFrmPt, size_t EncdVdoOtptSrcFrmLenByt )
 	{
 		
 	}

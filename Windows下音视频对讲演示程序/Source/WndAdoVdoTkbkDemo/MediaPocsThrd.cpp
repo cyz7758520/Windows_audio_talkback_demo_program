@@ -5727,35 +5727,39 @@ extern "C" void MediaPocsThrdClsUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocs
 //回调MediaPocsThrdCls类的用户定义的写入音频输出帧函数。
 extern "C" void MediaPocsThrdClsUserWriteAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx,
 													 int16_t * PcmAdoOtptSrcFrmPt, size_t PcmAdoOtptFrmLenUnit,
-													 uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmSzByt, size_t * EncdAdoOtptSrcFrmLenByt )
+													 uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmSzByt, size_t * EncdAdoOtptSrcFrmLenBytPt )
 {
-	( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserWriteAdoOtptFrm( AdoOtptStrmIdx, PcmAdoOtptSrcFrmPt, PcmAdoOtptFrmLenUnit, EncdAdoOtptSrcFrmPt, EncdAdoOtptSrcFrmSzByt, EncdAdoOtptSrcFrmLenByt );
+	( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserWriteAdoOtptFrm( AdoOtptStrmIdx, PcmAdoOtptSrcFrmPt, PcmAdoOtptFrmLenUnit, EncdAdoOtptSrcFrmPt, EncdAdoOtptSrcFrmSzByt, EncdAdoOtptSrcFrmLenBytPt );
 }
 
 //回调MediaPocsThrdCls类的用户定义的获取音频输出帧函数。
 extern "C" void MediaPocsThrdClsUserGetAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx,
-												   int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLenUnit,
+												   int16_t * PcmAdoOtptSrcFrmPt, size_t PcmAdoOtptFrmLenUnit,
 												   uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmLenByt )
 {
 	( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserGetAdoOtptFrm( AdoOtptStrmIdx,
-																				PcmAdoOtptFrmPt, PcmAdoOtptFrmLenUnit,
+																				PcmAdoOtptSrcFrmPt, PcmAdoOtptFrmLenUnit,
 																				EncdAdoOtptSrcFrmPt, EncdAdoOtptSrcFrmLenByt );
 }
 
 //回调MediaPocsThrdCls类的用户定义的写入视频输出帧函数。
-extern "C" void MediaPocsThrdClsUserWriteVdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t VdoOtptStrmIdx, uint8_t * YU12VdoOtptFrmPt, int32_t * YU12VdoOtptFrmWidthPt, int32_t * YU12VdoOtptFrmHeightPt, uint8_t * EncdVdoOtptFrmPt, size_t EncdVdoOtptFrmSzByt, size_t * EncdVdoOtptFrmLenBytPt )
+extern "C" void MediaPocsThrdClsUserWriteVdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t VdoOtptStrmIdx,
+													 uint8_t * YU12VdoOtptSrcFrmPt, int32_t * YU12VdoOtptSrcFrmWidthPt, int32_t * YU12VdoOtptSrcFrmHeightPt,
+													 uint8_t * EncdVdoOtptSrcFrmPt, size_t EncdVdoOtptSrcFrmSzByt, size_t * EncdVdoOtptSrcFrmLenBytPt )
 {
-	( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserWriteVdoOtptFrm( VdoOtptStrmIdx, YU12VdoOtptFrmPt, YU12VdoOtptFrmWidthPt, YU12VdoOtptFrmHeightPt, EncdVdoOtptFrmPt, EncdVdoOtptFrmSzByt, EncdVdoOtptFrmLenBytPt );
+	( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserWriteVdoOtptFrm( VdoOtptStrmIdx,
+																				  YU12VdoOtptSrcFrmPt, YU12VdoOtptSrcFrmWidthPt, YU12VdoOtptSrcFrmHeightPt,
+																				  EncdVdoOtptSrcFrmPt, EncdVdoOtptSrcFrmSzByt, EncdVdoOtptSrcFrmLenBytPt );
 }
 
 //回调MediaPocsThrdCls类的用户定义的获取视频输出帧函数。
 extern "C" void MediaPocsThrdClsUserGetVdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t VdoOtptStrmIdx,
-												   uint8_t * YU12VdoOtptFrmPt, int32_t YU12VdoOtptFrmWidth, int32_t YU12VdoOtptFrmHeight,
-												   uint8_t * EncdVdoOtptFrmPt, size_t EncdVdoOtptFrmLenBytPt )
+												   uint8_t * YU12VdoOtptSrcFrmPt, int32_t YU12VdoOtptSrcFrmWidth, int32_t YU12VdoOtptSrcFrmHeight,
+												   uint8_t * EncdVdoOtptSrcFrmPt, size_t EncdVdoOtptSrcFrmLenByt )
 {
 	( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserGetVdoOtptFrm( VdoOtptStrmIdx,
-																				YU12VdoOtptFrmPt, YU12VdoOtptFrmWidth, YU12VdoOtptFrmHeight,
-																				EncdVdoOtptFrmPt, EncdVdoOtptFrmLenBytPt );
+																				YU12VdoOtptSrcFrmPt, YU12VdoOtptSrcFrmWidth, YU12VdoOtptSrcFrmHeight,
+																				EncdVdoOtptSrcFrmPt, EncdVdoOtptSrcFrmLenByt );
 }
 
 int MediaPocsThrdCls::Init( VstrCls * ErrInfoVstrPt )
