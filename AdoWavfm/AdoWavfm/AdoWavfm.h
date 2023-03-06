@@ -46,7 +46,7 @@ extern "C"
 typedef struct AdoWavfm AdoWavfm;
 
 __ADOWAVFM_DLLAPI__ int AdoWavfmInit( AdoWavfm * * AdoWavfmPtPt, Vstr * ErrInfoVstrPt );
-__ADOWAVFM_DLLAPI__ int AdoWavfmDrawToWnd( AdoWavfm * AdoWavfmPt, int16_t * PcmFrmPt, int FrmLen, HWND DstWndHdl, Vstr * ErrInfoVstrPt );
+__ADOWAVFM_DLLAPI__ int AdoWavfmDrawToWnd( AdoWavfm * AdoWavfmPt, int16_t * PcmFrmPt, int32_t FrmLenUnit, HWND DstWndHdl, Vstr * ErrInfoVstrPt );
 __ADOWAVFM_DLLAPI__ int AdoWavfmDstoy( AdoWavfm * AdoWavfmPt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus

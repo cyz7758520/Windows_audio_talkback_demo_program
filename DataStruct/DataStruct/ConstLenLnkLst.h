@@ -10,7 +10,7 @@ extern "C"
 	
 typedef struct ConstLenLnkLst ConstLenLnkLst;
 
-__DATASTRUCT_DLLAPI__ int ConstLenLnkLstInit( ConstLenLnkLst * * ConstLenLnkLstPtPt, size_t ElmDataLen, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenLnkLstInit( ConstLenLnkLst * * ConstLenLnkLstPtPt, size_t ElmDataLenByt, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int ConstLenLnkLstLocked( ConstLenLnkLst * ConstLenLnkLstPt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int ConstLenLnkLstUnlock( ConstLenLnkLst * ConstLenLnkLstPt, Vstr * ErrInfoVstrPt );
@@ -53,7 +53,7 @@ public:
 	ConstLenLnkLstCls() { m_ConstLenLnkLstPt = NULL; }
 	~ConstLenLnkLstCls() { Dstoy( NULL ); }
 
-	int Init( size_t ElmDataLen, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return ConstLenLnkLstInit( &m_ConstLenLnkLstPt, ElmDataLen, BufAutoAdjMeth, BufAutoAdjParm, BufAutoAdjIsAllowShrink, ElmMinNum, ElmMaxNum, ErrInfoVstrPt ); }
+	int Init( size_t ElmDataLenByt, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return ConstLenLnkLstInit( &m_ConstLenLnkLstPt, ElmDataLenByt, BufAutoAdjMeth, BufAutoAdjParm, BufAutoAdjIsAllowShrink, ElmMinNum, ElmMaxNum, ErrInfoVstrPt ); }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return ConstLenLnkLstLocked( m_ConstLenLnkLstPt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return ConstLenLnkLstUnlock( m_ConstLenLnkLstPt, ErrInfoVstrPt ); }

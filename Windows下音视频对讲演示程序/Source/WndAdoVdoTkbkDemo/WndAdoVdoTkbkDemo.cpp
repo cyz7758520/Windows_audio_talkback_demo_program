@@ -9,10 +9,6 @@
 #include "Ajb.h"
 #include "MediaPocsThrd.h"
 #include "LibYUV.h"
-#ifdef __DEBUG__
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#endif
 
 typedef enum
 {
@@ -139,7 +135,7 @@ public:
 	//用户定义的初始化函数。
 	int UserInit()
 	{
-		int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+		int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 		Vstr * p_LclNodeAddrVstrPt = NULL; //存放本地节点地址。
 		Vstr * p_LclNodePortVstrPt = NULL; //存放本地节点端口。
 		Vstr * p_RmtNodeAddrVstrPt = NULL; //存放远程节点地址。
@@ -563,8 +559,8 @@ public:
 				if( m_RqstCnctRslt == 1 ) //如果允许连接。
 				{
 					m_TmpBytePt[0] = PKT_TYP_ALLOW_CNCT; //设置允许连接包。
-					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 					{
 						PostMessage( m_MainDlgWndHdl, WinMsg::RqstCnctDlgDstoy, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
@@ -587,8 +583,8 @@ public:
 				else if( m_RqstCnctRslt == 2 ) //如果拒绝连接。
 				{
 					m_TmpBytePt[0] = PKT_TYP_REFUSE_CNCT; //设置拒绝连接包。
-					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 					{
 						PostMessage( m_MainDlgWndHdl, WinMsg::RqstCnctDlgDstoy, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
@@ -614,8 +610,8 @@ public:
 				if( m_RqstCnctRslt == 2 ) //如果中断等待。
 				{
 					m_TmpBytePt[0] = PKT_TYP_REFUSE_CNCT; //设置拒绝连接包。
-					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 					{
 						PostMessage( m_MainDlgWndHdl, WinMsg::RqstCnctDlgDstoy, 0, 0 ); //向主对话框发送毁请求连接对话框的消息。
 
@@ -638,8 +634,8 @@ public:
 			}
 		
 			//接收一个远端发送的数据包。
-			if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.RecvPkt( m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-				( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.RecvPkt( m_AudpCnctIdx, m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+			if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.RecvApkt( m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+				( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.RecvApkt( m_AudpCnctIdx, m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 			{
 				if( p_TmpSz != -1 ) //如果用本端套接字接收一个连接的远端套接字发送的数据包成功。
 				{
@@ -705,7 +701,7 @@ public:
 			case 0: //如果使用链表。
 			{
 				//初始化接收音频输出帧链表。
-				if( m_RecvAdoOtptFrmLnkLst.Init( BufAutoAdjMethFreeNumber, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ), 0, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ), SIZE_MAX, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+				if( m_RecvAdoOtptFrmLnkLst.Init( BufAutoAdjMethFreeNumber, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, 0, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, SIZE_MAX, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
 					LOGI( Cu8vstr( "初始化接收音频输出帧链表成功。" ) );
 				}
@@ -718,7 +714,7 @@ public:
 				}
 
 				//初始化接收视频输出帧链表。
-				if( m_RecvVdoOtptFrmLnkLst.Init( BufAutoAdjMethFreeNumber, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ), 0, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLen * sizeof( int16_t ), SIZE_MAX, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+				if( m_RecvVdoOtptFrmLnkLst.Init( BufAutoAdjMethFreeNumber, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, 0, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, SIZE_MAX, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
 					LOGI( Cu8vstr( "初始化接收视频输出帧链表成功。" ) );
 				}
@@ -734,7 +730,7 @@ public:
 			case 1: //如果使用自适应抖动缓冲器。
 			{
 				//初始化音频自适应抖动缓冲器。
-				if( AAjbInit( &m_AAjbPt, m_MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLen, 1, 1, 0, m_AAjbMinNeedBufFrmCnt, m_AAjbMaxNeedBufFrmCnt, m_AAjbMaxCntuLostFrmCnt, m_AAjbAdaptSensitivity, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+				if( AAjbInit( &m_AAjbPt, m_MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit, 1, 1, 0, m_AAjbMinNeedBufFrmCnt, m_AAjbMaxNeedBufFrmCnt, m_AAjbMaxCntuLostFrmCnt, m_AAjbAdaptSensitivity, ( m_XfrMode == 0 ) ? 0 : 1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
 					LOGI( Cu8vstr( "初始化音频自适应抖动缓冲器成功。" ) );
 				}
@@ -787,13 +783,13 @@ public:
 	//用户定义的处理函数。
 	int UserPocs()
 	{
-		int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+		int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 		size_t p_TmpSz;
 		uint32_t p_TmpUint32;
 
 		//接收远端发送过来的一个数据包。
-		if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.RecvPkt( m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-			( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.RecvPkt( m_AudpCnctIdx, m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+		if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.RecvApkt( m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+			( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.RecvApkt( m_AudpCnctIdx, m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 		{
 			if( p_TmpSz != -1 ) //如果用本端套接字接收一个连接的远端套接字发送的数据包成功。
 			{
@@ -829,8 +825,9 @@ public:
 
 					//读取音频输出帧时间戳。
 					p_TmpUint32 = ( m_TmpBytePt[1] & 0xFF ) + ( ( m_TmpBytePt[2] & 0xFF ) << 8 ) + ( ( m_TmpBytePt[3] & 0xFF ) << 16 ) + ( ( m_TmpBytePt[4] & 0xFF ) << 24 );
-				
-					if( m_MediaPocsThrdPt->m_AdoOtpt.m_IsUseAdoOtpt != 0 ) //如果要使用音频输出。
+
+					if( ( m_MediaPocsThrdPt->m_AdoOtpt.m_IsInitAdoOtpt != 0 ) || //如果已初始化音频输出。
+						( ( m_XfrMode == 0 ) && ( ( m_LclTkbkMode == TkbkMode::Ado ) || ( m_LclTkbkMode == TkbkMode::AdoVdo ) ) ) ) //如果传输模式为实时半双工（一键通），且本端对讲模式为音频或音视频。
 					{
 						//将输出帧放入链表或自适应抖动缓冲器。
 						switch( m_UseWhatRecvOtptFrm ) //使用什么接收输出帧。
@@ -882,15 +879,15 @@ public:
 							}
 						}
 					}
-					else //如果不使用音频输出。
+					else //如果未初始化音频输出。
 					{
 						if( p_TmpSz > 1 + 4 ) //如果该音频输出帧为有语音活动。
 						{
-							LOGFI( Cu8vstr( "接收到一个有语音活动的音频输出帧包成功，但不使用音频输出。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
+							LOGFI( Cu8vstr( "接收到一个有语音活动的音频输出帧包成功，但未初始化音频输出。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
 						}
 						else //如果该音频输出帧为无语音活动。
 						{
-							LOGFI( Cu8vstr( "接收到一个无语音活动的音频输出帧包成功，但不使用音频输出。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
+							LOGFI( Cu8vstr( "接收到一个无语音活动的音频输出帧包成功，但未初始化音频输出。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
 						}
 					}
 				}
@@ -904,8 +901,9 @@ public:
 
 					//读取视频输出帧时间戳。
 					p_TmpUint32 = ( m_TmpBytePt[1] & 0xFF ) + ( ( m_TmpBytePt[2] & 0xFF ) << 8 ) + ( ( m_TmpBytePt[3] & 0xFF ) << 16 ) + ( ( m_TmpBytePt[4] & 0xFF ) << 24 );
-				
-					if( m_MediaPocsThrdPt->m_VdoOtpt.m_IsUseVdoOtpt ) //如果要使用视频输出。
+
+					if( ( m_MediaPocsThrdPt->m_VdoOtpt.m_IsInitVdoOtpt != 0 ) || //如果已初始化视频输出。
+						( ( m_XfrMode == 0 ) && ( ( m_LclTkbkMode == TkbkMode::Vdo ) || ( m_LclTkbkMode == TkbkMode::AdoVdo ) ) ) ) //如果传输模式为实时半双工（一键通），且本端对讲模式为视频或音视频。
 					{
 						//将视频输出帧放入链表或自适应抖动缓冲器。
 						switch( m_UseWhatRecvOtptFrm ) //使用什么接收输出帧。
@@ -934,9 +932,7 @@ public:
 							{
 								if( p_TmpSz > 1 + 4 ) //如果该视频输出帧为有图像活动。
 								{
-									uint64_t p_CurTime;
-									FuncGetTimeAsMsec( &p_CurTime );
-									VAjbPutFrm( m_VAjbPt, p_CurTime, p_TmpUint32, m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, 1, NULL );
+									VAjbPutFrm( m_VAjbPt, FuncGetTickAsMsec(), p_TmpUint32, m_TmpBytePt + 1 + 4, p_TmpSz - 1 - 4, 1, NULL );
 									LOGFI( Cu8vstr( "接收到一个有图像活动的视频输出帧包，并放入视频自适应抖动缓冲器成功。视频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
 								}
 								else //如果该视频输出帧为无图像活动。
@@ -954,15 +950,15 @@ public:
 							}
 						}
 					}
-					else //如果不使用视频输出。
+					else //如果未初始化视频输出。
 					{
 						if( p_TmpSz > 1 + 4 ) //如果该视频输出帧为有图像活动。
 						{
-							LOGFI( Cu8vstr( "接收到一个有图像活动的视频输出帧包成功，但不使用视频输出。视频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
+							LOGFI( Cu8vstr( "接收到一个有图像活动的视频输出帧包成功，但未初始化视频输出。视频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
 						}
 						else //如果该视频输出帧为无图像活动。
 						{
-							LOGFI( Cu8vstr( "接收到一个无图像活动的视频输出帧包成功，但不使用视频输出。视频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
+							LOGFI( Cu8vstr( "接收到一个无图像活动的视频输出帧包成功，但未初始化视频输出。视频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpUint32, p_TmpSz );
 						}
 					}
 				}
@@ -1012,15 +1008,15 @@ public:
 			{
 				//发送退出包。
 				m_TmpBytePt[0] = PKT_TYP_EXIT; //设置退出包。
-				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) ||
-					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) )
+				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, 1, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) ||
+					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, 1, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) )
 				{
 					VstrIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个退出包失败。原因：" ) );
 					LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, WinMsg::ShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 					goto SendExitPkt;
 				}
-			
+
 				VstrCpy( m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "发送一个退出包成功。" ) );
 				LOGI( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, WinMsg::ShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
@@ -1030,8 +1026,8 @@ public:
 				{
 					while( true ) //循环接收退出包。
 					{
-						if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.RecvPkt( m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 5000, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-							( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.RecvPkt( m_AudpCnctIdx, m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 5000, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+						if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.RecvApkt( m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 5000, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+							( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.RecvApkt( m_AudpCnctIdx, m_TmpBytePt, m_TmpByteSz, &p_TmpSz, 5000, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 						{
 							if( p_TmpSz != -1 ) //如果用本端套接字接收一个连接的远端套接字发送的数据包成功。
 							{
@@ -1346,7 +1342,7 @@ public:
 	//用户定义的消息函数。
 	int UserMsg( void * MsgArgPt )
 	{
-		int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+		int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
 		switch( ( ( UserMsgLclTkbkMode * )MsgArgPt )->m_MsgTyp )
 		{
@@ -1359,8 +1355,8 @@ public:
 					//发送对讲模式包。
 					m_TmpBytePt[0] = PKT_TYP_TKBK_MODE; //设置对讲模式包。
 					m_TmpBytePt[1] = m_LclTkbkMode; //设置对讲模式。
-					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, 2, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) ||
-						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, 2, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) )
+					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, 2, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) ||
+						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, 2, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) ) )
 					{
 						VstrIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个对讲模式包失败。原因：" ) );
 						LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -1402,39 +1398,43 @@ public:
 	}
 
 	//用户定义的读取音视频输入帧函数。
-	void UserReadAdoVdoInptFrm( int16_t * PcmAdoInptFrmPt, int16_t * PcmAdoRsltFrmPt, int32_t VoiceActSts, uint8_t * EncdAdoInptFrmPt, size_t EncdAdoInptFrmLen, int32_t EncdAdoInptFrmIsNeedTrans, uint8_t * YU12VdoInptFrmPt, int32_t YU12VdoInptFrmWidth, int32_t YU12VdoInptFrmHeight, uint8_t * EncdVdoInptFrmPt, size_t EncdVdoInptFrmLen )
+	void UserReadAdoVdoInptFrm( int16_t * PcmAdoInptSrcFrmPt, int16_t * PcmAdoInptRsltFrmPt, size_t PcmAdoInptFrmLenUnit, int32_t PcmAdoInptRsltFrmVoiceActSts,
+								uint8_t * EncdAdoInptRsltFrmPt, size_t EncdAdoInptRsltFrmLenByt, int32_t EncdAdoInptRsltFrmIsNeedTrans,
+								uint8_t * BgraVdoInptSrcFrmPt, int32_t BgraVdoInptSrcFrmWidth, int32_t BgraVdoInptSrcFrmHeight, size_t BgraVdoInptSrcFrmLenByt,
+								uint8_t * YU12VdoInptRsltFrmPt, int32_t YU12VdoInptRsltFrmWidth, int32_t YU12VdoInptRsltFrmHeight, size_t YU12VdoInptRsltFrmLenByt,
+								uint8_t * EncdVdoInptRsltFrmPt, size_t EncdVdoInptRsltFrmLenByt )
 	{
-		int p_FrmPktLen = 0; //存放输入输出帧数据包的长度，单位为字节。
+		int p_FrmPktLen = 0; //存放帧数据包的长度，单位为字节。
 
 		//发送音频输入帧。
-		if( PcmAdoInptFrmPt != NULL ) //如果要使用音频输入。
+		if( PcmAdoInptSrcFrmPt != NULL ) //如果有PCM格式音频输入原始帧。
 		{
-			if( EncdAdoInptFrmPt != NULL ) //如果要使用已编码格式音频输入帧。
+			if( EncdAdoInptRsltFrmPt == NULL ) //如果没有已编码格式音频输入结果帧。
 			{
-				if( VoiceActSts != 0 && EncdAdoInptFrmIsNeedTrans != 0 ) //如果本次音频输入帧为有语音活动，且需要传输。
+				if( PcmAdoInptRsltFrmVoiceActSts != 0 ) //如果PCM格式音频输入结果帧为有语音活动。
 				{
-					memcpy( m_TmpBytePt + 1 + 4, EncdAdoInptFrmPt, EncdAdoInptFrmLen ); //设置音频输入输出帧。
-					p_FrmPktLen = 1 + 4 + EncdAdoInptFrmLen; //数据包长度 = 数据包类型 + 音频输入帧时间戳 + 已编码格式音频输入帧。
+					memcpy( m_TmpBytePt + 1 + 4, PcmAdoInptRsltFrmPt, m_MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ); //设置音频输入帧。
+					p_FrmPktLen = 1 + 4 + m_MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt; //帧数据包长度 = 数据包类型 + 音频输入帧时间戳 + PCM格式音频输入帧。
 				}
 				else //如果本次音频输入帧为无语音活动，或不需要传输。
 				{
-					p_FrmPktLen = 1 + 4; //数据包长度 = 数据包类型 + 音频输入帧时间戳。
+					p_FrmPktLen = 1 + 4; //帧数据包长度 = 数据包类型 + 音频输入帧时间戳。
 				}
 			}
-			else //如果要使用PCM格式音频输入帧。
+			else //如果有已编码格式音频输入结果帧。
 			{
-				if( VoiceActSts != 0 ) //如果本次音频输入帧为有语音活动。
+				if( PcmAdoInptRsltFrmVoiceActSts != 0 && EncdAdoInptRsltFrmIsNeedTrans != 0 ) //如果PCM格式音频输入结果帧为有语音活动，且已编码格式音频输入结果帧需要传输。
 				{
-					memcpy( m_TmpBytePt + 1 + 4, PcmAdoRsltFrmPt, m_MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ) ); //设置音频输入输出帧。
-					p_FrmPktLen = 1 + 4 + m_MediaPocsThrdPt->m_AdoInpt.m_FrmLen * sizeof( int16_t ); //数据包长度 = 数据包类型 + 音频输入帧时间戳 + PCM格式音频输入帧。
+					memcpy( m_TmpBytePt + 1 + 4, EncdAdoInptRsltFrmPt, EncdAdoInptRsltFrmLenByt ); //设置音频输入帧。
+					p_FrmPktLen = 1 + 4 + EncdAdoInptRsltFrmLenByt; //帧数据包长度 = 数据包类型 + 音频输入帧时间戳 + 已编码格式音频输入帧。
 				}
 				else //如果本次音频输入帧为无语音活动，或不需要传输。
 				{
-					p_FrmPktLen = 1 + 4; //数据包长度 = 数据包类型 + 音频输入帧时间戳。
+					p_FrmPktLen = 1 + 4; //帧数据包长度 = 数据包类型 + 音频输入帧时间戳。
 				}
 			}
-
-			if( p_FrmPktLen != 1 + 4 ) //如果本音频输入帧为有语音活动，就发送。
+			
+			if( p_FrmPktLen != 1 + 4 ) //如果本次音频输入帧为有语音活动，就发送。
 			{
 				m_LastSendAdoInptFrmTimeStamp += 1; //音频输入帧的时间戳递增一个步进。
 
@@ -1446,8 +1446,8 @@ public:
 				m_TmpBytePt[3] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
 				m_TmpBytePt[4] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
 
-				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
 					LOGFI( Cu8vstr( "发送一个有语音活动的音频输入帧包成功。音频输入帧时间戳：%uz32d，总长度：%d。" ), m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen );
 				}
@@ -1457,75 +1457,80 @@ public:
 					LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 					{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, WinMsg::ShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 				}
-			
+
 				m_LastSendAdoInptFrmIsAct = 1; //设置最后一个发送的音频输入帧有语音活动。
 			}
-			else if( ( p_FrmPktLen == 1 + 4 ) && ( m_LastSendAdoInptFrmIsAct != 0 ) ) //如果本音频输入帧为无语音活动，但最后一个发送的音频输入帧为有语音活动，就发送。
+			else //如果本次音频输入帧为无语音活动。
 			{
-				m_LastSendAdoInptFrmTimeStamp += 1; //音频输入帧的时间戳递增一个步进。
-
-				//设置数据包类型为音频输入帧包。
-				m_TmpBytePt[0] = PKT_TYP_ADO_FRM;
-				//设置音频输入帧时间戳。
-				m_TmpBytePt[1] = ( int8_t ) ( m_LastSendAdoInptFrmTimeStamp & 0xFF );
-				m_TmpBytePt[2] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF00 ) >> 8 );
-				m_TmpBytePt[3] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
-				m_TmpBytePt[4] = ( int8_t ) ( ( m_LastSendAdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
-
-				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+				if( m_LastSendAdoInptFrmIsAct != 0 ) //如果最后一个发送的音频输入帧为有语音活动，就发送。
 				{
-					LOGFI( Cu8vstr( "发送一个无语音活动的音频输入帧包成功。音频输入帧时间戳：%uz32d，总长度：%d。" ), m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen );
-				}
-				else
-				{
-					VstrIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个无语音活动的音频输入帧包失败。原因：" ) );
-					LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-					{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, WinMsg::ShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-				}
+					m_LastSendAdoInptFrmTimeStamp += 1; //音频输入帧的时间戳递增一个步进。
 
-				m_LastSendAdoInptFrmIsAct = 0; //设置最后一个发送的音频输入帧无语音活动。
-			}
-			else //如果本音频输入帧为无语音活动，且最后一个发送的音频输入帧为无语音活动，无需发送。
-			{
-				LOGI( Cu8vstr( "本音频输入帧为无语音活动，且最后一个发送的音频输入帧为无语音活动，无需发送。" ) );
+					//设置数据包类型为音频输入帧包。
+					m_TmpBytePt[ 0 ] = PKT_TYP_ADO_FRM;
+					//设置音频输入帧时间戳。
+					m_TmpBytePt[ 1 ] = ( int8_t )( m_LastSendAdoInptFrmTimeStamp & 0xFF );
+					m_TmpBytePt[ 2 ] = ( int8_t )( ( m_LastSendAdoInptFrmTimeStamp & 0xFF00 ) >> 8 );
+					m_TmpBytePt[ 3 ] = ( int8_t )( ( m_LastSendAdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
+					m_TmpBytePt[ 4 ] = ( int8_t )( ( m_LastSendAdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
+
+					if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+						( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 10, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					{
+						LOGFI( Cu8vstr( "发送一个无语音活动的音频输入帧包成功。音频输入帧时间戳：%uz32d，总长度：%d。" ), m_LastSendAdoInptFrmTimeStamp, p_FrmPktLen );
+					}
+					else
+					{
+						VstrIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "发送一个无语音活动的音频输入帧包失败。原因：" ) );
+						LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+						{
+							Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, WinMsg::ShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 );
+						}
+					}
+
+					m_LastSendAdoInptFrmIsAct = 0; //设置最后一个发送的音频输入帧无语音活动。
+				}
+				else //如果最后一个发送的音频输入帧为无语音活动，无需发送。
+				{
+					LOGI( Cu8vstr( "本次音频输入帧为无语音活动，且最后一个发送的音频输入帧为无语音活动，无需发送。" ) );
+				}
 			}
 		}
 
 		//发送视频输入帧。
-		if( YU12VdoInptFrmPt != NULL ) //如果要使用视频输入。
+		if( YU12VdoInptRsltFrmPt != NULL ) //如果有YU12格式视频输入结果帧。
 		{
-			if( EncdVdoInptFrmPt != NULL ) //如果要使用已编码格式视频输入帧。
+			if( EncdVdoInptRsltFrmPt == NULL ) //如果没有已编码格式视频输入结果帧。
 			{
-				if( EncdVdoInptFrmLen != 0 ) //如果本次视频输入帧为有图像活动。
+				//设置视频输入帧宽度。
+				m_TmpBytePt[5] = ( int8_t ) ( YU12VdoInptRsltFrmWidth & 0xFF );
+				m_TmpBytePt[6] = ( int8_t ) ( ( YU12VdoInptRsltFrmWidth & 0xFF00 ) >> 8 );
+				m_TmpBytePt[7] = ( int8_t ) ( ( YU12VdoInptRsltFrmWidth & 0xFF0000 ) >> 16 );
+				m_TmpBytePt[8] = ( int8_t ) ( ( YU12VdoInptRsltFrmWidth & 0xFF000000 ) >> 24 );
+				//设置视频输入帧高度。
+				m_TmpBytePt[9] = ( int8_t ) ( YU12VdoInptRsltFrmHeight & 0xFF );
+				m_TmpBytePt[10] = ( int8_t ) ( ( YU12VdoInptRsltFrmHeight & 0xFF00 ) >> 8 );
+				m_TmpBytePt[11] = ( int8_t ) ( ( YU12VdoInptRsltFrmHeight & 0xFF0000 ) >> 16 );
+				m_TmpBytePt[12] = ( int8_t ) ( ( YU12VdoInptRsltFrmHeight & 0xFF000000 ) >> 24 );
+
+				memcpy( m_TmpBytePt + 1 + 4 + 4 + 4, YU12VdoInptRsltFrmPt, YU12VdoInptRsltFrmWidth * YU12VdoInptRsltFrmHeight * 3 / 2 ); //设置视频输入帧。
+				p_FrmPktLen = 1 + 4 + 4 + 4 + YU12VdoInptRsltFrmWidth * YU12VdoInptRsltFrmHeight * 3 / 2; //帧数据包长度 = 数据包类型 + 视频输入帧时间戳 + 视频输入帧宽度 + 视频输入帧高度 + YU12格式视频输入结果帧。
+			}
+			else //如果有已编码格式视频输入结果帧。
+			{
+				if( EncdVdoInptRsltFrmLenByt != 0 ) //如果本次已编码格式视频输入结果帧为有图像活动。
 				{
-					memcpy( m_TmpBytePt + 1 + 4, EncdVdoInptFrmPt, EncdVdoInptFrmLen ); //设置视频输入输出帧。
-					p_FrmPktLen = 1 + 4 + EncdVdoInptFrmLen; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 已编码格式视频输入帧。
+					memcpy( m_TmpBytePt + 1 + 4, EncdVdoInptRsltFrmPt, EncdVdoInptRsltFrmLenByt ); //设置视频输入帧。
+					p_FrmPktLen = 1 + 4 + EncdVdoInptRsltFrmLenByt; //帧数据包长度 = 数据包类型 + 视频输入帧时间戳 + 已编码格式视频输入结果帧。
 				}
 				else
 				{
-					p_FrmPktLen = 1 + 4; //数据包长度 = 数据包类型 + 视频输入帧时间戳。
+					p_FrmPktLen = 1 + 4; //帧数据包长度 = 数据包类型 + 视频输入帧时间戳。
 				}
 			}
-			else //如果要使用YU12格式视频输入帧。
-			{
-				//设置视频输入帧宽度。
-				m_TmpBytePt[5] = ( int8_t ) ( YU12VdoInptFrmWidth & 0xFF );
-				m_TmpBytePt[6] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF00 ) >> 8 );
-				m_TmpBytePt[7] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF0000 ) >> 16 );
-				m_TmpBytePt[8] = ( int8_t ) ( ( YU12VdoInptFrmWidth & 0xFF000000 ) >> 24 );
-				//设置视频输入帧高度。
-				m_TmpBytePt[9] = ( int8_t ) ( YU12VdoInptFrmHeight & 0xFF );
-				m_TmpBytePt[10] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF00 ) >> 8 );
-				m_TmpBytePt[11] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF0000 ) >> 16 );
-				m_TmpBytePt[12] = ( int8_t ) ( ( YU12VdoInptFrmHeight & 0xFF000000 ) >> 24 );
-
-				memcpy( m_TmpBytePt + 1 + 4 + 4 + 4, YU12VdoInptFrmPt, YU12VdoInptFrmWidth * YU12VdoInptFrmHeight * 3 / 2 ); //设置视频输入输出帧。
-				p_FrmPktLen = 1 + 4 + 4 + 4 + YU12VdoInptFrmWidth * YU12VdoInptFrmHeight * 3 / 2; //数据包长度 = 数据包类型 + 视频输入帧时间戳 + 视频输入帧宽度 + 视频输入帧高度 + YU12格式视频输入帧。
-			}
-
+			
 			//发送视频输入帧数据包。
-			if( p_FrmPktLen != 1 + 4 ) //如果本视频输入帧为有图像活动，就发送。
+			if( p_FrmPktLen != 1 + 4 ) //如果本次视频输入帧为有图像活动，就发送。
 			{
 				m_LastSendVdoInptFrmTimeStamp += 1; //视频输入帧的时间戳递增一个步进。
 
@@ -1537,8 +1542,8 @@ public:
 				m_TmpBytePt[3] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF0000 ) >> 16 );
 				m_TmpBytePt[4] = ( int8_t ) ( ( m_LastSendVdoInptFrmTimeStamp & 0xFF000000 ) >> 24 );
 
-				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendPkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
-					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendPkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+				if( ( ( m_UseWhatXfrPrtcl == 0 ) && ( m_TcpClntSokt.SendApkt( m_TmpBytePt, p_FrmPktLen, 0, 1, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+					( ( m_UseWhatXfrPrtcl == 1 ) && ( m_AudpSokt.SendApkt( m_AudpCnctIdx, m_TmpBytePt, p_FrmPktLen, 1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
 					LOGFI( Cu8vstr( "发送一个有图像活动的视频输入帧包成功。视频输入帧时间戳：%uz32d，总长度：%d，类型：%d。" ), m_LastSendVdoInptFrmTimeStamp, p_FrmPktLen, m_TmpBytePt[13] & 0xff );
 				}
@@ -1549,15 +1554,17 @@ public:
 					{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, WinMsg::ShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 				}
 			}
-			else //如果本视频输入帧为无图像活动，无需发送。
+			else //如果本次视频输入帧为无图像活动，无需发送。
 			{
-				LOGI( Cu8vstr( "本视频输入帧为无图像活动，无需发送。" ) );
+				LOGI( Cu8vstr( "本次视频输入帧为无图像活动，无需发送。" ) );
 			}
 		}
 	}
 
 	//用户定义的写入音频输出帧函数。
-	void UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx, int16_t * PcmAdoOtptFrmPt, uint8_t * EncdAdoOtptFrmPt, size_t * AdoOtptFrmLenPt )
+	void UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
+							  int16_t * PcmAdoOtptSrcFrmPt, size_t PcmAdoOtptFrmLenUnit,
+							  uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmSzByt, size_t * EncdAdoOtptSrcFrmLenByt )
 	{
 		size_t m_TmpSz = 0;
 
@@ -1576,7 +1583,7 @@ public:
 						m_RecvAdoOtptFrmLnkLst.DelHead( 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ); //删除接收音频输出帧链表的第一个音频输出帧。
 						m_RecvAdoOtptFrmLnkLst.Unlock( NULL ); //接收音频输出帧链表的互斥锁解锁。
 					}
-				
+
 					if( m_TmpSz != 0 ) //如果接收音频输出帧链表的第一个输出帧为有语音活动。
 					{
 						LOGFI( Cu8vstr( "从接收音频输出帧链表取出一个有语音活动的音频输出帧，帧的长度：%uzd。" ), m_TmpSz );
@@ -1625,54 +1632,54 @@ public:
 			//写入音频输出帧。
 			if( ( m_TmpSz > 0 ) && ( m_TmpSz != SIZE_MAX ) ) //如果音频输出帧为有语音活动。
 			{
-				if( PcmAdoOtptFrmPt != NULL ) //如果要使用PCM格式音频输出帧。
+				if( PcmAdoOtptSrcFrmPt != NULL ) //如果有PCM格式音频输出原始帧。
 				{
-					if( m_TmpSz != *AdoOtptFrmLenPt * sizeof( int16_t ) )
+					if( m_TmpSz != PcmAdoOtptFrmLenUnit * sizeof( int16_t ) )
 					{
-						memset( PcmAdoOtptFrmPt, 0, *AdoOtptFrmLenPt * sizeof( int16_t ) );
-						LOGFE( Cu8vstr( "音频输出帧的长度不等于PCM格式的长度。音频输出帧：%uzd，PCM格式：%z32d。" ), m_TmpSz, *AdoOtptFrmLenPt * sizeof( int16_t ) );
+						memset( PcmAdoOtptSrcFrmPt, 0, PcmAdoOtptFrmLenUnit * sizeof( int16_t ) );
+						LOGFE( Cu8vstr( "音频输出帧的长度不等于PCM格式的长度。音频输出帧：%uzd，PCM格式：%z32d。" ), m_TmpSz, PcmAdoOtptFrmLenUnit * sizeof( int16_t ) );
 					}
 					else
 					{
 						//写入PCM格式音频输出帧。
-						memcpy( PcmAdoOtptFrmPt, m_TmpByte2Pt, *AdoOtptFrmLenPt * sizeof( int16_t ) );
+						memcpy( PcmAdoOtptSrcFrmPt, m_TmpByte2Pt, PcmAdoOtptFrmLenUnit * sizeof( int16_t ) );
 					}
 				}
-				else //如果要使用已编码格式音频输出帧。
+				else //如果没有PCM格式音频输出原始帧。
 				{
-					if( m_TmpSz > *AdoOtptFrmLenPt )
+					if( m_TmpSz > EncdAdoOtptSrcFrmSzByt )
 					{
-						LOGFE( Cu8vstr( "音频输出帧的长度已超过已编码格式的长度。音频输出帧：%uzd，已编码格式：%uzd。" ), m_TmpSz, *AdoOtptFrmLenPt );
-						*AdoOtptFrmLenPt = 0;
+						LOGFE( Cu8vstr( "音频输出帧的长度已超过已编码格式的长度。音频输出帧：%uzd，已编码格式：%uzd。" ), m_TmpSz, EncdAdoOtptSrcFrmSzByt );
+						*EncdAdoOtptSrcFrmLenByt = 0;
 					}
 					else
 					{
 						//写入已编码格式音频输出帧。
-						*AdoOtptFrmLenPt = m_TmpSz;
-						memcpy( EncdAdoOtptFrmPt, m_TmpByte2Pt, *AdoOtptFrmLenPt );
+						*EncdAdoOtptSrcFrmLenByt = m_TmpSz;
+						memcpy( EncdAdoOtptSrcFrmPt, m_TmpByte2Pt, m_TmpSz );
 					}
 				}
 			}
 			else if( m_TmpSz == 0 ) //如果音频输出帧为无语音活动。
 			{
-				if( PcmAdoOtptFrmPt != NULL ) //如果要使用PCM格式音频输出帧。
+				if( PcmAdoOtptSrcFrmPt != NULL ) //如果要使用PCM格式音频输出帧。
 				{
-					memset( PcmAdoOtptFrmPt, 0, *AdoOtptFrmLenPt * sizeof( int16_t ) );
+					memset( PcmAdoOtptSrcFrmPt, 0, PcmAdoOtptFrmLenUnit * sizeof( int16_t ) );
 				}
 				else //如果要使用已编码格式音频输出帧。
 				{
-					*AdoOtptFrmLenPt = 0;
+					*EncdAdoOtptSrcFrmLenByt = 0;
 				}
 			}
 			else //如果音频输出帧为丢失。
 			{
-				if( PcmAdoOtptFrmPt != NULL ) //如果要使用PCM格式音频输出帧。
+				if( PcmAdoOtptSrcFrmPt != NULL ) //如果要使用PCM格式音频输出帧。
 				{
-					memset( PcmAdoOtptFrmPt, 0, *AdoOtptFrmLenPt * sizeof( int16_t ) );
+					memset( PcmAdoOtptSrcFrmPt, 0, PcmAdoOtptFrmLenUnit * sizeof( int16_t ) );
 				}
 				else //如果要使用已编码格式音频输出帧。
 				{
-					*AdoOtptFrmLenPt = m_TmpSz;
+					*EncdAdoOtptSrcFrmLenByt = m_TmpSz;
 				}
 			}
 		}
@@ -1680,14 +1687,18 @@ public:
 		return;
 	}
 
-	//用户定义的获取PCM格式音频输出帧函数。
-	void UserGetPcmAdoOtptFrm( int32_t AdoOtptStrmIdx, int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLen )
+	//用户定义的获取音频输出帧函数。
+	void UserGetAdoOtptFrm( int32_t AdoOtptStrmIdx,
+							int16_t * PcmAdoOtptFrmPt, size_t PcmAdoOtptFrmLenUnit,
+							uint8_t * EncdAdoOtptSrcFrmPt, size_t EncdAdoOtptSrcFrmLenByt )
 	{
 		
 	}
 
 	//用户定义的写入视频输出帧函数。
-	void UserWriteVdoOtptFrm( int32_t VdoOtptStrmIdx, uint8_t * YU12VdoOtptFrmPt, int32_t * YU12VdoOtptFrmWidthPt, int32_t * YU12VdoOtptFrmHeightPt, uint8_t * EncdVdoOtptFrmPt, size_t * EncdVdoOtptFrmLenPt )
+	void UserWriteVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+							  uint8_t * YU12VdoOtptFrmPt, int32_t * YU12VdoOtptFrmWidthPt, int32_t * YU12VdoOtptFrmHeightPt,
+							  uint8_t * EncdVdoOtptFrmPt, size_t EncdVdoOtptFrmSzByt, size_t * EncdVdoOtptFrmLenBytPt )
 	{
 		size_t m_TmpSz = 0;
 
@@ -1731,7 +1742,7 @@ public:
 					uint32_t p_VdoOtptFrmTimeStamp;
 
 					//从视频自适应抖动缓冲器取出视频输出帧。
-					VAjbGetFrm( m_VAjbPt, FuncGetTimeAsMsec( NULL ), &p_VdoOtptFrmTimeStamp, m_TmpByte3Pt, m_TmpByte3Sz, &m_TmpSz, 1, NULL );
+					VAjbGetFrm( m_VAjbPt, FuncGetTickAsMsec(), &p_VdoOtptFrmTimeStamp, m_TmpByte3Pt, m_TmpByte3Sz, &m_TmpSz, 1, NULL );
 
 					if( m_TmpSz != 0 ) //如果视频输出帧为有图像活动。
 					{
@@ -1752,11 +1763,11 @@ public:
 			if( YU12VdoOtptFrmPt != NULL ) //如果要使用YU12格式视频输出帧。
 			{
 				*YU12VdoOtptFrmWidthPt = ( m_TmpByte3Pt[0] & 0xFF ) + ( ( m_TmpByte3Pt[1] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[2] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[3] & 0xFF ) << 24 );
-				*YU12VdoOtptFrmHeightPt = ( m_TmpByte3Pt[4] & 0xFF ) + ( ( m_TmpByte3Pt[5] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[6] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[17] & 0xFF ) << 24 );
+				*YU12VdoOtptFrmHeightPt = ( m_TmpByte3Pt[4] & 0xFF ) + ( ( m_TmpByte3Pt[5] & 0xFF ) << 8 ) + ( ( m_TmpByte3Pt[6] & 0xFF ) << 16 ) + ( ( m_TmpByte3Pt[7] & 0xFF ) << 24 );
 
 				if( m_TmpSz - 4 - 4 != *YU12VdoOtptFrmWidthPt * *YU12VdoOtptFrmHeightPt * 3 / 2 )
 				{
-					LOGFE( Cu8vstr( "视频输出帧的长度不等于YU12格式的长度。视频输出帧：%uzd，YU12格式：%z32d。" ), m_TmpSz - 4 - 4, *EncdVdoOtptFrmLenPt );
+					LOGFE( Cu8vstr( "视频输出帧的长度不等于YU12格式的长度。视频输出帧：%uzd，YU12格式：%z32d。" ), m_TmpSz - 4 - 4, *YU12VdoOtptFrmWidthPt * *YU12VdoOtptFrmHeightPt * 3 / 2 );
 					*YU12VdoOtptFrmWidthPt = 0;
 					*YU12VdoOtptFrmHeightPt = 0;
 					return;
@@ -1767,33 +1778,35 @@ public:
 			}
 			else //如果要使用已编码格式视频输出帧。
 			{
-				if( m_TmpSz > *EncdVdoOtptFrmLenPt )
+				if( m_TmpSz > EncdVdoOtptFrmSzByt )
 				{
-					*EncdVdoOtptFrmLenPt = 0;
-					LOGFE( Cu8vstr( "视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz, *EncdVdoOtptFrmLenPt );
+					*EncdVdoOtptFrmLenBytPt = 0;
+					LOGFE( Cu8vstr( "视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz, EncdVdoOtptFrmSzByt );
 					return;
 				}
 
 				//写入已编码格式视频输出帧。
 				memcpy( EncdVdoOtptFrmPt, m_TmpByte3Pt, m_TmpSz );
-				*EncdVdoOtptFrmLenPt = m_TmpSz;
+				*EncdVdoOtptFrmLenBytPt = m_TmpSz;
 			}
 		}
 		else if( m_TmpSz == 0 ) //如果视频输出帧为无图像活动。
 		{
 			if( YU12VdoOtptFrmPt != NULL ) //如果要使用YU12格式视频输出帧。
 			{
-				*EncdVdoOtptFrmLenPt = 0;
+				
 			}
 			else //如果要使用已编码格式视频输出帧。
 			{
-				*EncdVdoOtptFrmLenPt = 0;
+				*EncdVdoOtptFrmLenBytPt = 0;
 			}
 		}
 	}
 
-	//用户定义的获取YU12格式视频输出帧函数。
-	void UserGetYU12VdoOtptFrm( int32_t VdoOtptStrmIdx, uint8_t * YU12VdoOtptFrmPt, int32_t YU12VdoOtptFrmWidth, int32_t YU12VdoOtptFrmHeight )
+	//用户定义的获取视频输出帧函数。
+	void UserGetVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+							uint8_t * YU12VdoOtptFrmPt, int32_t YU12VdoOtptFrmWidth, int32_t YU12VdoOtptFrmHeight,
+							uint8_t * EncdVdoOtptFrmPt, size_t EncdVdoOtptFrmLenBytPt )
 	{
 		
 	}
@@ -1830,7 +1843,7 @@ int g_VdoOtptDspyTxtWndIsMax = 0; //存放视频输出显示文本框窗口是�
 //窗口消息处理过程函数。
 INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	int p_Rslt = -1; //存放本函数执行结果的值，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	
 	UNREFERENCED_PARAMETER( lParam );
 	switch( message )
@@ -2218,7 +2231,22 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 							( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 							NULL,
-							& g_ErrInfoVstr );
+							&g_ErrInfoVstr );
+
+						//设置是否使用阻止系统休眠。
+						g_MyMediaPocsThrdPt->SetIsUsePrvntSysSleep(
+							( IsDlgButtonChecked( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+							&g_ErrInfoVstr );
+
+						//设置是否保存音视频输入输出到文件。
+						g_MyMediaPocsThrdPt->SetIsSaveAdoVdoInptOtptToFile(
+							Cu8vstr( "AdoVdoInptOtpt.avi" ),
+							8 * 1024,
+							( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+							( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+							( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+							( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+							&g_ErrInfoVstr );
 
 						//设置音频输入。
 						g_MyMediaPocsThrdPt->SetAdoInpt(
@@ -2485,17 +2513,18 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							g_MyMediaPocsThrdPt->SetAdoInptUseOpusEncd( &g_ErrInfoVstr );
 						}
 						
-						//设置音频输入是否保存音频到文件。
-						g_MyMediaPocsThrdPt->SetAdoInptIsSaveAdoToFile( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																   Cu8vstr( ".\\AdoInpt.wav" ),
-																   Cu8vstr( ".\\AdoRslt.wav" ),
-																   &g_ErrInfoVstr );
-						
 						//设置音频输入是否绘制音频波形到窗口。
 						g_MyMediaPocsThrdPt->SetAdoInptIsDrawAdoWavfmToWnd( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																	   GetDlgItem( g_MainDlgWndHdl, AdoInptWavfmTxtId ),
-																	   GetDlgItem( g_MainDlgWndHdl, AdoRsltWavfmTxtId ),
+																	   GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ),
+																	   GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ),
 																	   &g_ErrInfoVstr );
+						
+						//设置音频输入是否保存音频到文件。
+						g_MyMediaPocsThrdPt->SetAdoInptIsSaveAdoToFile( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+																		Cu8vstr( ".\\AdoInptSrc.wav" ),
+																		Cu8vstr( ".\\AdoInptRslt.wav" ),
+																		8 * 1024,
+																		&g_ErrInfoVstr );
 						
 						//设置音频输入使用的设备。
 						g_MyMediaPocsThrdPt->SetAdoInptUseDvc( SendMessage( GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ),
@@ -2541,16 +2570,17 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						
 						//设置音频输出流是否使用。
 						g_MyMediaPocsThrdPt->SetAdoOtptStrmIsUse( 0, 1, &g_ErrInfoVstr );
-
-						//设置音频输出是否保存音频到文件。
-						g_MyMediaPocsThrdPt->SetAdoOtptIsSaveAdoToFile( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																		Cu8vstr( ".\\AdoOtpt.wav" ),
-																		& g_ErrInfoVstr );
 						
 						//设置音频输出是否绘制音频波形到窗口。
 						g_MyMediaPocsThrdPt->SetAdoOtptIsDrawAdoWavfmToWnd( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																			GetDlgItem( g_MainDlgWndHdl, AdoOtptWavfmTxtId ),
+																			GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ),
 																			&g_ErrInfoVstr );
+						
+						//设置音频输出是否保存音频到文件。
+						g_MyMediaPocsThrdPt->SetAdoOtptIsSaveAdoToFile( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoToFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+																		Cu8vstr( ".\\AdoOtptSrc.wav" ),
+																		8 * 1024,
+																		&g_ErrInfoVstr );
 						
 						//设置音频输出使用的设备。
 						g_MyMediaPocsThrdPt->SetAdoOtptUseDvc( SendMessage( GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ),
@@ -2625,10 +2655,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						g_MyMediaPocsThrdPt->SetVdoOtptStrm(
 							0,
 							GetDlgItem( g_MainDlgWndHdl, VdoOtptDspyTxtId ),
-							( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoDspyScale1_0RdBtnId ) == BST_CHECKED ) ? 1.0f :
-							  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoDspyScale1_5RdBtnId ) == BST_CHECKED ) ? 1.5f :
-							    ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoDspyScale2_0RdBtnId ) == BST_CHECKED ) ? 2.0f :
-								  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoDspyScale3_0RdBtnId ) == BST_CHECKED ) ? 3.0f : 0,
 							&g_ErrInfoVstr );
 						
 						//设置视频输出是否使用YU12原始数据。
@@ -2734,7 +2760,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					CheckDlgButton( g_StngDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate12RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSize120_160RdBtnId, UseVdoFrmSize960_1280RdBtnId, UseVdoFrmSize120_160RdBtnId );
-					CheckRadioButton( g_StngDlgWndHdl, UseVdoDspyScale1_0RdBtnId, UseVdoDspyScale3_0RdBtnId, UseVdoDspyScale1_0RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseYU12RdBtnId, UseOpenH264CodecRdBtnId, UseOpenH264CodecRdBtnId );
 
 					SetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenEdTxtId ), L"500" );
@@ -2817,7 +2842,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					CheckDlgButton( g_StngDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate15RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSize120_160RdBtnId, UseVdoFrmSize960_1280RdBtnId, UseVdoFrmSize240_320RdBtnId );
-					CheckRadioButton( g_StngDlgWndHdl, UseVdoDspyScale1_0RdBtnId, UseVdoDspyScale3_0RdBtnId, UseVdoDspyScale1_0RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseYU12RdBtnId, UseOpenH264CodecRdBtnId, UseOpenH264CodecRdBtnId );
 
 					SetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenEdTxtId ), L"500" );
@@ -2900,7 +2924,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					CheckDlgButton( g_StngDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate15RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSize120_160RdBtnId, UseVdoFrmSize960_1280RdBtnId, UseVdoFrmSize480_640RdBtnId );
-					CheckRadioButton( g_StngDlgWndHdl, UseVdoDspyScale1_0RdBtnId, UseVdoDspyScale3_0RdBtnId, UseVdoDspyScale1_0RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseYU12RdBtnId, UseOpenH264CodecRdBtnId, UseOpenH264CodecRdBtnId );
 
 					SetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenEdTxtId ), L"500" );
@@ -2983,7 +3006,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					CheckDlgButton( g_StngDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate24RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSize120_160RdBtnId, UseVdoFrmSize960_1280RdBtnId, UseVdoFrmSize480_640RdBtnId );
-					CheckRadioButton( g_StngDlgWndHdl, UseVdoDspyScale1_0RdBtnId, UseVdoDspyScale3_0RdBtnId, UseVdoDspyScale1_0RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseYU12RdBtnId, UseOpenH264CodecRdBtnId, UseOpenH264CodecRdBtnId );
 
 					SetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenEdTxtId ), L"500" );
@@ -3066,7 +3088,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					CheckDlgButton( g_StngDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate30RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSize120_160RdBtnId, UseVdoFrmSize960_1280RdBtnId, UseVdoFrmSize960_1280RdBtnId );
-					CheckRadioButton( g_StngDlgWndHdl, UseVdoDspyScale1_0RdBtnId, UseVdoDspyScale3_0RdBtnId, UseVdoDspyScale1_0RdBtnId );
 					CheckRadioButton( g_StngDlgWndHdl, UseYU12RdBtnId, UseOpenH264CodecRdBtnId, UseOpenH264CodecRdBtnId );
 
 					SetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenEdTxtId ), L"500" );
@@ -3283,9 +3304,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, CnctSrvrBtnId ), SW_HIDE ); //设置连接服务端按钮为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, StngBtnId ), SW_HIDE ); //设置设置按钮为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ReadMeBtnId ), SW_HIDE ); //设置必读说明按钮为隐藏。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptWavfmTxtId ), SW_HIDE ); //设置音频输入波形文本框为隐藏。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptWavfmTxtId ), SW_HIDE ); //设置音频输出波形文本框为隐藏。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoRsltWavfmTxtId ), SW_HIDE ); //设置音频结果波形文本框为隐藏。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ), SW_HIDE ); //设置音频输入原始波形文本框为隐藏。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ), SW_HIDE ); //设置音频输出原始波形文本框为隐藏。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ), SW_HIDE ); //设置音频输入结果波形文本框为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ClearLogBtnId ), SW_HIDE ); //设置清空日志按钮为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, LogLtBoxId ), SW_HIDE ); //设置日志列表框为隐藏。
 						ShowWindow( g_VdoOtptDspyTxtWndHdl, SW_HIDE ); //设置视频输出显示文本框为隐藏。
@@ -3315,9 +3336,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, CnctSrvrBtnId ), SW_SHOW ); //设置连接服务端按钮为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, StngBtnId ), SW_SHOW ); //设置设置按钮为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ReadMeBtnId ), SW_SHOW ); //设置必读说明按钮为显示。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptWavfmTxtId ), SW_SHOW ); //设置音频输入波形文本框为显示。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptWavfmTxtId ), SW_SHOW ); //设置音频输出波形文本框为显示。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoRsltWavfmTxtId ), SW_SHOW ); //设置音频结果波形文本框为显示。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ), SW_SHOW ); //设置音频输入原始波形文本框为显示。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ), SW_SHOW ); //设置音频输出原始波形文本框为显示。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ), SW_SHOW ); //设置音频输入结果波形文本框为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ClearLogBtnId ), SW_SHOW ); //设置清空日志按钮为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, LogLtBoxId ), SW_SHOW ); //设置日志列表框为显示。
 						ShowWindow( g_VdoOtptDspyTxtWndHdl, SW_SHOW ); //设置视频输出显示文本框为显示。
@@ -3353,9 +3374,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, CnctSrvrBtnId ), SW_HIDE ); //设置连接服务端按钮为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, StngBtnId ), SW_HIDE ); //设置设置按钮为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ReadMeBtnId ), SW_HIDE ); //设置必读说明按钮为隐藏。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptWavfmTxtId ), SW_HIDE ); //设置音频输入波形文本框为隐藏。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptWavfmTxtId ), SW_HIDE ); //设置音频输出波形文本框为隐藏。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoRsltWavfmTxtId ), SW_HIDE ); //设置音频结果波形文本框为隐藏。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ), SW_HIDE ); //设置音频输入原始波形文本框为隐藏。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ), SW_HIDE ); //设置音频输出原始波形文本框为隐藏。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ), SW_HIDE ); //设置音频输入结果波形文本框为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ClearLogBtnId ), SW_HIDE ); //设置清空日志按钮为隐藏。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, LogLtBoxId ), SW_HIDE ); //设置日志列表框为隐藏。
 						ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_HIDE ); //设置视频输入预览文本框为隐藏。
@@ -3385,9 +3406,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, CnctSrvrBtnId ), SW_SHOW ); //设置连接服务端按钮为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, StngBtnId ), SW_SHOW ); //设置设置按钮为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ReadMeBtnId ), SW_SHOW ); //设置必读说明按钮为显示。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptWavfmTxtId ), SW_SHOW ); //设置音频输入波形文本框为显示。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptWavfmTxtId ), SW_SHOW ); //设置音频输出波形文本框为显示。
-						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoRsltWavfmTxtId ), SW_SHOW ); //设置音频结果波形文本框为显示。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ), SW_SHOW ); //设置音频输入原始波形文本框为显示。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ), SW_SHOW ); //设置音频输出原始波形文本框为显示。
+						ShowWindow( GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ), SW_SHOW ); //设置音频输入结果波形文本框为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, ClearLogBtnId ), SW_SHOW ); //设置清空日志按钮为显示。
 						ShowWindow( GetDlgItem( g_MainDlgWndHdl, LogLtBoxId ), SW_SHOW ); //设置日志列表框为显示。
 						ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_SHOW ); //设置视频输入预览文本框为显示。
@@ -3610,10 +3631,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 				//显示日志。
 				{
-					SYSTEMTIME p_SystemTime;
-
-					GetLocalTime( &p_SystemTime );
-					VstrFmtIns( p_LogVstrPt, 0, Cu8vstr( "%02.2d:%02.2d:%02.2d %03.3d：" ), p_SystemTime.wHour, p_SystemTime.wMinute, p_SystemTime.wSecond, p_SystemTime.wMilliseconds );
+					int p_Hour, p_Min, p_Sec, p_Msec;
+					FuncGetTimeAsLclDateTime( NULL, NULL, NULL, &p_Hour, &p_Min, &p_Sec, &p_Msec );
+					VstrFmtIns( p_LogVstrPt, 0, Cu8vstr( "%02.2d:%02.2d:%02.2d %03.3d：" ), p_Hour, p_Min, p_Sec, p_Msec );
 					p_LogU16strTmpPt = ( uint16_t * )alloca( ( p_LogVstrPt->m_StrLen + 1 ) * 2 );
 					StrU16TmpCpy( p_LogU16strTmpPt, p_LogVstrPt->m_StrPt, p_LogVstrPt->m_StrChrSet );
 					SendMessage( GetDlgItem( hDlg, LogLtBoxId ), LB_ADDSTRING, 0, ( WPARAM )p_LogU16strTmpPt );
@@ -3653,7 +3673,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	// TODO: 在此处放置代码。
 	#ifdef __DEBUG__
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	//_CrtSetBreakAlloc( 177 );
+	//_CrtSetBreakAlloc( 711 );
 	#endif
 
 	g_IstnsHdl = hInstance; //设置当前实例的句柄。
@@ -3788,6 +3808,8 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		CheckRadioButton( g_StngDlgWndHdl, UseLnkLstRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId );
 		CheckDlgButton( g_StngDlgWndHdl, IsSaveStngToFileCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId, BST_CHECKED );
+		CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_CHECKED );
+		CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToFileCkBoxId, BST_CHECKED );
 
 		SendMessage( g_MainDlgWndHdl, WM_COMMAND, UseEffectSuperRdBtnId, 0 ); //默认效果等级：超。
 		SendMessage( g_MainDlgWndHdl, WM_COMMAND, UseBitrateSuperRdBtnId, 0 ); //默认比特率等级：超。
@@ -3848,7 +3870,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	g_ErrInfoVstr.Dstoy(); //销毁错误信息动态字符串。
 	
 	#ifdef __DEBUG__
-	_CrtDumpMemoryLeaks();
+	_ASSERTE( _CrtCheckMemory() ); //检查堆和栈是否被破坏。
 	#endif
 	return (int) p_Msg.wParam;
 }

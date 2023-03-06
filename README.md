@@ -13,6 +13,7 @@
 &emsp;&emsp;* 支持视频软编解码，支持指定比特率，最低到10KB/s仍然可以进行视频对讲。  
 &emsp;&emsp;* 支持音视频自适应抖动缓冲，当网络存在丢包、乱序、延时等抖动情况时，通过自适应调节缓冲深度来应对这些抖动。  
 &emsp;&emsp;* 支持自定义调节各种功能的参数来适应不同的设备，绝大部分情况下都不需要修改。  
+&emsp;&emsp;* 支持保存音视频输入输出到文件。  
 &emsp;&emsp;* 支持与Android下音视频对讲演示程序进行音视频对讲。  
 
 &emsp;&emsp;声学回音消除器效果对比：
@@ -61,6 +62,7 @@
 &emsp;&emsp;如果要使用8000Hz采样频率时，最好不要使用RNNoise噪音抑制器，因为它可能对8000Hz的声音抑制非常强烈。  
 &emsp;&emsp;本软件不支持音乐，尤其是RNNoise噪音抑制器可能对音乐的抑制非常强烈。  
 &emsp;&emsp;某些Windows设备的软硬件环境可能存在问题，从而可能会导致声学回音消除失败，这种情况必须要先解决这些问题。  
+&emsp;&emsp;保存音视频输入输出的AdoVdoInptOtpt.avi文件不能直接播放，需要使用FFmpeg命令转码后才能播放，建议用VLC播放器，转码命令为：ffmpeg -i AdoVdoInptOtpt.avi -filter_complex "[0:a:1][0:a:2]amix=inputs=2:duration=max[aout]" -map [aout] -map 0:v -acodec pcm_s16le -vcodec copy AdoVdoInptOtpt_Mix.avi -y。
 
 # 其他
 &emsp;&emsp;本软件采用了Speex的1.2.1版本、SpeexDsp的1.2.1版本、WebRtc的2019年7月份版本、OpenH264的2.3.1版本为基础，并进行了大量优化。  

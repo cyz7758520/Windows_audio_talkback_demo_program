@@ -41,8 +41,8 @@ typedef enum FileOrgnPos
 }FileOrgnPos;
 
 //新建、读取、写入文件。
-__FUNC_DLLAPI__ int FileInitByPath( File * * FilePtPt, const Vstr * FullPathVstrPt, FilePrmsn PrmsnMode, FileCreate CreateMode, size_t WrBufSz, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int FileInitByFd( File * * FilePtPt, int32_t Fd, size_t WrBufSz, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FileInitByPath( File * * FilePtPt, const Vstr * FullPathVstrPt, FilePrmsn PrmsnMode, FileCreate CreateMode, size_t WrBufSzByt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FileInitByFd( File * * FilePtPt, int32_t Fd, size_t WrBufSzByt, Vstr * ErrInfoVstrPt );
 
 __FUNC_DLLAPI__ int FileLocked( File * FilePt, Vstr * ErrInfoVstrPt );
 __FUNC_DLLAPI__ int FileUnlock( File * FilePt, Vstr * ErrInfoVstrPt );
@@ -52,13 +52,13 @@ __FUNC_DLLAPI__ int FileGetFd( File * FilePt, int32_t * FdPt, Vstr * ErrInfoVstr
 __FUNC_DLLAPI__ int FileSetPos( File * FilePt, FileOrgnPos OrgnPos, uint64_t Offset, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __FUNC_DLLAPI__ int FileGetPos( File * FilePt, uint64_t * StartOffsetPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__FUNC_DLLAPI__ int FileRead( File * FilePt, void * DataBufPt, size_t MaxReadLen, size_t * DataLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int FileWrite( File * FilePt, const void * DataBufPt, size_t DataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FileRead( File * FilePt, void * DataBufPt, size_t MaxReadLen, size_t * DataLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FileWrite( File * FilePt, const void * DataBufPt, size_t DataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __FUNC_DLLAPI__ int FileFmtWrite( File * FilePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt, const Vstr * FmtVstrPt, ... );
 __FUNC_DLLAPI__ int FileFlush( File * FilePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__FUNC_DLLAPI__ int FileSetSz( File * FilePt, uint64_t Sz, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int FileGetSz( File * FilePt, uint64_t * SzPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FileSetSz( File * FilePt, uint64_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FileGetSz( File * FilePt, uint64_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __FUNC_DLLAPI__ int FileDstoy( File * FilePt, int32_t IsDstoyFd, Vstr * ErrInfoVstrPt );
 #endif
@@ -68,10 +68,10 @@ __FUNC_DLLAPI__ int DelFile( const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt )
 
 //获取文件大小。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-__FUNC_DLLAPI__ int FuncGetFileSzByPath( const Vstr * FullPathVstrPt, uint64_t * FileSzPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FuncGetFileSzByPath( const Vstr * FullPathVstrPt, uint64_t * FileSzBytPt, Vstr * ErrInfoVstrPt );
 #endif
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__FUNC_DLLAPI__ int FuncGetFileSzByHdl( HANDLE FileHdl, uint64_t * FileSzPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int FuncGetFileSzByHdl( HANDLE FileHdl, uint64_t * FileSzBytPt, Vstr * ErrInfoVstrPt );
 #endif
 
 //路径字符串查找文件名。

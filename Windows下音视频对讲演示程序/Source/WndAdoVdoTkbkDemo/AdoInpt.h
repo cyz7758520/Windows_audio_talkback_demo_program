@@ -12,14 +12,17 @@ typedef struct AdoInpt //音频输入。
 	int32_t m_IsUseAdoInpt; //存放是否使用音频输入，为0表示不使用，为非0表示要使用。
 	int32_t m_IsInitAdoInpt; //存放是否初始化音频输入，为0表示未初始化，为非0表示已初始化。
 
-	int32_t m_SmplRate; //存放采样频率，单位赫兹，取值只能为8000、16000、32000、48000。
-	int32_t m_FrmLen; //存放帧的长度，单位采样数据，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
+	int32_t m_SmplRate; //存放采样频率，单位为赫兹，取值只能为8000、16000、32000、48000。
+	int32_t m_FrmLenMsec; //存放帧的长度，单位为毫秒，取值只能为10毫秒的倍数。
+	int32_t m_FrmLenUnit; //存放帧的长度，单位为采样单元，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
+	int32_t m_FrmLenData; //存放帧的长度，单位为采样数据，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
+	int32_t m_FrmLenByt; //存放帧的长度，单位为字节，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80*2、20毫秒为160*2、30毫秒为240*2，16000Hz的10毫秒为160*2、20毫秒为320*2、30毫秒为480*2，32000Hz的10毫秒为320*2、20毫秒为640*2、30毫秒为960*2，48000Hz的10毫秒为480*2、20毫秒为960*2、30毫秒为1440*2。
 
 	int32_t m_UseWhatAec; //存放使用什么声学回音消除器，为0表示不使用，为1表示Speex声学回音消除器，为2表示WebRtc定点版声学回音消除器，为2表示WebRtc浮点版声学回音消除器，为4表示SpeexWebRtc三重声学回音消除器。
 	int32_t m_IsCanUseAec; //存放是否可以使用声学回音消除器，为0表示不可以，为非0表示可以。
 
 	SpeexAec * m_SpeexAecPt; //存放Speex声学回音消除器的指针。
-	int32_t m_SpeexAecFilterLen; //存放Speex声学回音消除器滤波器的长度，单位毫秒。
+	int32_t m_SpeexAecFilterLen; //存放Speex声学回音消除器滤波器的长度，单位为毫秒。
 	int32_t m_SpeexAecIsUseRec; //存放Speex声学回音消除器是否使用残余回音消除，为非0表示要使用，为0表示不使用。
 	float m_SpeexAecEchoMutp; //存放Speex声学回音消除器在残余回音消除时，残余回音的倍数，倍数越大消除越强，取值区间为[0.0,100.0]。
 	float m_SpeexAecEchoCntu; //存放Speex声学回音消除器在残余回音消除时，残余回音的持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
@@ -31,11 +34,11 @@ typedef struct AdoInpt //音频输入。
 	WebRtcAecm * m_WebRtcAecmPt; //存放WebRtc定点版声学回音消除器的指针。
 	int32_t m_WebRtcAecmIsUseCNGMode; //存放WebRtc定点版声学回音消除器是否使用舒适噪音生成模式，为非0表示要使用，为0表示不使用。
 	int32_t m_WebRtcAecmEchoMode; //存放WebRtc定点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,4]。
-	int32_t m_WebRtcAecmDelay; //存放WebRtc定点版声学回音消除器的回音延迟，单位毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+	int32_t m_WebRtcAecmDelay; //存放WebRtc定点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 
 	WebRtcAec * m_WebRtcAecPt; //存放WebRtc浮点版声学回音消除器的指针。
 	int32_t m_WebRtcAecEchoMode; //存放WebRtc浮点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,2]。
-	int32_t m_WebRtcAecDelay; //存放WebRtc浮点版声学回音消除器的回音延迟，单位毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+	int32_t m_WebRtcAecDelay; //存放WebRtc浮点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 	int32_t m_WebRtcAecIsUseDelayAgstcMode; //存放WebRtc浮点版声学回音消除器是否使用回音延迟不可知模式，为非0表示要使用，为0表示不使用。
 	int32_t m_WebRtcAecIsUseExtdFilterMode; //存放WebRtc浮点版声学回音消除器是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 	int32_t m_WebRtcAecIsUseRefinedFilterAdaptAecMode; //存放WebRtc浮点版声学回音消除器是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
@@ -45,7 +48,7 @@ typedef struct AdoInpt //音频输入。
 
 	SpeexWebRtcAec * m_SpeexWebRtcAecPt; //存放SpeexWebRtc三重声学回音消除器的指针。
 	int32_t m_SpeexWebRtcAecWorkMode; //存放SpeexWebRtc三重声学回音消除器的工作模式，为1表示Speex声学回音消除器+WebRtc定点版声学回音消除器，为2表示WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器，为3表示Speex声学回音消除器+WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器。
-	int32_t m_SpeexWebRtcAecSpeexAecFilterLen; //存放SpeexWebRtc三重声学回音消除器的Speex声学回音消除器滤波器的长度，单位毫秒。
+	int32_t m_SpeexWebRtcAecSpeexAecFilterLen; //存放SpeexWebRtc三重声学回音消除器的Speex声学回音消除器滤波器的长度，单位为毫秒。
 	int32_t m_SpeexWebRtcAecSpeexAecIsUseRec; //存放SpeexWebRtc三重声学回音消除器的Speex声学回音消除器是否使用残余回音消除，为非0表示要使用，为0表示不使用。
 	float m_SpeexWebRtcAecSpeexAecEchoMutp; //存放SpeexWebRtc三重声学回音消除器的Speex声学回音消除器在残余回音消除时，残余回音的倍数，倍数越大消除越强，取值区间为[0.0,100.0]。
 	float m_SpeexWebRtcAecSpeexAecEchoCntu; //存放SpeexWebRtc三重声学回音消除器的Speex声学回音消除器在残余回音消除时，残余回音的持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
@@ -53,15 +56,15 @@ typedef struct AdoInpt //音频输入。
 	int32_t m_SpeexWebRtcAecSpeexAecEchoSupesAct; //存放SpeexWebRtc三重声学回音消除器的Speex声学回音消除器在残余回音消除时，有近端语音活动时残余回音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
 	int32_t m_SpeexWebRtcAecWebRtcAecmIsUseCNGMode; //存放SpeexWebRtc三重声学回音消除器的WebRtc定点版声学回音消除器是否使用舒适噪音生成模式，为非0表示要使用，为0表示不使用。
 	int32_t m_SpeexWebRtcAecWebRtcAecmEchoMode; //存放SpeexWebRtc三重声学回音消除器的WebRtc定点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,4]。
-	int32_t m_SpeexWebRtcAecWebRtcAecmDelay; //存放SpeexWebRtc三重声学回音消除器的WebRtc定点版声学回音消除器的回音延迟，单位毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+	int32_t m_SpeexWebRtcAecWebRtcAecmDelay; //存放SpeexWebRtc三重声学回音消除器的WebRtc定点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 	int32_t m_SpeexWebRtcAecWebRtcAecEchoMode; //存放SpeexWebRtc三重声学回音消除器的WebRtc浮点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,2]。
-	int32_t m_SpeexWebRtcAecWebRtcAecDelay; //存放SpeexWebRtc三重声学回音消除器的WebRtc浮点版声学回音消除器的回音延迟，单位毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+	int32_t m_SpeexWebRtcAecWebRtcAecDelay; //存放SpeexWebRtc三重声学回音消除器的WebRtc浮点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 	int32_t m_SpeexWebRtcAecWebRtcAecIsUseDelayAgstcMode; //存放SpeexWebRtc三重声学回音消除器的WebRtc浮点版声学回音消除器是否使用回音延迟不可知模式，为非0表示要使用，为0表示不使用。
 	int32_t m_SpeexWebRtcAecWebRtcAecIsUseExtdFilterMode; //存放SpeexWebRtc三重声学回音消除器的WebRtc浮点版声学回音消除器是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 	int32_t m_SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecMode; //存放SpeexWebRtc三重声学回音消除器的WebRtc浮点版声学回音消除器是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
 	int32_t m_SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelay; //存放SpeexWebRtc三重声学回音消除器的WebRtc浮点版声学回音消除器是否使用自适应调节回音的延迟，为非0表示要使用，为0表示不使用。
 	int32_t m_SpeexWebRtcAecIsUseSameRoomAec; //存放SpeexWebRtc三重声学回音消除器是否使用同一房间声学回音消除，为非0表示要使用，为0表示不使用。
-	int32_t m_SpeexWebRtcAecSameRoomEchoMinDelay; //存放SpeexWebRtc三重声学回音消除器的同一房间回音最小延迟，单位毫秒，取值区间为[1,2147483647]。
+	int32_t m_SpeexWebRtcAecSameRoomEchoMinDelay; //存放SpeexWebRtc三重声学回音消除器的同一房间回音最小延迟，单位为毫秒，取值区间为[1,2147483647]。
 
 	int32_t m_UseWhatNs; //存放使用什么噪音抑制器，为0表示不使用，为1表示Speex预处理器的噪音抑制，为2表示WebRtc定点版噪音抑制器，为3表示WebRtc浮点版噪音抑制器，为4表示RNNoise噪音抑制器。
 
@@ -95,18 +98,19 @@ typedef struct AdoInpt //音频输入。
 	int32_t m_SpeexEncdQualt; //存放Speex编码器的编码质量等级，质量等级越高音质越好、压缩率越低，取值区间为[0,10]。
 	int32_t m_SpeexEncdCmplxt; //存放Speex编码器的编码复杂度，复杂度越高压缩率不变、CPU使用率越高、音质越好，取值区间为[0,10]。
 	int32_t m_SpeexEncdPlcExptLossRate; //存放Speex编码器在数据包丢失隐藏时，数据包的预计丢失概率，预计丢失概率越高抗网络抖动越强、压缩率越低，取值区间为[0,100]。
-		
-	int32_t m_IsSaveAdoToFile; //存放是否保存音频到文件，非0表示要使用，0表示不使用。
-	WaveFileWriter * m_AdoInptWaveFileWriterPt; //存放音频输入Wave文件写入器的指针。
-	WaveFileWriter * m_AdoRsltWaveFileWriterPt; //存放音频结果Wave文件写入器的指针。
-	Vstr * m_AdoInptFileFullPathVstrPt; //存放音频输入文件完整路径动态字符串的指针。
-	Vstr * m_AdoRsltFileFullPathVstrPt; //存放音频结果文件完整路径动态字符串的指针。
 
     int32_t m_IsDrawAdoWavfmToWnd; //存放是否绘制音频波形到窗口，为非0表示要绘制，为0表示不绘制。
-	HWND m_AdoInptWavfmWndHdl; //存放音频输入波形窗口的句柄。
-    AdoWavfm * m_AdoInptWavfmPt; //存放音频输入波形器对象的指针。
-    HWND m_AdoRsltWavfmWndHdl; //存放音频结果波形窗口的句柄。
-    AdoWavfm * m_AdoRsltWavfmPt; //存放音频结果波形器对象的指针。
+	HWND m_AdoInptSrcWavfmWndHdl; //存放音频输入原始波形窗口的句柄。
+    AdoWavfm * m_AdoInptSrcWavfmPt; //存放音频输入原始波形器的指针。
+    HWND m_AdoInptRsltWavfmWndHdl; //存放音频输入结果波形窗口的句柄。
+    AdoWavfm * m_AdoInptRsltWavfmPt; //存放音频输入结果波形器的指针。
+	
+	int32_t m_IsSaveAdoToFile; //存放是否保存音频到文件，非0表示要使用，0表示不使用。
+	WaveFileWriter * m_AdoInptSrcWaveFileWriterPt; //存放音频输入原始Wave文件写入器的指针。
+	WaveFileWriter * m_AdoInptRsltWaveFileWriterPt; //存放音频输入结果Wave文件写入器的指针。
+	Vstr * m_AdoInptSrcFileFullPathVstrPt; //存放音频输入原始文件完整路径动态字符串的指针。
+	Vstr * m_AdoInptRsltFileFullPathVstrPt; //存放音频输入结果文件完整路径动态字符串的指针。
+	size_t m_AdoInptFileWrBufSzByt; //存放音频输入文件写入缓冲区的大小，单位为字节。
 
 	UINT m_AdoInptDvcID; //存放音频输入设备的标识符。
 	IMMDeviceEnumerator * m_AdoInptDvcEnumPt; //存放音频输入设备枚举器的指针。
@@ -114,25 +118,26 @@ typedef struct AdoInpt //音频输入。
 	IMMDevice * m_AdoInptDvcPt; //存放音频输入设备的指针。
 	IAudioClient * m_AdoInptDvcClntPt; //存放音频输入设备客户端的指针。
 	WAVEFORMATEX * m_AdoInptDvcWaveFmtExPt; //存放音频输入设备格式的指针。
-	UINT32 m_AdoInptDvcBufSz; //存放音频输入设备的缓冲区大小，单位为采样单元。
+	UINT32 m_AdoInptDvcBufSzUnit; //存放音频输入设备的缓冲区大小，单位为采样单元。
 	IAudioCaptureClient * m_AdoInptDvcCptrClntPt; //存放音频输入设备捕获客户端的指针。
 	IGlobalInterfaceTable * m_AdoInptDvcGlblIntfcTablePt; //存放音频输入设备全局接口表的指针。
 	DWORD m_AdoInptDvcCptrClntCookie; //存放音频输入设备捕获客户端的Cookie。
-	BufQueueCls m_AdoInptDvcBufQueue; //存放音频输入设备缓冲区队列。
-	int16_t * m_AdoInptDvcFrmPt; //存放音频输入设备帧的指针。
-	size_t m_AdoInptDvcFrmSz; //存放音频输入设备帧的大小，单位为采样单元。
-	SpeexResamplerState * m_AdoInptDvcSpeexResamplerPt; //存放音频输入设备Speex重采样器的指针。
+	BufQueueCls m_PcmAdoInptDvcFrmBufQueue; //存放PCM格式音频输入设备帧的缓冲区队列。
+	int16_t * m_PcmAdoInptDvcFrmPt; //存放PCM格式音频输入设备帧的指针。
+	size_t m_PcmAdoInptDvcFrmLenUnit; //存放PCM格式音频输入设备帧的长度，单位为采样单元。
+	size_t m_PcmAdoInptDvcFrmLenByt; //存放PCM格式音频输入设备帧的长度，单位为字节。
+	SpeexResamplerState * m_PcmAdoInptSrcFrmSpeexResamplerPt; //存放PCM格式音频输入原始帧Speex重采样器的指针。
 	int32_t m_AdoInptIsMute; //存放音频输入是否静音，为0表示有声音，为非0表示静音。
 	int32_t m_AdoInptDvcIsClos; //存放音频输入设备是否关闭，为0表示正常，为非0表示关闭。
 
-	ConstLenLnkLstCls m_AdoInptFrmLnkLst; //存放音频输入帧链表。
-	ConstLenLnkLstCls m_AdoInptIdleFrmLnkLst; //存放音频输入空闲帧链表。
+	ConstLenLnkLstCls m_PcmAdoInptSrcFrmLnkLst; //存放PCM格式音频输入原始帧链表。
+	ConstLenLnkLstCls m_PcmAdoInptIdleFrmLnkLst; //存放PCM格式音频输入空闲帧链表。
 
 	int32_t m_IsInitAdoInptThrdTmpVar; //存放是否初始化音频输入线程的临时变量。
-	int16_t * m_AdoInptFrmPt; //存放音频输入帧的指针。
-	size_t m_AdoInptFrmLnkLstElmTotal; //存放音频输入帧链表的元数总数。
-	uint64_t m_LastTimeMsec; //存放上次时间的毫秒数。
-	uint64_t m_NowTimeMsec; //存放本次时间的毫秒数。
+	int16_t * m_PcmAdoInptSrcFrmPt; //存放PCM格式音频输入原始帧的指针。
+	size_t m_FrmLnkLstElmTotal; //存放帧链表的元素总数。
+	uint64_t m_LastTickMsec; //存放上次的嘀嗒钟。
+	uint64_t m_NowTickMsec; //存放本次的嘀嗒钟。
 
 	ThrdInfo * m_AdoInptThrdInfoPt; //存放音频输入线程信息的指针。
 	int m_AdoInptThrdExitFlag; //存放音频输入线程退出标记，0表示保持运行，1表示请求退出。

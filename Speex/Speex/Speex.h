@@ -46,13 +46,13 @@ extern "C"
 typedef struct SpeexEncd SpeexEncd;
 
 __SPEEX_DLLAPI__ int SpeexEncdInit( SpeexEncd * * SpeexEncdPtPt, int32_t SmplRate, int32_t UseCbrOrVbr, int32_t Qualt, int32_t Cmplxt, int32_t PlcExptLossRate );
-__SPEEX_DLLAPI__ int SpeexEncdPocs( SpeexEncd * SpeexEncdPt, int16_t * PcmFrmPt, uint8_t * SpeexFrmPt, size_t SpeexFrmSz, size_t * SpeexFrmLenPt, int32_t * IsNeedTransPt );
+__SPEEX_DLLAPI__ int SpeexEncdPocs( SpeexEncd * SpeexEncdPt, int16_t * PcmFrmPt, uint8_t * SpeexFrmPt, size_t SpeexFrmSzByt, size_t * SpeexFrmLenBytPt, int32_t * IsNeedTransPt );
 __SPEEX_DLLAPI__ int SpeexEncdDstoy( SpeexEncd * SpeexEncdPt );
 
 typedef struct SpeexDecd SpeexDecd;
 
 __SPEEX_DLLAPI__ int SpeexDecdInit( SpeexDecd * * SpeexDecdPtPt, int32_t SmplRate, int32_t IsUsePrcplEnhsmt );
-__SPEEX_DLLAPI__ int SpeexDecdPocs( SpeexDecd * SpeexDecdPt, uint8_t * SpeexFrmPt, size_t SpeexFrmLen, int16_t * PcmFrmPt );
+__SPEEX_DLLAPI__ int SpeexDecdPocs( SpeexDecd * SpeexDecdPt, uint8_t * SpeexFrmPt, size_t SpeexFrmLenByt, int16_t * PcmFrmPt );
 __SPEEX_DLLAPI__ int SpeexDecdDstoy( SpeexDecd * SpeexDecdPt );
 
 #ifdef __cplusplus

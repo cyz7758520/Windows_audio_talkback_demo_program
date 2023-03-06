@@ -12,6 +12,7 @@
 #include <string.h>                       //memchr、memcmp、memcpy、memmove、memset、strcat、strncat、strchr、strcmp、strncmp、strcoll、strcpy、strncpy、strcspn、strerror、strlen、strpbrk、strrchr、strspn、strstr、strtok、strxfrm
 #include <inttypes.h>                     //PRId*、PRIi*、PRIu*、PRIo*、PRIx*、PRIX*、SCNd*、SCNi*、SCNu*、SCNo*、SCNx*
 #include <locale.h>                       //setlocale
+#include <math.h>
 
 #ifdef __cplusplus
 #include <thread>                         //std::thread
@@ -45,6 +46,8 @@
 #include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
 #include <Functiondiscoverykeys_devpkey.h>//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
 #include <Objbase.h>                      //CoInitialize、CoInitializeEx
+#include <shlwapi.h>                      //DLLVERSIONINFO
+#include <crtdbg.h>                       //_CrtSetBreakAlloc、_CrtSetDbgFlag、_CrtCheckMemory、_CrtDumpMemoryLeaks。
 
 #include <io.h>                           //_open、_wopen
 #include <sys/stat.h>                     //struct stat、fstat、_stat64、_wstat64
@@ -146,8 +149,8 @@ typedef int HANDLE;
 #define __thread __declspec( thread )
 #endif
 
-//交换两个指针变量的值。
-#define SWAPPT( Type, Pt1, Pt2 ) ( Pt1 = ( Type )( ( size_t )Pt1 ^ ( size_t )Pt2 ), Pt2 = ( Type )( ( size_t )Pt1 ^ ( size_t )Pt2 ), Pt1 = ( Type )( ( size_t )Pt1 ^ ( size_t )Pt2 ) )
+//交换两个指针变量。
+#define SWAPPT( Pt1, Pt2 ) { size_t Pt; Pt = ( size_t )Pt1; *( ( size_t * )&Pt1 ) = ( size_t )Pt2; *( ( size_t * )&Pt2 ) = Pt; }
 
 //函数默认参数。
 #define DEFARG( Type, Name, DefVal ) ( ( #Name[0] ) ? ( Type )( Name + 0 ) : ( DefVal ) )
@@ -160,7 +163,7 @@ typedef int HANDLE;
 #define SetEndPt( Type, StartPt, Sz, EndPt ) \
 { \
 	if( ( ( SIZE_MAX - ( size_t )( StartPt ) ) / sizeof( Type ) ) > ( Sz ) ) EndPt = ( Type * )( StartPt )+( Sz ); /*不会溢出。*/\
-	else EndPt = ( Type * )( SIZE_MAX / sizeof( Type ) ); /*会溢出。*/ \
+	else EndPt = ( Type * )( SIZE_MAX - sizeof( Type ) ); /*会溢出。*/ \
 }
 
 //获取数组的大小。
@@ -274,7 +277,7 @@ extern "C"
 
 //获取函数。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__FUNC_DLLAPI__ int FuncGetPrivateProfileStringFromSectionMem( const char * KeyNameStrPt, const char * DefaultKeyStrValPt, char * KeyStrValPt, size_t KeyStrValSz, size_t * KeyStrValLenPt, const char * SectionMemPt );
+__FUNC_DLLAPI__ int FuncGetPrivateProfileStringFromSectionMem( const char * SectionMemPt, const char * KeyStrPt, const char * DfltValStrPt, char * ValStrPt, size_t ValStrSzByt, size_t * ValStrLenBytPt );
 #endif
 
 //设置函数。
@@ -293,7 +296,7 @@ __FUNC_DLLAPI__ int FuncIsForegroundFullscreen();
 //管道函数。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __FUNC_DLLAPI__ int FuncCreatePipe( HANDLE * PipeReadHdl, HANDLE * PipeWriteHdl, LPVOID * SecurityDescriptor, BOOL InheritHdl, DWORD BufSz );
-__FUNC_DLLAPI__ int FuncReadPipe( HANDLE PipeReadHdl, char * * BufPtPt, size_t * BufSzPt, size_t * BufLenPt, const char * EndMemPt, size_t EndMemLen, int IsAllowRealloc, uint64_t TimeOutMsec );
+__FUNC_DLLAPI__ int FuncReadPipe( HANDLE PipeReadHdl, char * * BufPtPt, size_t * BufSzPt, size_t * BufLenPt, const char * EndMemPt, size_t EndMemLen, int IsAllowRealloc, uint64_t TmotMsec );
 __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
 #endif
 

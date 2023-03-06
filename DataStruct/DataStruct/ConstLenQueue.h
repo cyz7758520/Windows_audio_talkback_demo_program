@@ -10,7 +10,7 @@ extern "C"
 
 typedef struct ConstLenQueue ConstLenQueue;
 
-__DATASTRUCT_DLLAPI__ int ConstLenQueueInit( ConstLenQueue * * ConstLenQueuePtPt, size_t ElmDataLen, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int ConstLenQueueInit( ConstLenQueue * * ConstLenQueuePtPt, size_t ElmDataLenByt, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int ConstLenQueueLocked( ConstLenQueue * ConstLenQueuePt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int ConstLenQueueUnlock( ConstLenQueue * ConstLenQueuePt, Vstr * ErrInfoVstrPt );
@@ -43,7 +43,7 @@ public:
 	ConstLenQueueCls() { m_ConstLenQueuePt = NULL; }
 	~ConstLenQueueCls() { Dstoy( NULL ); }
 
-	int Init( size_t ElmDataLen, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return ConstLenQueueInit( &m_ConstLenQueuePt, ElmDataLen, BufAutoAdjMeth, BufAutoAdjParm, BufAutoAdjIsAllowShrink, ElmMinNum, ElmMaxNum, ErrInfoVstrPt ); }
+	int Init( size_t ElmDataLenByt, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return ConstLenQueueInit( &m_ConstLenQueuePt, ElmDataLenByt, BufAutoAdjMeth, BufAutoAdjParm, BufAutoAdjIsAllowShrink, ElmMinNum, ElmMaxNum, ErrInfoVstrPt ); }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return ConstLenQueueLocked( m_ConstLenQueuePt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return ConstLenQueueUnlock( m_ConstLenQueuePt, ErrInfoVstrPt ); }

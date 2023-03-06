@@ -10,20 +10,20 @@ extern "C"
 
 typedef struct BufQueue BufQueue;
 
-__DATASTRUCT_DLLAPI__ int BufQueueInit( BufQueue * * BufQueuePtPt, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t BufMinSz, size_t BufMaxSz, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueInit( BufQueue * * BufQueuePtPt, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, int BufAutoAdjIsAllowShrink, size_t BufMinSzByt, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int BufQueueLocked( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int BufQueueUnlock( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int BufQueuePutHead( BufQueue * BufQueuePt, const void * NewHeadDataPt, size_t NewHeadDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__DATASTRUCT_DLLAPI__ int BufQueuePutTail( BufQueue * BufQueuePt, const void * NewTailDataPt, size_t NewTailDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueuePutHead( BufQueue * BufQueuePt, const void * NewHeadDataPt, size_t NewHeadDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueuePutTail( BufQueue * BufQueuePt, const void * NewTailDataPt, size_t NewTailDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int BufQueueGetHead( BufQueue * BufQueuePt, void * HeadDataPt, size_t HeadDataSz, size_t * HeadDataLenPt, int32_t IsDelHeadData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__DATASTRUCT_DLLAPI__ int BufQueueGetTail( BufQueue * BufQueuePt, void * TailDataPt, size_t TailDataSz, size_t * TailDataLenPt, int32_t IsDelTailData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__DATASTRUCT_DLLAPI__ int BufQueueGetLen( BufQueue * BufQueuePt, size_t * LenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueGetHead( BufQueue * BufQueuePt, void * HeadDataPt, size_t HeadDataSzByt, size_t * HeadDataLenBytPt, int32_t IsDelHeadData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueGetTail( BufQueue * BufQueuePt, void * TailDataPt, size_t TailDataSzByt, size_t * TailDataLenBytPt, int32_t IsDelTailData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueGetLen( BufQueue * BufQueuePt, size_t * LenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int BufQueueDelHead( BufQueue * BufQueuePt, size_t HeadDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__DATASTRUCT_DLLAPI__ int BufQueueDelTail( BufQueue * BufQueuePt, size_t TailDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueDelHead( BufQueue * BufQueuePt, size_t HeadDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueDelTail( BufQueue * BufQueuePt, size_t TailDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int BufQueueDelAll( BufQueue * BufQueuePt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int BufQueueDstoy( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
@@ -46,15 +46,15 @@ public:
 	int Locked( Vstr * ErrInfoVstrPt ) { return BufQueueLocked( m_BufQueuePt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return BufQueueUnlock( m_BufQueuePt, ErrInfoVstrPt ); }
 
-	int PutHead( const void * NewHeadDataPt, size_t NewHeadDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueuePutHead( m_BufQueuePt, NewHeadDataPt, NewHeadDataLen, IsAutoLock, ErrInfoVstrPt ); }
-	int PutTail( const void * NewTailDataPt, size_t NewTailDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueuePutTail( m_BufQueuePt, NewTailDataPt, NewTailDataLen, IsAutoLock, ErrInfoVstrPt ); }
+	int PutHead( const void * NewHeadDataPt, size_t NewHeadDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueuePutHead( m_BufQueuePt, NewHeadDataPt, NewHeadDataLenByt, IsAutoLock, ErrInfoVstrPt ); }
+	int PutTail( const void * NewTailDataPt, size_t NewTailDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueuePutTail( m_BufQueuePt, NewTailDataPt, NewTailDataLenByt, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int GetHead( void * HeadDataPt, size_t HeadDataSz, size_t * HeadDataLenPt, int32_t IsDelHeadData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetHead( m_BufQueuePt, HeadDataPt, HeadDataSz, HeadDataLenPt, IsDelHeadData, IsAutoLock, ErrInfoVstrPt ); }
-	int GetTail( void * TailDataPt, size_t TailDataSz, size_t * TailDataLenPt, int32_t IsDelTailData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetTail( m_BufQueuePt, TailDataPt, TailDataSz, TailDataLenPt, IsDelTailData, IsAutoLock, ErrInfoVstrPt ); }
-	int GetLen( size_t * LenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetLen( m_BufQueuePt, LenPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetHead( void * HeadDataPt, size_t HeadDataSzByt, size_t * HeadDataLenBytPt, int32_t IsDelHeadData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetHead( m_BufQueuePt, HeadDataPt, HeadDataSzByt, HeadDataLenBytPt, IsDelHeadData, IsAutoLock, ErrInfoVstrPt ); }
+	int GetTail( void * TailDataPt, size_t TailDataSzByt, size_t * TailDataLenBytPt, int32_t IsDelTailData, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetTail( m_BufQueuePt, TailDataPt, TailDataSzByt, TailDataLenBytPt, IsDelTailData, IsAutoLock, ErrInfoVstrPt ); }
+	int GetLen( size_t * LenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetLen( m_BufQueuePt, LenBytPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int DelHead( size_t HeadDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueDelHead( m_BufQueuePt, HeadDataLen, IsAutoLock, ErrInfoVstrPt ); }
-	int DelTail( size_t TailDataLen, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueDelTail( m_BufQueuePt, TailDataLen, IsAutoLock, ErrInfoVstrPt ); }
+	int DelHead( size_t HeadDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueDelHead( m_BufQueuePt, HeadDataLenByt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelTail( size_t TailDataLenByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueDelTail( m_BufQueuePt, TailDataLenByt, IsAutoLock, ErrInfoVstrPt ); }
 	int DelAll( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueDelAll( m_BufQueuePt, IsAutoLock, ErrInfoVstrPt ); }
 
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = BufQueueDstoy( m_BufQueuePt, ErrInfoVstrPt ); m_BufQueuePt = NULL; return p_Rslt; }

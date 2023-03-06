@@ -34,18 +34,21 @@ __SOKT_DLLAPI__ int TcpClntGetRmtAddr( TcpClntSokt * TcpClntSoktPt, int32_t * Rm
 __SOKT_DLLAPI__ int TcpClntSetNoDelay( TcpClntSokt * TcpClntSoktPt, int IsNoDelay, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int TcpClntGetNoDelay( TcpClntSokt * TcpClntSoktPt, int * IsNoDelayPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int TcpClntSetSendBufSz( TcpClntSokt * TcpClntSoktPt, size_t SendBufSz, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__SOKT_DLLAPI__ int TcpClntGetSendBufSz( TcpClntSokt * TcpClntSoktPt, size_t * SendBufSzPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntSetSendBufSz( TcpClntSokt * TcpClntSoktPt, size_t SendBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntGetSendBufSz( TcpClntSokt * TcpClntSoktPt, size_t * SendBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int TcpClntSetRecvBufSz( TcpClntSokt * TcpClntSoktPt, size_t RecvBufSz, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__SOKT_DLLAPI__ int TcpClntGetRecvBufSz( TcpClntSokt * TcpClntSoktPt, size_t * RecvBufSzPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__SOKT_DLLAPI__ int TcpClntGetRecvBufLen( TcpClntSokt * TcpClntSoktPt, size_t * RecvBufLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntSetRecvBufSz( TcpClntSokt * TcpClntSoktPt, size_t RecvBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntGetRecvBufSz( TcpClntSokt * TcpClntSoktPt, size_t * RecvBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntGetRecvBufLen( TcpClntSokt * TcpClntSoktPt, size_t * RecvBufLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int TcpClntSetKeepAlive( TcpClntSokt * TcpClntSoktPt, int IsKeepAlive, int KeepIdle, int KeepIntvl, int KeepCnt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int TcpClntGetKeepAlive( TcpClntSokt * TcpClntSoktPt, int * IsKeepAlivePt, int * KeepIdlePt, int * KeepIntvlPt, int * KeepCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int TcpClntSendPkt( TcpClntSokt * TcpClntSoktPt, const void * DataBufPt, size_t DataBufLen, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-__SOKT_DLLAPI__ int TcpClntRecvPkt( TcpClntSokt * TcpClntSoktPt, void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntSendPkt( TcpClntSokt * TcpClntSoktPt, const void * PktPt, size_t PktLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntRecvPkt( TcpClntSokt * TcpClntSoktPt, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+
+__SOKT_DLLAPI__ int TcpClntSendApkt( TcpClntSokt * TcpClntSoktPt, const void * PktPt, size_t PktLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntRecvApkt( TcpClntSokt * TcpClntSoktPt, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int TcpClntDstoy( TcpClntSokt * TcpClntSoktPt, uint16_t TmotSec, Vstr * ErrInfoVstrPt );
 
@@ -74,18 +77,21 @@ public:
 	int SetNoDelay( int IsNoDelay, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetNoDelay( m_TcpClntSoktPt, IsNoDelay, IsAutoLock, ErrInfoVstrPt ); }
 	int GetNoDelay( int * IsNoDelayPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetNoDelay( m_TcpClntSoktPt, IsNoDelayPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SetSendBufSz( size_t SendBufSz, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetSendBufSz( m_TcpClntSoktPt, SendBufSz, IsAutoLock, ErrInfoVstrPt ); }
-	int GetSendBufSz( size_t * SendBufSzPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetSendBufSz( m_TcpClntSoktPt, SendBufSzPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetSendBufSz( size_t SendBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetSendBufSz( m_TcpClntSoktPt, SendBufSzByt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetSendBufSz( size_t * SendBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetSendBufSz( m_TcpClntSoktPt, SendBufSzBytPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SetRecvBufSz( size_t RecvBufSz, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetRecvBufSz( m_TcpClntSoktPt, RecvBufSz, IsAutoLock, ErrInfoVstrPt ); }
-	int GetRecvBufSz( size_t * RecvBufSzPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufSz( m_TcpClntSoktPt, RecvBufSzPt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetRecvBufLen( size_t * RecvBufLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufLen( m_TcpClntSoktPt, RecvBufLenPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetRecvBufSz( size_t RecvBufBytSz, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetRecvBufSz( m_TcpClntSoktPt, RecvBufBytSz, IsAutoLock, ErrInfoVstrPt ); }
+	int GetRecvBufSz( size_t * RecvBufBytSzPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufSz( m_TcpClntSoktPt, RecvBufBytSzPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetRecvBufLen( size_t * RecvBufBytLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufLen( m_TcpClntSoktPt, RecvBufBytLenPt, IsAutoLock, ErrInfoVstrPt ); }
 
 	int SetKeepAlive( int IsUseKeepAlive, int KeepIdle, int KeepIntvl, int KeepCnt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetKeepAlive( m_TcpClntSoktPt, IsUseKeepAlive, KeepIdle, KeepIntvl, KeepCnt, IsAutoLock, ErrInfoVstrPt ); }
 	int GetKeepAlive( int * IsUseKeepAlivePt, int * KeepIdlePt, int * KeepIntvlPt, int * KeepCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetKeepAlive( m_TcpClntSoktPt, IsUseKeepAlivePt, KeepIdlePt, KeepIntvlPt, KeepCntPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SendPkt( const void * DataBufPt, size_t DataBufLen, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendPkt( m_TcpClntSoktPt, DataBufPt, DataBufLen, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
-	int RecvPkt( void * DataBufPt, size_t DataBufSz, size_t * DataBufLenPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvPkt( m_TcpClntSoktPt, DataBufPt, DataBufSz, DataBufLenPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
+	int SendPkt( const void * DataPt, size_t DataLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendPkt( m_TcpClntSoktPt, DataPt, DataLenByt, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
+	int RecvPkt( void * DataPt, size_t DataSzByt, size_t * DataLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvPkt( m_TcpClntSoktPt, DataPt, DataSzByt, DataLenBytPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
+	
+	int SendApkt( const void * DataPt, size_t DataLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendApkt( m_TcpClntSoktPt, DataPt, DataLenByt, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
+	int RecvApkt( void * DataPt, size_t DataSzByt, size_t * DataLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvApkt( m_TcpClntSoktPt, DataPt, DataSzByt, DataLenBytPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
 
 	int Dstoy( uint16_t TmotSec, Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpClntDstoy( m_TcpClntSoktPt, TmotSec, ErrInfoVstrPt ); m_TcpClntSoktPt = NULL; return p_Rslt; }
 };

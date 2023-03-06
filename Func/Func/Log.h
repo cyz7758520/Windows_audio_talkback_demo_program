@@ -4,27 +4,27 @@
 #define __LOG_H__
 
 //日志级别
-#define LOG_LVL_ERROR                 1   //错误级别
-#define LOG_LVL_WARN                  2   //警告级别
-#define LOG_LVL_INFO                  3   //信息级别
-#define LOG_LVL_DEBUG                 4   //调试级别
-#define LOG_LVL_DEFAULT   LOG_LVL_DEBUG   //默认级别
+#define LOG_LVL_ERROR                 1   //错误级别。
+#define LOG_LVL_WARN                  2   //警告级别。
+#define LOG_LVL_INFO                  3   //信息级别。
+#define LOG_LVL_DEBUG                 4   //调试级别。
+#define LOG_LVL_DEFAULT   LOG_LVL_DEBUG   //默认级别。
 
 //日志文件备份模式
-#define LOG_BACKUP_MODE_NONE         1              //不备份
-#define LOG_BACKUP_MODE_SIZE         2              //按文件大小备份，文件大小参考LOG_BACKUP_DEFAULT_FILESIZE宏
-#define LOG_BACKUP_MODE_HOUR         3              //按一个小时为一个日志文件备份
-#define LOG_BACKUP_MODE_DAY          4              //按一天为一个日志文件备份
+#define LOG_BACKUP_MODE_NONE         1              //不备份。
+#define LOG_BACKUP_MODE_SIZE         2              //按文件大小备份，文件大小参考LOG_BACKUP_DEFAULT_FILESIZE宏。
+#define LOG_BACKUP_MODE_HOUR         3              //按一个小时为一个日志文件备份。
+#define LOG_BACKUP_MODE_DAY          4              //按一天为一个日志文件备份。
 
-#define LOG_BACKUP_MODE_DEFAULT      LOG_BACKUP_MODE_HOUR   //默认的日志备份模式
+#define LOG_BACKUP_MODE_DEFAULT      LOG_BACKUP_MODE_HOUR   //默认的日志备份模式。
 
-#define LOG_BACKUP_DEFAULT_FILESIZE          1024*1024*32   //默认的日志文件备份大小，单位字节，日志文件一旦达到这么大就备份，然后创建一个新的日志文件
+#define LOG_BACKUP_DEFAULT_FILESIZE          1024*1024*32   //默认的日志文件备份大小，单位为字节，日志文件一旦达到这么大就备份，然后创建一个新的日志文件。
 
 //查找最老日志文件的判定条件
-#define LOG_FIND_FILE_MAXLEN         1      //所有的日志文件的总大小达到多大，包括正在使用的日志
-#define LOG_FIND_FILE_FREEPERCENT    2      //日志文件所在磁盘的剩余空间的百分比
-#define LOG_FIND_FILE_DAYSBEFORE     3      //日志文件的最后修改时间相对当前系统时间在多少天以前
-#define LOG_FIND_FILE_END            0      //判定条件参数结束
+#define LOG_FIND_FILE_MAXLEN         1      //所有的日志文件的总大小达到多大，包括正在使用的日志。
+#define LOG_FIND_FILE_FREEPERCENT    2      //日志文件所在磁盘的剩余空间的百分比。
+#define LOG_FIND_FILE_DAYSBEFORE     3      //日志文件的最后修改时间相对当前系统时间在多少天以前。
+#define LOG_FIND_FILE_END            0      //判定条件参数结束。
 
 //日志头项目。
 typedef enum LogHeadItem

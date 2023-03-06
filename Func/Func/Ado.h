@@ -8,12 +8,12 @@ extern "C"
 {
 #endif
 	
-__FUNC_DLLAPI__ int AdoInt16IncrDecr( int16_t * SrcInt16AdoPt, int16_t * DstInt16AdoPt, int SmplCnt, int16_t Qntt );
+__FUNC_DLLAPI__ int PcmInt16IncrDecr( int16_t * SrcInt16PcmPt, int16_t * DstInt16PcmPt, int PcmLenData, int16_t Qntt );
 
-__FUNC_DLLAPI__ int AdoInt16ToFlt32768( const int16_t * Int16AdoPt, float * Flt32768AdoPt, int SmplCnt, Drct_t CnvrtDrct );
-__FUNC_DLLAPI__ int AdoInt16ToFlt1( const int16_t * Int16AdoPt, float * Flt1AdoPt, int SmplCnt, Drct_t CnvrtDrct );
-__FUNC_DLLAPI__ int AdoFlt32768ToInt16( const float * Flt32768AdoPt, int16_t * Int16AdoPt, int SmplCnt, Drct_t CnvrtDrct );
-__FUNC_DLLAPI__ int AdoFlt1ToInt16( const float * Flt1AdoPt, int16_t * Int16AdoPt, int SmplCnt, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmInt16ToFlt32768( const int16_t * Int16PcmPt, float * Flt32768PcmPt, int PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmInt16ToFlt1( const int16_t * Int16PcmPt, float * Flt1PcmPt, int PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmFlt32768ToInt16( const float * Flt32768PcmPt, int16_t * Int16PcmPt, int PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmFlt1ToInt16( const float * Flt1PcmPt, int16_t * Int16PcmPt, int PcmLenData, Drct_t CnvrtDrct );
 
 __FUNC_DLLAPI__ void AdoOneBand32kInt16ToLHBand16kInt16( const int16_t OneBand32kInt16[320],
 														 int16_t LowBand16kInt16[160], int16_t HighBand16kInt16[160],
@@ -48,11 +48,11 @@ __FUNC_DLLAPI__ void AdoLMHBand16kFlt32768ToOneBand48kInt16( const float LowBand
 															 float SynthesisState[10][15] );
 
 //G711的A律和μ律编解码。
-__FUNC_DLLAPI__ int G711aEncdPocs( int16_t * PcmFrmPt, size_t PcmFrmLen, uint8_t * G711aFrmPt, size_t G711aFrmSz, size_t * G711aFrmLenPt, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int G711aDecdPocs( uint8_t * G711aFrmPt, size_t G711aFrmLen, int16_t * PcmFrmPt, size_t PcmFrmSz, size_t * PcmFrmLenPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int G711aEncdPocs( int16_t * PcmFrmPt, size_t PcmFrmLenData, uint8_t * G711aFrmPt, size_t G711aFrmSzByt, size_t * G711aFrmLenBytPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int G711aDecdPocs( uint8_t * G711aFrmPt, size_t G711aFrmLenByt, int16_t * PcmFrmPt, size_t PcmFrmSzData, size_t * PcmFrmLenDataPt, Vstr * ErrInfoVstrPt );
 
-__FUNC_DLLAPI__ int G711uEncdPocs( int16_t * PcmFrmPt, size_t PcmFrmLen, uint8_t * G711uFrmPt, size_t G711uFrmSz, size_t * G711uFrmLenPt, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int G711uDecdPocs( uint8_t * G711uFrmPt, size_t G711uFrmLen, int16_t * PcmFrmPt, size_t PcmFrmSz, size_t * PcmFrmLenPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int G711uEncdPocs( int16_t * PcmFrmPt, size_t PcmFrmLenData, uint8_t * G711uFrmPt, size_t G711uFrmSzByt, size_t * G711uFrmLenBytPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int G711uDecdPocs( uint8_t * G711uFrmPt, size_t G711uFrmLenByt, int16_t * PcmFrmPt, size_t PcmFrmSzData, size_t * PcmFrmLenDataPt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
