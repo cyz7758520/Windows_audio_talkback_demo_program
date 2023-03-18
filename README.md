@@ -53,7 +53,7 @@
 
 &emsp;&emsp;如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。  
 
-&emsp;&emsp;**普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、Wave文件读取器、Wave文件写入器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。**  
+&emsp;&emsp;**普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、Wave文件读取器、Wave文件写入器、音频波形器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。**  
 
 &emsp;&emsp;**高级收费功能包括：Speex声学回音消除器、WebRtc浮点版声学回音消除器、SpeexWebRtc三重声学回音消除器、RNNoise噪音抑制器、OpenH264编解码器、自己设计的自适应抖动缓冲器、Avi文件写入器、本端高级UDP协议套接字。**  
 
@@ -138,7 +138,7 @@ ___
 函数名称：UserWriteAdoOtptFrm  
 功能说明：用户定义的写入音频输出帧函数，在需要写入一个音频输出帧时回调一次。如果不使用音频输出，则本函数不会被回调。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。  
 参数说明：MediaPocsThrdPt：\[输入\]，存放媒体处理线程的指针。  
-&emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptStrmIdx：\[输入\]，存放音频输出流索引。
+&emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptStrmIdx：\[输入\]，存放音频输出流索引。  
 &emsp;&emsp;&emsp;&emsp;&emsp;PcmAdoOtptSrcFrmPt：\[输出\]，存放PCM格式音频输出原始帧的指针。如果音频输出解码器不使用PCM原始数据，则本参数为NULL。  
 &emsp;&emsp;&emsp;&emsp;&emsp;PcmAdoOtptFrmLenUnit：\[输入\]，存放PCM格式音频输出帧的长度，单位为采样单元。如果音频输出解码器不使用PCM原始数据，则本参数无意义。  
 &emsp;&emsp;&emsp;&emsp;&emsp;EncdAdoOtptSrcFrmPt：\[输出\]，存放已编码格式音频输出原始帧的指针。如果音频输出解码器要使用PCM原始数据，则本参数为NULL。  
@@ -149,7 +149,7 @@ ___
 函数名称：UserGetAdoOtptFrm  
 功能说明：用户定义的获取音频输出帧函数，在解码完一个已编码音频输出帧时回调一次。如果不使用音频输出，则本函数不会被回调。注意：本函数不是在媒体处理线程中执行的，而是在音频输出线程中执行的，所以本函数应尽量在一瞬间完成执行，否则会导致音频输入输出帧不同步，从而导致声学回音消除失败。  
 参数说明：MediaPocsThrdPt：\[输入\]，存放媒体处理线程的指针。  
-&emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptStrmIdx：\[输入\]，存放音频输出流索引。
+&emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptStrmIdx：\[输入\]，存放音频输出流索引。  
 &emsp;&emsp;&emsp;&emsp;&emsp;PcmAdoOtptSrcFrmPt：\[输入\]，存放PCM格式音频输出原始帧的指针。  
 &emsp;&emsp;&emsp;&emsp;&emsp;PcmAdoOtptFrmLenUnit：\[输入\]，存放PCM格式音频输出帧的长度，单位为采样单元。  
 &emsp;&emsp;&emsp;&emsp;&emsp;EncdAdoOtptSrcFrmPt：\[输入\]，存放已编码格式音频输出原始帧的指针。如果音频输出解码器要使用PCM原始数据，则本参数为NULL。  
