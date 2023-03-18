@@ -55,7 +55,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年03月06日",IDC_STATIC,7,7,295,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年03月18日",IDC_STATIC,7,7,295,16
     LTEXT           "传输协议：",IDC_STATIC,7,35,58,8
     CONTROL         "TCP协议",UseTcpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,78,34,45,10
     CONTROL         "UDP协议",UseUdpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON,164,34,45,10
@@ -125,6 +125,8 @@ BEGIN
     CONTROL         "打印Log日志到可执行文件所在目录下的Log.txt文件中，并显示Toast",IsPrintLogShowToastCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,70,253,10
     CONTROL         "使用阻止系统休眠",IsUsePrvntSysSleepCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,83,253,10
+    CONTROL         "将音视频输入输出替换保存到当前进程活动目录下的AdoVdoInptOtpt.avi文件中",IsSaveAdoVdoInptOtptToAviFileCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,96,295,9
     CTEXT           "音视频预设设置",IDC_STATIC,7,113,295,9,WS_TABSTOP
     LTEXT           "效果等级：",IDC_STATIC,7,131,74,8
     CONTROL         "低",UseEffectLowRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,130,20,10
@@ -175,9 +177,9 @@ BEGIN
     PUSHBUTTON      "设置",SpeexCodecStngBtnId,252,382,50,14
     CONTROL         "Opus编解码器",UseOpusCodecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,97,399,137,10
     PUSHBUTTON      "设置",OpusCodecStngBtnId,252,397,50,14,WS_DISABLED
-    CONTROL         "将音频输入、音频输出、音频结果的波形绘制到窗口中",IsDrawAdoWavfmToWndCkBoxId,
+    CONTROL         "将音频输入原始、音频输入结果、音频输出原始的波形绘制到窗口中",IsDrawAdoWavfmToWndCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,413,295,10
-    CONTROL         "将音频输入原始、音频输入结果、音频输出原始分别替换保存到当前进程活动目录下的AdoInptSrc.wav、AdoInptRslt.wav、AdoOtptSrc.wav文件中",IsSaveAdoToFileCkBoxId,
+    CONTROL         "将音频输入原始、音频输入结果、音频输出原始分别替换保存到当前进程活动目录下的AdoInptSrc.wav、AdoInptRslt.wav、AdoOtptSrc.wav文件中",IsSaveAdoToWaveFileCkBoxId,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,425,295,20
     CTEXT           "视频设置",IDC_STATIC,7,458,295,9,WS_TABSTOP
     LTEXT           "采样频率：",IDC_STATIC,7,476,74,8
@@ -195,8 +197,6 @@ BEGIN
     CONTROL         "OpenH264编解码器",UseOpenH264CodecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,513,137,10
     PUSHBUTTON      "设置",OpenH264CodecStngBtnId,252,511,50,14
     DEFPUSHBUTTON   "确定",StngOkBtnId,7,529,295,14
-    CONTROL         "将音视频输入输出替换保存到当前进程活动目录下的AdoVdoInptOtpt.avi文件中",IsSaveAdoVdoInptOtptToFileCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,96,295,9
 END
 
 AjbStngDlgId DIALOGEX 0, 0, 309, 241

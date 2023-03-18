@@ -60,7 +60,7 @@
 #define IsSaveStngToFileCkBoxId         1038
 #define IsPrintLogShowToastCkBoxId      1039
 #define IsUsePrvntSysSleepCkBoxId       1040
-#define	IsSaveAdoVdoInptOtptToFileCkBoxId	1041
+#define	IsSaveAdoVdoInptOtptToAviFileCkBoxId	1041
 #define	UseEffectLowRdBtnId	1042
 #define	UseEffectMidRdBtnId	1043
 #define	UseEffectHighRdBtnId	1044
@@ -103,7 +103,7 @@
 #define	UseOpusCodecRdBtnId	1081
 #define	OpusCodecStngBtnId	1082
 #define	IsDrawAdoWavfmToWndCkBoxId	1083
-#define	IsSaveAdoToFileCkBoxId	1084
+#define	IsSaveAdoToWaveFileCkBoxId	1084
 #define	UseVdoSmplRate12RdBtnId	1085
 #define	UseVdoSmplRate15RdBtnId	1086
 #define	UseVdoSmplRate24RdBtnId	1087

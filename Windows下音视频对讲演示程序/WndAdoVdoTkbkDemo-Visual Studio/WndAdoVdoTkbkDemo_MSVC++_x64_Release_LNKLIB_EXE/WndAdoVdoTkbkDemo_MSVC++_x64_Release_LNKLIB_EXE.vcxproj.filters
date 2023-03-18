@@ -39,6 +39,9 @@
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.cpp">
@@ -57,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

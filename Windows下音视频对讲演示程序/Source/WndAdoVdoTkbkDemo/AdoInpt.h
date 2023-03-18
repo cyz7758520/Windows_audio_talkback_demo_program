@@ -105,12 +105,12 @@ typedef struct AdoInpt //音频输入。
     HWND m_AdoInptRsltWavfmWndHdl; //存放音频输入结果波形窗口的句柄。
     AdoWavfm * m_AdoInptRsltWavfmPt; //存放音频输入结果波形器的指针。
 	
-	int32_t m_IsSaveAdoToFile; //存放是否保存音频到文件，非0表示要使用，0表示不使用。
+	int32_t m_IsSaveAdoToWaveFile; //存放是否保存音频到Wave文件，非0表示要使用，0表示不使用。
 	WaveFileWriter * m_AdoInptSrcWaveFileWriterPt; //存放音频输入原始Wave文件写入器的指针。
 	WaveFileWriter * m_AdoInptRsltWaveFileWriterPt; //存放音频输入结果Wave文件写入器的指针。
-	Vstr * m_AdoInptSrcFileFullPathVstrPt; //存放音频输入原始文件完整路径动态字符串的指针。
-	Vstr * m_AdoInptRsltFileFullPathVstrPt; //存放音频输入结果文件完整路径动态字符串的指针。
-	size_t m_AdoInptFileWrBufSzByt; //存放音频输入文件写入缓冲区的大小，单位为字节。
+	Vstr * m_AdoInptSrcWaveFileFullPathVstrPt; //存放音频输入原始Wave文件完整路径动态字符串的指针。
+	Vstr * m_AdoInptRsltWaveFileFullPathVstrPt; //存放音频输入结果Wave文件完整路径动态字符串的指针。
+	size_t m_AdoInptWaveFileWrBufSzByt; //存放音频输入Wave文件写入缓冲区的大小，单位为字节。
 
 	UINT m_AdoInptDvcID; //存放音频输入设备的标识符。
 	IMMDeviceEnumerator * m_AdoInptDvcEnumPt; //存放音频输入设备枚举器的指针。
@@ -122,22 +122,22 @@ typedef struct AdoInpt //音频输入。
 	IAudioCaptureClient * m_AdoInptDvcCptrClntPt; //存放音频输入设备捕获客户端的指针。
 	IGlobalInterfaceTable * m_AdoInptDvcGlblIntfcTablePt; //存放音频输入设备全局接口表的指针。
 	DWORD m_AdoInptDvcCptrClntCookie; //存放音频输入设备捕获客户端的Cookie。
-	BufQueueCls m_PcmAdoInptDvcFrmBufQueue; //存放PCM格式音频输入设备帧的缓冲区队列。
-	int16_t * m_PcmAdoInptDvcFrmPt; //存放PCM格式音频输入设备帧的指针。
-	size_t m_PcmAdoInptDvcFrmLenUnit; //存放PCM格式音频输入设备帧的长度，单位为采样单元。
-	size_t m_PcmAdoInptDvcFrmLenByt; //存放PCM格式音频输入设备帧的长度，单位为字节。
-	SpeexResamplerState * m_PcmAdoInptSrcFrmSpeexResamplerPt; //存放PCM格式音频输入原始帧Speex重采样器的指针。
+	BufQueueCls m_PcmAdoInptDvcFrmBufQueue; //存放Pcm格式音频输入设备帧的缓冲区队列。
+	int16_t * m_PcmAdoInptDvcFrmPt; //存放Pcm格式音频输入设备帧的指针。
+	size_t m_PcmAdoInptDvcFrmLenUnit; //存放Pcm格式音频输入设备帧的长度，单位为采样单元。
+	size_t m_PcmAdoInptDvcFrmLenByt; //存放Pcm格式音频输入设备帧的长度，单位为字节。
+	SpeexResamplerState * m_PcmAdoInptSrcFrmSpeexResamplerPt; //存放Pcm格式音频输入原始帧Speex重采样器的指针。
 	int32_t m_AdoInptIsMute; //存放音频输入是否静音，为0表示有声音，为非0表示静音。
 	int32_t m_AdoInptDvcIsClos; //存放音频输入设备是否关闭，为0表示正常，为非0表示关闭。
 
-	ConstLenLnkLstCls m_PcmAdoInptSrcFrmLnkLst; //存放PCM格式音频输入原始帧链表。
-	ConstLenLnkLstCls m_PcmAdoInptIdleFrmLnkLst; //存放PCM格式音频输入空闲帧链表。
+	ConstLenLnkLstCls m_PcmAdoInptSrcFrmLnkLst; //存放Pcm格式音频输入原始帧链表。
+	ConstLenLnkLstCls m_PcmAdoInptIdleFrmLnkLst; //存放Pcm格式音频输入空闲帧链表。
 
 	int32_t m_IsInitAdoInptThrdTmpVar; //存放是否初始化音频输入线程的临时变量。
-	int16_t * m_PcmAdoInptSrcFrmPt; //存放PCM格式音频输入原始帧的指针。
+	int16_t * m_PcmAdoInptSrcFrmPt; //存放Pcm格式音频输入原始帧的指针。
 	size_t m_FrmLnkLstElmTotal; //存放帧链表的元素总数。
-	uint64_t m_LastTickMsec; //存放上次的嘀嗒钟。
-	uint64_t m_NowTickMsec; //存放本次的嘀嗒钟。
+	uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
+	uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 
 	ThrdInfo * m_AdoInptThrdInfoPt; //存放音频输入线程信息的指针。
 	int m_AdoInptThrdExitFlag; //存放音频输入线程退出标记，0表示保持运行，1表示请求退出。

@@ -6,15 +6,6 @@
 typedef struct MediaPocsThrd MediaPocsThrd;
 typedef struct VdoInptThrd VdoInptThrd;
 
-typedef struct VdoInptFrmElm //视频输入帧链表元素。
-{
-	uint8_t * m_BgraVdoInptSrcFrmPt; //存放BGRA8888格式视频输入原始帧的指针，宽度为m_BgraVdoInptSrcFrmWidth，高度为m_BgraVdoInptSrcFrmHeight，大小为m_BgraVdoInptSrcFrmWidth * m_BgraVdoInptSrcFrmHeight * 4字节。
-	uint8_t * m_YU12VdoInptRsltFrmPt; //存放YU12格式视频输入结果帧的指针，宽度为m_FrmWidth，高度为m_FrmHeight，大小为m_YU12FrmLenByt字节。
-	uint8_t * m_EncdVdoInptRsltFrmPt; //存放已编码格式视频输入结果帧的指针，大小为m_YU12FrmLenByt字节。
-	size_t m_EncdVdoInptRsltFrmLenByt; //存放已编码格式视频输入结果帧的长度，单位为字节。
-	uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
-}VdoInptFrmElm;
-
 typedef struct VdoInpt //视频输入。
 {
 	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程的指针。
@@ -52,9 +43,17 @@ typedef struct VdoInpt //视频输入。
 	int32_t m_BgraVdoInptSrcFrmScaleWidth; //存放BGRA8888格式视频输入原始帧缩放后的宽度，单位为像素。
 	int32_t m_BgraVdoInptSrcFrmScaleHeight; //存放BGRA8888格式视频输入原始帧缩放后的高度，单位为像素。
 	size_t m_BgraVdoInptSrcFrmScaleLenByt; //存放BGRA8888格式视频输入原始帧缩放后的长度，单位为字节。
-	int32_t m_VdoInptIsBlack; //存放视频输入是否黑屏，为0表示有图像，为非0表示黑屏。
 	HWND m_VdoInptPrvwWndHdl; //存放视频输入预览窗口的句柄。
+	int32_t m_VdoInptIsBlack; //存放视频输入是否黑屏，为0表示有图像，为非0表示黑屏。
 
+	typedef struct VdoInptFrm //视频输入帧。
+	{
+		uint8_t * m_BgraVdoInptSrcFrmPt; //存放BGRA8888格式视频输入原始帧的指针，宽度为m_BgraVdoInptSrcFrmWidth，高度为m_BgraVdoInptSrcFrmHeight，大小为m_BgraVdoInptSrcFrmWidth * m_BgraVdoInptSrcFrmHeight * 4字节。
+		uint8_t * m_YU12VdoInptRsltFrmPt; //存放YU12格式视频输入结果帧的指针，宽度为m_FrmWidth也为m_BgraVdoInptSrcFrmScaleWidth，高度为m_FrmHeight也为m_BgraVdoInptSrcFrmScaleHeight，大小为m_YU12FrmLenByt也为m_BgraVdoInptSrcFrmScaleLenByt字节。
+		uint8_t * m_EncdVdoInptRsltFrmPt; //存放已编码格式视频输入结果帧的指针，大小为m_YU12FrmLenByt字节。
+		size_t m_EncdVdoInptRsltFrmLenByt; //存放已编码格式视频输入结果帧的长度，单位为字节。
+		uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
+	}VdoInptFrm;
 	ConstLenLnkLstCls m_VdoInptFrmLnkLst; //存放视频输入帧链表。
 	ConstLenLnkLstCls m_VdoInptIdleFrmLnkLst; //存放视频输入空闲帧链表。
 
@@ -65,10 +64,10 @@ typedef struct VdoInpt //视频输入。
 	uint8_t * m_VdoInptTmp2FrmPt; //存放视频输入临时帧的指针。
 	size_t m_VdoInptTmpFrmSzByt; //存放视频输入临时帧的大小，单位为字节。
 	size_t m_VdoInptTmpFrmLenByt; //存放视频输入临时帧的长度，单位为字节。
-	VdoInptFrmElm * m_VdoInptFrmElmPt; //存放视频输入帧元素的指针。
+	VdoInptFrm * m_VdoInptFrmPt; //存放视频输入帧的指针。
 	size_t m_FrmLnkLstElmTotal; //存放帧链表的元素总数。
-	uint64_t m_LastTickMsec; //存放上次的嘀嗒钟。
-	uint64_t m_NowTickMsec; //存放本次的嘀嗒钟。
+	uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
+	uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 
 	VdoInptThrd * m_VdoInptThrdPt; //存放视频输入线程的指针。
 }VdoInpt;

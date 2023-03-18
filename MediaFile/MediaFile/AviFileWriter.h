@@ -10,7 +10,7 @@ extern "C"
 
 typedef struct AviFileWriter AviFileWriter;
 
-__MEDIAFILE_DLLAPI__ int AviFileWriterInit( AviFileWriter * * AviFileWriterPtPt, const Vstr * AviFileFullPathVstrPt, size_t AviFileWrBufSz, uint32_t MaxStrmNum, Vstr * ErrInfoVstrPt );
+__MEDIAFILE_DLLAPI__ int AviFileWriterInit( AviFileWriter * * AviFileWriterPtPt, const Vstr * AviFileFullPathVstrPt, size_t AviFileWrBufSzByt, uint32_t MaxStrmNum, Vstr * ErrInfoVstrPt );
 
 __MEDIAFILE_DLLAPI__ int AviFileWriterSetStartTimeStamp( AviFileWriter * AviFileWriterPt, uint64_t StartTimeStampMsec, Vstr * ErrInfoVstrPt );
 __MEDIAFILE_DLLAPI__ int AviFileWriterGetStartTimeStamp( AviFileWriter * AviFileWriterPt, uint64_t * StartTimeStampMsecPt, Vstr * ErrInfoVstrPt );

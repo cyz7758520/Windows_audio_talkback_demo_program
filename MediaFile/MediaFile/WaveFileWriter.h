@@ -10,7 +10,7 @@ extern "C"
 
 typedef struct WaveFileWriter WaveFileWriter;
 
-__MEDIAFILE_DLLAPI__ int WaveFileWriterInit( WaveFileWriter * * WaveFileWriterPtPt, const Vstr * WaveFileFullPathVstrPt, size_t WaveFileWrBufSz, int32_t ChanlNum, int32_t SmplRate, int32_t SmplBit );
+__MEDIAFILE_DLLAPI__ int WaveFileWriterInit( WaveFileWriter * * WaveFileWriterPtPt, const Vstr * WaveFileFullPathVstrPt, size_t WaveFileWrBufSzByt, int32_t ChanlNum, int32_t SmplRate, int32_t SmplBit );
 __MEDIAFILE_DLLAPI__ int WaveFileWriterWrite( WaveFileWriter * WaveFileWriterPt, const char * DataPt, size_t DataLenByt );
 __MEDIAFILE_DLLAPI__ int WaveFileWriterDstoy( WaveFileWriter * WaveFileWriterPt );
 
@@ -27,7 +27,7 @@ public:
 	WaveFileWriterCls() { m_WaveFileWriterPt = NULL; }
 	~WaveFileWriterCls() { Dstoy(); }
 
-	int Init( const Vstr * WaveFileFullPathVstrPt, size_t WaveFileWrBufSz, int32_t ChanlNum, int32_t SmplRate, int32_t SmplBit ) { return WaveFileWriterInit( &m_WaveFileWriterPt, WaveFileFullPathVstrPt, WaveFileWrBufSz, ChanlNum, SmplRate, SmplBit ); }
+	int Init( const Vstr * WaveFileFullPathVstrPt, size_t WaveFileWrBufSzByt, int32_t ChanlNum, int32_t SmplRate, int32_t SmplBit ) { return WaveFileWriterInit( &m_WaveFileWriterPt, WaveFileFullPathVstrPt, WaveFileWrBufSzByt, ChanlNum, SmplRate, SmplBit ); }
 	
 	int Write( const char * DataPt, size_t DataLenByt ) { return WaveFileWriterWrite( m_WaveFileWriterPt, DataPt, DataLenByt ); }
 

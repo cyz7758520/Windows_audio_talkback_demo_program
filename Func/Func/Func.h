@@ -15,7 +15,9 @@
 #include <math.h>
 
 #ifdef __cplusplus
+#ifndef _LIBCPP_HAS_NO_THREADS
 #include <thread>                         //std::thread
+#endif
 #include <queue>                          //std::queue
 #include <list>                           //std::list
 #include <map>                            //std::map
