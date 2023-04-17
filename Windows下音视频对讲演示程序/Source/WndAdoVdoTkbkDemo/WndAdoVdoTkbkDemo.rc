@@ -50,12 +50,12 @@ END
 // Dialog
 //
 
-MainDlgId DIALOGEX 0, 0, 543, 413
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+MainDlgId DIALOGEX 0, 0, 543, 414
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年03月18日",IDC_STATIC,7,7,295,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年04月17日",IDC_STATIC,7,7,295,16
     LTEXT           "传输协议：",IDC_STATIC,7,35,58,8
     CONTROL         "TCP协议",UseTcpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,78,34,45,10
     CONTROL         "UDP协议",UseUdpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON,164,34,45,10
@@ -90,9 +90,9 @@ BEGIN
     CTEXT           "音频输出原始波形",AdoOtptSrcWavfmTxtId,78,221,225,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
     LTEXT           "日志：",IDC_STATIC,7,247,25,8
     PUSHBUTTON      "清空日志",ClearLogBtnId,252,243,50,14
-    LISTBOX         LogLtBoxId,7,256,295,150,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
-    CTEXT           "视频输入预览",VdoInptPrvwTxtId,303,7,233,198,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
-    CTEXT           "视频输出显示",VdoOtptDspyTxtId,303,208,233,198,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
+    LISTBOX         LogLtBoxId,7,256,295,151,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    CTEXT           "视频输入预览",VdoInptPrvwTxtId,303,7,233,200,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
+    CTEXT           "视频输出显示",VdoOtptDspyTxtId,303,207,233,200,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
 END
 
 XfrPrtclStngDlgId DIALOGEX 0, 0, 309, 104
@@ -121,64 +121,66 @@ BEGIN
     CONTROL         "自己设计的自适应抖动缓冲器",UseAjbRecvOtptFrmRdBtnId,"Button",BS_AUTORADIOBUTTON,97,42,137,10
     PUSHBUTTON      "设置",AjbStngBtnId,252,40,50,14
     CONTROL         "保存设置到可执行文件所在目录下的Setting.txt文件中",IsSaveStngToFileCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,56,203,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,54,203,10
     CONTROL         "打印Log日志到可执行文件所在目录下的Log.txt文件中，并显示Toast",IsPrintLogShowToastCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,70,253,10
-    CONTROL         "使用阻止系统休眠",IsUsePrvntSysSleepCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,83,253,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,66,253,10
+    CONTROL         "使用阻止系统休眠",IsUsePrvntSysSleepCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,78,253,10
     CONTROL         "将音视频输入输出替换保存到当前进程活动目录下的AdoVdoInptOtpt.avi文件中",IsSaveAdoVdoInptOtptToAviFileCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,96,295,9
-    CTEXT           "音视频预设设置",IDC_STATIC,7,113,295,9,WS_TABSTOP
-    LTEXT           "效果等级：",IDC_STATIC,7,131,74,8
-    CONTROL         "低",UseEffectLowRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,130,20,10
-    CONTROL         "中",UseEffectMidRdBtnId,"Button",BS_AUTORADIOBUTTON,144,130,20,10
-    CONTROL         "高",UseEffectHighRdBtnId,"Button",BS_AUTORADIOBUTTON,190,130,20,10
-    CONTROL         "超",UseEffectSuperRdBtnId,"Button",BS_AUTORADIOBUTTON,236,130,20,10
-    CONTROL         "特",UseEffectPremiumRdBtnId,"Button",BS_AUTORADIOBUTTON,282,130,20,10
-    LTEXT           "比特率等级：",IDC_STATIC,7,144,74,8
-    CONTROL         "低",UseBitrateLowRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,143,20,10
-    CONTROL         "中",UseBitrateMidRdBtnId,"Button",BS_AUTORADIOBUTTON,144,143,20,10
-    CONTROL         "高",UseBitrateHighRdBtnId,"Button",BS_AUTORADIOBUTTON,190,143,20,10
-    CONTROL         "超",UseBitrateSuperRdBtnId,"Button",BS_AUTORADIOBUTTON,236,143,20,10
-    CONTROL         "特",UseBitratePremiumRdBtnId,"Button",BS_AUTORADIOBUTTON,282,143,20,10
-    CTEXT           "音频设置",IDC_STATIC,7,161,295,9,WS_TABSTOP
-    LTEXT           "采样频率：",IDC_STATIC,7,178,74,8
-    CONTROL         "8k",UseAdoSmplRate8000RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,178,25,10
-    CONTROL         "16k",UseAdoSmplRate16000RdBtnId,"Button",BS_AUTORADIOBUTTON,157,178,25,10
-    CONTROL         "32k",UseAdoSmplRate32000RdBtnId,"Button",BS_AUTORADIOBUTTON,216,178,25,10
-    CONTROL         "48k",UseAdoSmplRate48000RdBtnId,"Button",BS_AUTORADIOBUTTON,275,178,25,10
-    LTEXT           "帧长度：",IDC_STATIC,7,192,74,8
-    CONTROL         "10ms",UseAdoFrmLen10msRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,191,45,10
-    CONTROL         "20ms",UseAdoFrmLen20msRdBtnId,"Button",BS_AUTORADIOBUTTON,163,191,45,10
-    CONTROL         "30ms",UseAdoFrmLen30msRdBtnId,"Button",BS_AUTORADIOBUTTON,228,191,45,10
-    LTEXT           "声学回音消除器：",IDC_STATIC,7,234,74,8
-    CONTROL         "不使用",UseNoAecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,204,137,10
-    CONTROL         "Speex声学回音消除器",UseSpeexAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,219,137,10
-    PUSHBUTTON      "设置",SpeexAecStngBtnId,252,217,50,14
-    CONTROL         "WebRtc定点版声学回音消除器",UseWebRtcAecmRdBtnId,"Button",BS_AUTORADIOBUTTON,98,234,137,10
-    PUSHBUTTON      "设置",WebRtcAecmStngBtnId,252,232,50,14
-    CONTROL         "WebRtc浮点版声学回音消除器",UseWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,249,137,10
-    PUSHBUTTON      "设置",WebRtcAecStngBtnId,252,247,50,14
-    CONTROL         "SpeexWebRtc三重声学回音消除器",UseSpeexWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,264,137,10
-    PUSHBUTTON      "设置",SpeexWebRtcAecStngBtnId,252,262,50,14
-    LTEXT           "噪音抑制器：",IDC_STATIC,7,309,74,8
-    CONTROL         "不使用",UseNoNsRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,97,279,137,10
-    CONTROL         "Speex预处理器的噪音抑制",UseSpeexPrpocsNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,294,137,10
-    PUSHBUTTON      "设置",SpeexPrpocsNsStngBtnId,252,292,50,14
-    CONTROL         "WebRtc定点版噪音抑制器",UseWebRtcNsxRdBtnId,"Button",BS_AUTORADIOBUTTON,98,309,137,10
-    PUSHBUTTON      "设置",WebRtcNsxStngBtnId,252,307,50,14
-    CONTROL         "WebRtc浮点版噪音抑制器",UseWebRtcNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,324,137,10
-    PUSHBUTTON      "设置",WebRtcNsStngBtnId,252,322,50,14
-    CONTROL         "RNNoise噪音抑制器",UseRNNoiseRdBtnId,"Button",BS_AUTORADIOBUTTON,98,339,137,10
-    CONTROL         "使用Speex预处理器的其他功能",IsUseSpeexPrpocsOtherCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,354,203,10
-    PUSHBUTTON      "设置",SpeexPrpocsOtherStngBtnId,252,352,50,14
-    LTEXT           "编解码器：",IDC_STATIC,7,384,74,8
-    CONTROL         "PCM原始数据",UsePcmRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,97,369,137,10
-    CONTROL         "Speex编解码器",UseSpeexCodecRdBtnId,"Button",BS_AUTORADIOBUTTON,97,384,137,10
-    PUSHBUTTON      "设置",SpeexCodecStngBtnId,252,382,50,14
-    CONTROL         "Opus编解码器",UseOpusCodecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,97,399,137,10
-    PUSHBUTTON      "设置",OpusCodecStngBtnId,252,397,50,14,WS_DISABLED
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,90,295,9
+    CTEXT           "音视频预设设置",IDC_STATIC,7,106,295,9,WS_TABSTOP
+    LTEXT           "效果等级：",IDC_STATIC,7,123,74,8
+    CONTROL         "低",UseEffectLowRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,122,20,10
+    CONTROL         "中",UseEffectMidRdBtnId,"Button",BS_AUTORADIOBUTTON,144,122,20,10
+    CONTROL         "高",UseEffectHighRdBtnId,"Button",BS_AUTORADIOBUTTON,190,122,20,10
+    CONTROL         "超",UseEffectSuperRdBtnId,"Button",BS_AUTORADIOBUTTON,236,122,20,10
+    CONTROL         "特",UseEffectPremiumRdBtnId,"Button",BS_AUTORADIOBUTTON,282,122,20,10
+    LTEXT           "比特率等级：",IDC_STATIC,7,135,74,8
+    CONTROL         "低",UseBitrateLowRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,134,20,10
+    CONTROL         "中",UseBitrateMidRdBtnId,"Button",BS_AUTORADIOBUTTON,144,134,20,10
+    CONTROL         "高",UseBitrateHighRdBtnId,"Button",BS_AUTORADIOBUTTON,190,134,20,10
+    CONTROL         "超",UseBitrateSuperRdBtnId,"Button",BS_AUTORADIOBUTTON,236,134,20,10
+    CONTROL         "特",UseBitratePremiumRdBtnId,"Button",BS_AUTORADIOBUTTON,282,134,20,10
+    CTEXT           "音频设置",IDC_STATIC,7,151,295,9,WS_TABSTOP
+    LTEXT           "采样频率：",IDC_STATIC,7,168,74,8
+    CONTROL         "8k",UseAdoSmplRate8000RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,168,25,10
+    CONTROL         "16k",UseAdoSmplRate16000RdBtnId,"Button",BS_AUTORADIOBUTTON,157,168,25,10
+    CONTROL         "32k",UseAdoSmplRate32000RdBtnId,"Button",BS_AUTORADIOBUTTON,216,168,25,10
+    CONTROL         "48k",UseAdoSmplRate48000RdBtnId,"Button",BS_AUTORADIOBUTTON,275,168,25,10
+    LTEXT           "帧长度：",IDC_STATIC,7,181,74,8
+    CONTROL         "10ms",UseAdoFrmLen10msRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,180,45,10
+    CONTROL         "20ms",UseAdoFrmLen20msRdBtnId,"Button",BS_AUTORADIOBUTTON,163,180,45,10
+    CONTROL         "30ms",UseAdoFrmLen30msRdBtnId,"Button",BS_AUTORADIOBUTTON,228,180,45,10
+    CONTROL         "使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器",IsUseSystemAecNsAgcCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,195,295,9
+    LTEXT           "声学回音消除器：",IDC_STATIC,7,238,74,8
+    CONTROL         "不使用",UseNoAecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,208,137,10
+    CONTROL         "Speex声学回音消除器",UseSpeexAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,223,137,10
+    PUSHBUTTON      "设置",SpeexAecStngBtnId,252,221,50,14
+    CONTROL         "WebRtc定点版声学回音消除器",UseWebRtcAecmRdBtnId,"Button",BS_AUTORADIOBUTTON,98,238,137,10
+    PUSHBUTTON      "设置",WebRtcAecmStngBtnId,252,236,50,14
+    CONTROL         "WebRtc浮点版声学回音消除器",UseWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,253,137,10
+    PUSHBUTTON      "设置",WebRtcAecStngBtnId,252,251,50,14
+    CONTROL         "SpeexWebRtc三重声学回音消除器",UseSpeexWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,268,137,10
+    PUSHBUTTON      "设置",SpeexWebRtcAecStngBtnId,252,266,50,14
+    LTEXT           "噪音抑制器：",IDC_STATIC,7,313,74,8
+    CONTROL         "不使用",UseNoNsRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,97,283,137,10
+    CONTROL         "Speex预处理器的噪音抑制",UseSpeexPrpocsNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,298,137,10
+    PUSHBUTTON      "设置",SpeexPrpocsNsStngBtnId,252,296,50,14
+    CONTROL         "WebRtc定点版噪音抑制器",UseWebRtcNsxRdBtnId,"Button",BS_AUTORADIOBUTTON,98,313,137,10
+    PUSHBUTTON      "设置",WebRtcNsxStngBtnId,252,311,50,14
+    CONTROL         "WebRtc浮点版噪音抑制器",UseWebRtcNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,328,137,10
+    PUSHBUTTON      "设置",WebRtcNsStngBtnId,252,326,50,14
+    CONTROL         "RNNoise噪音抑制器",UseRNNoiseRdBtnId,"Button",BS_AUTORADIOBUTTON,98,343,137,10
+    CONTROL         "使用Speex预处理器",IsUseSpeexPrpocsCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,358,203,10
+    PUSHBUTTON      "设置",SpeexPrpocsStngBtnId,252,356,50,14
+    LTEXT           "编解码器：",IDC_STATIC,7,386,74,8
+    CONTROL         "PCM原始数据",UsePcmRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,97,371,137,10
+    CONTROL         "Speex编解码器",UseSpeexCodecRdBtnId,"Button",BS_AUTORADIOBUTTON,97,386,137,10
+    PUSHBUTTON      "设置",SpeexCodecStngBtnId,252,384,50,14
+    CONTROL         "Opus编解码器",UseOpusCodecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,97,401,137,10
+    PUSHBUTTON      "设置",OpusCodecStngBtnId,252,399,50,14,WS_DISABLED
     CONTROL         "将音频输入原始、音频输入结果、音频输出原始的波形绘制到窗口中",IsDrawAdoWavfmToWndCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,413,295,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,415,295,10
     CONTROL         "将音频输入原始、音频输入结果、音频输出原始分别替换保存到当前进程活动目录下的AdoInptSrc.wav、AdoInptRslt.wav、AdoOtptSrc.wav文件中",IsSaveAdoToWaveFileCkBoxId,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,425,295,20
     CTEXT           "视频设置",IDC_STATIC,7,458,295,9,WS_TABSTOP
@@ -187,11 +189,13 @@ BEGIN
     CONTROL         "15",UseVdoSmplRate15RdBtnId,"Button",BS_AUTORADIOBUTTON,159,475,20,10
     CONTROL         "24",UseVdoSmplRate24RdBtnId,"Button",BS_AUTORADIOBUTTON,220,475,20,10
     CONTROL         "30",UseVdoSmplRate30RdBtnId,"Button",BS_AUTORADIOBUTTON,281,475,20,10
-    LTEXT           "帧大小：",IDC_STATIC,7,488,74,8
-    CONTROL         "120×160",UseVdoFrmSize120_160RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,487,45,10
-    CONTROL         "240×320",UseVdoFrmSize240_320RdBtnId,"Button",BS_AUTORADIOBUTTON,151,487,45,10
-    CONTROL         "480×640",UseVdoFrmSize480_640RdBtnId,"Button",BS_AUTORADIOBUTTON,204,487,45,10
-    CONTROL         "960×1280",UseVdoFrmSize960_1280RdBtnId,"Button",BS_AUTORADIOBUTTON,257,487,45,10
+    LTEXT           "帧大小：",IDC_STATIC,7,489,74,8
+    CONTROL         "",UseVdoFrmSzPrsetRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,488,10,10
+    COMBOBOX        VdoFrmSzPrsetCbBoxId,109,486,68,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_TRANSPARENT
+    CONTROL         "",UseVdoFrmSzOtherRdBtnId,"Button",BS_AUTORADIOBUTTON,220,487,10,10
+    EDITTEXT        VdoFrmSzOtherWidthEdTxtId,229,485,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "×",IDC_STATIC,255,488,5,8
+    EDITTEXT        VdoFrmSzOtherHeightEdTxtId,261,485,26,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "编解码器：",IDC_STATIC,7,507,74,8
     CONTROL         "YU12原始数据",UseYU12RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,500,137,10
     CONTROL         "OpenH264编解码器",UseOpenH264CodecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,513,137,10
@@ -229,7 +233,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "Speex声学回音消除器\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
     LTEXT           "滤波器的长度，单位为毫秒：",IDC_STATIC,7,35,213,8
-    EDITTEXT        SpeexAecFilterLenEdTxtId,231,32,71,14,ES_AUTOHSCROLL
+    EDITTEXT        SpeexAecFilterLenMsecEdTxtId,231,32,71,14,ES_AUTOHSCROLL
     CONTROL         "使用残余回音消除",SpeexAecIsUseRecCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,213,10
     LTEXT           "在残余回音消除时，残余回音的倍数，倍数越大消除越强，取值区间为[0.0,100.0]：",IDC_STATIC,7,67,213,16
     EDITTEXT        SpeexAecEchoMutpEdTxtId,231,68,71,14,ES_AUTOHSCROLL
@@ -294,7 +298,7 @@ BEGIN
     CONTROL         "Speex声学回音消除器+WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器",SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId,
                     "Button",BS_AUTORADIOBUTTON | BS_MULTILINE,87,72,215,18
     LTEXT           "Speex声学回音消除器滤波器的长度，单位为毫秒：",IDC_STATIC,7,97,213,8
-    EDITTEXT        SpeexWebRtcAecSpeexAecFilterLenEdTxtId,231,94,71,14,ES_AUTOHSCROLL
+    EDITTEXT        SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId,231,94,71,14,ES_AUTOHSCROLL
     CONTROL         "Speex声学回音消除器使用残余回音消除",SpeexWebRtcAecSpeexAecIsUseRecCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,213,10
     LTEXT           "Speex声学回音消除器在残余回音消除时，残余回音的倍数，倍数越大消除越强，取值区间为[0.0,100.0]：",IDC_STATIC,7,129,213,16
@@ -365,12 +369,12 @@ BEGIN
     DEFPUSHBUTTON   "确定",WebRtcNsStngOkBtnId,7,54,295,14
 END
 
-SpeexPrpocsOtherStngDlgId DIALOGEX 0, 0, 309, 251
+SpeexPrpocsStngDlgId DIALOGEX 0, 0, 309, 251
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Speex预处理器的其他功能\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
+    CTEXT           "Speex预处理器\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
     CONTROL         "使用语音活动检测",SpeexPrpocsIsUseVadCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,33,213,10
     LTEXT           "在语音活动检测时，从无语音活动到有语音活动的判断百分比概率，概率越大越难判断为有语音活，取值区间为[0,100]：",IDC_STATIC,7,51,213,24
     EDITTEXT        SpeexPrpocsVadProbStartEdTxtId,231,56,71,14,ES_AUTOHSCROLL
@@ -385,7 +389,7 @@ BEGIN
     EDITTEXT        SpeexPrpocsAgcDecrementEdTxtId,231,182,71,14,ES_AUTOHSCROLL
     LTEXT           "在自动增益控制时，最大增益的分贝值，分贝值越大增益越大，取值区间为[0,2147483647]：",IDC_STATIC,7,204,213,16
     EDITTEXT        SpeexPrpocsAgcMaxGainEdTxtId,231,205,71,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "确定",SpeexPrpocsOtherStngOkBtnId,7,230,295,14
+    DEFPUSHBUTTON   "确定",SpeexPrpocsStngOkBtnId,7,230,295,14
 END
 
 SpeexCodecStngDlgId DIALOGEX 0, 0, 309, 173
@@ -458,7 +462,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 536
         TOPMARGIN, 7
-        BOTTOMMARGIN, 406
+        BOTTOMMARGIN, 407
     END
 
     XfrPrtclStngDlgId, DIALOG
@@ -541,7 +545,7 @@ BEGIN
         BOTTOMMARGIN, 68
     END
 
-    SpeexPrpocsOtherStngDlgId, DIALOG
+    SpeexPrpocsStngDlgId, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302

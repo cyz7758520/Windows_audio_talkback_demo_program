@@ -84,34 +84,34 @@ __FUNC_DLLAPI__ void LogWrite( size_t FileNum, int Lvl, const uint8_t * SrcFileN
 __FUNC_DLLAPI__ void LogFmtWrite( size_t FileNum, int Lvl, const uint8_t * SrcFileNameStrPt, uint64_t SrcFileLine, const uint8_t * FuncNameStrPt, const Vstr * FmtVstrPt, ... );
 
 
-#define LOGH( Lvl, LineLen, DataPt, DataSz ) LogHexWrite( SIZE_MAX, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHE( LineLen, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHW( LineLen, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHI( LineLen, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHD( LineLen, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
+#define LOGH( Lvl, LineLenByt, DataPt, DataSz ) LogHexWrite( SIZE_MAX, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHE( LineLenByt, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHW( LineLenByt, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHI( LineLenByt, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHD( LineLenByt, DataPt, DataSz ) LogHexWrite( SIZE_MAX, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
 
-#define LOGHN( FileNum, Lvl, LineLen, DataPt, DataSz ) LogHexWrite( FileNum, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHNE( FileNum, LineLen, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHNW( FileNum, LineLen, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHNI( FileNum, LineLen, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
-#define LOGHND( FileNum, LineLen, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, DataPt, DataSz )
+#define LOGHN( FileNum, Lvl, LineLenByt, DataPt, DataSz ) LogHexWrite( FileNum, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHNE( FileNum, LineLenByt, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHNW( FileNum, LineLenByt, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHNI( FileNum, LineLenByt, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
+#define LOGHND( FileNum, LineLenByt, DataPt, DataSz ) LogHexWrite( FileNum, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, DataPt, DataSz )
 
-__FUNC_DLLAPI__ void LogHexWrite( size_t FileNum, int Lvl, const uint8_t * SrcFileNameStrPt, uint64_t SrcFileLine, const uint8_t * FuncNameStrPt, size_t LineLen, const void * DataPt, size_t DataSz );
+__FUNC_DLLAPI__ void LogHexWrite( size_t FileNum, int Lvl, const uint8_t * SrcFileNameStrPt, uint64_t SrcFileLine, const uint8_t * FuncNameStrPt, size_t LineLenByt, const void * DataPt, size_t DataSz );
 
 
-#define LOGHF( Lvl, LineLen, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHFE( LineLen, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHFW( LineLen, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHFI( LineLen, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHFD( LineLen, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
+#define LOGHF( Lvl, LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHFE( LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHFW( LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHFI( LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHFD( LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( SIZE_MAX, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
 
-#define LOGHNF( FileNum, Lvl, LineLen, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHNFE( FileNum, LineLen, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHNFW( FileNum, LineLen, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHNFI( FileNum, LineLen, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
-#define LOGHNFD( FileNum, LineLen, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLen, FmtVstrPt, __VA_ARGS__ )
+#define LOGHNF( FileNum, Lvl, LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, Lvl, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHNFE( FileNum, LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_ERROR, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHNFW( FileNum, LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_WARN, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHNFI( FileNum, LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_INFO, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
+#define LOGHNFD( FileNum, LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
 
-__FUNC_DLLAPI__ void LogHexFmtWrite( size_t FileNum, int Lvl, const uint8_t * SrcFileNameStrPt, uint64_t SrcFileLine, const uint8_t * FuncNameStrPt, size_t LineLen, const Vstr * FmtVstrPt, ... );
+__FUNC_DLLAPI__ void LogHexFmtWrite( size_t FileNum, int Lvl, const uint8_t * SrcFileNameStrPt, uint64_t SrcFileLine, const uint8_t * FuncNameStrPt, size_t LineLenByt, const Vstr * FmtVstrPt, ... );
 
 
 __FUNC_DLLAPI__ void LogDstoy();

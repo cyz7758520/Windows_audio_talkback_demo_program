@@ -36,7 +36,7 @@
 
 &emsp;&emsp;设置按钮提供了各项功能的参数设置，绝大部分情况下都不需要修改，当然你也可以根据需要自行修改。  
 
-&emsp;&emsp;**特别注意：如果把两台设备放在同一房间里测试，有可能会出现啸叫、声音不完整、等问题，这是因为现在的麦克风都很灵敏了，一点小小的声音都会被录进去，两台设备会相互录音，导致软件无法正确识别回音，所以建议放在不同的房间里测试。如果实在要测试这种情况，就在设置里，Speex预处理器的其他功能设置里，关闭“使用自动增益控制”后再测试。**  
+&emsp;&emsp;**特别注意：如果把两台设备放在同一房间里测试，有可能会出现啸叫、声音不完整、等问题，这是因为现在的麦克风都很灵敏了，一点小小的声音都会被录进去，两台设备会相互录音，导致软件无法正确识别回音，所以建议放在不同的房间里测试。如果实在要测试这种情况，就在设置里，Speex预处理器的设置里，关闭“使用自动增益控制”后再测试。**  
 
 # 移植
 &emsp;&emsp;如果需要在自己的软件中使用本软件的音视频功能，需要以下几个步骤：  
@@ -53,9 +53,41 @@
 
 &emsp;&emsp;如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。  
 
-&emsp;&emsp;**普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器的其他功能、Speex编解码器、Wave文件读取器、Wave文件写入器、音频波形器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。**  
+&emsp;&emsp;**普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器、Speex编解码器、Wave文件读取器、Wave文件写入器、音频波形器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。**  
 
 &emsp;&emsp;**高级收费功能包括：Speex声学回音消除器、WebRtc浮点版声学回音消除器、SpeexWebRtc三重声学回音消除器、RNNoise噪音抑制器、OpenH264编解码器、自己设计的自适应抖动缓冲器、Avi文件写入器、本端高级UDP协议套接字。**  
+
+# 命令
+&emsp;&emsp;本软件支持通过命令行参数来设置，参数如下：  
+&emsp;&emsp;**-Tcp**：表示选择TCP协议。  
+&emsp;&emsp;**-Udp**：表示选择UDP协议。  
+&emsp;&emsp;**-Ip xx.xx.xx.xx**：表示设置IP地址。  
+&emsp;&emsp;**-Port xxx**：表示设置端口号。  
+&emsp;&emsp;**-Ado**：表示选择音频对讲模式。  
+&emsp;&emsp;**-Vdo**：表示选择视频对讲模式。  
+&emsp;&emsp;**-AdoVdo**：表示选择音视频对讲模式。  
+&emsp;&emsp;**-SaveStng xxx.txt**：表示要保存设置到xxx.txt文件，可以为相对或绝对完整路径。  
+&emsp;&emsp;**-NoSaveStng**：表示不保存设置到文件。  
+&emsp;&emsp;**-PrintLogShowToast**：表示要打印Log日志，要显示Toast。  
+&emsp;&emsp;**-NoPrintLogShowToast**：表示不打印Log日志，不显示Toast。  
+&emsp;&emsp;**-SaveAdoVdoInptOtpt xxx.avi**：表示要保存音视频输入输出到xxx.avi文件，可以为相对或绝对完整路径。  
+&emsp;&emsp;**-NoSaveAdoVdoInptOtpt**：表示不保存音视频输入输出到文件。  
+&emsp;&emsp;**-SaveAdo AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav**：表示要分别保存音频输入原始、音频输入结果、音频输出原始到AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav文件，可以为相对或绝对完整路径。  
+&emsp;&emsp;**-NoSaveAdo**：表示不保存音频输入原始、音频输入结果、音频输出原始到文件。  
+&emsp;&emsp;**-VdoInptPrvwWndHdl xxx**：表示设置视频输入预览窗口的句柄为xxx（十进制）。  
+&emsp;&emsp;**-VdoOtptDspyWndHdl xxx**：表示设置视频输出显示窗口的句柄为xxx（十进制）。  
+&emsp;&emsp;**-VdoWndShowMode 0|1|2**：表示设置视频窗口的显示模式，为0表示正常，为1表示垂直最大化排列，为2表示水平最大化排列。  
+&emsp;&emsp;**-VdoFrmSz Width Height**：表示设置视频帧的宽度和高度，单位为像素，只能为偶数，不能为奇数。  
+&emsp;&emsp;**-WndSz Width Height**：表示设置窗口的宽度和高度，单位为像素。  
+&emsp;&emsp;**-ShowWnd**：表示显示窗口。  
+&emsp;&emsp;**-HideWnd**：表示隐藏窗口。  
+&emsp;&emsp;**-MinWnd**：表示最小化窗口。  
+&emsp;&emsp;**-MaxWnd**：表示最大化窗口。  
+&emsp;&emsp;**-TkbkStsWndHdl**：表示设置对讲状态窗口的句柄为xxx（十进制）。  
+&emsp;&emsp;**-CreateSrvr**：表示创建服务端。本参数要放在所有参数的最后。  
+&emsp;&emsp;**-CnctSrvr**：表示链接服务端。本参数要放在所有参数的最后。  
+
+&emsp;&emsp;例如：“Windows下音视频对讲演示程序.exe -Tcp -Ip 192.168.0.100 -Port 12345 -AdoVdo -VdoFrmSz 1280 960 -WndSz 1000 900 -CreateSrvr”：表示选择TCP协议，设置IP地址为192.168.0.100，设置端口号为12345，选择音视频对讲模式，设置视频帧的宽度为1280像素、高度为960像素。设置窗口的宽度为1000像素、高度为900像素，最后创建服务端。
 
 # 注意
 &emsp;&emsp;从老版本更新到新版本时，类文件和库文件全部都要更新，不能只更新类文件或库文件，否则会导致意想不到的问题。  

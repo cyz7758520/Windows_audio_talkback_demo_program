@@ -80,9 +80,9 @@ public:
 	int SetSendBufSz( size_t SendBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetSendBufSz( m_TcpClntSoktPt, SendBufSzByt, IsAutoLock, ErrInfoVstrPt ); }
 	int GetSendBufSz( size_t * SendBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetSendBufSz( m_TcpClntSoktPt, SendBufSzBytPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SetRecvBufSz( size_t RecvBufBytSz, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetRecvBufSz( m_TcpClntSoktPt, RecvBufBytSz, IsAutoLock, ErrInfoVstrPt ); }
-	int GetRecvBufSz( size_t * RecvBufBytSzPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufSz( m_TcpClntSoktPt, RecvBufBytSzPt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetRecvBufLen( size_t * RecvBufBytLenPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufLen( m_TcpClntSoktPt, RecvBufBytLenPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetRecvBufSz( size_t RecvBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetRecvBufSz( m_TcpClntSoktPt, RecvBufSzByt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetRecvBufSz( size_t * RecvBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufSz( m_TcpClntSoktPt, RecvBufSzBytPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetRecvBufLen( size_t * RecvBufLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufLen( m_TcpClntSoktPt, RecvBufLenBytPt, IsAutoLock, ErrInfoVstrPt ); }
 
 	int SetKeepAlive( int IsUseKeepAlive, int KeepIdle, int KeepIntvl, int KeepCnt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetKeepAlive( m_TcpClntSoktPt, IsUseKeepAlive, KeepIdle, KeepIntvl, KeepCnt, IsAutoLock, ErrInfoVstrPt ); }
 	int GetKeepAlive( int * IsUseKeepAlivePt, int * KeepIdlePt, int * KeepIntvlPt, int * KeepCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetKeepAlive( m_TcpClntSoktPt, IsUseKeepAlivePt, KeepIdlePt, KeepIntvlPt, KeepCntPt, IsAutoLock, ErrInfoVstrPt ); }

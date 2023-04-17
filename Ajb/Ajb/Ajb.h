@@ -45,7 +45,7 @@ extern "C"
 
 typedef struct AAjb AAjb;
 
-__AJB_DLLAPI__ int AAjbInit( AAjb * * AAjbPtPt, int32_t SmplRate, int32_t FrmLenUnit, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, int32_t IsDelObsltFrm, Vstr * ErrInfoVstrPt );
+__AJB_DLLAPI__ int AAjbInit( AAjb * * AAjbPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, int32_t IsDelObsltFrm, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int AAjbLocked( AAjb * AAjbPt, Vstr * ErrInfoVstrPt );
 __AJB_DLLAPI__ int AAjbUnlock( AAjb * AAjbPt, Vstr * ErrInfoVstrPt );
@@ -72,7 +72,7 @@ public:
 	AAjbCls() { m_AAjbPt = NULL; }
 	~AAjbCls() { Dstoy( NULL ); }
 
-	int Init( int32_t SmplRate, int32_t FrmLenUnit, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, int32_t IsDelObsltFrm, Vstr * ErrInfoVstrPt ) { return AAjbInit( &m_AAjbPt, SmplRate, FrmLenUnit, IsHaveTimeStamp, TimeStampStep, InactIsContPut, MinNeedBufFrmCnt, MaxNeedBufFrmCnt, MaxCntuLostFrmCnt, AdaptSensitivity, IsDelObsltFrm, ErrInfoVstrPt ); }
+	int Init( int32_t SmplRate, size_t FrmLenUnit, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, int32_t IsDelObsltFrm, Vstr * ErrInfoVstrPt ) { return AAjbInit( &m_AAjbPt, SmplRate, FrmLenUnit, IsHaveTimeStamp, TimeStampStep, InactIsContPut, MinNeedBufFrmCnt, MaxNeedBufFrmCnt, MaxCntuLostFrmCnt, AdaptSensitivity, IsDelObsltFrm, ErrInfoVstrPt ); }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return AAjbLocked( m_AAjbPt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return AAjbUnlock( m_AAjbPt, ErrInfoVstrPt ); }

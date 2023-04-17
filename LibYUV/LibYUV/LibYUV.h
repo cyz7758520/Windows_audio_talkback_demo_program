@@ -76,16 +76,16 @@ __LIBYUV_DLLAPI__ int LibYUVPictrCrop( const uint8_t * SrcPictrPt, int32_t SrcPi
 									   int32_t CropX, int32_t CropY, int32_t CropWidth, int32_t CropHeight,
 									   uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 									   Vstr * ErrInfoVstrPt );
-__LIBYUV_DLLAPI__ int LibYUVPictrCropWithStrd( const uint8_t * SrcPictrPlane1Pt, int32_t SrcPictrPlane1StrdByt,
-											   const uint8_t * SrcPictrPlane2Pt, int32_t SrcPictrPlane2StrdByt,
-											   const uint8_t * SrcPictrPlane3Pt, int32_t SrcPictrPlane3StrdByt,
+__LIBYUV_DLLAPI__ int LibYUVPictrCropWithStrd( const uint8_t * SrcPictrPlane1Pt, size_t SrcPictrPlane1StrdByt,
+											   const uint8_t * SrcPictrPlane2Pt, size_t SrcPictrPlane2StrdByt,
+											   const uint8_t * SrcPictrPlane3Pt, size_t SrcPictrPlane3StrdByt,
 											   int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 
 											   int32_t CropX, int32_t CropY, int32_t CropWidth, int32_t CropHeight,
 
-											   uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1SzByt, int32_t DstPictrPlane1StrdByt, size_t * DstPictrPlane1LenBytPt,
-											   uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2SzByt, int32_t DstPictrPlane2StrdByt, size_t * DstPictrPlane2LenBytPt,
-											   uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3SzByt, int32_t DstPictrPlane3StrdByt, size_t * DstPictrPlane3LenBytPt,
+											   uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1SzByt, size_t DstPictrPlane1StrdByt, size_t * DstPictrPlane1LenBytPt,
+											   uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2SzByt, size_t DstPictrPlane2StrdByt, size_t * DstPictrPlane2LenBytPt,
+											   uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3SzByt, size_t DstPictrPlane3StrdByt, size_t * DstPictrPlane3LenBytPt,
 											   int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 
 											   Vstr * ErrInfoVstrPt );
@@ -93,16 +93,16 @@ __LIBYUV_DLLAPI__ int LibYUVPictrMirror( const uint8_t * SrcPictrPt, int32_t Src
 										 int32_t HorizontalOrVertical,
 										 uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 										 Vstr * ErrInfoVstrPt );
-__LIBYUV_DLLAPI__ int LibYUVPictrMirrorWithStrd( const uint8_t * SrcPictrPlane1Pt, int32_t SrcPictrPlane1StrdByt,
-												 const uint8_t * SrcPictrPlane2Pt, int32_t SrcPictrPlane2StrdByt,
-												 const uint8_t * SrcPictrPlane3Pt, int32_t SrcPictrPlane3StrdByt,
+__LIBYUV_DLLAPI__ int LibYUVPictrMirrorWithStrd( const uint8_t * SrcPictrPlane1Pt, size_t SrcPictrPlane1StrdByt,
+												 const uint8_t * SrcPictrPlane2Pt, size_t SrcPictrPlane2StrdByt,
+												 const uint8_t * SrcPictrPlane3Pt, size_t SrcPictrPlane3StrdByt,
 												 int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 
 												 int32_t HorizontalOrVertical,
 
-												 uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1SzByt, int32_t DstPictrPlane1StrdByt, size_t * DstPictrPlane1LenBytPt,
-												 uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2SzByt, int32_t DstPictrPlane2StrdByt, size_t * DstPictrPlane2LenBytPt,
-												 uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3SzByt, int32_t DstPictrPlane3StrdByt, size_t * DstPictrPlane3LenBytPt,
+												 uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1SzByt, size_t DstPictrPlane1StrdByt, size_t * DstPictrPlane1LenBytPt,
+												 uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2SzByt, size_t DstPictrPlane2StrdByt, size_t * DstPictrPlane2LenBytPt,
+												 uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3SzByt, size_t DstPictrPlane3StrdByt, size_t * DstPictrPlane3LenBytPt,
 												 int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 
 												 Vstr * ErrInfoVstrPt );
@@ -117,14 +117,14 @@ __LIBYUV_DLLAPI__ int LibYUVPictrScale( const uint8_t * SrcPictrPt, int32_t SrcP
 __LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrt( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										   uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, int32_t DstPictrFmt,
 										   Vstr * ErrInfoVstrPt );
-__LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrtWithStrd( const uint8_t * SrcPictrPlane1Pt, int32_t SrcPictrPlane1StrdByt,
-												   const uint8_t * SrcPictrPlane2Pt, int32_t SrcPictrPlane2StrdByt,
-												   const uint8_t * SrcPictrPlane3Pt, int32_t SrcPictrPlane3StrdByt,
+__LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrtWithStrd( const uint8_t * SrcPictrPlane1Pt, size_t SrcPictrPlane1StrdByt,
+												   const uint8_t * SrcPictrPlane2Pt, size_t SrcPictrPlane2StrdByt,
+												   const uint8_t * SrcPictrPlane3Pt, size_t SrcPictrPlane3StrdByt,
 												   int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 
-												   uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1SzByt, int32_t DstPictrPlane1StrdByt, size_t * DstPictrPlane1LenBytPt,
-												   uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2SzByt, int32_t DstPictrPlane2StrdByt, size_t * DstPictrPlane2LenBytPt,
-												   uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3SzByt, int32_t DstPictrPlane3StrdByt, size_t * DstPictrPlane3LenBytPt,
+												   uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1SzByt, size_t DstPictrPlane1StrdByt, size_t * DstPictrPlane1LenBytPt,
+												   uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2SzByt, size_t DstPictrPlane2StrdByt, size_t * DstPictrPlane2LenBytPt,
+												   uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3SzByt, size_t DstPictrPlane3StrdByt, size_t * DstPictrPlane3LenBytPt,
 												   int32_t DstPictrFmt,
 
 												   Vstr * ErrInfoVstrPt );

@@ -8,12 +8,12 @@ extern "C"
 {
 #endif
 	
-__FUNC_DLLAPI__ int PcmInt16IncrDecr( int16_t * SrcInt16PcmPt, int16_t * DstInt16PcmPt, int PcmLenData, int16_t Qntt );
+__FUNC_DLLAPI__ int PcmInt16IncrDecr( int16_t * SrcInt16PcmPt, int16_t * DstInt16PcmPt, size_t PcmLenData, int16_t Qntt );
 
-__FUNC_DLLAPI__ int PcmInt16ToFlt32768( const int16_t * Int16PcmPt, float * Flt32768PcmPt, int PcmLenData, Drct_t CnvrtDrct );
-__FUNC_DLLAPI__ int PcmInt16ToFlt1( const int16_t * Int16PcmPt, float * Flt1PcmPt, int PcmLenData, Drct_t CnvrtDrct );
-__FUNC_DLLAPI__ int PcmFlt32768ToInt16( const float * Flt32768PcmPt, int16_t * Int16PcmPt, int PcmLenData, Drct_t CnvrtDrct );
-__FUNC_DLLAPI__ int PcmFlt1ToInt16( const float * Flt1PcmPt, int16_t * Int16PcmPt, int PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmInt16ToFlt32768( const int16_t * Int16PcmPt, float * Flt32768PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmInt16ToFlt1( const int16_t * Int16PcmPt, float * Flt1PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmFlt32768ToInt16( const float * Flt32768PcmPt, int16_t * Int16PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmFlt1ToInt16( const float * Flt1PcmPt, int16_t * Int16PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
 
 __FUNC_DLLAPI__ void AdoOneBand32kInt16ToLHBand16kInt16( const int16_t OneBand32kInt16[ 320 ],
 														 int16_t LowBand16kInt16[ 160 ], int16_t HighBand16kInt16[ 160 ],

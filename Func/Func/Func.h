@@ -23,6 +23,7 @@
 #include <map>                            //std::map
 #include <atomic>                         //std::atomic
 #include <cfloat>                         //FLT_MAX、DBL_MAX
+#include <typeinfo>
 #endif
 
 #if( defined __MS_VCXX__ )
@@ -41,11 +42,16 @@
 #include <wininet.h>                      //INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
 #include <pdhmsg.h>                       //PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
 #include <Ws2tcpip.h>                     //Windows套接字相关
+#include <conio.h>                        //getch、getche
 #include <Dshow.h>                        //waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
 #include <mmsystem.h>                     //MMRESULT
-#include <conio.h>                        //getch、getche
 #include <mmdeviceapi.h>                  //IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
+#include <endpointvolume.h>
+#include <Propkey.h>
+#include <wmcodecdsp.h>                   //CLSID_CWMAudioAEC
+#include <dmort.h>                        //MoInitMediaType
 #include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
+#include <audiopolicy.h>                  //IAudioSessionControl、IAudioSessionManager
 #include <Functiondiscoverykeys_devpkey.h>//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
 #include <Objbase.h>                      //CoInitialize、CoInitializeEx
 #include <shlwapi.h>                      //DLLVERSIONINFO
@@ -58,6 +64,23 @@
 
 #undef StrCpy
 #undef StrToInt
+
+//Windows Core Audio API的相关宏。
+#define CLSID_MMDeviceEnumerator __uuidof( MMDeviceEnumerator )
+#define IID_IMMDeviceEnumerator __uuidof( IMMDeviceEnumerator )
+#define IID_IAudioClient __uuidof( IAudioClient )
+#define IID_IAudioCaptureClient __uuidof( IAudioCaptureClient )
+#define IID_IAudioRenderClient __uuidof( IAudioRenderClient )
+
+//获取位置结构体的宽度和高度。
+#define RectWidth( Rect ) ( ( Rect ).right - ( Rect ).left )
+#define RectHeight( Rect ) ( ( Rect ).bottom - ( Rect ).top )
+
+//屏幕位置转客户区位置。
+#define RectScrnToClnt( ClntWndHdl, Rect ) ( ScreenToClient( ClntWndHdl, ( LPPOINT )&( ( Rect ).left ) ), ScreenToClient( ClntWndHdl, ( LPPOINT )&( ( Rect ).right ) ) )
+
+//屏幕位置转客户区位置。
+#define RectClntToScrn( ClntWndHdl, Rect ) ( ClientToScreen( ClntWndHdl, ( LPPOINT )&( ( Rect ).left ) ), ClientToScreen( ClntWndHdl, ( LPPOINT )&( ( Rect ).right ) ) )
 
 #endif
 
@@ -140,6 +163,14 @@ typedef int HANDLE;
 #include <android/native_window_jni.h>
 #endif
 
+#ifndef ssize_t
+#if( ( defined __X86__ ) || ( defined __ARMV7__ ) )
+typedef int32_t ssize_t;
+#elif( ( defined __X64__ ) || ( defined __ARMV8__ ) )
+typedef int64_t ssize_t;
+#endif
+#endif
+
 //路径字符串最大长度。
 #undef MAX_PATH
 #undef PATH_MAX
@@ -162,10 +193,10 @@ typedef int HANDLE;
 #define ALIGNDOWN( Val, ByteAlign ) ( ( Val ) & ~( ( ByteAlign ) - 1 ) ) //向下字节对齐。
 
 //设置结束指针。
-#define SetEndPt( Type, StartPt, Sz, EndPt ) \
+#define SetEndPt( StartTyp, StartPt, SzTyp, EndTyp, EndPt ) \
 { \
-	if( ( ( SIZE_MAX - ( size_t )( StartPt ) ) / sizeof( Type ) ) > ( Sz ) ) EndPt = ( Type * )( StartPt )+( Sz ); /*不会溢出。*/\
-	else EndPt = ( Type * )( SIZE_MAX - sizeof( Type ) ); /*会溢出。*/ \
+	if( ( ( SIZE_MAX - ( size_t )( StartPt ) ) / sizeof( StartTyp ) ) > ( SzTyp ) ) EndPt = ( EndTyp * )( ( StartTyp * )( StartPt )+( SzTyp ) ); /*不会溢出。*/\
+	else EndPt = ( EndTyp * )( ( StartTyp * )( SIZE_MAX - sizeof( StartTyp ) ) ); /*会溢出。*/ \
 }
 
 //获取数组的大小。
@@ -186,6 +217,61 @@ typedef int HANDLE;
 #ifndef min
 #define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 #endif
+#endif
+
+//数据类型。
+typedef enum DataTyp
+{
+	DtChar,
+	DtUChar,
+	DtShort,
+	DtUShort,
+	DtInt,
+	DtUInt,
+	DtLong,
+	DtULong,
+	DtLLong,
+	DtULLong,
+	DtFlt,
+	DtDbl,
+	DtLDbl,
+	DtOther,
+} DataTyp;
+
+#ifndef __cplusplus
+#define GetDataTyp( x ) ( _Generic( ( x ), \
+	char : DtChar, \
+	unsigned char : DtUChar, \
+	short : DtShort, \
+	unsigned short : DtUShort, \
+	int : DtInt, \
+	unsigned int : DtUInt, \
+	long : DtLong, \
+	unsigned long : DtULong, \
+	long long : DtLLong, \
+	unsigned long long : DtULLong, \
+	float : DtFlt, \
+	double : DtDbl, \
+	long double : DtLDbl, \
+	default : DtOther \
+	) )
+#else
+#define GetDataTyp( x ) ( \
+	( typeid( x ) == typeid( char ) ) ? DtChar : \
+	( typeid( x ) == typeid( unsigned char ) ) ? DtUChar : \
+	( typeid( x ) == typeid( short ) ) ? DtShort : \
+	( typeid( x ) == typeid( unsigned short ) ) ? DtUShort : \
+	( typeid( x ) == typeid( int ) ) ? DtInt : \
+	( typeid( x ) == typeid( unsigned int ) ) ? DtUInt : \
+	( typeid( x ) == typeid( long ) ) ? DtLong : \
+	( typeid( x ) == typeid( unsigned long ) ) ? DtULong : \
+	( typeid( x ) == typeid( long long ) ) ? DtLLong : \
+	( typeid( x ) == typeid( unsigned long long ) ) ? DtULLong : \
+	( typeid( x ) == typeid( float ) ) ? DtFlt : \
+	( typeid( x ) == typeid( double ) ) ? DtDbl : \
+	( typeid( x ) == typeid( long double ) ) ? DtLDbl : \
+	DtOther \
+	)
 #endif
 
 //方向。
@@ -298,7 +384,7 @@ __FUNC_DLLAPI__ int FuncIsForegroundFullscreen();
 //管道函数。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __FUNC_DLLAPI__ int FuncCreatePipe( HANDLE * PipeReadHdl, HANDLE * PipeWriteHdl, LPVOID * SecurityDescriptor, BOOL InheritHdl, DWORD BufSz );
-__FUNC_DLLAPI__ int FuncReadPipe( HANDLE PipeReadHdl, char * * BufPtPt, size_t * BufSzPt, size_t * BufLenPt, const char * EndMemPt, size_t EndMemLen, int IsAllowRealloc, uint64_t TmotMsec );
+__FUNC_DLLAPI__ int FuncReadPipe( HANDLE PipeReadHdl, char * * BufPtPt, size_t * BufSzBytPt, size_t * BufLenBytPt, const char * EndMemPt, size_t EndMemLenByt, int IsAllowRealloc, uint64_t TmotMsec );
 __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
 #endif
 
