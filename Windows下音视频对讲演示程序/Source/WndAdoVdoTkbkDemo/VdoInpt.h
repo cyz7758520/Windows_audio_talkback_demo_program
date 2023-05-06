@@ -16,9 +16,9 @@ typedef struct //视频输入。
 	int32_t m_MaxSmplRate; //存放最大采样频率，取值范围为[1,60]，实际帧率以视频输入设备支持的为准。
 	int32_t m_FrmWidth; //存放帧的宽度，单位为像素。
 	int32_t m_FrmHeight; //存放帧的高度，单位为像素。
-	size_t m_YU12FrmLenByt; //存放YU12格式帧的长度，单位为字节，为m_FrmWidth * m_FrmHeight * 3 / 2。
+	size_t m_Yu12FrmLenByt; //存放Yu12格式帧的长度，单位为字节，为m_FrmWidth * m_FrmHeight * 3 / 2。
 
-	int32_t m_UseWhatEncd; //存放使用什么编码器，为0表示YU12原始数据，为1表示OpenH264编码器。
+	int32_t m_UseWhatEncd; //存放使用什么编码器，为0表示Yu12原始数据，为1表示OpenH264编码器。
 
 	struct //存放OpenH264编码器。
 	{
@@ -36,32 +36,32 @@ typedef struct //视频输入。
 		IGraphBuilder * m_FilterGraphManagerPt; //存放过滤器图管理器的指针。
 		IMediaEventEx * m_FilterGraphMediaEventPt; //存放过滤器图媒体事件器的指针。
 		IMediaControl * m_FilterGraphMediaCtrlPt; //存放过滤器图媒体控制器的指针。
-		int32_t m_BgraSrcFrmWidth; //存放BGRA8888格式原始帧的宽度，单位为像素。
-		int32_t m_BgraSrcFrmHeight; //存放BGRA8888格式原始帧的高度，单位为像素。
-		size_t m_BgraSrcFrmLenByt; //存放BGRA8888格式原始帧的长度，单位为字节，为m_Dvc.m_BgraSrcFrmWidth * m_Dvc.m_BgraSrcFrmHeight * 4。
-		int32_t m_BgraSrcFrmIsCrop; //存放BGRA8888格式原始帧是否裁剪，为0表示不裁剪，为非0表示要裁剪。
-		int32_t m_BgraSrcFrmCropX; //存放BGRA8888格式原始帧裁剪区域左上角的横坐标，单位像素。
-		int32_t m_BgraSrcFrmCropY; //存放BGRA8888格式原始帧裁剪区域左上角的纵坐标，单位像素。
-		int32_t m_BgraSrcFrmCropWidth; //存放BGRA8888格式原始帧裁剪区域的宽度，单位像素。
-		int32_t m_BgraSrcFrmCropHeight; //存放BGRA8888格式原始帧裁剪区域的高度，单位像素。
-		int32_t m_BgraSrcFrmIsScale; //存放BGRA8888格式原始帧是否缩放，为0表示不缩放，为非0表示要缩放。
-		int32_t m_BgraSrcFrmScaleWidth; //存放BGRA8888格式原始帧缩放后的宽度，单位为像素，为m_FrmWidth。
-		int32_t m_BgraSrcFrmScaleHeight; //存放BGRA8888格式原始帧缩放后的高度，单位为像素，为m_FrmHeight。
-        size_t m_BgraSrcFrmScaleLenByt; //存放BGRA8888格式原始帧缩放后的长度，单位为字节，为m_BgraSrcFrmScaleWidth * m_BgraSrcFrmScaleHeight * 4。
+		int32_t m_BgraSrcFrmWidth; //存放Bgra8888格式原始帧的宽度，单位为像素。
+		int32_t m_BgraSrcFrmHeight; //存放Bgra8888格式原始帧的高度，单位为像素。
+		size_t m_BgraSrcFrmLenByt; //存放Bgra8888格式原始帧的长度，单位为字节，为m_Dvc.m_BgraSrcFrmWidth * m_Dvc.m_BgraSrcFrmHeight * 4。
+		int32_t m_BgraSrcFrmIsCrop; //存放Bgra8888格式原始帧是否裁剪，为0表示不裁剪，为非0表示要裁剪。
+		int32_t m_BgraSrcFrmCropX; //存放Bgra8888格式原始帧裁剪区域左上角的横坐标，单位像素。
+		int32_t m_BgraSrcFrmCropY; //存放Bgra8888格式原始帧裁剪区域左上角的纵坐标，单位像素。
+		int32_t m_BgraSrcFrmCropWidth; //存放Bgra8888格式原始帧裁剪区域的宽度，单位像素。
+		int32_t m_BgraSrcFrmCropHeight; //存放Bgra8888格式原始帧裁剪区域的高度，单位像素。
+		int32_t m_BgraSrcFrmIsScale; //存放Bgra8888格式原始帧是否缩放，为0表示不缩放，为非0表示要缩放。
+		int32_t m_BgraSrcFrmScaleWidth; //存放Bgra8888格式原始帧缩放后的宽度，单位为像素，为m_FrmWidth。
+		int32_t m_BgraSrcFrmScaleHeight; //存放Bgra8888格式原始帧缩放后的高度，单位为像素，为m_FrmHeight。
+        size_t m_BgraSrcFrmScaleLenByt; //存放Bgra8888格式原始帧缩放后的长度，单位为字节，为m_BgraSrcFrmScaleWidth * m_BgraSrcFrmScaleHeight * 4。
 		HWND m_PrvwWndHdl; //存放预览窗口的句柄。
 		int32_t m_IsBlack; //存放是否黑屏，为0表示有图像，为非0表示黑屏。
 	} m_Dvc;
 
 	typedef struct //存放帧。
 	{
-		uint8_t * m_BgraSrcFrmPt; //存放BGRA8888格式原始帧的指针，宽度为m_Dvc.m_BgraSrcFrmWidth，高度为m_Dvc.m_BgraSrcFrmHeight，大小为m_Dvc.m_BgraSrcFrmLenByt。
-		uint8_t * m_YU12RsltFrmPt; //存放YU12格式结果帧的指针，宽度为m_FrmWidth，高度为m_FrmHeight，大小为m_YU12FrmLenByt。
-		uint8_t * m_EncdRsltFrmPt; //存放已编码格式结果帧的指针，大小为m_YU12FrmLenByt。
+		uint8_t * m_BgraSrcFrmPt; //存放Bgra8888格式原始帧的指针，宽度为m_Dvc.m_BgraSrcFrmWidth，高度为m_Dvc.m_BgraSrcFrmHeight，大小为m_Dvc.m_BgraSrcFrmLenByt。
+		uint8_t * m_Yu12RsltFrmPt; //存放Yu12格式结果帧的指针，宽度为m_FrmWidth，高度为m_FrmHeight，大小为m_Yu12FrmLenByt。
+		uint8_t * m_EncdRsltFrmPt; //存放已编码格式结果帧的指针，大小为m_Yu12FrmLenByt。
 		size_t m_EncdRsltFrmLenByt; //存放已编码格式结果帧的长度，单位为字节。
 		uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
 	} Frm;
-	ConstLenLnkLstCls m_FrmLnkLst; //存放帧链表。
-	ConstLenLnkLstCls m_IdleFrmLnkLst; //存放空闲帧链表。
+	CLnkLstCls m_FrmLnkLst; //存放帧链表。
+	CLnkLstCls m_IdleFrmLnkLst; //存放空闲帧链表。
 	
 	struct //存放线程。
 	{

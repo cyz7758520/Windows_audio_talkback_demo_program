@@ -42,14 +42,14 @@
 //队列的缺点：不能增中间、删中间慢。
 
 #include "BufQueue.h"
-#include "ConstLenQueue.h"
-#include "VarLenQueue.h"
+#include "CQueue.h"
+#include "VQueue.h"
 
 //链表的优点：增删改查头尾快、遍历快。
 //链表的缺点：增删改查中间慢。
 
-#include "ConstLenLnkLst.h"
-#include "VarLenLnkLst.h"
+#include "CLnkLst.h"
+#include "VLnkLst.h"
 #include "AVLTreeConstLenMap.h"
 
 #endif

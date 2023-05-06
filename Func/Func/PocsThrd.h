@@ -7,7 +7,7 @@
 extern "C"
 {
 #endif
-	
+
 //进程函数。
 #if( defined __MS_VCXX__ )
 #define PocsGetCurHdl() GetModuleHandle( NULL )

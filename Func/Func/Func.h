@@ -152,6 +152,7 @@ typedef int HANDLE;
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>                      //pthread_create、pthread_join
+#include <threads.h>                      //thrd_yield
 
 typedef int HANDLE;
 #define Sleep( Msec ) usleep( ( Msec ) * 1000 )
@@ -345,18 +346,18 @@ typedef enum BufAutoAdjMeth
 		#define __FUNC_DLLAPI__
 	#endif
 #endif
-	
+
 #include "Vstr.h"
 #include "Log.h"
-#include "ThreadLock.h"
-#include "Ado.h"
+#include "ThrdLock.h"
 #include "Utf.h"
 #include "DateTime.h"
 #include "ChrStrMem.h"
 #include "File.h"
 #include "PocsThrd.h"
-#include "JavaNtvIntfc.h"
 #include "Toast.h"
+#include "Ado.h"
+#include "JavaNtvIntfc.h"
 
 #ifdef __cplusplus
 extern "C"

@@ -32,7 +32,7 @@ typedef struct //音频输出。
 			int32_t m_IsUsePrcplEnhsmt; //存放是否使用知觉增强，为非0表示要使用，为0表示不使用。
 		} m_SpeexDecd;
 	} Strm;
-	ConstLenLnkLstCls m_StrmLnkLst; //存放流链表。
+	CLnkLstCls m_StrmLnkLst; //存放流链表。
 	int32_t m_StrmUseTotal; //存放流要使用的总数。
 	
 	struct //存放波形器。
@@ -70,8 +70,8 @@ typedef struct //音频输出。
 		int32_t m_IsClos; //存放是否关闭，为0表示正常，为非0表示关闭。
 	} m_Dvc;
 
-	ConstLenLnkLstCls m_PcmSrcFrmLnkLst; //存放Pcm格式原始帧链表。
-	ConstLenLnkLstCls m_PcmIdleFrmLnkLst; //存放Pcm格式空闲帧链表。
+	CLnkLstCls m_PcmSrcFrmLnkLst; //存放Pcm格式原始帧链表。
+	CLnkLstCls m_PcmIdleFrmLnkLst; //存放Pcm格式空闲帧链表。
 	
 	struct //存放线程。
 	{

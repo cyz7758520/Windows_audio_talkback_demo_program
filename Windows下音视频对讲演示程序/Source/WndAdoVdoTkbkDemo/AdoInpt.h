@@ -174,8 +174,8 @@ typedef struct //音频输入。
 		int32_t m_IsClos; //存放是否关闭，为0表示正常，为非0表示关闭。
 	} m_Dvc;
 
-	ConstLenLnkLstCls m_PcmSrcFrmLnkLst; //存放Pcm格式原始帧链表。
-	ConstLenLnkLstCls m_PcmIdleFrmLnkLst; //存放Pcm格式空闲帧链表。
+	CLnkLstCls m_PcmSrcFrmLnkLst; //存放Pcm格式原始帧链表。
+	CLnkLstCls m_PcmIdleFrmLnkLst; //存放Pcm格式空闲帧链表。
 
 	struct //存放线程。
 	{

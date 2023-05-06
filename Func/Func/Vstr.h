@@ -8,7 +8,7 @@ typedef struct Vstr
 {
 #ifdef __cplusplus
 public:
-	Vstr( void * StrPt, ChrSet ChrSet, size_t LenChr ) :m_Pt( StrPt ), m_ChrSet( ChrSet ), m_SzChr( LenChr + 1 ), m_LenChr( LenChr ){}
+	Vstr( void * StrPt, ChrSet ChrSet_, size_t LenChr ) :m_Pt( StrPt ), m_ChrSet( ChrSet_ ), m_SzChr( LenChr + 1 ), m_LenChr( LenChr ){}
 #endif
 	void * m_Pt; //存放指针。
 	ChrSet m_ChrSet; //存放字符集。

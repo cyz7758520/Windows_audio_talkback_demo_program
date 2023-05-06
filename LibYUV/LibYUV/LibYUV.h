@@ -46,21 +46,21 @@ extern "C"
 //图片格式。
 enum PictrFmt
 {
-	PICTR_FMT_BT601F8_NV12,       //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UVUVUVUV……'。libyuv::FOURCC_NV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_BT601F8_NV21,       //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VUVUVUVU……'。libyuv::FOURCC_NV21，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_BT601F8_YU12_I420,  //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UUUU……','VVVV……'。libyuv::FOURCC_J420，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_BT601F8_YV12,       //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VVVV……','UUUU……'。libyuv::FOURCC_YV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
-	PICTR_FMT_SRGBF8_RGB555,      //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
-	PICTR_FMT_SRGBF8_BGR555,      //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB555
-	PICTR_FMT_SRGBF8_RGB565,      //sRGB标准，Full Range，8位，内存排列：'R','G','B'。libyuv::FOURCC_RGBP，WINDOW_FORMAT_RGB_565
-	PICTR_FMT_SRGBF8_BGR565,      //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB565
-	PICTR_FMT_SRGBF8_RGB888,      //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
-	PICTR_FMT_SRGBF8_BGR888,      //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB24
-	PICTR_FMT_SRGBF8_ARGB8888,    //sRGB标准，Full Range，8位，内存排列：'A','R','G','B'。
-	PICTR_FMT_SRGBF8_ABGR8888,    //sRGB标准，Full Range，8位，内存排列：'A','B','G','R'。libyuv::FOURCC_ABGR，WINDOW_FORMAT_RGBA_8888
-	PICTR_FMT_SRGBF8_RGBA8888,    //sRGB标准，Full Range，8位，内存排列：'R','G','B','A'。
-	PICTR_FMT_SRGBF8_BGRA8888,    //sRGB标准，Full Range，8位，内存排列：'B','G','R','A'。libyuv::FOURCC_ARGB，MEDIASUBTYPE_RGB32
-	PICTR_FMT_UNKOWN = 99         //未知格式。
+	PictrFmtBt601F8Nv12,          //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UVUVUVUV……'。libyuv::FOURCC_NV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PictrFmtBt601F8Nv21,          //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VUVUVUVU……'。libyuv::FOURCC_NV21，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PictrFmtBt601F8Yu12I420,      //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UUUU……','VVVV……'。libyuv::FOURCC_J420，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PictrFmtBt601F8Yv12,          //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VVVV……','UUUU……'。libyuv::FOURCC_YV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
+	PictrFmtSrgbF8Rgb555,         //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
+	PictrFmtSrgbF8Bgr555,         //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB555
+	PictrFmtSrgbF8Rgb565,         //sRGB标准，Full Range，8位，内存排列：'R','G','B'。libyuv::FOURCC_RGBP，WINDOW_FORMAT_RGB_565
+	PictrFmtSrgbF8Bgr565,         //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB565
+	PictrFmtSrgbF8Rgb888,         //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
+	PictrFmtSrgbF8Bgr888,         //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB24
+	PictrFmtSrgbF8Argb8888,       //sRGB标准，Full Range，8位，内存排列：'A','R','G','B'。
+	PictrFmtSrgbF8Abgr8888,       //sRGB标准，Full Range，8位，内存排列：'A','B','G','R'。libyuv::FOURCC_ABGR，WINDOW_FORMAT_RGBA_8888
+	PictrFmtSrgbF8Rgba8888,       //sRGB标准，Full Range，8位，内存排列：'R','G','B','A'。
+	PictrFmtSrgbF8Bgra8888,       //sRGB标准，Full Range，8位，内存排列：'B','G','R','A'。libyuv::FOURCC_ARGB，MEDIASUBTYPE_RGB32
+	PictrFmtUnkown,               //未知。
 };
 
 //旋转角度。

@@ -1,7 +1,7 @@
 ﻿#include "Func.h"
 
-#ifndef __READWRITELOCK_H__
-#define __READWRITELOCK_H__
+#ifndef __THRDLOCK_H__
+#define __THRDLOCK_H__
 
 //互斥锁，内存初始时必须保证是全为0。
 #ifndef __cplusplus
@@ -12,7 +12,23 @@ struct MutexLock
 #else
 struct MutexLock
 {
+	#if( defined __MS_VCXX__ )
+
 	std::atomic_flag m_StdAtomicFlag = ATOMIC_FLAG_INIT;
+
+	#elif( ( defined __CYGWIN_GCC__ ) )
+
+	std::atomic_flag m_StdAtomicFlag = ATOMIC_FLAG_INIT;
+
+	#elif( ( defined __LINUX_GCC__ ) )
+
+	std::atomic_flag m_StdAtomicFlag = ATOMIC_FLAG_INIT;
+
+	#elif( defined __ANDROID_GCC__ )
+
+	std::atomic<int> m_StdAtomicInt = {};
+
+	#endif
 };
 #endif
 

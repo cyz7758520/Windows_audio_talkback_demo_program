@@ -40,6 +40,7 @@ __FUNC_DLLAPI__ int StrTrim( char * SrcStrPt, const char * TrimStrPt, char TrimP
 __FUNC_DLLAPI__ void * MemCpy( void * DstPt, const void * SrcPt, size_t MemSzByt );
 //__FUNC_DLLAPI__ void * MemCpy_inline( void * DstPt, const void * SrcPt, size_t MemSzByt );
 
+//获取错误信息。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 typedef enum
 {
@@ -66,9 +67,9 @@ __FUNC_DLLAPI__ Vstr * GetErrInfo( uint32_t ErrNum, Vstr * InfoVstrPt, ... );
 #define GetWinNtDllErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinNtDll, ErrTypeEnd )
 #define GetWinMMErrInfo( ErrNum, InfoVstrPt ) GetErrInfo( ErrNum, InfoVstrPt, ErrTypeWinMM, ErrTypeEnd )
 #endif
-
 #endif
 
+//获取窗口消息信息。
 #if( defined __MS_VCXX__ )
 __FUNC_DLLAPI__ Vstr * GetWndMsgInfo( HWND WndHdl, UINT MsgNum, WPARAM WParam, LPARAM LParam, Vstr * InfoVstrPt );
 #endif
@@ -84,10 +85,10 @@ __FUNC_DLLAPI__ int _StrCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t DstStr
        _StrCpy( DEFARG( void *, DstStrPt, NULL ), DEFARG( ChrSet, DstStrChrSet, Utf8 ), DEFARG( size_t, DstStrSzChr, SIZE_MAX ), DEFARG( int32_t, IsWriteEnd, 1 ), DEFARG( size_t *, DstStrLenChrPt, NULL ), SrcStrPt, DEFARG( ChrSet, SrcStrChrSet, Utf8 ), DEFARG( size_t, SrcStrSzChr, SIZE_MAX ), DEFARG( size_t *, SrcStrLenChrPt, NULL ) )
 
 //字符串复制并创建栈字符串。
-#define AstrCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChr, SrcStrPt, SrcStrChrSet, SrcStrSzChr, SrcStrLenChrPt ) \
+#define AstrCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChrPt, SrcStrPt, SrcStrChrSet, SrcStrSzChr, SrcStrLenChrPt ) \
 { \
-    StrCpy( , AstrChrSet, , IsWriteEnd, &AstrLenChr, SrcStrPt, SrcStrChrSet, SrcStrSzChr, SrcStrLenChrPt ); /*设置栈字符串的长度。*/ \
-	AstrPt = ( AstrPtType )alloca( ( AstrLenChr + IsWriteEnd ) * AstrChrSet ); /*设置栈字符串缓冲区的指针。*/ \
+    StrCpy( , AstrChrSet, , IsWriteEnd, AstrLenChrPt, SrcStrPt, SrcStrChrSet, SrcStrSzChr, SrcStrLenChrPt ); /*设置栈字符串的长度。*/ \
+	AstrPt = ( AstrPtType )alloca( ( *AstrLenChrPt + IsWriteEnd ) * AstrChrSet ); /*设置栈字符串缓冲区的指针。*/ \
 	StrCpy( AstrPt, AstrChrSet, , IsWriteEnd, , SrcStrPt, SrcStrChrSet, SrcStrSzChr, SrcStrLenChrPt ); /*设置栈字符串。*/ \
 }
 
@@ -96,10 +97,10 @@ __FUNC_DLLAPI__ int _StrFmtCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t Dst
 #define StrFmtCpy( DstStrPt, DstStrChrSet, DstStrSzChr, IsWriteEnd, DstStrLenChrPt, FmtStrPt, FmtStrChrSet, ... ) \
        _StrFmtCpy( DEFARG( void *, DstStrPt, NULL ), DEFARG( ChrSet, DstStrChrSet, Utf8 ), DEFARG( size_t, DstStrSzChr, SIZE_MAX ), DEFARG( int32_t, IsWriteEnd, 1 ), DEFARG( size_t *, DstStrLenChrPt, NULL ), FmtStrPt, DEFARG( ChrSet, FmtStrChrSet, Utf8 ), __VA_ARGS__ )
 
-#define AstrFmtCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChr, FmtStrPt, FmtStrChrSet, ... ) \
+#define AstrFmtCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, ... ) \
 { \
-    StrFmtCpy( , AstrChrSet, , IsWriteEnd, &AstrLenChr, FmtStrPt, FmtStrChrSet, __VA_ARGS__ ); /*设置栈字符串的长度。*/ \
-	AstrPt = ( AstrPtType )alloca( ( AstrLenChr + IsWriteEnd ) * AstrChrSet ); /*设置栈字符串缓冲区的指针。*/ \
+    StrFmtCpy( , AstrChrSet, , IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, __VA_ARGS__ ); /*设置栈字符串的长度。*/ \
+	AstrPt = ( AstrPtType )alloca( ( *AstrLenChrPt + IsWriteEnd ) * AstrChrSet ); /*设置栈字符串缓冲区的指针。*/ \
 	StrFmtCpy( AstrPt, AstrChrSet, , IsWriteEnd, , FmtStrPt, FmtStrChrSet, __VA_ARGS__ ); /*设置栈字符串。*/ \
 }
 
@@ -108,10 +109,10 @@ __FUNC_DLLAPI__ int _StrVaFmtCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t D
 #define StrVaFmtCpy( DstStrPt, DstStrChrSet, DstStrSzChr, IsWriteEnd, DstStrLenChrPt, FmtStrPt, FmtStrChrSet, VaLst ) \
        _StrVaFmtCpy( DEFARG( void *, DstStrPt, NULL ), DEFARG( ChrSet, DstStrChrSet, Utf8 ), DEFARG( size_t, DstStrSzChr, SIZE_MAX ), DEFARG( int32_t, IsWriteEnd, 1 ), DEFARG( size_t *, DstStrLenChrPt, NULL ), FmtStrPt, DEFARG( ChrSet, FmtStrChrSet, Utf8 ), VaLst )
 
-#define AstrVaFmtCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChr, FmtStrPt, FmtStrChrSet, VaLst ) \
+#define AstrVaFmtCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, VaLst ) \
 { \
-    StrVaFmtCpy( , AstrChrSet, , IsWriteEnd, &AstrLenChr, FmtStrPt, FmtStrChrSet, VaLst ); /*设置栈字符串的长度。*/ \
-	AstrPt = ( AstrPtType )alloca( ( AstrLenChr + IsWriteEnd ) * AstrChrSet ); /*设置栈字符串缓冲区的指针。*/ \
+    StrVaFmtCpy( , AstrChrSet, , IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, VaLst ); /*设置栈字符串的长度。*/ \
+	AstrPt = ( AstrPtType )alloca( ( *AstrLenChrPt + IsWriteEnd ) * AstrChrSet ); /*设置栈字符串缓冲区的指针。*/ \
 	StrVaFmtCpy( AstrPt, AstrChrSet, , IsWriteEnd, , FmtStrPt, FmtStrChrSet, VaLst ); /*设置栈字符串。*/ \
 }
 

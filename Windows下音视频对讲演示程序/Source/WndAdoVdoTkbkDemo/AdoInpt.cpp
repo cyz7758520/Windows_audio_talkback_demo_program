@@ -1082,7 +1082,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 				}
 			}
 
-			p_HRslt = AdoInptPt->m_Dvc.m_Pt->Activate( IID_IAudioClient, CLSCTX_INPROC_SERVER, NULL, ( void ** )&AdoInptPt->m_Dvc.m_ClntPt ); //激活设备的客户端接口。
+			p_HRslt = AdoInptPt->m_Dvc.m_Pt->Activate( IID_IAudioClient, CLSCTX_INPROC_SERVER, NULL, ( void * * )&AdoInptPt->m_Dvc.m_ClntPt ); //激活设备的客户端接口。
 			if( p_HRslt != S_OK )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：激活设备的客户端接口失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
@@ -1133,7 +1133,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取设备的捕获客户端失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 				goto Out;
 			}
-
+			
 			p_HRslt = CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&AdoInptPt->m_Dvc.m_GlblIntfcTablePt ); //初始化设备全局接口表。
 			if( p_HRslt != S_OK )
 			{
@@ -1151,7 +1151,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 
 		AdoInptPt->m_Dvc.m_PcmBufFrmLenUnit = AdoInptPt->m_FrmLenMsec * AdoInptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec / 1000; //设置Pcm格式缓冲区帧的长度。
 		AdoInptPt->m_Dvc.m_PcmBufFrmLenByt = AdoInptPt->m_Dvc.m_PcmBufFrmLenUnit * sizeof( int16_t ); //设置Pcm格式缓冲区帧的长度。
-		if( AdoInptPt->m_Dvc.m_PcmBufFrmBufQueue.Init( BufAutoAdjMethFreeNumber, AdoInptPt->m_Dvc.m_PcmBufFrmLenByt, 0, AdoInptPt->m_Dvc.m_PcmBufFrmLenByt, AdoInptPt->m_Dvc.m_PcmBufFrmLenByt * 50, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+		if( AdoInptPt->m_Dvc.m_PcmBufFrmBufQueue.Init( AdoInptPt->m_Dvc.m_PcmBufFrmLenByt, BufAutoAdjMethFreeNumber, AdoInptPt->m_Dvc.m_PcmBufFrmLenByt, AdoInptPt->m_Dvc.m_PcmBufFrmLenByt * 50, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式缓冲区帧的缓冲区队列失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			goto Out;
@@ -1178,7 +1178,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	}
 
 	//初始化Pcm格式原始帧链表。
-	if( AdoInptPt->m_PcmSrcFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( AdoInptPt->m_PcmSrcFrmLnkLst.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式原始帧链表成功。" ) );
 	}
@@ -1189,7 +1189,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	}
 
 	//初始化Pcm格式空闲帧链表。
-	if( AdoInptPt->m_PcmIdleFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( AdoInptPt->m_PcmIdleFrmLnkLst.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式空闲帧链表成功。" ) );
 	}
@@ -1273,9 +1273,9 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	}
 
 	//销毁Pcm格式空闲帧链表。
-	if( AdoInptPt->m_PcmIdleFrmLnkLst.m_ConstLenLnkLstPt != NULL )
+	if( AdoInptPt->m_PcmIdleFrmLnkLst.m_CLnkLstPt != NULL )
 	{
-		while( AdoInptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, NULL ) == 0 )
+		while( AdoInptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, 0, NULL ) == 0 )
 		{
 			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
@@ -1292,9 +1292,9 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	}
 	
 	//销毁Pcm格式原始帧链表。
-	if( AdoInptPt->m_PcmSrcFrmLnkLst.m_ConstLenLnkLstPt != NULL )
+	if( AdoInptPt->m_PcmSrcFrmLnkLst.m_CLnkLstPt != NULL )
 	{
-		while( AdoInptPt->m_PcmSrcFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, NULL ) == 0 )
+		while( AdoInptPt->m_PcmSrcFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, 0, NULL ) == 0 )
 		{
 			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
@@ -1343,7 +1343,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 			AdoInptPt->m_Dvc.m_GlblIntfcTablePt->Release();
 			AdoInptPt->m_Dvc.m_GlblIntfcTablePt = NULL;
 		}
-		if( AdoInptPt->m_IsUseSystemAecNsAgc != 0 )
+		if( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt != NULL )
 		{
 			if( AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt != NULL ) //销毁系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象。
 			{
@@ -1364,7 +1364,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 			AdoInptPt->m_Dvc.m_IsClos = 0;
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：销毁系统自带的声学回音消除器、噪音抑制器和自动增益控制器成功。" ) );
 		}
-		else
+		if( AdoInptPt->m_Dvc.m_Pt != NULL )
 		{
 			if( AdoInptPt->m_Dvc.m_CptrClntPt != NULL ) //销毁设备的捕获客户端。
 			{
@@ -1715,14 +1715,11 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			AdoInptPt->m_PcmIdleFrmLnkLst.GetTotal( &AdoInptPt->m_Thrd.m_LnkLstElmTotal, 1, NULL ); //获取Pcm格式空闲帧链表的元素总数。
 			if( AdoInptPt->m_Thrd.m_LnkLstElmTotal > 0 ) //如果Pcm格式空闲帧链表中有帧。
 			{
-				//从Pcm格式空闲帧链表中取出第一个帧。
+				//从Pcm格式空闲帧链表中取出并删除第一个帧。
 				{
-					AdoInptPt->m_PcmIdleFrmLnkLst.Locked( NULL ); //Pcm格式空闲帧链表的互斥锁加锁。
-					AdoInptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, NULL );
-					AdoInptPt->m_PcmIdleFrmLnkLst.DelHead( 0, NULL );
-					AdoInptPt->m_PcmIdleFrmLnkLst.Unlock( NULL ); //Pcm格式空闲帧链表的互斥锁解锁。
+					AdoInptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 1, NULL );
 				}
-				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从Pcm格式空闲帧链表中取出第一个帧，Pcm格式空闲帧链表元素总数：%uzd。" ), AdoInptPt->m_Thrd.m_LnkLstElmTotal );
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从Pcm格式空闲帧链表中取出并删除第一个帧，Pcm格式空闲帧链表元素总数：%uzd。" ), AdoInptPt->m_Thrd.m_LnkLstElmTotal );
 			}
 			else //如果Pcm格式空闲帧链表中没有帧。
 			{
@@ -1785,6 +1782,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
         }
 	} //音频输入循环结束。
 
+	if( p_SystemAecNsAgcMediaObjPt != NULL ) p_SystemAecNsAgcMediaObjPt->Release();
 	CoUninitialize(); //销毁COM库。
 	
 	if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：本线程已退出。" ) );

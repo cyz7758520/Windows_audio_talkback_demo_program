@@ -130,7 +130,7 @@ void AdoOtptAddStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	AdoOtptPt->m_StrmLnkLst.Locked( NULL ); //流链表的互斥锁加锁。
 
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果流索引找到了。
 		{
@@ -143,7 +143,7 @@ void AdoOtptAddStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	{
 		goto Out;
 	}
-	AdoOtptPt->m_StrmLnkLst.GetTail( NULL, NULL, ( void * * )&p_StrmPt, 0, NULL );
+	AdoOtptPt->m_StrmLnkLst.GetTail( NULL, NULL, ( void * * )&p_StrmPt, 0, 0, NULL );
 	p_StrmPt->m_Idx = StrmIdx;
 	p_StrmPt->m_UseWhatDecd = 0;
 
@@ -169,7 +169,7 @@ void AdoOtptDelStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	AdoOtptPt->m_StrmLnkLst.Locked( NULL ); //流链表的互斥锁加锁。
 
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果流索引找到了。
 		{
@@ -202,7 +202,7 @@ void AdoOtptSetStrmUsePcm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	AdoOtptPt->m_StrmLnkLst.Locked( NULL ); //流链表的互斥锁加锁。
 
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果流索引找到了。
 		{
@@ -238,7 +238,7 @@ void AdoOtptSetStrmUseSpeexDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t I
 	AdoOtptPt->m_StrmLnkLst.Locked( NULL ); //流链表的互斥锁加锁。
 
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果流索引找到了。
 		{
@@ -274,7 +274,7 @@ void AdoOtptSetStrmUseOpusDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	AdoOtptPt->m_StrmLnkLst.Locked( NULL ); //流链表的互斥锁加锁。
 
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果流索引找到了。
 		{
@@ -309,7 +309,7 @@ void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStr
 	AdoOtptPt->m_StrmLnkLst.Locked( NULL ); //流链表的互斥锁加锁。
 
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果流索引找到了。
 		{
@@ -377,7 +377,7 @@ int AdoOtptStrmLnkLstInit( AdoOtpt * AdoOtptPt )
 	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 
 	AdoOtptPt->m_StrmUseTotal = 0;
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_IsUse != 0 )
 		{
@@ -415,7 +415,7 @@ void AdoOtptStrmLnkLstDstoy( AdoOtpt * AdoOtptPt )
 {
 	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_IsUse != 0 )
 		{
@@ -711,7 +711,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 	}
 
 	//初始化Pcm格式原始帧链表。
-	if( AdoOtptPt->m_PcmSrcFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( AdoOtptPt->m_PcmSrcFrmLnkLst.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化Pcm格式原始帧链表成功。" ) );
 	}
@@ -722,7 +722,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 	}
 	
 	//初始化Pcm格式空闲帧链表。
-	if( AdoOtptPt->m_PcmIdleFrmLnkLst.Init( sizeof( int16_t * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( AdoOtptPt->m_PcmIdleFrmLnkLst.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化Pcm格式空闲帧链表成功。" ) );
 	}
@@ -832,9 +832,9 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 	}
 
 	//销毁Pcm格式空闲帧链表。
-	if( AdoOtptPt->m_PcmIdleFrmLnkLst.m_ConstLenLnkLstPt != NULL )
+	if( AdoOtptPt->m_PcmIdleFrmLnkLst.m_CLnkLstPt != NULL )
 	{
-		while( AdoOtptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, NULL ) == 0 )
+		while( AdoOtptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, 0, NULL ) == 0 )
 		{
 			free( AdoOtptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
@@ -851,9 +851,9 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 	}
 	
 	//销毁Pcm格式原始帧链表。
-	if( AdoOtptPt->m_PcmSrcFrmLnkLst.m_ConstLenLnkLstPt != NULL )
+	if( AdoOtptPt->m_PcmSrcFrmLnkLst.m_CLnkLstPt != NULL )
 	{
-		while( AdoOtptPt->m_PcmSrcFrmLnkLst.GetHead( NULL, &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, NULL ) == 0 )
+		while( AdoOtptPt->m_PcmSrcFrmLnkLst.GetHead( NULL, &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, 0, NULL ) == 0 )
 		{
 			free( AdoOtptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
@@ -1052,7 +1052,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 				p_HRslt = p_DvcRndrClntPt->GetBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, ( BYTE ** )&AdoOtptPt->m_Dvc.m_PcmBufFrmPt ); //获取设备的Pcm格式缓冲区。
 				if( p_HRslt == S_OK ) //如果获取设备的Pcm格式缓冲区成功。
 				{
-					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：PcmAdoOtptDvcBufFrmLenUnit：%uzd。" ), AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit );
+					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit：%uzd。" ), AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit );
 				}
 				else //如果获取设备的Pcm格式缓冲区失败。
 				{
@@ -1105,14 +1105,11 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 			AdoOtptPt->m_PcmIdleFrmLnkLst.GetTotal( &AdoOtptPt->m_Thrd.m_LnkLstElmTotal, 1, NULL ); //获取Pcm格式空闲帧链表的元素总数。
 			if( AdoOtptPt->m_Thrd.m_LnkLstElmTotal > 0 ) //如果Pcm格式空闲帧链表中有帧。
 			{
-				//从Pcm格式空闲帧链表中取出第一个帧。
+				//从Pcm格式空闲帧链表中取出并删除第一个帧。
 				{
-					AdoOtptPt->m_PcmIdleFrmLnkLst.Locked( NULL ); //Pcm格式空闲帧链表的互斥锁加锁。
-					AdoOtptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, NULL );
-					AdoOtptPt->m_PcmIdleFrmLnkLst.DelHead( 0, NULL );
-					AdoOtptPt->m_PcmIdleFrmLnkLst.Unlock( NULL ); //Pcm格式空闲帧链表的互斥锁解锁。
+					AdoOtptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 1, NULL );
 				}
-				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：从Pcm格式空闲帧链表中取出第一个帧，Pcm格式空闲帧链表元素总数：%uzd。" ), AdoOtptPt->m_Thrd.m_LnkLstElmTotal );
+				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：从Pcm格式空闲帧链表中取出并删除第一个帧，Pcm格式空闲帧链表元素总数：%uzd。" ), AdoOtptPt->m_Thrd.m_LnkLstElmTotal );
 			}
 			else //如果Pcm格式空闲帧链表中没有帧。
 			{
@@ -1150,7 +1147,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 					size_t p_StrmDataIdx = SIZE_MAX;
 					AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 
-					while( AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmDataIdx, &p_StrmDataIdx, NULL, ( void ** )&p_StrmPt, 0, NULL ) == 0 ) //查找第一条要使用的流。
+					while( AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmDataIdx, &p_StrmDataIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0 ) //查找第一条要使用的流。
 					{
 						if( p_StrmPt->m_IsUse != 0 ) //如果该流为要使用。
 						{
@@ -1209,7 +1206,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 							AdoOtptPt->m_Thrd.m_PcmMixFrmPt[ p_TmpInt ] = AdoOtptPt->m_Thrd.m_PcmSrcFrmPt[ p_TmpInt ];
 						}
 
-						while( AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmDataIdx, &p_StrmDataIdx, NULL, ( void ** )&p_StrmPt, 0, NULL ) == 0 )
+						while( AdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmDataIdx, &p_StrmDataIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0 )
 						{
 							if( p_StrmPt->m_IsUse != 0 ) //如果该流为要使用。
 							{

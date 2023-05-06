@@ -28,9 +28,9 @@ int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 	switch( StrmPt->m_UseWhatDecd )
 	{
-		case 0: //如果要使用YU12原始数据。
+		case 0: //如果要使用Yu12原始数据。
 		{
-			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：初始化YU12原始数据成功。" ), StrmPt->m_Idx );
+			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：初始化Yu12原始数据成功。" ), StrmPt->m_Idx );
 			break;
 		}
 		case 1: //如果要使用OpenH264解码器。
@@ -76,9 +76,9 @@ void VdoOtptStrmDecdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 {
 	switch( StrmPt->m_UseWhatDecd )
 	{
-		case 0: //如果要使用YU12原始数据。
+		case 0: //如果要使用Yu12原始数据。
 		{
-			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：销毁YU12原始数据成功。" ), StrmPt->m_Idx );
+			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：销毁Yu12原始数据成功。" ), StrmPt->m_Idx );
 			break;
 		}
 		case 1: //如果要使用OpenH264解码器。
@@ -121,10 +121,10 @@ int VdoOtptStrmThrdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 	//初始化线程的临时变量。
 	{
 		StrmPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程的临时变量。
-		StrmPt->m_Thrd.m_BgraRlstFrmPt = ( uint8_t * )malloc( VdoOtptPt->m_FrmMaxWidth * VdoOtptPt->m_FrmMaxHeight * 4 * 3 ); //初始化BGRA8888格式结果帧的指针。按照最高分辨率、BGRA格式来计算。
+		StrmPt->m_Thrd.m_BgraRlstFrmPt = ( uint8_t * )malloc( VdoOtptPt->m_FrmMaxWidth * VdoOtptPt->m_FrmMaxHeight * 4 * 3 ); //初始化Bgra8888格式结果帧的指针。按照最高分辨率、Bgra8888格式来计算。
 		if( StrmPt->m_Thrd.m_BgraRlstFrmPt == NULL )
 		{
-			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：创建BGRA8888格式结果帧的内存块失败。" ), StrmPt->m_Idx );
+			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：创建Bgra8888格式结果帧的内存块失败。" ), StrmPt->m_Idx );
 			goto Out;
 		}
 		StrmPt->m_Thrd.m_FrmPt = NULL; //初始化帧的指针。
@@ -191,7 +191,7 @@ void VdoOtptStrmThrdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 	if( StrmPt->m_Thrd.m_IsInitThrdTmpVar != 0 )
 	{
 		StrmPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程的临时变量。
-		if( StrmPt->m_Thrd.m_BgraRlstFrmPt != NULL ) //销毁BGRA8888格式结果帧的指针。
+		if( StrmPt->m_Thrd.m_BgraRlstFrmPt != NULL ) //销毁Bgra8888格式结果帧的指针。
 		{
 			free( StrmPt->m_Thrd.m_BgraRlstFrmPt );
 			StrmPt->m_Thrd.m_BgraRlstFrmPt = NULL;
@@ -285,14 +285,11 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 				p_VdoOtptPt->m_IdleFrmLnkLst.GetTotal( &p_StrmPt->m_Thrd.m_LnkLstElmTotal, 1, NULL ); //获取空闲帧链表的元素总数。
 				if( p_StrmPt->m_Thrd.m_LnkLstElmTotal > 0 ) //如果空闲帧链表中有帧。
 				{
-					//从空闲帧链表中取出第一个帧。
+					//从空闲帧链表中取出并删除第一个帧。
 					{
-						p_VdoOtptPt->m_IdleFrmLnkLst.Locked( NULL ); //空闲帧链表的互斥锁加锁。
-						p_VdoOtptPt->m_IdleFrmLnkLst.GetHead( NULL, &p_StrmPt->m_Thrd.m_FrmPt, NULL, 0, NULL );
-						p_VdoOtptPt->m_IdleFrmLnkLst.DelHead( 0, NULL );
-						p_VdoOtptPt->m_IdleFrmLnkLst.Unlock( NULL ); //空闲帧链表的互斥锁解锁。
+						p_VdoOtptPt->m_IdleFrmLnkLst.GetHead( NULL, &p_StrmPt->m_Thrd.m_FrmPt, NULL, 1, 1, NULL );
 					}
-					if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )  LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：从空闲帧链表中取出第一个帧，空闲帧链表元素总数：%uzd。" ), p_StrmPt->m_Idx, p_StrmPt->m_Thrd.m_LnkLstElmTotal );
+					if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )  LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：从空闲帧链表中取出并删除第一个帧，空闲帧链表元素总数：%uzd。" ), p_StrmPt->m_Idx, p_StrmPt->m_Thrd.m_LnkLstElmTotal );
 				}
 				else //如果空闲帧链表中没有帧。
 				{
@@ -308,8 +305,8 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 							{
 								goto OutCreateVdoOtptIdleFrm;
 							}
-							p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt = ( uint8_t * )malloc( p_VdoOtptPt->m_FrmMaxWidth * p_VdoOtptPt->m_FrmMaxHeight * 3 / 2 );
-							if( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt == NULL )
+							p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt = ( uint8_t * )malloc( p_VdoOtptPt->m_FrmMaxWidth * p_VdoOtptPt->m_FrmMaxHeight * 3 / 2 );
+							if( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt == NULL )
 							{
 								goto OutCreateVdoOtptIdleFrm;
 							}
@@ -329,7 +326,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 							{
 								if( p_StrmPt->m_Thrd.m_FrmPt != NULL )
 								{
-									if( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt != NULL ) free( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt );
+									if( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt != NULL ) free( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt );
 									if( p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmPt != NULL ) free( p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmPt );
 									free( p_StrmPt->m_Thrd.m_FrmPt );
 									p_StrmPt->m_Thrd.m_FrmPt = NULL;
@@ -357,21 +354,21 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 
 			p_StrmPt->m_Thrd.m_LastTickMsec = FuncGetTickAsMsec();
 
-			//调用用户定义的写入视频输出帧函数，并解码成YU12原始数据。
+			//调用用户定义的写入视频输出帧函数，并解码成Yu12原始数据。
 			switch( p_StrmPt->m_UseWhatDecd ) //使用什么解码器。
 			{
-				case 0: //如果要使用YU12原始数据。
+				case 0: //如果要使用Yu12原始数据。
 				{
 					//调用用户定义的写入视频输出帧函数。
-					p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth = 0;
-					p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight = 0;
+					p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth = 0;
+					p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight = 0;
 					p_VdoOtptPt->m_MediaPocsThrdPt->m_UserWriteVdoOtptFrmFuncPt( p_VdoOtptPt->m_MediaPocsThrdPt, p_StrmPt->m_Idx,
-																				 p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt, &p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, &p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight,
+																				 p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt, &p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, &p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight,
 																				 NULL, 0, NULL );
 
-					if( ( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth > 0 ) && ( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight > 0 ) ) //如果本次写入了帧。
+					if( ( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth > 0 ) && ( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight > 0 ) ) //如果本次写入了帧。
 					{
-						if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：使用YU12原始数据成功。YU12格式原始帧宽度：%z32d，高度：%z32d。" ), p_StrmPt->m_Idx, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight );
+						if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：使用Yu12原始数据成功。Yu12格式原始帧宽度：%z32d，高度：%z32d。" ), p_StrmPt->m_Idx, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight );
 					}
 					else //如果本次没写入帧。
 					{
@@ -380,7 +377,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 
 					//用户定义的获取视频输出帧函数。
 					p_VdoOtptPt->m_MediaPocsThrdPt->m_UserGetVdoOtptFrmFuncPt( p_VdoOtptPt->m_MediaPocsThrdPt, p_StrmPt->m_Idx,
-																			   p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight,
+																			   p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight,
 																			   NULL, 0 );
 					break;
 				}
@@ -397,11 +394,11 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 						//使用OpenH264解码器。
 						if( OpenH264DecdPocs( p_StrmPt->m_OpenH264Decd.m_Pt,
 											  p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmPt, p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmLenByt,
-											  p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt, p_VdoOtptPt->m_FrmMaxWidth * p_VdoOtptPt->m_FrmMaxHeight * 3 / 2, &p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, &p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight,
+											  p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt, p_VdoOtptPt->m_FrmMaxWidth * p_VdoOtptPt->m_FrmMaxHeight * 3 / 2, &p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, &p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight,
 											  NULL ) == 0 )
 						{
-							if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：使用OpenH264解码器成功。YU12格式原始帧宽度：%z32d，高度：%z32d。" ), p_StrmPt->m_Idx, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight );
-							if( ( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth == 0 ) || ( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight == 0 ) ) goto OutPocs; //如果未解码出YU12格式帧，就把本次帧丢弃。
+							if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：使用OpenH264解码器成功。Yu12格式原始帧宽度：%z32d，高度：%z32d。" ), p_StrmPt->m_Idx, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight );
+							if( ( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth == 0 ) || ( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight == 0 ) ) goto OutPocs; //如果未解码出Yu12格式帧，就把本次帧丢弃。
 						}
 						else
 						{
@@ -416,7 +413,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 
 					//用户定义的获取视频输出帧函数。
 					p_VdoOtptPt->m_MediaPocsThrdPt->m_UserGetVdoOtptFrmFuncPt( p_VdoOtptPt->m_MediaPocsThrdPt, p_StrmPt->m_Idx,
-																			   p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight,
+																			   p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight,
 																			   p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmPt, p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmLenByt );
 					break;
 				}
@@ -425,17 +422,17 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 			//判断设备是否黑屏。在视频处理完后再设置黑屏，这样可以保证视频处理器的连续性。
 			if( p_StrmPt->m_Dvc.m_IsBlack != 0 )
 			{
-				size_t p_TmpLenByt = p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth * p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight;
-				memset( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt, 0, p_TmpLenByt );
-				memset( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt + p_TmpLenByt, 128, p_TmpLenByt / 2 );
+				size_t p_TmpLenByt = p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth * p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight;
+				memset( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt, 0, p_TmpLenByt );
+				memset( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt + p_TmpLenByt, 128, p_TmpLenByt / 2 );
 			}
 
-			//将本次YU12格式帧转为BGRA格式帧。
-			if( LibYUVPictrFmtCnvrt( p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmPt, PICTR_FMT_BT601F8_YU12_I420, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight,
-									 p_StrmPt->m_Thrd.m_BgraRlstFrmPt, p_VdoOtptPt->m_FrmMaxWidth * p_VdoOtptPt->m_FrmMaxHeight * 4, NULL, PICTR_FMT_SRGBF8_BGRA8888,
+			//将本次Yu12格式帧转为Bgra8888格式帧。
+			if( LibYUVPictrFmtCnvrt( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt, PictrFmtBt601F8Yu12I420, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight,
+									 p_StrmPt->m_Thrd.m_BgraRlstFrmPt, p_VdoOtptPt->m_FrmMaxWidth * p_VdoOtptPt->m_FrmMaxHeight * 4, NULL, PictrFmtSrgbF8Bgra8888,
 									 NULL ) != 0 )
 			{
-				if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：将本次YU12格式原始帧转为BGRA格式结果帧失败，本次帧丢弃。" ), p_StrmPt->m_Idx );
+				if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：将本次Yu12格式原始帧转为Bgra8888格式结果帧失败，本次帧丢弃。" ), p_StrmPt->m_Idx );
 				goto OutPocs;
 			}
 
@@ -443,12 +440,12 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 			if( p_StrmPt->m_Dvc.m_DspyWndHdl != NULL )
 			{
 				//绘制帧到显示窗口。
-				if( LibYUVPictrDrawToWnd( p_StrmPt->m_Thrd.m_BgraRlstFrmPt, PICTR_FMT_SRGBF8_BGRA8888, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_YU12SrcFrmHeight,
+				if( LibYUVPictrDrawToWnd( p_StrmPt->m_Thrd.m_BgraRlstFrmPt, PictrFmtSrgbF8Bgra8888, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight,
 										  0,
 										  p_StrmPt->m_Dvc.m_DspyWndHdl,
 										  NULL ) != 0 )
 				{
-					if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：绘制BGRA格式结果帧到显示窗口失败，本次帧丢弃。" ), p_StrmPt->m_Idx );
+					if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：绘制Bgra8888格式结果帧到显示窗口失败，本次帧丢弃。" ), p_StrmPt->m_Idx );
 					goto OutPocs;
 				}
 			}
@@ -506,7 +503,7 @@ void VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx )
 		{
@@ -519,7 +516,7 @@ void VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 	{
 		return;
 	}
-	VdoOtptPt->m_StrmLnkLst.GetTail( NULL, NULL, ( void * * )&p_StrmPt, 0, NULL );
+	VdoOtptPt->m_StrmLnkLst.GetTail( NULL, NULL, ( void * * )&p_StrmPt, 0, 0, NULL );
 	p_StrmPt->m_Idx = StrmIdx;
 	p_StrmPt->m_UseWhatDecd = 0;
 }
@@ -540,7 +537,7 @@ void VdoOtptDelStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx )
 		{
@@ -569,7 +566,7 @@ void VdoOtptSetStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, HWND DspyWndHdl )
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx )
 		{
@@ -584,8 +581,8 @@ void VdoOtptSetStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, HWND DspyWndHdl )
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：VdoOtptSetStrmUseYU12
- * 功能说明：设置视频输出的流使用YU12原始数据。
+ * 函数名称：VdoOtptSetStrmUseYu12
+ * 功能说明：设置视频输出的流使用Yu12原始数据。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -595,12 +592,12 @@ void VdoOtptSetStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, HWND DspyWndHdl )
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void VdoOtptSetStrmUseYU12( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
+void VdoOtptSetStrmUseYu12( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 {
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx )
 		{
@@ -632,7 +629,7 @@ void VdoOtptSetStrmUseOpenH264Decd( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx )
 		{
@@ -665,7 +662,7 @@ void VdoOtptSetStrmIsBlack( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsBla
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx )
 		{
@@ -693,7 +690,7 @@ void VdoOtptSetStrmIsUse( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsUseSt
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果索引找到了。
 		{
@@ -758,7 +755,7 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
 	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始的嘀嗒钟。
 	
 	//初始化帧链表。
-	if( VdoOtptPt->m_FrmLnkLst.Init( sizeof( VdoOtpt::Frm * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( VdoOtptPt->m_FrmLnkLst.Init( sizeof( VdoOtpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出：初始化帧链表成功。" ) );
 	}
@@ -769,7 +766,7 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
 	}
 
 	//初始化空闲帧链表。
-	if( VdoOtptPt->m_IdleFrmLnkLst.Init( sizeof( VdoOtpt::Frm * ), BufAutoAdjMethFreeNumber, 1, 0, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( VdoOtptPt->m_IdleFrmLnkLst.Init( sizeof( VdoOtpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出：初始化空闲帧链表成功。" ) );
 	}
@@ -779,7 +776,7 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
 		goto Out;
 	}
 
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void ** )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_IsUse )
 		{
@@ -826,7 +823,7 @@ void VdoOtptDstoy( VdoOtpt * VdoOtptPt )
 	
 	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录销毁开始的嘀嗒钟。
 	
-	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, NULL ) == 0; )
+	for( size_t p_StrmLnkLstIdx = SIZE_MAX; VdoOtptPt->m_StrmLnkLst.GetNextByIdx( p_StrmLnkLstIdx, &p_StrmLnkLstIdx, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; )
 	{
 		if( p_StrmPt->m_IsUse )
 		{
@@ -835,14 +832,14 @@ void VdoOtptDstoy( VdoOtpt * VdoOtptPt )
 	}
 
 	//销毁空闲帧链表。
-	if( VdoOtptPt->m_IdleFrmLnkLst.m_ConstLenLnkLstPt != NULL )
+	if( VdoOtptPt->m_IdleFrmLnkLst.m_CLnkLstPt != NULL )
 	{
-		while( VdoOtptPt->m_IdleFrmLnkLst.GetHead( NULL, &p_FrmPt, NULL, 0, NULL ) == 0 )
+		while( VdoOtptPt->m_IdleFrmLnkLst.GetHead( NULL, &p_FrmPt, NULL, 0, 0, NULL ) == 0 )
 		{
-			if( p_FrmPt->m_YU12SrcFrmPt )
+			if( p_FrmPt->m_Yu12SrcFrmPt )
 			{
-				free( p_FrmPt->m_YU12SrcFrmPt );
-				p_FrmPt->m_YU12SrcFrmPt = NULL;
+				free( p_FrmPt->m_Yu12SrcFrmPt );
+				p_FrmPt->m_Yu12SrcFrmPt = NULL;
 			}
 			if( p_FrmPt->m_EncdSrcFrmPt != NULL )
 			{
@@ -864,14 +861,14 @@ void VdoOtptDstoy( VdoOtpt * VdoOtptPt )
 	}
 
 	//销毁帧链表。
-	if( VdoOtptPt->m_FrmLnkLst.m_ConstLenLnkLstPt != NULL )
+	if( VdoOtptPt->m_FrmLnkLst.m_CLnkLstPt != NULL )
 	{
-		while( VdoOtptPt->m_FrmLnkLst.GetHead( NULL, &p_FrmPt, NULL, 0, NULL ) == 0 )
+		while( VdoOtptPt->m_FrmLnkLst.GetHead( NULL, &p_FrmPt, NULL, 0, 0, NULL ) == 0 )
 		{
-			if( p_FrmPt->m_YU12SrcFrmPt )
+			if( p_FrmPt->m_Yu12SrcFrmPt )
 			{
-				free( p_FrmPt->m_YU12SrcFrmPt );
-				p_FrmPt->m_YU12SrcFrmPt = NULL;
+				free( p_FrmPt->m_Yu12SrcFrmPt );
+				p_FrmPt->m_Yu12SrcFrmPt = NULL;
 			}
 			if( p_FrmPt->m_EncdSrcFrmPt != NULL )
 			{

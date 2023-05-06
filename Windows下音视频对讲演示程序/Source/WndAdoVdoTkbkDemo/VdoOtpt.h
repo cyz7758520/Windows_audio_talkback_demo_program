@@ -18,15 +18,15 @@ typedef struct //视频输出。
 	typedef struct //存放帧。
 	{
 		uint32_t m_StrmIdx; //存放流索引。
-		uint8_t * m_YU12SrcFrmPt; //存放YU12格式原始帧的指针，大小为m_FrmMaxWidth * m_FrmMaxHeight * 3 / 2字节。
-		int32_t m_YU12SrcFrmWidth; //存放YU12格式原始帧的宽度，单位为像素。
-		int32_t m_YU12SrcFrmHeight; //存放YU12格式原始帧的高度，单位为像素。
+		uint8_t * m_Yu12SrcFrmPt; //存放Yu12格式原始帧的指针，大小为m_FrmMaxWidth * m_FrmMaxHeight * 3 / 2字节。
+		int32_t m_Yu12SrcFrmWidth; //存放Yu12格式原始帧的宽度，单位为像素。
+		int32_t m_Yu12SrcFrmHeight; //存放Yu12格式原始帧的高度，单位为像素。
 		uint8_t * m_EncdSrcFrmPt; //存放已编码格式原始帧的指针，大小为m_FrmMaxWidth * m_FrmMaxHeight * 3 / 2字节。
 		size_t m_EncdSrcFrmLenByt; //存放已编码格式原始帧的长度，单位为字节。
 		uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
 	} Frm;
-	ConstLenLnkLstCls m_FrmLnkLst; //存放帧链表。
-	ConstLenLnkLstCls m_IdleFrmLnkLst; //存放空闲帧链表。
+	CLnkLstCls m_FrmLnkLst; //存放帧链表。
+	CLnkLstCls m_IdleFrmLnkLst; //存放空闲帧链表。
 
 	typedef struct //存放流。
 	{
@@ -34,7 +34,7 @@ typedef struct //视频输出。
 
 		int32_t m_IsUse; //存放是否使用流，为0表示不使用，为非0表示要使用。
 
-		int32_t m_UseWhatDecd; //存放使用什么编码器，为0表示YU12原始数据，为1表示OpenH264解码器。
+		int32_t m_UseWhatDecd; //存放使用什么编码器，为0表示Yu12原始数据，为1表示OpenH264解码器。
 
 		struct //存放OpenH264解码器。
 		{
@@ -51,7 +51,7 @@ typedef struct //视频输出。
 		struct //存放线程。
 		{
 			int32_t m_IsInitThrdTmpVar; //存放是否初始化线程的临时变量。
-			uint8_t * m_BgraRlstFrmPt; //存放BGRA8888格式结果帧的指针，大小为m_FrmMaxWidth * m_FrmMaxHeight * 4字节。
+			uint8_t * m_BgraRlstFrmPt; //存放Bgra8888格式结果帧的指针，大小为m_FrmMaxWidth * m_FrmMaxHeight * 4字节。
 			Frm * m_FrmPt; //存放帧的指针。
 			size_t m_LnkLstElmTotal; //存放链表的元素总数。
 			uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
@@ -61,7 +61,7 @@ typedef struct //视频输出。
 			int32_t m_ExitFlag; //存放退出标记，0表示保持运行，1表示请求退出。
 		} m_Thrd;
 	} Strm;
-	ConstLenLnkLstCls m_StrmLnkLst; //存放流链表。
+	CLnkLstCls m_StrmLnkLst; //存放流链表。
 } VdoOtpt;
 
 #ifdef __cplusplus
@@ -78,7 +78,7 @@ void VdoOtptStrmDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
 void VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );
 void VdoOtptDelStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );
 void VdoOtptSetStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, HWND DspyWndHdl );
-void VdoOtptSetStrmUseYU12( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );
+void VdoOtptSetStrmUseYu12( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );
 void VdoOtptSetStrmUseOpenH264Decd( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t DecdThrdNum );
 void VdoOtptSetStrmIsBlack( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsBlack );
 void VdoOtptSetStrmIsUse( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsUseStrm );
