@@ -1177,25 +1177,25 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 		}
 	}
 
-	//初始化Pcm格式原始帧链表。
-	if( AdoInptPt->m_PcmSrcFrmLnkLst.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	//初始化Pcm格式原始帧容器。
+	if( AdoInptPt->m_PcmSrcFrmCntnr.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
-		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式原始帧链表成功。" ) );
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式原始帧容器成功。" ) );
 	}
 	else
 	{
-		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式原始帧链表失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式原始帧容器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		goto Out;
 	}
 
-	//初始化Pcm格式空闲帧链表。
-	if( AdoInptPt->m_PcmIdleFrmLnkLst.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	//初始化Pcm格式空闲帧容器。
+	if( AdoInptPt->m_PcmIdleFrmCntnr.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
-		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式空闲帧链表成功。" ) );
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式空闲帧容器成功。" ) );
 	}
 	else
 	{
-		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式空闲帧链表失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式空闲帧容器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		goto Out;
 	}
 
@@ -1203,7 +1203,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	{
 		AdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程的临时变量。
 		AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //初始化Pcm格式原始帧的指针。
-		AdoInptPt->m_Thrd.m_LnkLstElmTotal = 0; //初始化链表的元素总数。
+		AdoInptPt->m_Thrd.m_ElmTotal = 0; //初始化元素总数。
 		AdoInptPt->m_Thrd.m_LastTickMsec = 0; //初始化上次的嘀嗒钟。
 		AdoInptPt->m_Thrd.m_NowTickMsec = 0; //初始化本次的嘀嗒钟。
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：初始化线程的临时变量成功。" ) );
@@ -1266,47 +1266,45 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	{
 		AdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程的临时变量。
 		AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //销毁Pcm格式原始帧的指针。
-		AdoInptPt->m_Thrd.m_LnkLstElmTotal = 0; //销毁链表的元素总数。
+		AdoInptPt->m_Thrd.m_ElmTotal = 0; //销毁元素总数。
 		AdoInptPt->m_Thrd.m_LastTickMsec = 0; //销毁上次的嘀嗒钟。
 		AdoInptPt->m_Thrd.m_NowTickMsec = 0; //销毁本次的嘀嗒钟。
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁线程的临时变量成功。" ) );
 	}
 
-	//销毁Pcm格式空闲帧链表。
-	if( AdoInptPt->m_PcmIdleFrmLnkLst.m_CLnkLstPt != NULL )
+	//销毁Pcm格式空闲帧容器。
+	if( AdoInptPt->m_PcmIdleFrmCntnr.m_CQueuePt != NULL )
 	{
-		while( AdoInptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, 0, NULL ) == 0 )
+		while( AdoInptPt->m_PcmIdleFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
 			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
-			AdoInptPt->m_PcmIdleFrmLnkLst.DelHead( 0, NULL );
 		}
-		if( AdoInptPt->m_PcmIdleFrmLnkLst.Dstoy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+		if( AdoInptPt->m_PcmIdleFrmCntnr.Dstoy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式空闲帧链表成功。" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式空闲帧容器成功。" ) );
 		}
 		else
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式空闲帧链表失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式空闲帧容器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 	}
 	
-	//销毁Pcm格式原始帧链表。
-	if( AdoInptPt->m_PcmSrcFrmLnkLst.m_CLnkLstPt != NULL )
+	//销毁Pcm格式原始帧容器。
+	if( AdoInptPt->m_PcmSrcFrmCntnr.m_CQueuePt != NULL )
 	{
-		while( AdoInptPt->m_PcmSrcFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 0, 0, NULL ) == 0 )
+		while( AdoInptPt->m_PcmSrcFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
 			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
-			AdoInptPt->m_PcmSrcFrmLnkLst.DelHead( 0, NULL );
 		}
-		if( AdoInptPt->m_PcmSrcFrmLnkLst.Dstoy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+		if( AdoInptPt->m_PcmSrcFrmCntnr.Dstoy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式原始帧链表成功。" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式原始帧容器成功。" ) );
 		}
 		else
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式原始帧链表失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm格式原始帧容器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 	}
 
@@ -1712,35 +1710,32 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			}
 
 			//获取一个Pcm格式空闲帧。
-			AdoInptPt->m_PcmIdleFrmLnkLst.GetTotal( &AdoInptPt->m_Thrd.m_LnkLstElmTotal, 1, NULL ); //获取Pcm格式空闲帧链表的元素总数。
-			if( AdoInptPt->m_Thrd.m_LnkLstElmTotal > 0 ) //如果Pcm格式空闲帧链表中有帧。
+			AdoInptPt->m_PcmIdleFrmCntnr.GetTotal( &AdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式空闲帧容器的元素总数。
+			if( AdoInptPt->m_Thrd.m_ElmTotal > 0 ) //如果Pcm格式空闲帧容器中有帧。
 			{
-				//从Pcm格式空闲帧链表中取出并删除第一个帧。
-				{
-					AdoInptPt->m_PcmIdleFrmLnkLst.GetHead( NULL, &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 1, NULL );
-				}
-				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从Pcm格式空闲帧链表中取出并删除第一个帧，Pcm格式空闲帧链表元素总数：%uzd。" ), AdoInptPt->m_Thrd.m_LnkLstElmTotal );
+				AdoInptPt->m_PcmIdleFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 1, NULL ); //从Pcm格式空闲帧容器中取出并删除第一个帧。
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从Pcm格式空闲帧容器中取出并删除第一个帧，Pcm格式空闲帧容器元素总数：%uzd。" ), AdoInptPt->m_Thrd.m_ElmTotal );
 			}
-			else //如果Pcm格式空闲帧链表中没有帧。
+			else //如果Pcm格式空闲帧容器中没有帧。
 			{
-				AdoInptPt->m_PcmSrcFrmLnkLst.GetTotal( &AdoInptPt->m_Thrd.m_LnkLstElmTotal, 1, NULL ); //获取Pcm格式原始帧链表的元素总数。
-				if( AdoInptPt->m_Thrd.m_LnkLstElmTotal <= 50 )
+				AdoInptPt->m_PcmSrcFrmCntnr.GetTotal( &AdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式原始帧容器的元素总数。
+				if( AdoInptPt->m_Thrd.m_ElmTotal <= 50 )
 				{
 					AdoInptPt->m_Thrd.m_PcmSrcFrmPt = ( int16_t * )calloc( AdoInptPt->m_FrmLenByt, 1 ); //创建一个Pcm格式空闲帧。
 					if( AdoInptPt->m_Thrd.m_PcmSrcFrmPt != NULL )
 					{
-						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：Pcm格式空闲帧链表中没有帧，创建一个Pcm格式空闲帧成功。" ) );
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧成功。" ) );
 					}
 					else
 					{
-						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：Pcm格式空闲帧链表中没有帧，创建一个Pcm格式空闲帧失败。原因：内存不足。" ) );
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧失败。原因：内存不足。" ) );
 						Sleep( 1 ); //暂停一下，避免CPU使用率过高。
 						goto OutPocs;
 					}
 				}
 				else
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：Pcm格式原始帧链表中帧总数为%uzd已经超过上限50，不再创建Pcm格式空闲帧。" ), AdoInptPt->m_Thrd.m_LnkLstElmTotal );
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：Pcm格式原始帧容器中帧总数为%uzd已经超过上限50，不再创建Pcm格式空闲帧。" ), AdoInptPt->m_Thrd.m_ElmTotal );
 					Sleep( 1 ); //暂停一下，避免CPU使用率过高。
 					goto OutPocs;
 				}
@@ -1760,9 +1755,9 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 				//fwrite( AdoInptPt->m_Thrd.m_PcmSrcFrmPt, AdoInptPt->m_FrmLenByt, 1, AdoInptFile3Pt );
 			}
 
-			//追加本次Pcm格式原始帧到Pcm格式原始帧链表。注意：从取出到追加过程中不能跳出，否则会内存泄露。
+			//追加本次Pcm格式原始帧到Pcm格式原始帧容器。注意：从取出到追加过程中不能跳出，否则会内存泄露。
 			{
-				AdoInptPt->m_PcmSrcFrmLnkLst.PutTail( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, 1, NULL );
+				AdoInptPt->m_PcmSrcFrmCntnr.PutTail( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
 				AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
 			}
 

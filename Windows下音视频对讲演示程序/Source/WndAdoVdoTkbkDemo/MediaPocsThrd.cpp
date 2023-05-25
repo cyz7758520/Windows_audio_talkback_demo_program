@@ -103,9 +103,9 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 	p_MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 1; //设置上一次调用了用户定义的销毁函数。
 	p_MediaPocsThrdPt->m_ReadyExitCnt = 1; //设置准备退出计数为1，当第一次处理调用用户定义的初始化函数消息时会递减。
 
-	if( p_MediaPocsThrdPt->m_MediaMsgLnkLst.Init( 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( p_MediaPocsThrdPt->m_MediaMsgCntnr.Init( 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -135,9 +135,9 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 
 	//初始化音频输出。
 	p_MediaPocsThrdPt->m_AdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置音频输出的媒体处理线程的指针。
-	if( p_MediaPocsThrdPt->m_AdoOtpt.m_StrmLnkLst.Init( sizeof( AdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( p_MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.Init( sizeof( AdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化音频输出的流链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化音频输出的流容器失败。原因：" ) );
 		goto Out;
 	}
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt, , , ) != 0 )
@@ -154,9 +154,9 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 
 	//初始化视频输出。
 	p_MediaPocsThrdPt->m_VdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输出的媒体处理线程的指针。
-	if( p_MediaPocsThrdPt->m_VdoOtpt.m_StrmLnkLst.Init( sizeof( VdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( p_MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Init( sizeof( VdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化视频输出的流链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化视频输出的流容器失败。原因：" ) );
 		goto Out;
 	}
 	
@@ -242,10 +242,10 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt = NULL;
 	}
 
-	//销毁视频输出的流链表。
-	if( MediaPocsThrdPt->m_VdoOtpt.m_StrmLnkLst.m_CLnkLstPt != NULL )
+	//销毁视频输出的流容器。
+	if( MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.m_CQueuePt != NULL )
 	{
-		MediaPocsThrdPt->m_VdoOtpt.m_StrmLnkLst.Dstoy( NULL );
+		MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Dstoy( NULL );
 	}
 
 	//销毁音频输出的原始Wave文件完整路径动态字符串。
@@ -255,10 +255,10 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt = NULL;
 	}
 	
-	//销毁音频输出的流链表。
-	if( MediaPocsThrdPt->m_AdoOtpt.m_StrmLnkLst.m_CLnkLstPt != NULL )
+	//销毁音频输出的流容器。
+	if( MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.m_CQueuePt != NULL )
 	{
-		MediaPocsThrdPt->m_AdoOtpt.m_StrmLnkLst.Dstoy( NULL );
+		MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.Dstoy( NULL );
 	}
 
 	//销毁音频输入的结果Wave文件完整路径动态字符串。
@@ -289,10 +289,10 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt = NULL;
 	}
 	
-	//销毁媒体消息链表。
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.m_VLnkLstPt != NULL )
+	//销毁媒体消息容器。
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.m_VQueuePt != NULL )
 	{
-		MediaPocsThrdPt->m_MediaMsgLnkLst.Dstoy( NULL );
+		MediaPocsThrdPt->m_MediaMsgCntnr.Dstoy( NULL );
 	}
 
 	//取消最小计时器分辨率。
@@ -1159,9 +1159,9 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, 
 	p_MediaMsgSetAdoInpt.m_MediaMsgTyp = MediaMsgTypSetAdoInpt;
 	p_MediaMsgSetAdoInpt.m_SmplRate = SmplRate;
 	p_MediaMsgSetAdoInpt.m_FrmLenMsec = FrmLenMsec;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetAdoInpt, sizeof( p_MediaMsgSetAdoInpt ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetAdoInpt, sizeof( p_MediaMsgSetAdoInpt ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1201,9 +1201,9 @@ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt,
 
 	p_MediaMsgAdoInptSetIsUseSystemAecNsAgc.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsUseSystemAecNsAgc;
 	p_MediaMsgAdoInptSetIsUseSystemAecNsAgc.m_IsUseSystemAecNsAgc = IsUseSystemAecNsAgc;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetIsUseSystemAecNsAgc, sizeof( p_MediaMsgAdoInptSetIsUseSystemAecNsAgc ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetIsUseSystemAecNsAgc, sizeof( p_MediaMsgAdoInptSetIsUseSystemAecNsAgc ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1241,9 +1241,9 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, Vstr * Err
 	}
 
 	p_MediaMsgAdoInptSetUseNoAec.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseNoAec;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseNoAec, sizeof( p_MediaMsgAdoInptSetUseNoAec ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseNoAec, sizeof( p_MediaMsgAdoInptSetUseNoAec ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1311,9 +1311,9 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int32_t
 			goto Out;
 		}
 	}
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseSpeexAec, sizeof( p_MediaMsgAdoInptSetUseSpeexAec ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseSpeexAec, sizeof( p_MediaMsgAdoInptSetUseSpeexAec ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1357,9 +1357,9 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int32
 	p_MediaMsgAdoInptSetUseWebRtcAecm.m_IsUseCNGMode = IsUseCNGMode;
 	p_MediaMsgAdoInptSetUseWebRtcAecm.m_EchoMode = EchoMode;
 	p_MediaMsgAdoInptSetUseWebRtcAecm.m_Delay = Delay;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseWebRtcAecm, sizeof( p_MediaMsgAdoInptSetUseWebRtcAecm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseWebRtcAecm, sizeof( p_MediaMsgAdoInptSetUseWebRtcAecm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 	
@@ -1427,9 +1427,9 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int32_
 			goto Out;
 		}
 	}
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseWebRtcAec, sizeof( p_MediaMsgAdoInptSetUseWebRtcAec ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseWebRtcAec, sizeof( p_MediaMsgAdoInptSetUseWebRtcAec ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1503,9 +1503,9 @@ int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, i
 	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay = WebRtcAecIsUseAdaptAdjDelay;
 	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_IsUseSameRoomAec = IsUseSameRoomAec;
 	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SameRoomEchoMinDelay = SameRoomEchoMinDelay;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseSpeexWebRtcAec, sizeof( p_MediaMsgAdoInptSetUseSpeexWebRtcAec ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseSpeexWebRtcAec, sizeof( p_MediaMsgAdoInptSetUseSpeexWebRtcAec ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1543,9 +1543,9 @@ int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrI
 	}
 
 	p_MediaMsgAdoInptSetUseNoNs.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseNoNs;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseNoNs, sizeof( p_MediaMsgAdoInptSetUseNoNs ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseNoNs, sizeof( p_MediaMsgAdoInptSetUseNoNs ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1589,9 +1589,9 @@ int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, in
 	p_MediaMsgAdoInptSetUseSpeexPrpocsNs.m_IsUseNs = IsUseNs;
 	p_MediaMsgAdoInptSetUseSpeexPrpocsNs.m_NoiseSupes = NoiseSupes;
     p_MediaMsgAdoInptSetUseSpeexPrpocsNs.m_IsUseDereverb = IsUseDereverb;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseSpeexPrpocsNs, sizeof( p_MediaMsgAdoInptSetUseSpeexPrpocsNs ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseSpeexPrpocsNs, sizeof( p_MediaMsgAdoInptSetUseSpeexPrpocsNs ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1631,9 +1631,9 @@ int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 	p_MediaMsgAdoInptSetUseWebRtcNsx.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseWebRtcNsx;
 	p_MediaMsgAdoInptSetUseWebRtcNsx.m_PolicyMode = PolicyMode;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseWebRtcNsx, sizeof( p_MediaMsgAdoInptSetUseWebRtcNsx ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseWebRtcNsx, sizeof( p_MediaMsgAdoInptSetUseWebRtcNsx ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1673,9 +1673,9 @@ int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int32_t
 	
 	p_MediaMsgAdoInptSetUseWebRtcNs.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseWebRtcNs;
 	p_MediaMsgAdoInptSetUseWebRtcNs.m_PolicyMode = PolicyMode;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseWebRtcNs, sizeof( p_MediaMsgAdoInptSetUseWebRtcNs ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseWebRtcNs, sizeof( p_MediaMsgAdoInptSetUseWebRtcNs ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1713,9 +1713,9 @@ int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, Vstr * E
 	}
 	
 	p_MediaMsgAdoInptSetUseRNNoise.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseRNNoise;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseRNNoise, sizeof( p_MediaMsgAdoInptSetUseRNNoise ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseRNNoise, sizeof( p_MediaMsgAdoInptSetUseRNNoise ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1771,9 +1771,9 @@ int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, in
     p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_AgcIncrement = AgcIncrement;
     p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_AgcDecrement = AgcDecrement;
     p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_AgcMaxGain = AgcMaxGain;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetIsUseSpeexPrpocs, sizeof( p_MediaMsgAdoInptSetIsUseSpeexPrpocs ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetIsUseSpeexPrpocs, sizeof( p_MediaMsgAdoInptSetIsUseSpeexPrpocs ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1811,9 +1811,9 @@ int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrIn
 	}
 	
 	p_MediaMsgAdoInptSetUsePcm.m_MediaMsgTyp = MediaMsgTypAdoInptSetUsePcm;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUsePcm, sizeof( p_MediaMsgAdoInptSetUsePcm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUsePcm, sizeof( p_MediaMsgAdoInptSetUsePcm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1859,9 +1859,9 @@ int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int32_
     p_MediaMsgAdoInptSetUseSpeexEncd.m_Qualt = Qualt;
     p_MediaMsgAdoInptSetUseSpeexEncd.m_Cmplxt = Cmplxt;
     p_MediaMsgAdoInptSetUseSpeexEncd.m_PlcExptLossRate = PlcExptLossRate;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseSpeexEncd, sizeof( p_MediaMsgAdoInptSetUseSpeexEncd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseSpeexEncd, sizeof( p_MediaMsgAdoInptSetUseSpeexEncd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1899,9 +1899,9 @@ int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, Vstr * 
 	}
 	
 	p_MediaMsgAdoInptSetUseOpusEncd.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseOpusEncd;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseOpusEncd, sizeof( p_MediaMsgAdoInptSetUseOpusEncd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseOpusEncd, sizeof( p_MediaMsgAdoInptSetUseOpusEncd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1963,9 +1963,9 @@ int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 		p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_SrcWavfmWndHdl = NULL;
 		p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_RsltWavfmWndHdl = NULL;
 	}
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd, sizeof( p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd, sizeof( p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2037,9 +2037,9 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 		}
 	}
 	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_WaveFileWrBufSzByt = WaveFileWrBufSzByt;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2081,9 +2081,9 @@ int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vst
 
 	p_MediaMsgAdoInptSetUseDvc.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseDvc;
 	p_MediaMsgAdoInptSetUseDvc.m_ID = ID;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetUseDvc, sizeof( p_MediaMsgAdoInptSetUseDvc ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetUseDvc, sizeof( p_MediaMsgAdoInptSetUseDvc ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2123,9 +2123,9 @@ int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMu
 	
 	p_MediaMsgAdoInptSetIsMute.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsMute;
 	p_MediaMsgAdoInptSetIsMute.m_IsMute = IsMute;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoInptSetIsMute, sizeof( p_MediaMsgAdoInptSetIsMute ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetIsMute, sizeof( p_MediaMsgAdoInptSetIsMute ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2177,9 +2177,9 @@ int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, 
 	p_MediaMsgSetAdoOtpt.m_MediaMsgTyp = MediaMsgTypSetAdoOtpt;
 	p_MediaMsgSetAdoOtpt.m_SmplRate = SmplRate;
 	p_MediaMsgSetAdoOtpt.m_FrmLenMsec = FrmLenMsec;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetAdoOtpt, sizeof( p_MediaMsgSetAdoOtpt ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetAdoOtpt, sizeof( p_MediaMsgSetAdoOtpt ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2219,9 +2219,9 @@ int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmId
 	
 	p_MediaMsgAdoOtptAddStrm.m_MediaMsgTyp = MediaMsgTypAdoOtptAddStrm;
 	p_MediaMsgAdoOtptAddStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptAddStrm, sizeof( p_MediaMsgAdoOtptAddStrm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptAddStrm, sizeof( p_MediaMsgAdoOtptAddStrm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2261,9 +2261,9 @@ int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmId
 	
 	p_MediaMsgAdoOtptDelStrm.m_MediaMsgTyp = MediaMsgTypAdoOtptDelStrm;
 	p_MediaMsgAdoOtptDelStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptDelStrm, sizeof( p_MediaMsgAdoOtptDelStrm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptDelStrm, sizeof( p_MediaMsgAdoOtptDelStrm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2303,9 +2303,9 @@ int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int32_t 
 	
 	p_MediaMsgAdoOtptSetStrmUsePcm.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmUsePcm;
 	p_MediaMsgAdoOtptSetStrmUsePcm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetStrmUsePcm, sizeof( p_MediaMsgAdoOtptSetStrmUsePcm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetStrmUsePcm, sizeof( p_MediaMsgAdoOtptSetStrmUsePcm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2347,9 +2347,9 @@ int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, in
 	p_MediaMsgAdoOtptSetStrmUseSpeexDecd.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmUseSpeexDecd;
 	p_MediaMsgAdoOtptSetStrmUseSpeexDecd.m_StrmIdx = StrmIdx;
 	p_MediaMsgAdoOtptSetStrmUseSpeexDecd.m_IsUsePrcplEnhsmt = IsUsePrcplEnhsmt;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetStrmUseSpeexDecd, sizeof( p_MediaMsgAdoOtptSetStrmUseSpeexDecd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetStrmUseSpeexDecd, sizeof( p_MediaMsgAdoOtptSetStrmUseSpeexDecd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2389,9 +2389,9 @@ int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int
 	
 	p_MediaMsgAdoOtptSetStrmUseOpusDecd.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmUseOpusDecd;
 	p_MediaMsgAdoOtptSetStrmUseOpusDecd.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetStrmUseOpusDecd, sizeof( p_MediaMsgAdoOtptSetStrmUseOpusDecd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetStrmUseOpusDecd, sizeof( p_MediaMsgAdoOtptSetStrmUseOpusDecd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2433,9 +2433,9 @@ int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int32_t S
 	p_MediaMsgAdoOtptSetStrmIsUse.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmIsUse;
 	p_MediaMsgAdoOtptSetStrmIsUse.m_StrmIdx = StrmIdx;
 	p_MediaMsgAdoOtptSetStrmIsUse.m_IsUse = IsUse;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetStrmIsUse, sizeof( p_MediaMsgAdoOtptSetStrmIsUse ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetStrmIsUse, sizeof( p_MediaMsgAdoOtptSetStrmIsUse ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2482,9 +2482,9 @@ int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 	p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_MediaMsgTyp = MediaMsgTypAdoOtptSetIsDrawAdoWavfmToWnd;
 	p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_IsDrawAdoWavfmToWnd = IsDrawAdoWavfmToWnd;
 	p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_SrcWavfmWndHdl = SrcWavfmWndHdl;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd, sizeof( p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd, sizeof( p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2542,9 +2542,9 @@ int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 		}
 	}
 	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_WaveFileWrBufSzByt = WaveFileWrBufSzByt;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2584,9 +2584,9 @@ int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vst
 	
 	p_MediaMsgAdoOtptSetUseDvc.m_MediaMsgTyp = MediaMsgTypAdoOtptSetUseDvc;
 	p_MediaMsgAdoOtptSetUseDvc.m_ID = ID;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetUseDvc, sizeof( p_MediaMsgAdoOtptSetUseDvc ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetUseDvc, sizeof( p_MediaMsgAdoOtptSetUseDvc ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2626,9 +2626,9 @@ int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMu
 	
 	p_MediaMsgAdoOtptSetIsMute.m_MediaMsgTyp = MediaMsgTypAdoOtptSetIsMute;
 	p_MediaMsgAdoOtptSetIsMute.m_IsMute = IsMute;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAdoOtptSetIsMute, sizeof( p_MediaMsgAdoOtptSetIsMute ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetIsMute, sizeof( p_MediaMsgAdoOtptSetIsMute ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2689,9 +2689,9 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t MaxSmplRat
     p_MediaMsgSetVdoInpt.m_FrmWidth = FrmWidth;
 	p_MediaMsgSetVdoInpt.m_FrmHeight = FrmHeight;
 	p_MediaMsgSetVdoInpt.m_PrvwWndHdl = PrvwWndHdl;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoInpt, sizeof( p_MediaMsgSetVdoInpt ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoInpt, sizeof( p_MediaMsgSetVdoInpt ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2729,9 +2729,9 @@ int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrI
 	}
 	
 	p_MediaMsgSetVdoInptUseYu12.m_MediaMsgTyp = MediaMsgTypVdoInptSetUseYu12;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoInptUseYu12, sizeof( p_MediaMsgSetVdoInptUseYu12 ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoInptUseYu12, sizeof( p_MediaMsgSetVdoInptUseYu12 ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2779,9 +2779,9 @@ int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int
     p_MediaMsgSetVdoInptUseOpenH264Encd.m_BitrateCtrlMode = BitrateCtrlMode;
     p_MediaMsgSetVdoInptUseOpenH264Encd.m_IDRFrmIntvl = IDRFrmIntvl;
 	p_MediaMsgSetVdoInptUseOpenH264Encd.m_Cmplxt = Cmplxt;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoInptUseOpenH264Encd, sizeof( p_MediaMsgSetVdoInptUseOpenH264Encd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoInptUseOpenH264Encd, sizeof( p_MediaMsgSetVdoInptUseOpenH264Encd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2821,9 +2821,9 @@ int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vst
 	
 	p_MediaMsgSetVdoInptUseDvc.m_MediaMsgTyp = MediaMsgTypVdoInptSetUseDvc;
 	p_MediaMsgSetVdoInptUseDvc.m_ID = ID;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoInptUseDvc, sizeof( p_MediaMsgSetVdoInptUseDvc ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoInptUseDvc, sizeof( p_MediaMsgSetVdoInptUseDvc ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2863,9 +2863,9 @@ int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlack
 	
 	p_MediaMsgSetVdoInptIsBlack.m_MediaMsgTyp = MediaMsgTypVdoInptSetIsBlack;
 	p_MediaMsgSetVdoInptIsBlack.m_IsBlack = IsBlack;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoInptIsBlack, sizeof( p_MediaMsgSetVdoInptIsBlack ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoInptIsBlack, sizeof( p_MediaMsgSetVdoInptIsBlack ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2905,9 +2905,9 @@ int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmI
 	
 	p_MediaMsgAddVdoOtptStrm.m_MediaMsgTyp = MediaMsgTypVdoOtptAddStrm;
 	p_MediaMsgAddVdoOtptStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgAddVdoOtptStrm, sizeof( p_MediaMsgAddVdoOtptStrm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAddVdoOtptStrm, sizeof( p_MediaMsgAddVdoOtptStrm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2947,9 +2947,9 @@ int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmI
 	
 	p_MediaMsgDelVdoOtptStrm.m_MediaMsgTyp = MediaMsgTypVdoOtptDelStrm;
 	p_MediaMsgDelVdoOtptStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgDelVdoOtptStrm, sizeof( p_MediaMsgDelVdoOtptStrm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgDelVdoOtptStrm, sizeof( p_MediaMsgDelVdoOtptStrm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2991,9 +2991,9 @@ int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmI
 	p_MediaMsgSetVdoOtptStrm.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrm;
 	p_MediaMsgSetVdoOtptStrm.m_StrmIdx = StrmIdx;
 	p_MediaMsgSetVdoOtptStrm.m_DspyWndHdl = DspyWndHdl;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoOtptStrm, sizeof( p_MediaMsgSetVdoOtptStrm ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoOtptStrm, sizeof( p_MediaMsgSetVdoOtptStrm ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3033,9 +3033,9 @@ int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, uint32_
 	
 	p_MediaMsgSetVdoOtptStrmUseYu12.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmUseYu12;
 	p_MediaMsgSetVdoOtptStrmUseYu12.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoOtptStrmUseYu12, sizeof( p_MediaMsgSetVdoOtptStrmUseYu12 ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoOtptStrmUseYu12, sizeof( p_MediaMsgSetVdoOtptStrmUseYu12 ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3077,9 +3077,9 @@ int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt,
 	p_MediaMsgSetVdoOtptStrmUseOpenH264Decd.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmUseOpenH264Decd;
 	p_MediaMsgSetVdoOtptStrmUseOpenH264Decd.m_StrmIdx = StrmIdx;
 	p_MediaMsgSetVdoOtptStrmUseOpenH264Decd.m_DecdThrdNum = DecdThrdNum;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoOtptStrmUseOpenH264Decd, sizeof( p_MediaMsgSetVdoOtptStrmUseOpenH264Decd ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoOtptStrmUseOpenH264Decd, sizeof( p_MediaMsgSetVdoOtptStrmUseOpenH264Decd ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3121,9 +3121,9 @@ int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, uint32_
 	p_MediaMsgSetVdoOtptStrmIsBlack.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmIsBlack;
 	p_MediaMsgSetVdoOtptStrmIsBlack.m_StrmIdx = StrmIdx;
 	p_MediaMsgSetVdoOtptStrmIsBlack.m_IsBlack = IsBlack;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoOtptStrmIsBlack, sizeof( p_MediaMsgSetVdoOtptStrmIsBlack ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoOtptStrmIsBlack, sizeof( p_MediaMsgSetVdoOtptStrmIsBlack ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3165,9 +3165,9 @@ int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, uint32_t 
 	p_MediaMsgSetVdoOtptStrmIsUse.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmIsUse;
 	p_MediaMsgSetVdoOtptStrmIsUse.m_StrmIdx = StrmIdx;
 	p_MediaMsgSetVdoOtptStrmIsUse.m_IsUse = IsUse;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetVdoOtptStrmIsUse, sizeof( p_MediaMsgSetVdoOtptStrmIsUse ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetVdoOtptStrmIsUse, sizeof( p_MediaMsgSetVdoOtptStrmIsUse ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3213,9 +3213,9 @@ int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_
 	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_IsUseAdoOtpt = IsUseAdoOtpt;
 	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_IsUseVdoInpt = IsUseVdoInpt;
 	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_IsUseVdoOtpt = IsUseVdoOtpt;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetIsUseAdoVdoInptOtpt, sizeof( p_MediaMsgSetIsUseAdoVdoInptOtpt ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetIsUseAdoVdoInptOtpt, sizeof( p_MediaMsgSetIsUseAdoVdoInptOtpt ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3296,9 +3296,9 @@ int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int32_t
 
 	p_MediaMsgSetIsUsePrvntSysSleep.m_MediaMsgTyp = MediaMsgTypSetIsUsePrvntSysSleep;
 	p_MediaMsgSetIsUsePrvntSysSleep.m_IsUsePrvntSysSleep = IsUsePrvntSysSleep;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetIsUsePrvntSysSleep, sizeof( p_MediaMsgSetIsUsePrvntSysSleep ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetIsUsePrvntSysSleep, sizeof( p_MediaMsgSetIsUsePrvntSysSleep ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3362,9 +3362,9 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveAdoOtpt = IsSaveAdoOtpt;
 	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveVdoInpt = IsSaveVdoInpt;
 	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveVdoOtpt = IsSaveVdoOtpt;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile, sizeof( p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile, sizeof( p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3415,9 +3415,9 @@ int MediaPocsThrdSaveStngToFile( MediaPocsThrd * MediaPocsThrdPt, const Vstr * F
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置完整路径动态字符串失败。" ) );
 		goto Out;
 	}
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgSaveStngToFile, sizeof( p_MediaMsgSaveStngToFile ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSaveStngToFile, sizeof( p_MediaMsgSaveStngToFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3534,9 +3534,9 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int Is
 	p_MediaMsgRqirExit.m_MediaMsgTyp = MediaMsgTypRqirExit;
 	p_MediaMsgRqirExit.m_ExitFlag = ExitFlag;
 	p_MediaMsgRqirExit.m_IsBlockWait = IsBlockWait;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgRqirExit, sizeof( p_MediaMsgRqirExit ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgRqirExit, sizeof( p_MediaMsgRqirExit ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 	MediaPocsThrdPt->m_ReadyExitCnt++; //设置准备退出计数递增。
@@ -3585,9 +3585,9 @@ int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, void * MsgArgPt, 
 	
 	p_MediaMsgUserMsg.m_MediaMsgTyp = MediaMsgTypUserMsg;
 	p_MediaMsgUserMsg.m_MsgArgPt = MsgArgPt;
-	if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutTail( &p_MediaMsgUserMsg, sizeof( p_MediaMsgUserMsg ), 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgUserMsg, sizeof( p_MediaMsgUserMsg ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
 	}
 
@@ -4161,14 +4161,14 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 		}*/
 
 		int p_MediaPocsRslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-		size_t p_MediaMsgLnkLstElmTotal; //存放媒体消息链表的元素总数。
+		size_t p_MediaMsgCntnrElmTotal; //存放媒体消息容器的元素总数。
 		MediaMsg p_MediaMsg;
 
 		{
-			MediaPocsThrdPt->m_MediaMsgLnkLst.GetTotal( &p_MediaMsgLnkLstElmTotal, 1, NULL );
-			if( p_MediaMsgLnkLstElmTotal > 0 ) //如果有媒体消息需要处理。
+			MediaPocsThrdPt->m_MediaMsgCntnr.GetTotal( &p_MediaMsgCntnrElmTotal, 1, NULL ); //从媒体消息容器中取出并删除第一个媒体消息。
+			if( p_MediaMsgCntnrElmTotal > 0 ) //如果有媒体消息需要处理。
 			{
-				MediaPocsThrdPt->m_MediaMsgLnkLst.GetHead( NULL, &p_MediaMsg, sizeof( p_MediaMsg ), NULL, NULL, 1, 1, NULL );
+				MediaPocsThrdPt->m_MediaMsgCntnr.GetHead( &p_MediaMsg, sizeof( p_MediaMsg ), NULL, NULL, 1, 1, NULL );
 				switch( p_MediaMsg.m_MediaMsgTyp )
 				{
 					case MediaMsgTypSetAdoInpt:
@@ -4789,9 +4789,9 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 						MediaMsgAdoVdoInptOtptInit p_MediaMsgSetIsUseAdoVdoInptOtpt;
 						p_MediaMsgSetIsUseAdoVdoInptOtpt.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptInit;
-						if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgSetIsUseAdoVdoInptOtpt, sizeof( p_MediaMsgSetIsUseAdoVdoInptOtpt ), 1, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgSetIsUseAdoVdoInptOtpt, sizeof( p_MediaMsgSetIsUseAdoVdoInptOtpt ), NULL, 1, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto OutMediaPocs;
 						}
 						break;
@@ -4950,11 +4950,11 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData );
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt );
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_AdoOtpt.m_StrmLnkLst：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmLnkLst.m_CLnkLstPt );
+						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.m_CQueuePt );
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						{
 							AdoOtpt::Strm * p_AdoOtptStrmPt; //存放音频输出流的指针。
-							for( size_t p_AdoOtptStrmInfoIdx = SIZE_MAX; MediaPocsThrdPt->m_AdoOtpt.m_StrmLnkLst.GetNextByIdx( p_AdoOtptStrmInfoIdx, &p_AdoOtptStrmInfoIdx, NULL, ( void * * )&p_AdoOtptStrmPt, 0, 0, NULL ) == 0; )
+							for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_AdoOtptStrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 							{
 								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Idx：%z32d\n" ), p_AdoOtptStrmPt->m_Idx );
 								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
@@ -5006,22 +5006,22 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsUse );
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsInit );
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmLnkLst.m_CLnkLstPt：%#P\n" ), MediaPocsThrdPt->m_VdoOtpt.m_StrmLnkLst.m_CLnkLstPt );
+						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.m_CQueuePt );
 						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						{
 							VdoOtpt::Strm * p_VdoOtptStrmPt; //存放视频输出流的指针。
-							for( size_t p_VdoOtptStrmLnkLstIdx = SIZE_MAX; MediaPocsThrdPt->m_VdoOtpt.m_StrmLnkLst.GetNextByIdx( p_VdoOtptStrmLnkLstIdx, &p_VdoOtptStrmLnkLstIdx, NULL, ( void * * )&p_VdoOtptStrmPt, 0, 0, NULL ) == 0; )
+							for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_VdoOtptStrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 							{
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmLnkLst.m_Idx：%z32d\n" ), p_VdoOtptStrmPt->m_Idx );
+								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Idx：%z32d\n" ), p_VdoOtptStrmPt->m_Idx );
 								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmLnkLst.m_IsUse：%z32d\n" ), p_VdoOtptStrmPt->m_IsUse );
+								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_IsUse：%z32d\n" ), p_VdoOtptStrmPt->m_IsUse );
 								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmLnkLst.m_UseWhatDecd：%z32d\n" ), p_VdoOtptStrmPt->m_UseWhatDecd );
+								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_UseWhatDecd：%z32d\n" ), p_VdoOtptStrmPt->m_UseWhatDecd );
 								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmLnkLst.m_OpenH264Decd.m_DecdThrdNum：%z32d\n" ), p_VdoOtptStrmPt->m_OpenH264Decd.m_DecdThrdNum );
+								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_OpenH264Decd.m_DecdThrdNum：%z32d\n" ), p_VdoOtptStrmPt->m_OpenH264Decd.m_DecdThrdNum );
 								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmLnkLst.m_Dvc.m_DspyWndHdl：%#P\n" ), p_VdoOtptStrmPt->m_Dvc.m_DspyWndHdl );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmLnkLst.m_Dvc.m_IsBlack：%z32d\n" ), p_VdoOtptStrmPt->m_Dvc.m_IsBlack );
+								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_DspyWndHdl：%#P\n" ), p_VdoOtptStrmPt->m_Dvc.m_DspyWndHdl );
+								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_IsBlack：%z32d\n" ), p_VdoOtptStrmPt->m_Dvc.m_IsBlack );
 								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
 							}
 						}
@@ -5041,21 +5041,21 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 							case 1: //为请求退出。
 							{
 								//执行顺序：媒体销毁，用户销毁并退出。
-								MediaPocsThrdPt->m_MediaMsgLnkLst.Locked( NULL );
+								MediaPocsThrdPt->m_MediaMsgCntnr.Locked( NULL );
 								if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数。
 								{
 									MediaMsgUserDstoy p_MediaMsgUserDstoy;
 									p_MediaMsgUserDstoy.m_MediaMsgTyp = MediaMsgTypUserDstoy;
-									if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+									if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 									{
-										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 										goto OutMediaPocs;
 									}
 									MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
 									p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-									if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+									if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 									{
-										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 										goto OutMediaPocs;
 									}
 								}
@@ -5063,72 +5063,72 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 								{
 									MediaPocsThrdPt->m_ReadyExitCnt--; //设置准备退出计数递减。因为在请求退出时递增了。
 								}
-								MediaPocsThrdPt->m_MediaMsgLnkLst.Unlock( NULL );
+								MediaPocsThrdPt->m_MediaMsgCntnr.Unlock( NULL );
 								break;
 							}
 							case 2: //请求重启。
 							{
 								//执行顺序：媒体销毁，用户销毁，用户初始化，媒体初始化。
-								MediaPocsThrdPt->m_MediaMsgLnkLst.Locked( NULL );
+								MediaPocsThrdPt->m_MediaMsgCntnr.Locked( NULL );
 								MediaMsgAdoVdoInptOtptInit p_MediaMsgAdoVdoInptOtptInit;
 								p_MediaMsgAdoVdoInptOtptInit.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptInit;
-								if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgAdoVdoInptOtptInit, sizeof( p_MediaMsgAdoVdoInptOtptInit ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgAdoVdoInptOtptInit, sizeof( p_MediaMsgAdoVdoInptOtptInit ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 								{
-									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 									goto OutMediaPocs;
 								}
 								MediaMsgUserInit p_MediaMsgUserInit;
 								p_MediaMsgUserInit.m_MediaMsgTyp = MediaMsgTypUserInit;
-								if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgUserInit, sizeof( p_MediaMsgUserInit ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgUserInit, sizeof( p_MediaMsgUserInit ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 								{
-									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 									goto OutMediaPocs;
 								}
 								if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数。
 								{
 									MediaMsgUserDstoy p_MediaMsgUserDstoy;
 									p_MediaMsgUserDstoy.m_MediaMsgTyp = MediaMsgTypUserDstoy;
-									if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+									if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 									{
-										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 										goto OutMediaPocs;
 									}
 									MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
 									p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-									if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+									if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 									{
-										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+										if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 										goto OutMediaPocs;
 									}
-									MediaPocsThrdPt->m_MediaMsgLnkLst.Locked( NULL );
+									MediaPocsThrdPt->m_MediaMsgCntnr.Locked( NULL );
 								}
 								else //如果上一次调用了用户定义的销毁函数，就不再进行媒体销毁，用户销毁。
 								{
 									MediaPocsThrdPt->m_ReadyExitCnt--; //设置准备退出计数递减。因为在请求退出时递增了。
 								}
-								MediaPocsThrdPt->m_MediaMsgLnkLst.Unlock( NULL );
+								MediaPocsThrdPt->m_MediaMsgCntnr.Unlock( NULL );
 								break;
 							}
 							case 3: //请求重启但不执行用户定义的UserInit初始化函数和UserDstoy销毁函数。
 							{
 								//执行顺序：媒体销毁，媒体初始化。
-								MediaPocsThrdPt->m_MediaMsgLnkLst.Locked( NULL );
+								MediaPocsThrdPt->m_MediaMsgCntnr.Locked( NULL );
 								MediaMsgAdoVdoInptOtptInit p_MediaMsgAdoVdoInptOtptInit;
 								p_MediaMsgAdoVdoInptOtptInit.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptInit;
-								if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgAdoVdoInptOtptInit, sizeof( p_MediaMsgAdoVdoInptOtptInit ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgAdoVdoInptOtptInit, sizeof( p_MediaMsgAdoVdoInptOtptInit ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 								{
-									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 									goto OutMediaPocs;
 								}
 								MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
 								p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-								if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 								{
-									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+									if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 									goto OutMediaPocs;
 								}
 								MediaPocsThrdPt->m_ReadyExitCnt--; //设置准备退出计数递减。因为在请求退出时递增了。
-								MediaPocsThrdPt->m_MediaMsgLnkLst.Unlock( NULL );
+								MediaPocsThrdPt->m_MediaMsgCntnr.Unlock( NULL );
 								break;
 							}
 						}
@@ -5221,25 +5221,22 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				}
 
 				//取出音频输入Pcm格式原始帧和音频输出Pcm格式原始帧。
-				if( MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmLnkLst.m_CLnkLstPt != NULL ) MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmLnkLst.GetTotal( &p_TmpSz1, 1, NULL ); //获取音频输入Pcm格式原始帧链表的元素总数。
+				if( MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取音频输入Pcm格式原始帧容器的元素总数。
 				else p_TmpSz1 = 0;
-				if( MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmLnkLst.m_CLnkLstPt != NULL ) MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmLnkLst.GetTotal( &p_TmpSz2, 1, NULL ); //获取音频输出Pcm格式原始帧链表的元素总数。
+				if( MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.GetTotal( &p_TmpSz2, 1, NULL ); //获取音频输出Pcm格式原始帧容器的元素总数。
 				else p_TmpSz2 = 0;
 				if( MediaPocsThrdPt->m_AdoInpt.m_IsCanUseAec != 0 ) //如果可以使用声学回音消除器。
 				{
-					if( ( p_TmpSz1 > 0 ) && ( p_TmpSz2 > 0 ) ) //如果音频输入Pcm格式原始帧链表和音频输出Pcm格式原始帧链表中都有帧了，就开始取出。
+					if( ( p_TmpSz1 > 0 ) && ( p_TmpSz2 > 0 ) ) //如果音频输入Pcm格式原始帧容器和音频输出Pcm格式原始帧容器中都有帧了，就开始取出。
 					{
-						//从音频输入Pcm格式原始帧链表中取出并删除第一个帧。
-						{
-							MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, NULL, 1, 1, NULL );
-						}
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输入Pcm格式原始帧链表中取出并删除第一个帧，音频输入Pcm格式原始帧链表元素总数：%z32d。" ), p_TmpSz1 );
+						MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.GetHead( &MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, NULL, 1, 1, NULL ); //从音频输入Pcm格式原始帧容器中取出并删除第一个帧。
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输入Pcm格式原始帧容器中取出并删除第一个帧，音频输入Pcm格式原始帧容器元素总数：%z32d。" ), p_TmpSz1 );
 
-						//从音频输出Pcm格式原始帧链表中取出并删除第一个帧。
+						//从音频输出Pcm格式原始帧容器中取出并删除第一个帧。
 						{
-							MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, NULL, 1, 1, NULL );
+							MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.GetHead( &MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, NULL, 1, 1, NULL );
 						}
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输出Pcm格式原始帧链表中取出并删除第一个帧，音频输出Pcm格式原始帧链表元素总数：%z32d。" ), p_TmpSz2 );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输出Pcm格式原始帧容器中取出并删除第一个帧，音频输出Pcm格式原始帧容器元素总数：%z32d。" ), p_TmpSz2 );
 
 						//将音频输入Pcm格式原始帧复制到音频输入Pcm格式结果帧，方便处理。
 						memcpy( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
@@ -5247,25 +5244,19 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				}
 				else //如果不可以使用声学回音消除器。
 				{
-					if( p_TmpSz1 > 0 ) //如果音频输入Pcm格式原始帧链表有帧了，就开始取出。
+					if( p_TmpSz1 > 0 ) //如果音频输入Pcm格式原始帧容器有帧了，就开始取出。
 					{
-						//从音频输入Pcm格式原始帧链表中取出并删除第一个帧。
-						{
-							MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, NULL, 1, 1, NULL );
-						}
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输入Pcm格式原始帧链表中取出并删除第一个帧，音频输入Pcm格式原始帧链表元素总数：%z32d。" ), p_TmpSz1 );
+						MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.GetHead( &MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, NULL, 1, 1, NULL ); //从音频输入Pcm格式原始帧容器中取出并删除第一个帧。
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输入Pcm格式原始帧容器中取出并删除第一个帧，音频输入Pcm格式原始帧容器元素总数：%z32d。" ), p_TmpSz1 );
 
 						//将音频输入Pcm格式原始帧复制到音频输入Pcm格式结果帧，方便处理。
 						memcpy( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
 					}
 
-					if( p_TmpSz2 > 0 ) //如果音频输出Pcm格式原始帧链表有帧了，就开始取出。
+					if( p_TmpSz2 > 0 ) //如果音频输出Pcm格式原始帧容器有帧了，就开始取出。
 					{
-						//从音频输出Pcm格式原始帧链表中取出并删除第一个帧。
-						{
-							MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, NULL, 1, 1, NULL );
-						}
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输出Pcm格式原始帧链表中取出并删除第一个帧，音频输出Pcm格式原始帧链表元素总数：%z32d。" ), p_TmpSz2 );
+						MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.GetHead( &MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, NULL, 1, 1, NULL ); //从音频输出Pcm格式原始帧容器中取出并删除第一个帧。
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从音频输出Pcm格式原始帧容器中取出并删除第一个帧，音频输出Pcm格式原始帧容器元素总数：%z32d。" ), p_TmpSz2 );
 					}
 				}
 
@@ -5566,16 +5557,13 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				} //处理音频输出帧结束。
 
 				//处理视频输入帧开始。
-				if( MediaPocsThrdPt->m_VdoInpt.m_FrmLnkLst.m_CLnkLstPt != NULL ) MediaPocsThrdPt->m_VdoInpt.m_FrmLnkLst.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输入帧链表的元素总数。
+				if( MediaPocsThrdPt->m_VdoInpt.m_FrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_VdoInpt.m_FrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输入帧容器的元素总数。
 				else p_TmpSz1 = 0;
-				if( ( p_TmpSz1 > 0 ) && //如果视频输入帧链表中有帧了。
-					( ( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt != NULL ) || ( MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmLnkLst.m_CLnkLstPt == NULL ) ) ) //且已经处理了音频输入帧或不使用音频输入Pcm格式原始帧链表。
+				if( ( p_TmpSz1 > 0 ) && //如果视频输入帧容器中有帧了。
+					( ( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt != NULL ) || ( MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.m_CQueuePt == NULL ) ) ) //且已经处理了音频输入帧或不使用音频输入Pcm格式原始帧容器。
 				{
-					//从视频输入帧链表中取出并删除第一个帧。
-					{
-						MediaPocsThrdPt->m_VdoInpt.m_FrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt, NULL, 1, 1, NULL );
-					}
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从视频输入帧链表中取出并删除第一个帧，视频输入帧链表元素总数：%uzd。" ), p_TmpSz1 );
+					MediaPocsThrdPt->m_VdoInpt.m_FrmCntnr.GetHead( &MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt, NULL, 1, 1, NULL ); //从视频输入帧容器中取出并删除第一个帧。
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从视频输入帧容器中取出并删除第一个帧，视频输入帧容器元素总数：%uzd。" ), p_TmpSz1 );
 					
 					//使用音视频输入输出Avi文件写入器写入视频输入已编码格式结果帧。
 					if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt != 0 ) && ( MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_EncdRsltFrmLenByt != 0 ) )
@@ -5600,15 +5588,12 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				} //处理视频输入帧结束。
 				
 				//处理视频输出帧开始。
-				if( MediaPocsThrdPt->m_VdoOtpt.m_FrmLnkLst.m_CLnkLstPt != NULL ) MediaPocsThrdPt->m_VdoOtpt.m_FrmLnkLst.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输出帧链表的元素总数。
+				if( MediaPocsThrdPt->m_VdoOtpt.m_FrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_VdoOtpt.m_FrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输出帧容器的元素总数。
 				else p_TmpSz1 = 0;
-				if( p_TmpSz1 > 0 ) //如果视频输出帧链表中有帧了。
+				if( p_TmpSz1 > 0 ) //如果视频输出帧容器中有帧了。
 				{
-					//从视频输出帧链表中取出并删除第一个帧。
-					{
-						MediaPocsThrdPt->m_VdoOtpt.m_FrmLnkLst.GetHead( NULL, &MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt, NULL, 1, 1, NULL );
-					}
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从视频输出帧链表中取出并删除第一个帧，视频输出帧链表元素总数：%uzd。" ), p_TmpSz1 );
+					MediaPocsThrdPt->m_VdoOtpt.m_FrmCntnr.GetHead( &MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt, NULL, 1, 1, NULL ); //从视频输出帧容器中取出并删除第一个帧。
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：从视频输出帧容器中取出并删除第一个帧，视频输出帧容器元素总数：%uzd。" ), p_TmpSz1 );
 
 					//使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧。
 					if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt != 0 ) && ( MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_EncdSrcFrmLenByt != 0 ) )
@@ -5765,24 +5750,24 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				}
 				OutUserReadAdoVdoInptFrmFunc:;
 
-				if( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt != NULL ) //如果取出了音频输入Pcm格式原始帧，就追加到音频输入Pcm格式空闲帧链表。注意：从取出到追加过程中不能跳出，否则会内存泄露。
+				if( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt != NULL ) //如果取出了音频输入Pcm格式原始帧，就追加到音频输入Pcm格式空闲帧容器。注意：从取出到追加过程中不能跳出，否则会内存泄露。
 				{
-					MediaPocsThrdPt->m_AdoInpt.m_PcmIdleFrmLnkLst.PutTail( &MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, 1, NULL );
+					MediaPocsThrdPt->m_AdoInpt.m_PcmIdleFrmCntnr.PutTail( &MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, NULL, 1, NULL );
 					MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt = NULL;
 				}
-				if( MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt != NULL ) //如果取出了音频输出Pcm格式原始帧，就追加到音频输出Pcm格式空闲帧链表。注意：从取出到追加过程中不能跳出，否则会内存泄露。
+				if( MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt != NULL ) //如果取出了音频输出Pcm格式原始帧，就追加到音频输出Pcm格式空闲帧容器。注意：从取出到追加过程中不能跳出，否则会内存泄露。
 				{
-					MediaPocsThrdPt->m_AdoOtpt.m_PcmIdleFrmLnkLst.PutTail( &MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, 1, NULL );
+					MediaPocsThrdPt->m_AdoOtpt.m_PcmIdleFrmCntnr.PutTail( &MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, NULL, 1, NULL );
 					MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt = NULL;
 				}
-				if( MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt != NULL ) //如果取出了视频输入帧，就追加到视频输入空闲帧链表。注意：从取出到追加过程中不能跳出，否则会内存泄露。
+				if( MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt != NULL ) //如果取出了视频输入帧，就追加到视频输入空闲帧容器。注意：从取出到追加过程中不能跳出，否则会内存泄露。
 				{
-					MediaPocsThrdPt->m_VdoInpt.m_IdleFrmLnkLst.PutTail( &MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt, 1, NULL );
+					MediaPocsThrdPt->m_VdoInpt.m_IdleFrmCntnr.PutTail( &MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt, NULL, 1, NULL );
 					MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt = NULL;
 				}
-				if( MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt != NULL ) //如果取出了视频输出帧，就追加到视频输出空闲帧链表。注意：从取出到追加过程中不能跳出，否则会内存泄露。
+				if( MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt != NULL ) //如果取出了视频输出帧，就追加到视频输出空闲帧容器。注意：从取出到追加过程中不能跳出，否则会内存泄露。
 				{
-					MediaPocsThrdPt->m_VdoOtpt.m_IdleFrmLnkLst.PutTail( &MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt, 1, NULL );
+					MediaPocsThrdPt->m_VdoOtpt.m_IdleFrmCntnr.PutTail( &MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt, NULL, 1, NULL );
 					MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt = NULL;
 				}
 
@@ -5825,7 +5810,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 		if( p_MediaPocsRslt != 0 ) //如果本次媒体处理失败。
 		{
-			if( p_MediaMsgLnkLstElmTotal > 0 ) //如果是媒体消息处理失败。
+			if( p_MediaMsgCntnrElmTotal > 0 ) //如果是媒体消息处理失败。
 			{
 				if( p_MediaMsg.m_MediaMsgTyp == MediaMsgTypUserInit )
 					MediaPocsThrdPt->m_ExitCode = MediaPocsThrd::ExitCodeUserInit; //设置退出码为调用用户定义的初始化函数失败。
@@ -5841,23 +5826,23 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				MediaPocsThrdPt->m_ReadyExitCnt++;
 				MediaMsgUserDstoy p_MediaMsgUserDstoy;
 				p_MediaMsgUserDstoy.m_MediaMsgTyp = MediaMsgTypUserDstoy;
-				if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+				if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 					goto OutMediaPocs;
 				}
 				MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
 				p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-				if( MediaPocsThrdPt->m_MediaMsgLnkLst.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+				if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), NULL, 0, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息链表失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 					goto OutMediaPocs;
 				}
 			}
 		}
 
-		MediaPocsThrdPt->m_MediaMsgLnkLst.GetTotal( &p_MediaMsgLnkLstElmTotal, 1, NULL );
-		if( ( p_MediaMsgLnkLstElmTotal == 0 ) && ( MediaPocsThrdPt->m_ReadyExitCnt > 0 ) ) break; //如果媒体消息处理完毕，且媒体处理线程准备退出。
+		MediaPocsThrdPt->m_MediaMsgCntnr.GetTotal( &p_MediaMsgCntnrElmTotal, 1, NULL );
+		if( ( p_MediaMsgCntnrElmTotal == 0 ) && ( MediaPocsThrdPt->m_ReadyExitCnt > 0 ) ) break; //如果媒体消息处理完毕，且媒体处理线程准备退出。
 	} //媒体处理循环结束。
 	
 	MediaPocsThrdTmpVarDstoy( MediaPocsThrdPt );

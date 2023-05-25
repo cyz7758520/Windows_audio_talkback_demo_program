@@ -96,19 +96,19 @@ public:
 			}
 
 			//获取一个空闲帧。
-			m_VdoInptPt->m_IdleFrmLnkLst.GetTotal( &m_VdoInptPt->m_Thrd.m_LnkLstElmTotal, 1, NULL ); //获取空闲帧链表的元素总数。
-			if( m_VdoInptPt->m_Thrd.m_LnkLstElmTotal > 0 ) //如果空闲帧链表中有帧。
+			m_VdoInptPt->m_IdleFrmCntnr.GetTotal( &m_VdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取空闲帧容器的元素总数。
+			if( m_VdoInptPt->m_Thrd.m_ElmTotal > 0 ) //如果空闲帧容器中有帧。
 			{
-				//从空闲帧链表中取出并删除第一个帧。
+				//从空闲帧容器中取出并删除第一个帧。
 				{
-					m_VdoInptPt->m_IdleFrmLnkLst.GetHead( NULL, &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 1, NULL );
+					m_VdoInptPt->m_IdleFrmCntnr.GetHead( &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 1, NULL );
 				}
-				if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )  LOGFI( Cu8vstr( "视频输入线程：从空闲帧链表中取出并删除第一个帧，空闲帧链表元素总数：%uzd。" ), m_VdoInptPt->m_Thrd.m_LnkLstElmTotal );
+				if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )  LOGFI( Cu8vstr( "视频输入线程：从空闲帧容器中取出并删除第一个帧，空闲帧容器元素总数：%uzd。" ), m_VdoInptPt->m_Thrd.m_ElmTotal );
 			}
-			else //如果空闲帧链表中没有帧。
+			else //如果空闲帧容器中没有帧。
 			{
-				m_VdoInptPt->m_FrmLnkLst.GetTotal( &m_VdoInptPt->m_Thrd.m_LnkLstElmTotal, 1, NULL ); //获取帧链表的元素总数。
-				if( m_VdoInptPt->m_Thrd.m_LnkLstElmTotal <= 20 )
+				m_VdoInptPt->m_FrmCntnr.GetTotal( &m_VdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取帧容器的元素总数。
+				if( m_VdoInptPt->m_Thrd.m_ElmTotal <= 20 )
 				{
 					//创建一个空闲帧。
 					{
@@ -156,17 +156,17 @@ public:
 
 					if( m_VdoInptPt->m_Thrd.m_FrmPt != NULL )
 					{
-						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "视频输入线程：空闲帧链表中没有帧，创建一个空闲帧成功。" ) );
+						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "视频输入线程：空闲帧容器中没有帧，创建一个空闲帧成功。" ) );
 					}
 					else
 					{
-						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "视频输入线程：空闲帧链表中没有帧，创建一个空闲帧失败。原因：内存不足。" ) );
+						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "视频输入线程：空闲帧容器中没有帧，创建一个空闲帧失败。原因：内存不足。" ) );
 						goto OutPocs;
 					}
 				}
 				else
 				{
-					if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输入线程：帧链表中帧总数为%uzd已经超过上限20，不再创建空闲帧，本次帧丢弃。" ), m_VdoInptPt->m_Thrd.m_LnkLstElmTotal );
+					if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输入线程：帧容器中帧总数为%uzd已经超过上限20，不再创建空闲帧，本次帧丢弃。" ), m_VdoInptPt->m_Thrd.m_ElmTotal );
 					goto OutPocs;
 				}
 			}
@@ -312,9 +312,9 @@ public:
 
 			m_VdoInptPt->m_Thrd.m_FrmPt->m_TimeStampMsec = m_VdoInptPt->m_Thrd.m_LastTickMsec; //设置时间戳。
 
-			//追加本次帧到帧链表。
+			//追加本次帧到帧容器。注意：从取出到放入过程中可以跳出，跳出后会重新放入到空闲帧容器。
 			{
-				m_VdoInptPt->m_FrmLnkLst.PutTail( &m_VdoInptPt->m_Thrd.m_FrmPt, 1, NULL );
+				m_VdoInptPt->m_FrmCntnr.PutTail( &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, NULL );
 				m_VdoInptPt->m_Thrd.m_FrmPt = NULL;
 			}
 
@@ -326,9 +326,9 @@ public:
 		}
 		OutPocs:;
 
-		if( m_VdoInptPt->m_Thrd.m_FrmPt != NULL ) //如果获取的空闲帧没有追加到帧链表。
+		if( m_VdoInptPt->m_Thrd.m_FrmPt != NULL ) //如果获取的空闲帧没有追加到帧容器。
 		{
-			m_VdoInptPt->m_IdleFrmLnkLst.PutTail( &m_VdoInptPt->m_Thrd.m_FrmPt, 1, NULL );
+			m_VdoInptPt->m_IdleFrmCntnr.PutTail( &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, NULL );
 			m_VdoInptPt->m_Thrd.m_FrmPt = NULL;
 		}
 		return 0;
@@ -927,7 +927,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		}
 		VdoInptPt->m_Thrd.m_TmpFrmLenByt  = 0; //初始化临时帧的长度。
 		VdoInptPt->m_Thrd.m_FrmPt = NULL; //初始化帧的指针。
-		VdoInptPt->m_Thrd.m_LnkLstElmTotal = 0; //初始化链表的元素总数。
+		VdoInptPt->m_Thrd.m_ElmTotal = 0; //初始化元素总数。
 		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //初始化上次的嘀嗒钟。
 		VdoInptPt->m_Thrd.m_NowTickMsec = 0; //初始化本次的嘀嗒钟。
 		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：初始化线程的临时变量成功。" ) );
@@ -956,25 +956,25 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		}
 	}
 
-	//初始化帧链表。
-	if( VdoInptPt->m_FrmLnkLst.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	//初始化帧容器。
+	if( VdoInptPt->m_FrmCntnr.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化帧链表成功。" ) );
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化帧容器成功。" ) );
 	}
 	else
 	{
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：初始化帧链表失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：初始化帧容器失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		goto Out;
 	}
 
-	//初始化空闲帧链表。
-	if( VdoInptPt->m_IdleFrmLnkLst.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	//初始化空闲帧容器。
+	if( VdoInptPt->m_IdleFrmCntnr.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化空闲帧链表成功。" ) );
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化空闲帧容器成功。" ) );
 	}
 	else
 	{
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：初始化空闲帧链表失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：初始化空闲帧容器失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		goto Out;
 	}
 
@@ -1074,16 +1074,16 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 		VdoInptPt->m_Thrd.m_TmpFrmSzByt = 0; //销毁临时帧的大小。
 		VdoInptPt->m_Thrd.m_TmpFrmLenByt  = 0; //销毁临时帧的长度。
 		VdoInptPt->m_Thrd.m_FrmPt = NULL; //销毁帧的指针。
-		VdoInptPt->m_Thrd.m_LnkLstElmTotal = 0; //销毁链表的元素总数。
+		VdoInptPt->m_Thrd.m_ElmTotal = 0; //销毁元素总数。
 		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //销毁上次的嘀嗒钟。
 		VdoInptPt->m_Thrd.m_NowTickMsec = 0; //销毁本次的嘀嗒钟。
 		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：销毁线程的临时变量成功。" ) );
 	}
 
-	//销毁空闲帧链表。
-	if( VdoInptPt->m_IdleFrmLnkLst.m_CLnkLstPt != NULL )
+	//销毁空闲帧容器。
+	if( VdoInptPt->m_IdleFrmCntnr.m_CQueuePt != NULL )
 	{
-		while( VdoInptPt->m_IdleFrmLnkLst.GetHead( NULL, &VdoInptPt->m_Thrd.m_FrmPt, NULL, 0, 0, NULL ) == 0 )
+		while( VdoInptPt->m_IdleFrmCntnr.GetHead( &VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
 			if( VdoInptPt->m_Thrd.m_FrmPt->m_BgraSrcFrmPt != NULL )
 			{
@@ -1102,22 +1102,21 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 			}
 			free( VdoInptPt->m_Thrd.m_FrmPt );
 			VdoInptPt->m_Thrd.m_FrmPt = NULL;
-			VdoInptPt->m_IdleFrmLnkLst.DelHead( 0, NULL );
 		}
-		if( VdoInptPt->m_IdleFrmLnkLst.Dstoy( VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+		if( VdoInptPt->m_IdleFrmCntnr.Dstoy( VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：销毁空闲帧链表成功。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：销毁空闲帧容器成功。" ) );
 		}
 		else
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：销毁空闲帧链表失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：销毁空闲帧容器失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 	}
 
-	//销毁帧链表。
-	if( VdoInptPt->m_FrmLnkLst.m_CLnkLstPt != NULL )
+	//销毁帧容器。
+	if( VdoInptPt->m_FrmCntnr.m_CQueuePt != NULL )
 	{
-		while( VdoInptPt->m_FrmLnkLst.GetHead( NULL, &VdoInptPt->m_Thrd.m_FrmPt, NULL, 0, 0, NULL ) == 0 )
+		while( VdoInptPt->m_FrmCntnr.GetHead( &VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
 			if( VdoInptPt->m_Thrd.m_FrmPt->m_BgraSrcFrmPt != NULL )
 			{
@@ -1136,15 +1135,14 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 			}
 			free( VdoInptPt->m_Thrd.m_FrmPt );
 			VdoInptPt->m_Thrd.m_FrmPt = NULL;
-			VdoInptPt->m_FrmLnkLst.DelHead( 0, NULL );
 		}
-		if( VdoInptPt->m_FrmLnkLst.Dstoy( VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+		if( VdoInptPt->m_FrmCntnr.Dstoy( VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：销毁帧链表成功。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：销毁帧容器成功。" ) );
 		}
 		else
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：销毁帧链表失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：销毁帧容器失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 	}
 

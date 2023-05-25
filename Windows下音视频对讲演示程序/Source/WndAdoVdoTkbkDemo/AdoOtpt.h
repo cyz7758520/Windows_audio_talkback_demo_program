@@ -32,7 +32,7 @@ typedef struct //音频输出。
 			int32_t m_IsUsePrcplEnhsmt; //存放是否使用知觉增强，为非0表示要使用，为0表示不使用。
 		} m_SpeexDecd;
 	} Strm;
-	CLnkLstCls m_StrmLnkLst; //存放流链表。
+	CQueueCls m_StrmCntnr; //存放流容器。
 	int32_t m_StrmUseTotal; //存放流要使用的总数。
 	
 	struct //存放波形器。
@@ -70,8 +70,8 @@ typedef struct //音频输出。
 		int32_t m_IsClos; //存放是否关闭，为0表示正常，为非0表示关闭。
 	} m_Dvc;
 
-	CLnkLstCls m_PcmSrcFrmLnkLst; //存放Pcm格式原始帧链表。
-	CLnkLstCls m_PcmIdleFrmLnkLst; //存放Pcm格式空闲帧链表。
+	CQueueCls m_PcmSrcFrmCntnr; //存放Pcm格式原始帧容器。
+	CQueueCls m_PcmIdleFrmCntnr; //存放Pcm格式空闲帧容器。
 	
 	struct //存放线程。
 	{
@@ -81,7 +81,7 @@ typedef struct //音频输出。
 		size_t m_EncdSrcFrmSzByt; //存放已编码格式原始帧的大小，单位为字节。
 		size_t m_EncdSrcFrmLenByt; //存放已编码格式原始帧的长度，单位为字节。
 		int32_t * m_PcmMixFrmPt; //存放Pcm格式混音帧的指针。
-		size_t m_LnkLstElmTotal; //存放链表的元素总数。
+		size_t m_ElmTotal; //存放元素总数。
 		uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
 		uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 
@@ -104,8 +104,8 @@ void AdoOtptSetStrmUsePcm( AdoOtpt * AdoOtptPt, int32_t StrmIdx );
 void AdoOtptSetStrmUseSpeexDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUsePrcplEnhsmt );
 void AdoOtptSetStrmUseOpusDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx );
 void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStrm );
-int AdoOtptStrmLnkLstInit( AdoOtpt * AdoOtptPt );
-void AdoOtptStrmLnkLstDstoy( AdoOtpt * AdoOtptPt );
+int AdoOtptStrmCntnrInit( AdoOtpt * AdoOtptPt );
+void AdoOtptStrmCntnrDstoy( AdoOtpt * AdoOtptPt );
 int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt );
 void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt );
 int AdoOtptWavfmInit( AdoOtpt * AdoOtptPt );

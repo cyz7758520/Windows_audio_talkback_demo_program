@@ -82,10 +82,10 @@ public:
     uint32_t m_LastSendVdoInptFrmTimeStamp; //存放最后一个发送视频输入帧的时间戳。
     int8_t m_IsRecvExitPkt; //存放是否接收到退出包，为0表示否，为1表示是。
 
-    int m_UseWhatRecvOtptFrm; //存放使用什么接收输出帧，为0表示链表，为1表示自适应抖动缓冲器。
+    int m_UseWhatRecvOtptFrm; //存放使用什么接收输出帧，为0表示容器，为1表示自适应抖动缓冲器。
 
-    VLnkLstCls m_RecvAdoOtptFrmLnkLst; //存放接收音频输出帧链表。
-	VLnkLstCls m_RecvVdoOtptFrmLnkLst; //存放接收视频输出帧链表。
+    VQueueCls m_RecvAdoOtptFrmLnkLst; //存放接收音频输出帧容器。
+	VQueueCls m_RecvVdoOtptFrmLnkLst; //存放接收视频输出帧容器。
 
 	struct //存放音频自适应抖动缓冲器。
 	{

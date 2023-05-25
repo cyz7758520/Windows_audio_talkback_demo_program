@@ -55,7 +55,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年05月06日",IDC_STATIC,7,7,295,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年05月25日",IDC_STATIC,7,7,295,16
     LTEXT           "传输协议：",IDC_STATIC,7,35,58,8
     CONTROL         "TCP协议",UseTcpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,63,34,45,8
     CONTROL         "UDP协议",UseUdpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON,165,34,45,8
@@ -118,7 +118,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "Windows下音频对讲演示程序\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
     LTEXT           "接收音频输出帧：",IDC_STATIC,7,36,74,8
-    CONTROL         "链表",UseLnkLstRecvOtptFrmRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,97,29,137,10
+    CONTROL         "容器",UseLnkLstRecvOtptFrmRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,97,29,137,10
     CONTROL         "自己设计的自适应抖动缓冲器",UseAjbRecvOtptFrmRdBtnId,"Button",BS_AUTORADIOBUTTON,97,42,137,10
     PUSHBUTTON      "设置",AjbStngBtnId,252,40,50,14
     CONTROL         "保存设置到可执行文件所在目录下的Setting.txt文件中",IsSaveStngToFileCkBoxId,

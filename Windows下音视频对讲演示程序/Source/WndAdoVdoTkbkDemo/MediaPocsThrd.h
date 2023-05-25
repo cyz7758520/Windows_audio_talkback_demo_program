@@ -47,7 +47,7 @@ typedef struct MediaPocsThrd
 	int32_t m_LastCallUserInitOrDstoy; //存放上一次调用了用户定义的初始化函数或销毁函数，为0表示初始化函数，为1表示销毁函数。
 	int32_t m_ReadyExitCnt; //存放准备退出计数，为0表示不准备退出，大于0表示要准备退出。
 	
-	VLnkLstCls m_MediaMsgLnkLst; //存放媒体消息链表。
+	VQueueCls m_MediaMsgCntnr; //存放媒体消息容器。
 
 	int32_t m_IsPrintLog; //存放是否打印Log日志，为非0表示要打印，为0表示不打印。
 	int32_t m_IsShowToast; //存放是否显示Toast，为非0表示要显示，为0表示不显示。

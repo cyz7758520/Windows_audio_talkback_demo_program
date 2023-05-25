@@ -35,8 +35,8 @@ __SOKT_DLLAPI__ int AudpSetRecvBufSz( AudpSokt * AudpSoktPt, size_t RecvBufSzByt
 __SOKT_DLLAPI__ int AudpGetRecvBufSz( AudpSokt * AudpSoktPt, size_t * RecvBufSzBytPt, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int AudpGetRecvBufLen( AudpSokt * AudpSoktPt, size_t * RecvBufLenBytPt, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int AudpSendApkt( AudpSokt * AudpSoktPt, size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, Vstr * ErrInfoVstrPt );
-__SOKT_DLLAPI__ int AudpRecvApkt( AudpSokt * AudpSoktPt, size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int AudpSendApkt( AudpSokt * AudpSoktPt, size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, int32_t IsRlab, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int AudpRecvApkt( AudpSokt * AudpSoktPt, size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, int32_t * IsRlabPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int AudpDstoy( AudpSokt * AudpSoktPt, Vstr * ErrInfoVstrPt );
 
@@ -71,8 +71,8 @@ public:
 	int GetRecvBufSz( size_t * RecvBufSzBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetRecvBufSz( m_AudpSoktPt, RecvBufSzBytPt, ErrInfoVstrPt ); }
 	int GetRecvBufLen( size_t * RecvBufLenBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetRecvBufLen( m_AudpSoktPt, RecvBufLenBytPt, ErrInfoVstrPt ); }
 	
-	int SendApkt( size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, Vstr * ErrInfoVstrPt ) { return AudpSendApkt( m_AudpSoktPt, CnctIdx, PktPt, PktLenByt, Times, ErrInfoVstrPt ); }
-	int RecvApkt( size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpRecvApkt( m_AudpSoktPt, CnctIdx, PktPt, PktSzByt, PktLenBytPt, TmotMsec, ErrInfoVstrPt ); }
+	int SendApkt( size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, int32_t IsRlab, Vstr * ErrInfoVstrPt ) { return AudpSendApkt( m_AudpSoktPt, CnctIdx, PktPt, PktLenByt, Times, IsRlab, ErrInfoVstrPt ); }
+	int RecvApkt( size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, int32_t * IsRlabPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpRecvApkt( m_AudpSoktPt, CnctIdx, PktPt, PktSzByt, PktLenBytPt, IsRlabPt, TmotMsec, ErrInfoVstrPt ); }
 
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AudpDstoy( m_AudpSoktPt, ErrInfoVstrPt ); m_AudpSoktPt = NULL; return p_Rslt; }
 };

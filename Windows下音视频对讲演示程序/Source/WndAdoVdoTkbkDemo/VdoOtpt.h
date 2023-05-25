@@ -25,8 +25,8 @@ typedef struct //视频输出。
 		size_t m_EncdSrcFrmLenByt; //存放已编码格式原始帧的长度，单位为字节。
 		uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
 	} Frm;
-	CLnkLstCls m_FrmLnkLst; //存放帧链表。
-	CLnkLstCls m_IdleFrmLnkLst; //存放空闲帧链表。
+	CQueueCls m_FrmCntnr; //存放帧容器。
+	CQueueCls m_IdleFrmCntnr; //存放空闲帧容器。
 
 	typedef struct //存放流。
 	{
@@ -53,7 +53,7 @@ typedef struct //视频输出。
 			int32_t m_IsInitThrdTmpVar; //存放是否初始化线程的临时变量。
 			uint8_t * m_BgraRlstFrmPt; //存放Bgra8888格式结果帧的指针，大小为m_FrmMaxWidth * m_FrmMaxHeight * 4字节。
 			Frm * m_FrmPt; //存放帧的指针。
-			size_t m_LnkLstElmTotal; //存放链表的元素总数。
+			size_t m_ElmTotal; //存放元素总数。
 			uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
 			uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 
@@ -61,7 +61,7 @@ typedef struct //视频输出。
 			int32_t m_ExitFlag; //存放退出标记，0表示保持运行，1表示请求退出。
 		} m_Thrd;
 	} Strm;
-	CLnkLstCls m_StrmLnkLst; //存放流链表。
+	CQueueCls m_StrmCntnr; //存放流容器。
 } VdoOtpt;
 
 #ifdef __cplusplus

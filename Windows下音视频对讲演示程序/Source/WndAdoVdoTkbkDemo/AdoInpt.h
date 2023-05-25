@@ -174,14 +174,14 @@ typedef struct //音频输入。
 		int32_t m_IsClos; //存放是否关闭，为0表示正常，为非0表示关闭。
 	} m_Dvc;
 
-	CLnkLstCls m_PcmSrcFrmLnkLst; //存放Pcm格式原始帧链表。
-	CLnkLstCls m_PcmIdleFrmLnkLst; //存放Pcm格式空闲帧链表。
+	CQueueCls m_PcmSrcFrmCntnr; //存放Pcm格式原始帧容器。
+	CQueueCls m_PcmIdleFrmCntnr; //存放Pcm格式空闲帧容器。
 
 	struct //存放线程。
 	{
 		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程的临时变量。
 		int16_t * m_PcmSrcFrmPt; //存放Pcm格式原始帧的指针。
-		size_t m_LnkLstElmTotal; //存放链表的元素总数。
+		size_t m_ElmTotal; //存放元素总数。
 		uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
 		uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 

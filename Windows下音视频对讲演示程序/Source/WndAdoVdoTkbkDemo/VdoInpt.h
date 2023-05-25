@@ -60,8 +60,8 @@ typedef struct //视频输入。
 		size_t m_EncdRsltFrmLenByt; //存放已编码格式结果帧的长度，单位为字节。
 		uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
 	} Frm;
-	CLnkLstCls m_FrmLnkLst; //存放帧链表。
-	CLnkLstCls m_IdleFrmLnkLst; //存放空闲帧链表。
+	CQueueCls m_FrmCntnr; //存放帧容器。
+	CQueueCls m_IdleFrmCntnr; //存放空闲帧容器。
 	
 	struct //存放线程。
 	{
@@ -73,7 +73,7 @@ typedef struct //视频输入。
 		size_t m_TmpFrmSzByt; //存放临时帧的大小，单位为字节。
 		size_t m_TmpFrmLenByt; //存放临时帧的长度，单位为字节。
 		Frm * m_FrmPt; //存放帧的指针。
-		size_t m_LnkLstElmTotal; //存放链表的元素总数。
+		size_t m_ElmTotal; //存放元素总数。
 		uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
 		uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 

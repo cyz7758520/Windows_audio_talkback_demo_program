@@ -667,7 +667,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							g_MyMediaPocsThrdPt->m_Ntwk.m_IsAutoAllowCnct = ( IsDlgButtonChecked( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId ) == BST_CHECKED ) ? 1 : 0;
 						}
 						
-						//设置是否使用链表。
+						//设置是否使用容器。
 						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseLnkLstRecvOtptFrmRdBtnId ) == BST_CHECKED )
 						{
 							g_MyMediaPocsThrdPt->m_UseWhatRecvOtptFrm = 0;
