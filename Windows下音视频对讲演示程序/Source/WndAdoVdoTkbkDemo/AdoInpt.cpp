@@ -984,7 +984,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 						return p_Rslt;
 					}
 
-					HRESULT STDMETHODCALLTYPE GetBufferAndLength( _Outptr_opt_result_bytebuffer_( *pcbLength ) BYTE ** ppBuffer, DWORD * pcbLength )
+					HRESULT STDMETHODCALLTYPE GetBufferAndLength( _Outptr_opt_result_bytebuffer_( *pcbLength ) BYTE * * ppBuffer, DWORD * pcbLength )
 					{
 						int p_Rslt = S_FALSE; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
