@@ -1679,7 +1679,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 					else if( p_HRslt == AUDCLNT_S_BUFFER_EMPTY ) //如果设备的Pcm格式缓冲区当前为空，表示还需要等待。
 					{
 						//if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：AUDCLNT_S_BUFFER_EMPTY。" ) );
-						Sleep( 1 ); //暂停一下，避免CPU使用率过高。
+						FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
 					}
 					else if( p_HRslt == AUDCLNT_E_BUFFER_ERROR )
 					{
@@ -1729,14 +1729,14 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 					else
 					{
 						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧失败。原因：内存不足。" ) );
-						Sleep( 1 ); //暂停一下，避免CPU使用率过高。
+						FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
 						goto OutPocs;
 					}
 				}
 				else
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：Pcm格式原始帧容器中帧总数为%uzd已经超过上限50，不再创建Pcm格式空闲帧。" ), AdoInptPt->m_Thrd.m_ElmTotal );
-					Sleep( 1 ); //暂停一下，避免CPU使用率过高。
+					FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
 					goto OutPocs;
 				}
 			}

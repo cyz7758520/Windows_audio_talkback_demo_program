@@ -389,6 +389,13 @@ __FUNC_DLLAPI__ int FuncReadPipe( HANDLE PipeReadHdl, char * * BufPtPt, size_t *
 __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
 #endif
 
+//休眠函数。
+#if( defined __MS_VCXX__ )
+#define FuncSleep( SleepTimeMesc ) WaitForSingleObject( ( HANDLE )-1, SleepTimeMesc )
+#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
+#define FuncSleep( SleepTimeMesc ) usleep( SleepTimeMesc * 1000 )
+#endif
+
 #ifdef __cplusplus
 }
 #endif

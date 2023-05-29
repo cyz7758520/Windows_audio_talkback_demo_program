@@ -5801,7 +5801,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 				}
 
-				Sleep( 1 ); //暂停一下，避免CPU使用率过高。
+				FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
 			} //音视频输入输出帧处理结束。
 
 			p_MediaPocsRslt = 0; //设置本媒体消息处理成功。
