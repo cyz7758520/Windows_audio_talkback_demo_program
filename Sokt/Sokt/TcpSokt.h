@@ -10,6 +10,12 @@ extern "C"
 
 typedef struct TcpSrvrSokt TcpSrvrSokt;
 typedef struct TcpClntSokt TcpClntSokt;
+enum TcpCnctSts
+{
+	TcpCnctStsWait, //连接状态：等待远端接受连接。
+	TcpCnctStsCnct, //连接状态：已连接。
+	TcpCnctStsFail, //连接状态：连接失败。
+};
 
 __SOKT_DLLAPI__ int TcpSrvrInit( TcpSrvrSokt * * TcpSrvrSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, Vstr * ErrInfoVstrPt );
 
@@ -23,7 +29,9 @@ __SOKT_DLLAPI__ int TcpSrvrAcpt( TcpSrvrSokt * TcpSrvrSoktPt, TcpClntSokt * * Tc
 __SOKT_DLLAPI__ int TcpSrvrDstoy( TcpSrvrSokt * TcpSrvrSoktPt, Vstr * ErrInfoVstrPt );
 
 
-__SOKT_DLLAPI__ int TcpClntInit( TcpClntSokt * * TcpClntSoktPtPt, const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntInit( TcpClntSokt * * TcpClntSoktPtPt, const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, Vstr * ErrInfoVstrPt );
+
+__SOKT_DLLAPI__ int TcpClntWaitCnct( TcpClntSokt * TcpClntSoktPt, uint16_t TmotMsec, TcpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int TcpClntLocked( TcpClntSokt * TcpClntSoktPt, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int TcpClntUnlock( TcpClntSokt * TcpClntSoktPt, Vstr * ErrInfoVstrPt );
@@ -66,8 +74,10 @@ public:
 	TcpClntSoktCls() { m_TcpClntSoktPt = NULL; }
 	~TcpClntSoktCls() { Dstoy( UINT16_MAX, NULL ); }
 
-	int Init( const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return TcpClntInit( &m_TcpClntSoktPt, RmtLclNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, LclNodeNameVstrPt, LclNodeSrvcVstrPt, TmotMsec, ErrInfoVstrPt ); }
+	int Init( const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, Vstr * ErrInfoVstrPt ) { return TcpClntInit( &m_TcpClntSoktPt, RmtLclNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ErrInfoVstrPt ); }
 	
+	int WaitCnct( uint16_t TmotMsec, TcpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt ) { return TcpClntWaitCnct( m_TcpClntSoktPt, TmotMsec, CnctStsPt, ErrInfoVstrPt ); }
+
 	int Locked( Vstr * ErrInfoVstrPt ) { return TcpClntLocked( m_TcpClntSoktPt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return TcpClntUnlock( m_TcpClntSoktPt, ErrInfoVstrPt ); }
 

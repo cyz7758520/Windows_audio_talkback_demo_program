@@ -587,16 +587,19 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				}
 				case IsDrawAdoWavfmToWndCkBoxId: //绘制音频波形复选框。
 				{
-					//设置音频输入是否绘制音频波形到窗口。
-					g_MyMediaPocsThrdPt->AdoInptSetIsDrawAdoWavfmToWnd( ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																		GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ),
-																		GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ),
-																		&g_ErrInfoVstr );
+					if( g_MyMediaPocsThrdPt != NULL )
+					{
+						//设置音频输入是否绘制音频波形到窗口。
+						g_MyMediaPocsThrdPt->AdoInptSetIsDrawAdoWavfmToWnd( ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+																			GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ),
+																			GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ),
+																			&g_ErrInfoVstr );
 
-					//设置音频输出是否绘制音频波形到窗口。
-					g_MyMediaPocsThrdPt->AdoOtptSetIsDrawAdoWavfmToWnd( ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																		GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ),
-																		& g_ErrInfoVstr );
+						//设置音频输出是否绘制音频波形到窗口。
+						g_MyMediaPocsThrdPt->AdoOtptSetIsDrawAdoWavfmToWnd( ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+																			GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ),
+																			&g_ErrInfoVstr );
+					}
 					break;
 				}
 				case CreateSrvrBtnId: //创建服务器按钮。
@@ -1225,8 +1228,10 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					}
 					else //如果媒体处理线程已经启动。
 					{
+						LOGI( Cu8vstr( "开始请求并等待媒体处理线程退出。" ) );
+						g_MyMediaPocsThrdPt->m_IsInterrupt = 1;
 						g_MyMediaPocsThrdPt->RqirExit( 1, 1, &g_ErrInfoVstr ); //请求媒体处理线程退出。
-
+						LOGI( Cu8vstr( "结束请求并等待媒体处理线程退出。" ) );
 						p_Rslt = 0; // //设置本函数执行成功。
 					}
 					return ( p_Rslt == 0 ) ? ( INT_PTR )TRUE : ( INT_PTR )FALSE;
@@ -1902,9 +1907,13 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					if( g_MainDlgWndHdl == hDlg ) //如果是主对话框。
 					{
 						LOGI( Cu8vstr( "用户在主对话框按下关闭按钮，本软件退出。" ) );
-
-						if( g_MyMediaPocsThrdPt != NULL ) g_MyMediaPocsThrdPt->RqirExit( 1, 1, &g_ErrInfoVstr ); //请求媒体处理线程退出。
-
+						if( g_MyMediaPocsThrdPt != NULL )
+						{
+							LOGI( Cu8vstr( "开始请求并等待媒体处理线程退出。" ) );
+							g_MyMediaPocsThrdPt->m_IsInterrupt = 1;
+							g_MyMediaPocsThrdPt->RqirExit( 1, 1, &g_ErrInfoVstr ); //请求媒体处理线程退出。
+							LOGI( Cu8vstr( "结束请求并等待媒体处理线程退出。" ) );
+						}
 						PostQuitMessage( 0 ); //发送退出消息。
 					}
 					else //如果是其他对话框。
@@ -2382,6 +2391,19 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 					 ( wcscmp( p_Argv[ p_Argn ], L"-NOSAVEADOVDOINPTOTPT" ) == 0 ) )
 			{
 				CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_UNCHECKED );
+			}
+			
+			else if( ( wcscmp( p_Argv[ p_Argn ], L"-usesystemaecnsagc" ) == 0 ) ||
+					 ( wcscmp( p_Argv[ p_Argn ], L"-UseSystemAecNsAgc" ) == 0 ) ||
+					 ( wcscmp( p_Argv[ p_Argn ], L"-USESYSTEMAECNSAGC" ) == 0 ) )
+			{
+				CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+			}
+			else if( ( wcscmp( p_Argv[ p_Argn ], L"-nousesystemaecnsagc" ) == 0 ) ||
+					 ( wcscmp( p_Argv[ p_Argn ], L"-NoUseSystemAecNsAgc" ) == 0 ) ||
+					 ( wcscmp( p_Argv[ p_Argn ], L"-NOUSESYSTEMAECNSAGC" ) == 0 ) )
+			{
+				CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_UNCHECKED );
 			}
 			else if( ( wcscmp( p_Argv[ p_Argn ], L"-saveado" ) == 0 ) ||
 					 ( wcscmp( p_Argv[ p_Argn ], L"-SaveAdo" ) == 0 ) ||

@@ -54,6 +54,7 @@
 &emsp;&emsp;4、当需要媒体处理线程退出时，调用MediaPocsThrdRqirExit()函数即可。  
 
 &emsp;&emsp;如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。  
+&emsp;&emsp;如果只移植部分功能，没有移植MediaPocsThrd媒体处理线程类，则效果可能不好，因为MediaPocsThrd类做了很多优化。  
 
 &emsp;&emsp;**普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器、Speex编解码器、Wave文件读取器、Wave文件写入器、音频波形器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。**  
 
@@ -74,6 +75,8 @@
 &emsp;&emsp;**-NoPrintLogShowToast**：表示不打印Log日志，不显示Toast。  
 &emsp;&emsp;**-SaveAdoVdoInptOtpt xxx.avi**：表示要保存音视频输入输出到xxx.avi文件，可以为相对或绝对完整路径。  
 &emsp;&emsp;**-NoSaveAdoVdoInptOtpt**：表示不保存音视频输入输出到文件。  
+&emsp;&emsp;**-UseSystemAecNsAgc**：表示要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
+&emsp;&emsp;**-NoUseSystemAecNsAgc**：表示不使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
 &emsp;&emsp;**-SaveAdo AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav**：表示要分别保存音频输入原始、音频输入结果、音频输出原始到AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav文件，可以为相对或绝对完整路径。  
 &emsp;&emsp;**-NoSaveAdo**：表示不保存音频输入原始、音频输入结果、音频输出原始到文件。  
 &emsp;&emsp;**-VdoInptPrvwWndHdl xxx**：表示设置视频输入预览窗口的句柄为xxx（十进制）。  

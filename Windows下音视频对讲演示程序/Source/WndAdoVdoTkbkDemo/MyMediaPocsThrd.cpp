@@ -203,33 +203,60 @@ int MyMediaPocsThrdCls::UserInit()
 						{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 					}
 
-					if( m_Ntwk.m_TcpClntSokt.Init( p_RmtNodeAddrFamly, m_Ntwk.m_IPAddrVstrPt, m_Ntwk.m_PortVstrPt, NULL, NULL, 5000, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议客户端套接字，并连接远端TCP协议服务端套接字成功。
+					if( m_Ntwk.m_TcpClntSokt.Init( p_RmtNodeAddrFamly, m_Ntwk.m_IPAddrVstrPt, m_Ntwk.m_PortVstrPt, NULL, NULL, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议客户端套接字，并连接远端TCP协议服务端套接字成功。
 					{
-						if( m_Ntwk.m_TcpClntSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						TcpCnctSts p_TcpCnctSts;
+
+						while( m_Ntwk.m_TcpClntSokt.WaitCnct( 1, &p_TcpCnctSts, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //循环等待本端TCP协议客户端套接字连接远端TCP协议服务端套接字成功。
 						{
-							if( m_TkbkStsWndHdl != NULL ) PostMessage( m_TkbkStsWndHdl, TkbkStsMsgCnctFail, 0, 0 ); //向对讲状态窗口发送连接失败消息。
+							if( p_TcpCnctSts == TcpCnctStsWait ) //如果等待远端接受连接。
+							{
+								//重新循环，继续等待本端本端TCP协议客户端套接字连接远端TCP协议服务端套接字。
+							}
+							else if( p_TcpCnctSts == TcpCnctStsCnct ) //如果连接成功。
+							{
+								if( m_Ntwk.m_TcpClntSokt.GetLclAddr( NULL, p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								{
+									if( m_TkbkStsWndHdl != NULL ) PostMessage( m_TkbkStsWndHdl, TkbkStsMsgCnctFail, 0, 0 ); //向对讲状态窗口发送连接失败消息。
 
-							VstrFmtIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端TCP协议客户端套接字绑定的本地节点地址和端口失败。原因：" ) );
-							if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-							{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-							goto Out;
+									VstrFmtIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端TCP协议客户端套接字绑定的本地节点地址和端口失败。原因：" ) );
+									if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+									{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+									goto Out;
+								}
+								if( m_Ntwk.m_TcpClntSokt.GetRmtAddr( NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								{
+									if( m_TkbkStsWndHdl != NULL ) PostMessage( m_TkbkStsWndHdl, TkbkStsMsgCnctFail, 0, 0 ); //向对讲状态窗口发送连接失败消息。
+
+									VstrFmtIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端TCP协议客户端套接字连接的远端TCP协议客户端套接字绑定的远程节点地址和端口失败。原因：" ) );
+									if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+									{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+									goto Out;
+								}
+
+								if( m_TkbkStsWndHdl != NULL ) PostMessage( m_TkbkStsWndHdl, TkbkStsMsgCnctSucs, 0, 0 ); //向对讲状态窗口发送连接成功消息。
+
+								VstrFmtCpy( m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "初始化本端TCP协议客户端套接字[%vs:%vs]，并连接远端TCP协议服务端套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
+								if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+								goto LoopTcpCnct; //跳出重连。
+							}
+							else //如果连接失败。
+							{
+								VstrFmtIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "初始化本端TCP协议客户端套接字，并连接远端TCP协议服务端套接字[%vs:%vs]失败。原因：连接失败。原因：" ), m_Ntwk.m_IPAddrVstrPt, m_Ntwk.m_PortVstrPt );
+								if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+								break;
+							}
+
+							if( m_MediaPocsThrdPt->m_ReadyExitCnt != 0 ) //如果本线程接收到退出请求。
+							{
+								if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "本线程接收到退出请求，开始准备退出。" ) );
+								goto Out;
+							}
 						}
-						if( m_Ntwk.m_TcpClntSokt.GetRmtAddr( NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, 0, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-						{
-							if( m_TkbkStsWndHdl != NULL ) PostMessage( m_TkbkStsWndHdl, TkbkStsMsgCnctFail, 0, 0 ); //向对讲状态窗口发送连接失败消息。
 
-							VstrFmtIns( m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "获取本端TCP协议客户端套接字连接的远端TCP协议客户端套接字绑定的远程节点地址和端口失败。原因：" ) );
-							if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-							{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-							goto Out;
-						}
-						
-						if( m_TkbkStsWndHdl != NULL ) PostMessage( m_TkbkStsWndHdl, TkbkStsMsgCnctSucs, 0, 0 ); //向对讲状态窗口发送连接成功消息。
-
-						VstrFmtCpy( m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "初始化本端TCP协议客户端套接字[%vs:%vs]，并连接远端TCP协议服务端套接字[%vs:%vs]成功。" ), p_LclNodeAddrVstrPt, p_LclNodePortVstrPt, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt );
-						if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-						{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-						goto LoopTcpCnct; //跳出重连。
+						m_Ntwk.m_TcpClntSokt.Dstoy( ( uint16_t )-1, m_MediaPocsThrdPt->m_ErrInfoVstrPt ); //销毁本端TCP协议客户端套接字，等待重连。
 					}
 					else
 					{
@@ -412,7 +439,11 @@ int MyMediaPocsThrdCls::UserInit()
 						
 						while( m_Ntwk.m_AudpSokt.WaitCnct( m_Ntwk.m_AudpCnctIdx, 1, &p_AudpCnctSts, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //循环等待本端高级UDP协议套接字连接远端成功。
 						{
-							if( p_AudpCnctSts == AudpCnctStsCnct ) //如果连接成功。
+							if( p_AudpCnctSts == AudpCnctStsWait ) //如果等待远端接受连接。
+							{
+								//重新循环，继续等待本端高级UDP协议套接字连接远端。
+							}
+							else if( p_AudpCnctSts == AudpCnctStsCnct ) //如果连接成功。
 							{
 								if( m_Ntwk.m_AudpSokt.GetRmtAddr( m_Ntwk.m_AudpCnctIdx, NULL, p_RmtNodeAddrVstrPt, p_RmtNodePortVstrPt, m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 								{
@@ -431,26 +462,19 @@ int MyMediaPocsThrdCls::UserInit()
 								{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 								goto LoopUdpCnct; //跳出重连。
 							}
-							else //如果连接失败。
+							else if( p_AudpCnctSts == AudpCnctStsTmot ) //如果连接超时。
 							{
-								if( p_AudpCnctSts == AudpCnctStsWait ) //如果等待远端接受连接。
-								{
-									//重新循环，继续等待本端高级UDP协议套接字连接远端。
-								}
-								else if( p_AudpCnctSts == AudpCnctStsTmot ) //如果连接超时。
-								{
-									VstrFmtCpy( m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]失败。原因：连接超时。" ), m_Ntwk.m_IPAddrVstrPt, m_Ntwk.m_PortVstrPt );
-									if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-									{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-									break;
-								}
-								else //如果连接断开。
-								{
-									VstrFmtCpy( m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]失败。原因：连接断开。" ), m_Ntwk.m_IPAddrVstrPt, m_Ntwk.m_PortVstrPt );
-									if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-									{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-									break;
-								}
+								VstrFmtCpy( m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]失败。原因：连接超时。" ), m_Ntwk.m_IPAddrVstrPt, m_Ntwk.m_PortVstrPt );
+								if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+								break;
+							}
+							else //如果连接断开。
+							{
+								VstrFmtCpy( m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "用本端高级UDP协议套接字连接远端高级UDP协议套接字[%vs:%vs]失败。原因：连接断开。" ), m_Ntwk.m_IPAddrVstrPt, m_Ntwk.m_PortVstrPt );
+								if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , m_MediaPocsThrdPt->m_ErrInfoVstrPt ); PostMessage( m_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+								break;
 							}
 
 							if( m_MediaPocsThrdPt->m_ReadyExitCnt != 0 ) //如果本线程接收到退出请求。
