@@ -42,6 +42,9 @@
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.cpp">
@@ -63,6 +66,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,15 +8,15 @@ typedef struct VdoInptThrd VdoInptThrd;
 
 typedef struct //视频输入。
 {
-	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程的指针。
+	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程指针。
 
 	int32_t m_IsUse; //存放是否使用视频输入，为0表示不使用，为非0表示要使用。
 	int32_t m_IsInit; //存放是否初始化视频输入，为0表示未初始化，为非0表示已初始化。
 
 	int32_t m_MaxSmplRate; //存放最大采样频率，取值范围为[1,60]，实际帧率以视频输入设备支持的为准。
-	int32_t m_FrmWidth; //存放帧的宽度，单位为像素。
-	int32_t m_FrmHeight; //存放帧的高度，单位为像素。
-	size_t m_Yu12FrmLenByt; //存放Yu12格式帧的长度，单位为字节，为m_FrmWidth * m_FrmHeight * 3 / 2。
+	int32_t m_FrmWidth; //存放帧宽度，单位为像素，只能为偶数。
+	int32_t m_FrmHeight; //存放帧高度，单位为像素，只能为偶数。
+	size_t m_Yu12FrmLenByt; //存放Yu12格式帧长度，单位为字节，为m_FrmWidth * m_FrmHeight * 3 / 2。
 
 	int32_t m_UseWhatEncd; //存放使用什么编码器，为0表示Yu12原始数据，为1表示OpenH264编码器。
 
@@ -32,32 +32,32 @@ typedef struct //视频输入。
 
 	struct //存放设备。
 	{
-		UINT m_ID; //存放标识符，取值范围为从0到视频输入设备的总数减一。
-		IGraphBuilder * m_FilterGraphManagerPt; //存放过滤器图管理器的指针。
-		IMediaEventEx * m_FilterGraphMediaEventPt; //存放过滤器图媒体事件器的指针。
-		IMediaControl * m_FilterGraphMediaCtrlPt; //存放过滤器图媒体控制器的指针。
-		int32_t m_BgraSrcFrmWidth; //存放Bgra8888格式原始帧的宽度，单位为像素。
-		int32_t m_BgraSrcFrmHeight; //存放Bgra8888格式原始帧的高度，单位为像素。
-		size_t m_BgraSrcFrmLenByt; //存放Bgra8888格式原始帧的长度，单位为字节，为m_Dvc.m_BgraSrcFrmWidth * m_Dvc.m_BgraSrcFrmHeight * 4。
+		UINT m_ID; //存放标识符，取值范围为从0到视频输入设备总数减一。
+		IGraphBuilder * m_FilterGraphManagerPt; //存放过滤器图管理器指针。
+		IMediaEventEx * m_FilterGraphMediaEventPt; //存放过滤器图媒体事件器指针。
+		IMediaControl * m_FilterGraphMediaCtrlPt; //存放过滤器图媒体控制器指针。
+		int32_t m_BgraSrcFrmWidth; //存放Bgra8888格式原始帧宽度，单位为像素。
+		int32_t m_BgraSrcFrmHeight; //存放Bgra8888格式原始帧高度，单位为像素。
+		size_t m_BgraSrcFrmLenByt; //存放Bgra8888格式原始帧长度，单位为字节，为m_Dvc.m_BgraSrcFrmWidth * m_Dvc.m_BgraSrcFrmHeight * 4。
 		int32_t m_BgraSrcFrmIsCrop; //存放Bgra8888格式原始帧是否裁剪，为0表示不裁剪，为非0表示要裁剪。
-		int32_t m_BgraSrcFrmCropX; //存放Bgra8888格式原始帧裁剪区域左上角的横坐标，单位像素。
-		int32_t m_BgraSrcFrmCropY; //存放Bgra8888格式原始帧裁剪区域左上角的纵坐标，单位像素。
-		int32_t m_BgraSrcFrmCropWidth; //存放Bgra8888格式原始帧裁剪区域的宽度，单位像素。
-		int32_t m_BgraSrcFrmCropHeight; //存放Bgra8888格式原始帧裁剪区域的高度，单位像素。
+		int32_t m_BgraSrcFrmCropX; //存放Bgra8888格式原始帧裁剪区域左上角横坐标，单位像素。
+		int32_t m_BgraSrcFrmCropY; //存放Bgra8888格式原始帧裁剪区域左上角纵坐标，单位像素。
+		int32_t m_BgraSrcFrmCropWidth; //存放Bgra8888格式原始帧裁剪区域宽度，单位像素。
+		int32_t m_BgraSrcFrmCropHeight; //存放Bgra8888格式原始帧裁剪区域高度，单位像素。
 		int32_t m_BgraSrcFrmIsScale; //存放Bgra8888格式原始帧是否缩放，为0表示不缩放，为非0表示要缩放。
-		int32_t m_BgraSrcFrmScaleWidth; //存放Bgra8888格式原始帧缩放后的宽度，单位为像素，为m_FrmWidth。
-		int32_t m_BgraSrcFrmScaleHeight; //存放Bgra8888格式原始帧缩放后的高度，单位为像素，为m_FrmHeight。
-        size_t m_BgraSrcFrmScaleLenByt; //存放Bgra8888格式原始帧缩放后的长度，单位为字节，为m_BgraSrcFrmScaleWidth * m_BgraSrcFrmScaleHeight * 4。
-		HWND m_PrvwWndHdl; //存放预览窗口的句柄。
+		int32_t m_BgraSrcFrmScaleWidth; //存放Bgra8888格式原始帧缩放后宽度，单位为像素，为m_FrmWidth。
+		int32_t m_BgraSrcFrmScaleHeight; //存放Bgra8888格式原始帧缩放后高度，单位为像素，为m_FrmHeight。
+        size_t m_BgraSrcFrmScaleLenByt; //存放Bgra8888格式原始帧缩放后长度，单位为字节，为m_BgraSrcFrmScaleWidth * m_BgraSrcFrmScaleHeight * 4。
+		HWND m_PrvwWndHdl; //存放预览窗口句柄。
 		int32_t m_IsBlack; //存放是否黑屏，为0表示有图像，为非0表示黑屏。
 	} m_Dvc;
 
 	typedef struct //存放帧。
 	{
-		uint8_t * m_BgraSrcFrmPt; //存放Bgra8888格式原始帧的指针，宽度为m_Dvc.m_BgraSrcFrmWidth，高度为m_Dvc.m_BgraSrcFrmHeight，大小为m_Dvc.m_BgraSrcFrmLenByt。
-		uint8_t * m_Yu12RsltFrmPt; //存放Yu12格式结果帧的指针，宽度为m_FrmWidth，高度为m_FrmHeight，大小为m_Yu12FrmLenByt。
-		uint8_t * m_EncdRsltFrmPt; //存放已编码格式结果帧的指针，大小为m_Yu12FrmLenByt。
-		size_t m_EncdRsltFrmLenByt; //存放已编码格式结果帧的长度，单位为字节。
+		uint8_t * m_BgraSrcFrmPt; //存放Bgra8888格式原始帧指针，宽度为m_Dvc.m_BgraSrcFrmWidth，高度为m_Dvc.m_BgraSrcFrmHeight，大小为m_Dvc.m_BgraSrcFrmLenByt。
+		uint8_t * m_Yu12RsltFrmPt; //存放Yu12格式结果帧指针，宽度为m_FrmWidth，高度为m_FrmHeight，大小为m_Yu12FrmLenByt。
+		uint8_t * m_EncdRsltFrmPt; //存放已编码格式结果帧指针，大小为m_Yu12FrmLenByt。
+		size_t m_EncdRsltFrmLenByt; //存放已编码格式结果帧长度，单位为字节。
 		uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
 	} Frm;
 	CQueueCls m_FrmCntnr; //存放帧容器。
@@ -65,19 +65,19 @@ typedef struct //视频输入。
 	
 	struct //存放线程。
 	{
-		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程的临时变量。
-		double m_LastFrmTickMsec; //存放上一个帧的嘀嗒钟，单位为毫秒。
-		double m_FrmTimeStepMsec; //存放帧的时间步进，单位为毫秒。
-		uint8_t * m_TmpFrm1Pt; //存放临时帧的指针。
-		uint8_t * m_TmpFrm2Pt; //存放临时帧的指针。
-		size_t m_TmpFrmSzByt; //存放临时帧的大小，单位为字节。
-		size_t m_TmpFrmLenByt; //存放临时帧的长度，单位为字节。
-		Frm * m_FrmPt; //存放帧的指针。
+		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程临时变量。
+		double m_LastFrmTickMsec; //存放上一个帧嘀嗒钟，单位为毫秒。
+		double m_FrmTimeStepMsec; //存放帧时间步进，单位为毫秒。
+		uint8_t * m_TmpFrm1Pt; //存放临时帧指针。
+		uint8_t * m_TmpFrm2Pt; //存放临时帧指针。
+		size_t m_TmpFrmSzByt; //存放临时帧大小，单位为字节。
+		size_t m_TmpFrmLenByt; //存放临时帧长度，单位为字节。
+		Frm * m_FrmPt; //存放帧指针。
 		size_t m_ElmTotal; //存放元素总数。
-		uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
-		uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
+		uint64_t m_LastTickMsec; //存放上次嘀嗒钟，单位为毫秒。
+		uint64_t m_NowTickMsec; //存放本次嘀嗒钟，单位为毫秒。
 
-		VdoInptThrd * m_ThrdPt; //存放线程的指针。
+		VdoInptThrd * m_ThrdPt; //存放线程指针。
 	} m_Thrd;
 } VdoInpt;
 

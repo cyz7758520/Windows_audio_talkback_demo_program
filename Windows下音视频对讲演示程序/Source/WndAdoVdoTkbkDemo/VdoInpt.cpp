@@ -30,10 +30,10 @@ void DeleteMediaType( AM_MEDIA_TYPE * pmt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoInptThrd
  * 功能说明：视频输入线程主类。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：无。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 struct VdoInptThrd : public ISampleGrabberCB
@@ -78,7 +78,7 @@ public:
 		{
 			//丢弃采样频率过快的Bgra8888格式原始帧。
 			m_VdoInptPt->m_Thrd.m_LastTickMsec = FuncGetTickAsMsec();
-			if( m_VdoInptPt->m_Thrd.m_LastFrmTickMsec != 0 ) //如果已经设置过上一个帧的嘀嗒钟。
+			if( m_VdoInptPt->m_Thrd.m_LastFrmTickMsec != 0 ) //如果已经设置过上一个帧嘀嗒钟。
 			{
 				if( m_VdoInptPt->m_Thrd.m_LastTickMsec - m_VdoInptPt->m_Thrd.m_LastFrmTickMsec >= m_VdoInptPt->m_Thrd.m_FrmTimeStepMsec )
 				{
@@ -90,13 +90,13 @@ public:
 					goto OutPocs;
 				}
 			}
-			else //如果没有设置过上一个帧的嘀嗒钟。
+			else //如果没有设置过上一个帧嘀嗒钟。
 			{
 				m_VdoInptPt->m_Thrd.m_LastFrmTickMsec = m_VdoInptPt->m_Thrd.m_LastTickMsec;
 			}
 
 			//获取一个空闲帧。
-			m_VdoInptPt->m_IdleFrmCntnr.GetTotal( &m_VdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取空闲帧容器的元素总数。
+			m_VdoInptPt->m_IdleFrmCntnr.GetTotal( &m_VdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取空闲帧容器元素总数。
 			if( m_VdoInptPt->m_Thrd.m_ElmTotal > 0 ) //如果空闲帧容器中有帧。
 			{
 				//从空闲帧容器中取出并删除第一个帧。
@@ -107,7 +107,7 @@ public:
 			}
 			else //如果空闲帧容器中没有帧。
 			{
-				m_VdoInptPt->m_FrmCntnr.GetTotal( &m_VdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取帧容器的元素总数。
+				m_VdoInptPt->m_FrmCntnr.GetTotal( &m_VdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取帧容器元素总数。
 				if( m_VdoInptPt->m_Thrd.m_ElmTotal <= 20 )
 				{
 					//创建一个空闲帧。
@@ -185,7 +185,7 @@ public:
 									 NULL ) == 0 )
 				{
 					if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "视频输入线程：裁剪Bgra8888格式原始帧成功。" ) );
-					SWAPPT( m_VdoInptPt->m_Thrd.m_TmpFrm1Pt, m_VdoInptPt->m_Thrd.m_TmpFrm2Pt ); //交换临时帧的指针。
+					SWAPPT( m_VdoInptPt->m_Thrd.m_TmpFrm1Pt, m_VdoInptPt->m_Thrd.m_TmpFrm2Pt ); //交换临时帧指针。
 				}
 				else
 				{
@@ -202,7 +202,7 @@ public:
 									   NULL ) == 0 )
 				{
 					if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "视频输入线程：垂直翻转镜像Bgra8888格式原始帧成功。" ) );
-					SWAPPT( m_VdoInptPt->m_Thrd.m_TmpFrm1Pt, m_VdoInptPt->m_Thrd.m_TmpFrm2Pt ); //交换临时帧的指针。
+					SWAPPT( m_VdoInptPt->m_Thrd.m_TmpFrm1Pt, m_VdoInptPt->m_Thrd.m_TmpFrm2Pt ); //交换临时帧指针。
 				}
 				else
 				{
@@ -220,7 +220,7 @@ public:
 									  NULL ) == 0 )
 				{
 					if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "视频输入线程：缩放Bgra8888格式原始帧成功。" ) );
-					SWAPPT( m_VdoInptPt->m_Thrd.m_TmpFrm1Pt, m_VdoInptPt->m_Thrd.m_TmpFrm2Pt ); //交换临时帧的指针。
+					SWAPPT( m_VdoInptPt->m_Thrd.m_TmpFrm1Pt, m_VdoInptPt->m_Thrd.m_TmpFrm2Pt ); //交换临时帧指针。
 				}
 				else
 				{
@@ -299,7 +299,7 @@ public:
 										  m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmPt, m_VdoInptPt->m_Yu12FrmLenByt, &m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmLenByt,
 										  NULL ) == 0 )
 					{
-						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输入线程：使用OpenH264编码器成功。H264格式结果帧的长度：%uzd，时间戳：%uz64d，类型：%hhd。" ), m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmLenByt, m_VdoInptPt->m_Thrd.m_LastTickMsec, m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmPt[ 4 ] );
+						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输入线程：使用OpenH264编码器成功。H264格式结果帧长度：%uzd，时间戳：%uz64d，类型：%hhd。" ), m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmLenByt, m_VdoInptPt->m_Thrd.m_LastTickMsec, m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmPt[ 4 ] );
 					}
 					else
 					{
@@ -338,26 +338,26 @@ public:
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoInptInit
  * 功能说明：初始化视频输入。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int VdoInptInit( VdoInpt * VdoInptPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
 	
-	if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始的嘀嗒钟。
+	if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始嘀嗒钟。
 
-	//初始化线程。必须在初始化设备前初始化线程，因为设备会使用线程的指针。
+	//初始化线程。必须在初始化设备前初始化线程，因为设备会使用线程指针。
 	{
 		VdoInptPt->m_Thrd.m_ThrdPt = new VdoInptThrd( VdoInptPt );
 		if( VdoInptPt->m_Thrd.m_ThrdPt != NULL )
@@ -373,7 +373,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 
 	//初始化设备。
 	{
-		int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+		int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 		ICreateDevEnum * p_CreateDevEnumPt = NULL;
 		IEnumMoniker * p_EnumMonikerPt = NULL;
 		IMoniker * p_MonikerPt = NULL;
@@ -383,7 +383,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		IEnumMediaTypes * p_EnumMediaTypesPt = NULL;
 		AM_MEDIA_TYPE * p_AmMediaTypePt = NULL;
 
-		IBaseFilter * p_DvcFilterPt = NULL; //存放设备过滤器的指针。
+		IBaseFilter * p_DvcFilterPt = NULL; //存放设备过滤器指针。
 		IPin * p_SelPinPt = NULL;
 		AM_MEDIA_TYPE * p_SelAmMediaTypePt = NULL;
 
@@ -427,7 +427,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 			goto OutInitVdoInptDvc;
 		}
 
-		//查找并创建指定的设备过滤器。
+		//查找并创建指定设备过滤器。
 		if( p_CreateDevEnumPt->CreateClassEnumerator( CLSID_VideoInputDeviceCategory, &p_EnumMonikerPt, 0 ) == S_OK )
 		{
 			for( p_TmpInt = 0; p_EnumMonikerPt->Next( 1, &p_MonikerPt, NULL ) == S_OK; p_TmpInt++ )
@@ -471,18 +471,18 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 			goto OutInitVdoInptDvc;
 		}
 
-		//选择设备过滤器上合适的引脚和媒体类型。
+		//选择设备过滤器上合适引脚和媒体类型。
 		if( p_DvcFilterPt->EnumPins( &p_EnumPinsPt ) == S_OK ) //创建引脚枚举器。
 		{
-			int32_t p_TgtFrmWidth = VdoInptPt->m_FrmWidth; //存放目标帧的宽度，单位为像素。
-			int32_t p_TgtFrmHeight = VdoInptPt->m_FrmHeight; //存放目标帧的高度，单位为像素。
-			double p_TgtFrmWidthToHeightRatio = ( double )VdoInptPt->m_FrmWidth / ( double )VdoInptPt->m_FrmHeight; //存放指定帧的宽高比。
-			int32_t p_TgtAvgTimePerFrm = 1000.0 / ( VdoInptPt->m_MaxSmplRate / 10.0 / 1000.0 ); //存放目标帧的帧间隔时间，单位为100纳秒。
-			double p_BufFrmAspectRatio; //存放本次缓冲区帧的宽高比。
-			int32_t p_BufFrmCropX; //存放本次缓冲区帧裁剪区域左上角的横坐标，单位像素。
-			int32_t p_BufFrmCropY; //存放本次缓冲区帧裁剪区域左上角的纵坐标，单位像素。
-			int32_t p_BufFrmCropWidth; //存放本次缓冲区帧裁剪区域的宽度，单位像素。
-			int32_t p_BufFrmCropHeight; //存放本次缓冲区帧裁剪区域的高度，单位像素。
+			int32_t p_TgtFrmWidth = VdoInptPt->m_FrmWidth; //存放目标的帧宽度，单位为像素。
+			int32_t p_TgtFrmHeight = VdoInptPt->m_FrmHeight; //存放目标的帧高度，单位为像素。
+			double p_TgtFrmWidthToHeightRatio = ( double )VdoInptPt->m_FrmWidth / ( double )VdoInptPt->m_FrmHeight; //存放目标的帧宽高比。
+			int32_t p_TgtAvgTimePerFrm = 1000.0 / ( VdoInptPt->m_MaxSmplRate / 10.0 / 1000.0 ); //存放目标的帧间隔时间，单位为100纳秒。
+			double p_BufFrmAspectRatio; //存放本次的缓冲区帧宽高比。
+			int32_t p_BufFrmCropX; //存放本次的缓冲区帧裁剪区域左上角横坐标，单位像素。
+			int32_t p_BufFrmCropY; //存放本次的缓冲区帧裁剪区域左上角纵坐标，单位像素。
+			int32_t p_BufFrmCropWidth; //存放本次的缓冲区帧裁剪区域宽度，单位像素。
+			int32_t p_BufFrmCropHeight; //存放本次的缓冲区帧裁剪区域高度，单位像素。
 			int32_t p_IsSetSelCur; //存放是否设置选择的为本次的，为0表示不设置，为非0表示要设置。
 			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：目标的媒体格式：帧间隔时间：%z32d，%lf，宽度：%ld，高度：%ld。" ),
 																		 p_TgtAvgTimePerFrm, 1000.0 / ( p_TgtAvgTimePerFrm / 10.0 / 1000.0 ),
@@ -492,7 +492,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 			{
 				if( ( p_PinPt->QueryDirection( &p_PinDirection ) == S_OK ) && ( p_PinDirection == PINDIR_OUTPUT ) ) //查询引脚方向是否为输出。
 				{
-					if( p_PinPt->EnumMediaTypes( &p_EnumMediaTypesPt ) == S_OK ) //创建引脚的媒体类型枚举器。
+					if( p_PinPt->EnumMediaTypes( &p_EnumMediaTypesPt ) == S_OK ) //创建引脚媒体类型枚举器。
 					{
 						//遍历媒体类型，并智能选择满足目标的媒体类型。
 						while( p_EnumMediaTypesPt->Next( 1, &p_AmMediaTypePt, NULL ) == S_OK )
@@ -513,26 +513,26 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 
 								if( ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_MJPG ) || ( p_AmMediaTypePt->subtype == MEDIASUBTYPE_YUY2 ) ) //如果媒体格式为MJPEG或YUY2才进行选择。
 								{
-									//设置本次缓冲区帧的宽高比、裁剪宽度、裁剪高度、裁剪区域左上角的坐标。
+									//设置本次的缓冲区帧宽高比、裁剪宽度、裁剪高度、裁剪区域左上角坐标。
 									p_BufFrmAspectRatio = ( double )VIDEOINFOHEADER_Width( p_AmMediaTypePt ) / ( double )VIDEOINFOHEADER_Height( p_AmMediaTypePt );
-									if( p_BufFrmAspectRatio >= p_TgtFrmWidthToHeightRatio ) //如果本次缓冲区帧的宽高比目标的大，就表示需要裁剪宽度。
+									if( p_BufFrmAspectRatio >= p_TgtFrmWidthToHeightRatio ) //如果本次的缓冲区帧宽高比比目标的大，就表示需要裁剪宽度。
 									{
-										p_BufFrmCropWidth = ( int )( ( double )VIDEOINFOHEADER_Height( p_AmMediaTypePt ) * p_TgtFrmWidthToHeightRatio ); //设置本次缓冲区帧裁剪区域左上角的宽度，使裁剪区域居中。
+										p_BufFrmCropWidth = ( int )( ( double )VIDEOINFOHEADER_Height( p_AmMediaTypePt ) * p_TgtFrmWidthToHeightRatio ); //设置本次的缓冲区帧裁剪区域宽度，使裁剪区域居中。
 										p_BufFrmCropWidth -= p_BufFrmCropWidth % 2;
-										p_BufFrmCropHeight = VIDEOINFOHEADER_Height( p_AmMediaTypePt ); //设置本次缓冲区帧裁剪区域左上角的高度，使裁剪区域居中。
+										p_BufFrmCropHeight = VIDEOINFOHEADER_Height( p_AmMediaTypePt ); //设置本次的缓冲区帧裁剪区域高度，使裁剪区域居中。
 
-										p_BufFrmCropX = ( VIDEOINFOHEADER_Width( p_AmMediaTypePt ) - p_BufFrmCropWidth ) / 2; //设置本次缓冲区帧裁剪区域左上角的横坐标，使裁剪区域居中。
+										p_BufFrmCropX = ( VIDEOINFOHEADER_Width( p_AmMediaTypePt ) - p_BufFrmCropWidth ) / 2; //设置本次的缓冲区帧裁剪区域左上角横坐标，使裁剪区域居中。
 										p_BufFrmCropX -= p_BufFrmCropX % 2;
-										p_BufFrmCropY = 0; //设置本次缓冲区帧裁剪区域左上角的纵坐标。
+										p_BufFrmCropY = 0; //设置本次的缓冲区帧裁剪区域左上角纵坐标。
 									}
-									else //如果本次缓冲区帧的宽高比目标的小，就表示需要裁剪高度。
+									else //如果本次的缓冲区帧宽高比比目标的小，就表示需要裁剪高度。
 									{
-										p_BufFrmCropWidth = VIDEOINFOHEADER_Width( p_AmMediaTypePt ); //设置本次缓冲区帧裁剪区域左上角的宽度，使裁剪区域居中。
-										p_BufFrmCropHeight = ( int )( ( double )VIDEOINFOHEADER_Width( p_AmMediaTypePt ) / p_TgtFrmWidthToHeightRatio ); //设置本次缓冲区帧裁剪区域左上角的高度，使裁剪区域居中。
+										p_BufFrmCropWidth = VIDEOINFOHEADER_Width( p_AmMediaTypePt ); //设置本次的缓冲区帧裁剪区域宽度，使裁剪区域居中。
+										p_BufFrmCropHeight = ( int )( ( double )VIDEOINFOHEADER_Width( p_AmMediaTypePt ) / p_TgtFrmWidthToHeightRatio ); //设置本次的缓冲区帧裁剪区域高度，使裁剪区域居中。
 										p_BufFrmCropHeight -= p_BufFrmCropHeight % 2;
 
-										p_BufFrmCropX = 0; //设置本次缓冲区帧裁剪区域左上角的横坐标。
-										p_BufFrmCropY = ( VIDEOINFOHEADER_Height( p_AmMediaTypePt ) - p_BufFrmCropHeight ) / 2; //设置本次缓冲区帧裁剪区域左上角的纵坐标，使裁剪区域居中。
+										p_BufFrmCropX = 0; //设置本次的缓冲区帧裁剪区域左上角横坐标。
+										p_BufFrmCropY = ( VIDEOINFOHEADER_Height( p_AmMediaTypePt ) - p_BufFrmCropHeight ) / 2; //设置本次的缓冲区帧裁剪区域左上角纵坐标，使裁剪区域居中。
 										p_BufFrmCropY -= p_BufFrmCropY % 2;
 									}
 
@@ -704,16 +704,16 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 																	 VIDEOINFOHEADER_Width( p_SelAmMediaTypePt ), VIDEOINFOHEADER_Height( p_SelAmMediaTypePt ) );
 
 		//判断缓冲区帧是否裁剪。
-		if( ( VdoInptPt->m_Dvc.m_BgraSrcFrmWidth > VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) || //如果Bgra8888格式原始帧的宽度比裁剪宽度大，就表示需要裁剪宽度。
-			( VdoInptPt->m_Dvc.m_BgraSrcFrmHeight > VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) ) //如果Bgra8888格式原始帧的高度比裁剪高度大，就表示需要裁剪高度。
+		if( ( VdoInptPt->m_Dvc.m_BgraSrcFrmWidth > VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) || //如果Bgra8888格式原始帧宽度比裁剪宽度大，就表示需要裁剪宽度。
+			( VdoInptPt->m_Dvc.m_BgraSrcFrmHeight > VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) ) //如果Bgra8888格式原始帧高度比裁剪高度大，就表示需要裁剪高度。
 		{
 			VdoInptPt->m_Dvc.m_BgraSrcFrmIsCrop = 1; //设置Bgra8888格式原始帧要裁剪。
 		}
-		else //如果缓冲区帧的宽度和高度与裁剪宽度和高度一致，就表示不需要裁剪。
+		else //如果缓冲区帧宽度和高度与裁剪宽度和高度一致，就表示不需要裁剪。
 		{
 			VdoInptPt->m_Dvc.m_BgraSrcFrmIsCrop = 0; //设置Bgra8888格式原始帧不裁剪。
 		}
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：Bgra8888格式原始帧是否裁剪：%z32d，裁剪区域左上角的横坐标：%z32d，纵坐标：%z32d，裁剪区域的宽度：%z32d，高度：%z32d。" ), VdoInptPt->m_Dvc.m_BgraSrcFrmIsCrop, VdoInptPt->m_Dvc.m_BgraSrcFrmCropX, VdoInptPt->m_Dvc.m_BgraSrcFrmCropY, VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth, VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight );
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：Bgra8888格式原始帧是否裁剪：%z32d，裁剪区域左上角横坐标：%z32d，纵坐标：%z32d，裁剪区域宽度：%z32d，高度：%z32d。" ), VdoInptPt->m_Dvc.m_BgraSrcFrmIsCrop, VdoInptPt->m_Dvc.m_BgraSrcFrmCropX, VdoInptPt->m_Dvc.m_BgraSrcFrmCropY, VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth, VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight );
 
 		//判断缓冲区帧是否缩放。
 		if( ( VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth != VdoInptPt->m_FrmWidth ) || ( VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight != VdoInptPt->m_FrmHeight ) )
@@ -724,10 +724,10 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		{
 			VdoInptPt->m_Dvc.m_BgraSrcFrmIsScale = 0; //设置Bgra8888格式原始帧不缩放。
 		}
-		VdoInptPt->m_Dvc.m_BgraSrcFrmScaleWidth = VdoInptPt->m_FrmWidth; //设置Bgra8888格式原始帧缩放后的宽度。
-		VdoInptPt->m_Dvc.m_BgraSrcFrmScaleHeight = VdoInptPt->m_FrmHeight; //设置Bgra8888格式原始帧缩放后的高度。
-		VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt = VdoInptPt->m_FrmWidth * VdoInptPt->m_FrmHeight * 4; //设置Bgra8888格式原始帧缩放后的长度。
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：Bgra8888格式原始帧是否缩放：%z32d，缩放后的宽度：%z32d，缩放后的高度：%z32d，缩放后的长度：%zd。" ), VdoInptPt->m_Dvc.m_BgraSrcFrmIsScale, VdoInptPt->m_Dvc.m_BgraSrcFrmScaleWidth, VdoInptPt->m_Dvc.m_BgraSrcFrmScaleHeight, VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt );
+		VdoInptPt->m_Dvc.m_BgraSrcFrmScaleWidth = VdoInptPt->m_FrmWidth; //设置Bgra8888格式原始帧缩放后宽度。
+		VdoInptPt->m_Dvc.m_BgraSrcFrmScaleHeight = VdoInptPt->m_FrmHeight; //设置Bgra8888格式原始帧缩放后高度。
+		VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt = VdoInptPt->m_FrmWidth * VdoInptPt->m_FrmHeight * 4; //设置Bgra8888格式原始帧缩放后长度。
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：Bgra8888格式原始帧是否缩放：%z32d，缩放后宽度：%z32d，缩放后高度：%z32d，缩放后长度：%zd。" ), VdoInptPt->m_Dvc.m_BgraSrcFrmIsScale, VdoInptPt->m_Dvc.m_BgraSrcFrmScaleWidth, VdoInptPt->m_Dvc.m_BgraSrcFrmScaleHeight, VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt );
 
 		//创建设备过滤器上选择的引脚和媒体类型对应的解码过滤器，并连接引脚。
 		if( p_SelAmMediaTypePt->subtype == MEDIASUBTYPE_MJPG )
@@ -773,8 +773,8 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		}
 		if( VdoInptPt->m_Dvc.m_FilterGraphManagerPt->ConnectDirect( p_SelPinPt, p_DecFilterInptPinPt, p_SelAmMediaTypePt ) != S_OK ) //如果连接引脚失败。
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：连接设备过滤器与解码过滤器的引脚失败。" ) );
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) ToastFmt( VdoInptPt->m_MediaPocsThrdPt->m_ShowToastWndHdl, 3000, NULL, Cu8vstr( "媒体处理线程：视频输入：连接设备过滤器与解码过滤器的引脚失败。原因：可能是视频输入设备无法正常工作。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：连接设备过滤器与解码过滤器引脚失败。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) ToastFmt( VdoInptPt->m_MediaPocsThrdPt->m_ShowToastWndHdl, 3000, NULL, Cu8vstr( "媒体处理线程：视频输入：连接设备过滤器与解码过滤器引脚失败。原因：可能是视频输入设备无法正常工作。" ) );
 			goto OutInitVdoInptDvc;
 		}
 
@@ -816,19 +816,19 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		p_TmpAmMediaType.subtype = MEDIASUBTYPE_RGB32; //PictrFmtSrgbF8Bgra8888。
 		if( VdoInptPt->m_Dvc.m_FilterGraphManagerPt->ConnectDirect( p_DecFilterOtptPinPt, p_SmplGrabberFilterInptPinPt, &p_TmpAmMediaType ) != S_OK ) //如果连接引脚失败。
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：连接解码过滤器与采样抓取过滤器的引脚失败。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：连接解码过滤器与采样抓取过滤器引脚失败。" ) );
 			goto OutInitVdoInptDvc;
 		}
 
-		//设置采样抓取过滤器的回调函数。
+		//设置采样抓取过滤器回调函数。
 		if( p_SmplGrabberFilterPt->QueryInterface( IID_ISampleGrabber, ( void * * )&p_SmplGrabberInterfacePt ) != S_OK )
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：获取采样抓取过滤器的回调接口失败。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：获取采样抓取过滤器回调接口失败。" ) );
 			goto OutInitVdoInptDvc;
 		}
 		if( p_SmplGrabberInterfacePt->SetCallback( VdoInptPt->m_Thrd.m_ThrdPt, 1 ) != S_OK )
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：设置采样抓取过滤器的回调函数失败。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：设置采样抓取过滤器回调函数失败。" ) );
 			goto OutInitVdoInptDvc;
 		}
 
@@ -900,37 +900,37 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		}
 	} //初始化设备完毕。
 
-	//初始化线程的临时变量。
+	//初始化线程临时变量。
 	{
-		VdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程的临时变量。
-		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //初始化上一个帧的嘀嗒钟。
-		VdoInptPt->m_Thrd.m_FrmTimeStepMsec = 1000.0 / VdoInptPt->m_MaxSmplRate; //初始化帧的时间步进。
-		if( VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt >= VdoInptPt->m_Dvc.m_BgraSrcFrmLenByt ) //如果Bgra8888格式原始帧缩放后的长度大于等于Bgra8888格式原始帧的长度。
+		VdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程临时变量。
+		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //初始化上一个帧嘀嗒钟。
+		VdoInptPt->m_Thrd.m_FrmTimeStepMsec = 1000.0 / VdoInptPt->m_MaxSmplRate; //初始化帧时间步进。
+		if( VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt >= VdoInptPt->m_Dvc.m_BgraSrcFrmLenByt ) //如果Bgra8888格式原始帧缩放后长度大于等于Bgra8888格式原始帧长度。
 		{
-			VdoInptPt->m_Thrd.m_TmpFrmSzByt = VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt; //初始化临时帧的大小。
+			VdoInptPt->m_Thrd.m_TmpFrmSzByt = VdoInptPt->m_Dvc.m_BgraSrcFrmScaleLenByt; //初始化临时帧大小。
 		}
-		else //如果Bgra8888格式原始帧缩放后的长度小于Bgra8888格式原始帧的长度。
+		else //如果Bgra8888格式原始帧缩放后长度小于Bgra8888格式原始帧长度。
 		{
-			VdoInptPt->m_Thrd.m_TmpFrmSzByt = VdoInptPt->m_Dvc.m_BgraSrcFrmLenByt; //初始化临时帧的大小。
+			VdoInptPt->m_Thrd.m_TmpFrmSzByt = VdoInptPt->m_Dvc.m_BgraSrcFrmLenByt; //初始化临时帧大小。
 		}
-		VdoInptPt->m_Thrd.m_TmpFrm1Pt = ( uint8_t * )malloc( VdoInptPt->m_Thrd.m_TmpFrmSzByt ); //初始化临时帧的指针。
+		VdoInptPt->m_Thrd.m_TmpFrm1Pt = ( uint8_t * )malloc( VdoInptPt->m_Thrd.m_TmpFrmSzByt ); //初始化临时帧指针。
 		if( VdoInptPt->m_Thrd.m_TmpFrm1Pt == NULL )
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：创建临时帧的内存块失败。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：创建临时帧内存块失败。" ) );
 			goto Out;
 		}
-		VdoInptPt->m_Thrd.m_TmpFrm2Pt = ( uint8_t * )malloc( VdoInptPt->m_Thrd.m_TmpFrmSzByt ); //初始化临时帧的指针。
+		VdoInptPt->m_Thrd.m_TmpFrm2Pt = ( uint8_t * )malloc( VdoInptPt->m_Thrd.m_TmpFrmSzByt ); //初始化临时帧指针。
 		if( VdoInptPt->m_Thrd.m_TmpFrm2Pt == NULL )
 		{
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：创建临时帧的内存块失败。" ) );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：创建临时帧内存块失败。" ) );
 			goto Out;
 		}
-		VdoInptPt->m_Thrd.m_TmpFrmLenByt  = 0; //初始化临时帧的长度。
-		VdoInptPt->m_Thrd.m_FrmPt = NULL; //初始化帧的指针。
+		VdoInptPt->m_Thrd.m_TmpFrmLenByt  = 0; //初始化临时帧长度。
+		VdoInptPt->m_Thrd.m_FrmPt = NULL; //初始化帧指针。
 		VdoInptPt->m_Thrd.m_ElmTotal = 0; //初始化元素总数。
-		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //初始化上次的嘀嗒钟。
-		VdoInptPt->m_Thrd.m_NowTickMsec = 0; //初始化本次的嘀嗒钟。
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：初始化线程的临时变量成功。" ) );
+		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //初始化上次嘀嗒钟。
+		VdoInptPt->m_Thrd.m_NowTickMsec = 0; //初始化本次嘀嗒钟。
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：初始化线程临时变量成功。" ) );
 	}
 
 	//初始化编码器。
@@ -980,7 +980,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 
 	if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
 	{
-		p_NowTickMsec = FuncGetTickAsMsec(); //记录初始化结束的嘀嗒钟。
+		p_NowTickMsec = FuncGetTickAsMsec(); //记录初始化结束嘀嗒钟。
 		LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
 	}
 
@@ -997,15 +997,15 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoInptDstoy
  * 功能说明：销毁视频输入。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoInptDstoy( VdoInpt * VdoInptPt )
@@ -1013,7 +1013,7 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
 	
-	if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录销毁开始的嘀嗒钟。
+	if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录销毁开始嘀嗒钟。
 
 	//销毁设备。
 	if( VdoInptPt->m_Dvc.m_FilterGraphMediaCtrlPt != NULL )
@@ -1055,29 +1055,29 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：销毁线程成功。" ) );
 	}
 
-	//销毁线程的临时变量。
+	//销毁线程临时变量。
 	if( VdoInptPt->m_Thrd.m_IsInitThrdTmpVar != 0 )
 	{
-		VdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程的临时变量。
-		VdoInptPt->m_Thrd.m_LastFrmTickMsec = 0; //销毁上一个帧的嘀嗒钟。
-		VdoInptPt->m_Thrd.m_FrmTimeStepMsec = 0; //销毁帧的时间步进。
-		if( VdoInptPt->m_Thrd.m_TmpFrm1Pt != NULL ) //销毁视频临时帧的指针。
+		VdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程临时变量。
+		VdoInptPt->m_Thrd.m_LastFrmTickMsec = 0; //销毁上一个帧嘀嗒钟。
+		VdoInptPt->m_Thrd.m_FrmTimeStepMsec = 0; //销毁帧时间步进。
+		if( VdoInptPt->m_Thrd.m_TmpFrm1Pt != NULL ) //销毁视频临时帧指针。
 		{
 			free( VdoInptPt->m_Thrd.m_TmpFrm1Pt );
 			VdoInptPt->m_Thrd.m_TmpFrm1Pt = NULL;
 		}
-		if( VdoInptPt->m_Thrd.m_TmpFrm2Pt != NULL ) //销毁视频临时帧的指针。
+		if( VdoInptPt->m_Thrd.m_TmpFrm2Pt != NULL ) //销毁视频临时帧指针。
 		{
 			free( VdoInptPt->m_Thrd.m_TmpFrm2Pt );
 			VdoInptPt->m_Thrd.m_TmpFrm2Pt = NULL;
 		}
-		VdoInptPt->m_Thrd.m_TmpFrmSzByt = 0; //销毁临时帧的大小。
-		VdoInptPt->m_Thrd.m_TmpFrmLenByt  = 0; //销毁临时帧的长度。
-		VdoInptPt->m_Thrd.m_FrmPt = NULL; //销毁帧的指针。
+		VdoInptPt->m_Thrd.m_TmpFrmSzByt = 0; //销毁临时帧大小。
+		VdoInptPt->m_Thrd.m_TmpFrmLenByt  = 0; //销毁临时帧长度。
+		VdoInptPt->m_Thrd.m_FrmPt = NULL; //销毁帧指针。
 		VdoInptPt->m_Thrd.m_ElmTotal = 0; //销毁元素总数。
-		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //销毁上次的嘀嗒钟。
-		VdoInptPt->m_Thrd.m_NowTickMsec = 0; //销毁本次的嘀嗒钟。
-		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：销毁线程的临时变量成功。" ) );
+		VdoInptPt->m_Thrd.m_LastTickMsec = 0; //销毁上次嘀嗒钟。
+		VdoInptPt->m_Thrd.m_NowTickMsec = 0; //销毁本次嘀嗒钟。
+		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：销毁线程临时变量成功。" ) );
 	}
 
 	//销毁空闲帧容器。
@@ -1174,7 +1174,7 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 	
 	if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
 	{
-		p_NowTickMsec = FuncGetTickAsMsec(); //记录销毁结束的嘀嗒钟。
+		p_NowTickMsec = FuncGetTickAsMsec(); //记录销毁结束嘀嗒钟。
 		LOGFI( Cu8vstr( "媒体处理线程：视频输入：销毁耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
 	}
 }

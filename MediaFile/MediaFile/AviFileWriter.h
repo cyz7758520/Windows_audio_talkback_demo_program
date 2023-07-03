@@ -21,6 +21,7 @@ __MEDIAFILE_DLLAPI__ int AviFileWriterAdoStrmGetCurTimeStamp( AviFileWriter * Av
 __MEDIAFILE_DLLAPI__ int AviFileWriterAdoStrmWrite( AviFileWriter * AviFileWriterPt, uint32_t AdoStrmIdx, void * FrmPt, size_t FrmLenByt, uint64_t FrmLenMsec, Vstr * ErrInfoVstrPt );
 
 __MEDIAFILE_DLLAPI__ int AviFileWriterAddVdoStrm( AviFileWriter * AviFileWriterPt, uint32_t Fmt, uint32_t MaxSampleRate, uint32_t * VdoStrmIdxPt, Vstr * ErrInfoVstrPt );
+__MEDIAFILE_DLLAPI__ int AviFileWriterVdoStrmGetCurTimeStamp( AviFileWriter * AviFileWriterPt, uint32_t VdoStrmIdx, uint64_t * CurTimeStampMsecPt, Vstr * ErrInfoVstrPt );
 __MEDIAFILE_DLLAPI__ int AviFileWriterVdoStrmWrite( AviFileWriter * AviFileWriterPt, uint32_t VdoStrmIdx, uint64_t FrmTimeStampMsec, void * FrmPt, size_t FrmLenByt, Vstr * ErrInfoVstrPt );
 
 __MEDIAFILE_DLLAPI__ int AviFileWriterDstoy( AviFileWriter * AviFileWriterPt, Vstr * ErrInfoVstrPt );

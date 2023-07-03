@@ -36,7 +36,11 @@
 # 开始
 &emsp;&emsp;在一台设备上直接点击创建服务端，再在另一台设备上将IP地址改为服务端设备的IP地址，并点击连接服务端，即可开始对讲，在任意一端点击中断，即可中断对讲。  
 
-&emsp;&emsp;设置按钮提供了各项功能的参数设置，绝大部分情况下都不需要修改，当然你也可以根据需要自行修改。  
+&emsp;&emsp;设置按钮：提供了各项功能的参数设置，大部分情况下都不需要修改，如果发现不适合某些设备，则需要根据设备情况修改。  
+&emsp;&emsp;保存设置按钮：将各项功能的参数保存到Stng.xml中，每次运行本软件时会自动读取设置。  
+&emsp;&emsp;读取设置按钮：将Stng.xml中各项功能的参数读取到本软件中。  
+&emsp;&emsp;删除设置按钮：将Stng.xml文件删除。  
+&emsp;&emsp;重置设置按钮：将本软件的设置重置为默认。  
 
 &emsp;&emsp;**特别注意：如果把两台设备放在同一房间里测试，有可能会出现啸叫、声音不完整、等问题，这是因为现在的麦克风都很灵敏了，一点小小的声音都会被录进去，两台设备会相互录音，导致软件无法正确识别回音，所以建议放在不同的房间里测试。如果实在要测试这种情况，就在设置里，Speex预处理器的设置里，关闭“使用自动增益控制”后再测试。**  
 
@@ -69,16 +73,16 @@
 &emsp;&emsp;**-Ado**：表示选择音频对讲模式。  
 &emsp;&emsp;**-Vdo**：表示选择视频对讲模式。  
 &emsp;&emsp;**-AdoVdo**：表示选择音视频对讲模式。  
-&emsp;&emsp;**-SaveStng xxx.txt**：表示要保存设置到xxx.txt文件，可以为相对或绝对完整路径。  
-&emsp;&emsp;**-NoSaveStng**：表示不保存设置到文件。  
+&emsp;&emsp;**-SaveStsToTxtFile xxx.txt**：表示要保存状态到xxx.txt文件，可以为相对或绝对完整路径。  
+&emsp;&emsp;**-NoSaveStsToTxtFile**：表示不保存状态到Txt文件。  
 &emsp;&emsp;**-PrintLogShowToast**：表示要打印Log日志，要显示Toast。  
 &emsp;&emsp;**-NoPrintLogShowToast**：表示不打印Log日志，不显示Toast。  
-&emsp;&emsp;**-SaveAdoVdoInptOtpt xxx.avi**：表示要保存音视频输入输出到xxx.avi文件，可以为相对或绝对完整路径。  
-&emsp;&emsp;**-NoSaveAdoVdoInptOtpt**：表示不保存音视频输入输出到文件。  
+&emsp;&emsp;**-SaveAdoVdoInptOtptToAviFile xxx.avi**：表示要保存音视频输入输出到xxx.avi文件，可以为相对或绝对完整路径。  
+&emsp;&emsp;**-NoSaveAdoVdoInptOtptToAviFile**：表示不保存音视频输入输出到Avi文件。  
 &emsp;&emsp;**-UseSystemAecNsAgc**：表示要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
 &emsp;&emsp;**-NoUseSystemAecNsAgc**：表示不使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
-&emsp;&emsp;**-SaveAdo AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav**：表示要分别保存音频输入原始、音频输入结果、音频输出原始到AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav文件，可以为相对或绝对完整路径。  
-&emsp;&emsp;**-NoSaveAdo**：表示不保存音频输入原始、音频输入结果、音频输出原始到文件。  
+&emsp;&emsp;**-SaveAdoInptOtptToWaveFile AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav**：表示要分别保存音频输入原始、音频输入结果、音频输出原始到AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav文件，可以为相对或绝对完整路径。  
+&emsp;&emsp;**-NoSaveAdoInptOtptToWaveFile**：表示不保存音频输入输出到Wave文件。  
 &emsp;&emsp;**-VdoInptPrvwWndHdl xxx**：表示设置视频输入预览窗口的句柄为xxx（十进制）。  
 &emsp;&emsp;**-VdoOtptDspyWndHdl xxx**：表示设置视频输出显示窗口的句柄为xxx（十进制）。  
 &emsp;&emsp;**-VdoWndShowMode 0|1|2**：表示设置视频窗口的显示模式，为0表示正常，为1表示垂直最大化排列，为2表示水平最大化排列。  
@@ -90,7 +94,7 @@
 &emsp;&emsp;**-MaxWnd**：表示最大化窗口。  
 &emsp;&emsp;**-TkbkStsWndHdl**：表示设置对讲状态窗口的句柄为xxx（十进制）。  
 &emsp;&emsp;**-CreateSrvr**：表示创建服务端。本参数要放在所有参数的最后。  
-&emsp;&emsp;**-CnctSrvr**：表示链接服务端。本参数要放在所有参数的最后。  
+&emsp;&emsp;**-CnctSrvr**：表示连接服务端。本参数要放在所有参数的最后。  
 
 &emsp;&emsp;例如：“Windows下音视频对讲演示程序.exe -Tcp -Ip 192.168.0.100 -Port 12345 -AdoVdo -VdoFrmSz 1280 960 -WndSz 1000 900 -CreateSrvr”：表示选择TCP协议，设置IP地址为192.168.0.100，设置端口号为12345，选择音视频对讲模式，设置视频帧的宽度为1280像素、高度为960像素。设置窗口的宽度为1000像素、高度为900像素，最后创建服务端。
 

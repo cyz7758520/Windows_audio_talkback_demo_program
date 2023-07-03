@@ -34,6 +34,7 @@
 #define _WIN32_IE        0xFFFF           //设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
 #include <windows.h>                      //包含整个Windows SDK支持的API
+#include <windowsx.h>                     //ComboBox_AddString、ComboBox_ResetContent
 #include <tchar.h>                        //_tmain、_tWinMain、TCHAR
 #include <process.h>                      //
 #include <psapi.h>                        //GetProcessImageFileName

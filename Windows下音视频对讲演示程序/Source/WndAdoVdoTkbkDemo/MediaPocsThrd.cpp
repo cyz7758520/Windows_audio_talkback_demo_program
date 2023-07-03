@@ -5,22 +5,22 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt );
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdInit
  * 功能说明：初始化媒体处理线程。
- * 参数说明：MediaPocsThrdPtPt：[输出]，存放媒体处理线程指针的指针，不能为NULL。
-			 UserDataPt：[输入]，存放用户数据的指针，可以为NULL。
-			 UserInitFuncPt：[输入]，存放用户定义的初始化函数的指针，不能为NULL。
-			 UserPocsFuncPt：[输入]，存放用户定义的处理函数的指针，不能为NULL。
-			 UserDstoyFuncPt：[输入]，存放用户定义的销毁函数的指针，不能为NULL。
-			 UserMsgFuncPt：[输入]，存放用户定义的消息函数的指针，不能为NULL。
-			 UserReadAdoVdoInptFrmFuncPt：[输入]，存放用户定义的读取音视频输入帧函数的指针，不能为NULL。
-			 UserWriteAdoOtptFrmFuncPt：[输入]，存放用户定义的写入音频输出帧函数的指针，不能为NULL。
-			 UserGetAdoOtptFrmFuncPt：[输入]，存放用户定义的获取音频输出帧函数的指针，不能为NULL。
+ * 参数说明：MediaPocsThrdPtPt：[输出]，存放媒体处理线程指针指针，不能为NULL。
+			 UserDataPt：[输入]，存放用户数据指针，可以为NULL。
+			 UserInitFuncPt：[输入]，存放用户定义的初始化函数指针，不能为NULL。
+			 UserPocsFuncPt：[输入]，存放用户定义的处理函数指针，不能为NULL。
+			 UserDstoyFuncPt：[输入]，存放用户定义的销毁函数指针，不能为NULL。
+			 UserMsgFuncPt：[输入]，存放用户定义的消息函数指针，不能为NULL。
+			 UserReadAdoVdoInptFrmFuncPt：[输入]，存放用户定义的读取音视频输入帧函数指针，不能为NULL。
+			 UserWriteAdoOtptFrmFuncPt：[输入]，存放用户定义的写入音频输出帧函数指针，不能为NULL。
+			 UserGetAdoOtptFrmFuncPt：[输入]，存放用户定义的获取音频输出帧函数指针，不能为NULL。
 			 UserWriteVdoOtptFrmFuncPt：[输入]，存放用户定义的写入视频输出帧函数，不能为NULL。
 			 UserGetVdoOtptFrmFuncPt：[输入]，存放用户定义的获取视频输出帧函数，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
@@ -30,66 +30,66 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 					   MediaPocsThrd::USER_WRITE_VDO_OTPT_FRM_FUNC_PT UserWriteVdoOtptFrmFuncPt, MediaPocsThrd::USER_GET_VDO_OTPT_FRM_FUNC_PT UserGetVdoOtptFrmFuncPt,
 					   Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaPocsThrd * p_MediaPocsThrdPt = NULL; //存放媒体处理线程的指针。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	MediaPocsThrd * p_MediaPocsThrdPt = NULL; //存放媒体处理线程指针。
 	
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPtPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针指针不正确。" ) );
 		goto Out;
 	}
 	if( UserInitFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的初始化函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的初始化函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserPocsFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的处理函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的处理函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserDstoyFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的销毁函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的销毁函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserMsgFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的消息函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的消息函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserReadAdoVdoInptFrmFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的读取音视频输入帧函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的读取音视频输入帧函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserWriteAdoOtptFrmFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的写入音频输出帧函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的写入音频输出帧函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserGetAdoOtptFrmFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的获取音频输出帧函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的获取音频输出帧函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserWriteVdoOtptFrmFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的写入视频输出帧函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的写入视频输出帧函数指针不正确。" ) );
 		goto Out;
 	}
 	if( UserGetVdoOtptFrmFuncPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的获取视频输出帧函数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的获取视频输出帧函数指针不正确。" ) );
 		goto Out;
 	}
 	
-	//创建并清空媒体处理线程的内存块。
+	//创建并清空媒体处理线程内存块。
 	p_MediaPocsThrdPt = ( MediaPocsThrd * )calloc( 1, sizeof( MediaPocsThrd ) );
 	if( p_MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并清空媒体处理线程的内存块失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并清空媒体处理线程内存块失败。" ) );
 		goto Out;
 	}
 	
@@ -110,60 +110,60 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 	}
 
 	//初始化音频输入。
-	p_MediaPocsThrdPt->m_AdoInpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置音频输入的媒体处理线程的指针。
+	p_MediaPocsThrdPt->m_AdoInpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置音频输入媒体处理线程指针。
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入Speex声学回音消除器的内存块文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入Speex声学回音消除器内存块文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入WebRtc浮点版声学回音消除器的内存块文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入WebRtc浮点版声学回音消除器内存块文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
-	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt, , , ) != 0 )
+	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入的原始Wave文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入原始Wave文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
-	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltWaveFileFullPathVstrPt, , , ) != 0 )
+	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入的结果Wave文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入结果Wave文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 	MediaPocsThrdSetAdoInpt( p_MediaPocsThrdPt, 8000, 20, NULL );
 
 	//初始化音频输出。
-	p_MediaPocsThrdPt->m_AdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置音频输出的媒体处理线程的指针。
+	p_MediaPocsThrdPt->m_AdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置音频输出媒体处理线程指针。
 	if( p_MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.Init( sizeof( AdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化音频输出的流容器失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化音频输出流容器失败。原因：" ) );
 		goto Out;
 	}
-	if( VstrInit( &p_MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt, , , ) != 0 )
+	if( VstrInit( &p_MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcFullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输出的原始Wave文件完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输出原始Wave文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 	MediaPocsThrdSetAdoOtpt( p_MediaPocsThrdPt, 8000, 20, NULL );
 
 	//初始化视频输入。
-	p_MediaPocsThrdPt->m_VdoInpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输入的媒体处理线程的指针。
+	p_MediaPocsThrdPt->m_VdoInpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输入媒体处理线程指针。
 	MediaPocsThrdSetVdoInpt( p_MediaPocsThrdPt, 15, 480, 640, NULL, NULL );
 	MediaPocsThrdVdoInptSetUseDvc( p_MediaPocsThrdPt, 0, NULL );
 
 	//初始化视频输出。
-	p_MediaPocsThrdPt->m_VdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输出的媒体处理线程的指针。
+	p_MediaPocsThrdPt->m_VdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输出媒体处理线程指针。
 	if( p_MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Init( sizeof( VdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化视频输出的流容器失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化视频输出流容器失败。原因：" ) );
 		goto Out;
 	}
 	
-	//初始化音视频输入输出Avi文件的完整路径动态字符串。
+	//初始化音视频输入输出Avi文件完整路径动态字符串。
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, , , ) != 0 )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音视频输入输出Avi文件的完整路径动态字符串失败。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音视频输入输出Avi文件完整路径动态字符串失败。" ) );
 		goto Out;
 	}
 
@@ -174,18 +174,18 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 		goto Out;
 	}
 
-	p_MediaPocsThrdPt->m_UserDataPt = UserDataPt; //设置用户数据的指针。
-	p_MediaPocsThrdPt->m_UserInitFuncPt = UserInitFuncPt; //设置用户定义的初始化函数的指针。
-	p_MediaPocsThrdPt->m_UserPocsFuncPt = UserPocsFuncPt; //设置用户定义的处理函数的指针。
-	p_MediaPocsThrdPt->m_UserDstoyFuncPt = UserDstoyFuncPt; //设置用户定义的销毁函数的指针。
-	p_MediaPocsThrdPt->m_UserMsgFuncPt = UserMsgFuncPt; //设置用户定义的消息函数的指针。
-	p_MediaPocsThrdPt->m_UserReadAdoVdoInptFrmFuncPt = UserReadAdoVdoInptFrmFuncPt; //设置用户定义的读取音视频输入帧函数的指针。
-	p_MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt = UserWriteAdoOtptFrmFuncPt; //设置用户定义的写入音频输出帧函数的指针。
-	p_MediaPocsThrdPt->m_UserGetAdoOtptFrmFuncPt = UserGetAdoOtptFrmFuncPt; //设置用户定义的获取音频输出帧函数的指针。
-	p_MediaPocsThrdPt->m_UserWriteVdoOtptFrmFuncPt = UserWriteVdoOtptFrmFuncPt; //设置用户定义的写入视频输出帧函数的指针。
-	p_MediaPocsThrdPt->m_UserGetVdoOtptFrmFuncPt = UserGetVdoOtptFrmFuncPt; //设置用户定义的获取视频输出帧函数的指针。
+	p_MediaPocsThrdPt->m_UserDataPt = UserDataPt; //设置用户数据指针。
+	p_MediaPocsThrdPt->m_UserInitFuncPt = UserInitFuncPt; //设置用户定义的初始化函数指针。
+	p_MediaPocsThrdPt->m_UserPocsFuncPt = UserPocsFuncPt; //设置用户定义的处理函数指针。
+	p_MediaPocsThrdPt->m_UserDstoyFuncPt = UserDstoyFuncPt; //设置用户定义的销毁函数指针。
+	p_MediaPocsThrdPt->m_UserMsgFuncPt = UserMsgFuncPt; //设置用户定义的消息函数指针。
+	p_MediaPocsThrdPt->m_UserReadAdoVdoInptFrmFuncPt = UserReadAdoVdoInptFrmFuncPt; //设置用户定义的读取音视频输入帧函数指针。
+	p_MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt = UserWriteAdoOtptFrmFuncPt; //设置用户定义的写入音频输出帧函数指针。
+	p_MediaPocsThrdPt->m_UserGetAdoOtptFrmFuncPt = UserGetAdoOtptFrmFuncPt; //设置用户定义的获取音频输出帧函数指针。
+	p_MediaPocsThrdPt->m_UserWriteVdoOtptFrmFuncPt = UserWriteVdoOtptFrmFuncPt; //设置用户定义的写入视频输出帧函数指针。
+	p_MediaPocsThrdPt->m_UserGetVdoOtptFrmFuncPt = UserGetVdoOtptFrmFuncPt; //设置用户定义的获取视频输出帧函数指针。
 
-	*MediaPocsThrdPtPt = p_MediaPocsThrdPt; //设置媒体处理线程的指针。
+	*MediaPocsThrdPtPt = p_MediaPocsThrdPt; //设置媒体处理线程指针。
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -200,22 +200,22 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * 函数名称：MediaPocsThrdDstoy
 * 功能说明：销毁媒体处理线程。
-* 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+* 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
 * 返回说明：0：成功。
 			非0：失败。
 * 线程安全：是 或 否
-* 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+* 调用样例：填写调用此函数样例，并解释函数参数和返回值。
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -228,7 +228,7 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_ErrInfoVstrPt = NULL;
 	}
 	
-	//销毁音视频输入输出Avi文件的完整路径动态字符串。
+	//销毁音视频输入输出Avi文件完整路径动态字符串。
 	if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt != NULL )
 	{
 		VstrDstoy( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
@@ -242,47 +242,47 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt = NULL;
 	}
 
-	//销毁视频输出的流容器。
+	//销毁视频输出流容器。
 	if( MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.m_CQueuePt != NULL )
 	{
 		MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Dstoy( NULL );
 	}
 
-	//销毁音频输出的原始Wave文件完整路径动态字符串。
-	if( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt != NULL )
+	//销毁音频输出原始Wave文件完整路径动态字符串。
+	if( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcFullPathVstrPt != NULL )
 	{
-		VstrDstoy( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt );
-		MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt = NULL;
+		VstrDstoy( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcFullPathVstrPt );
+		MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcFullPathVstrPt = NULL;
 	}
 	
-	//销毁音频输出的流容器。
+	//销毁音频输出流容器。
 	if( MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.m_CQueuePt != NULL )
 	{
 		MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.Dstoy( NULL );
 	}
 
-	//销毁音频输入的结果Wave文件完整路径动态字符串。
-	if( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltWaveFileFullPathVstrPt != NULL )
+	//销毁音频输入结果Wave文件完整路径动态字符串。
+	if( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltFullPathVstrPt != NULL )
 	{
-		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltWaveFileFullPathVstrPt );
-		MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltWaveFileFullPathVstrPt = NULL;
+		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltFullPathVstrPt );
+		MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltFullPathVstrPt = NULL;
 	}
 	
-	//销毁音频输入的原始Wave文件完整路径动态字符串。
-	if( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt != NULL )
+	//销毁音频输入原始Wave文件完整路径动态字符串。
+	if( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcFullPathVstrPt != NULL )
 	{
-		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt );
-		MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt = NULL;
+		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcFullPathVstrPt );
+		MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcFullPathVstrPt = NULL;
 	}
 
-	//销毁音频输入WebRtc浮点版声学回音消除器的内存块文件完整路径动态字符串。
+	//销毁音频输入WebRtc浮点版声学回音消除器内存块文件完整路径动态字符串。
 	if( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt != NULL )
 	{
 		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt );
 		MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt = NULL;
 	}
 
-	//销毁音频输入Speex声学回音消除器的内存块文件完整路径动态字符串。
+	//销毁音频输入Speex声学回音消除器内存块文件完整路径动态字符串。
 	if( MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt != NULL )
 	{
 		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt );
@@ -298,7 +298,7 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 	//取消最小计时器分辨率。
 	timeEndPeriod( 1 );
 
-	//销毁媒体处理线程的内存块。
+	//销毁媒体处理线程内存块。
 	free( MediaPocsThrdPt );
 
 	p_Rslt = 0; //设置本函数执行成功。
@@ -313,40 +313,40 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdGetAdoInptDvcName
- * 功能说明：获取音频输入设备的名称。调用本函数成功后，必须手动调用MediaPocsThrdDstoyDvcName函数销毁。
- * 参数说明：AdoInptDvcNameVstrArrPtPtPt：[输出]，存放音频输入设备名称动态字符串数组指针的指针，不能为NULL。
-			 AdoInptDvcTotalPt：[输出]，存放音频输入设备总数的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：获取音频输入设备名称。调用本函数成功后，必须手动调用MediaPocsThrdDstoyDvcName函数销毁。
+ * 参数说明：AdoInptDvcNameVstrArrPtPtPt：[输出]，存放音频输入设备名称动态字符串指针数组指针，不能为NULL。
+			 AdoInptDvcTotalPt：[输出]，存放音频输入设备总数指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT * AdoInptDvcTotalPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	Vstr * * p_AdoInptDvcNameArrPtPt = NULL; //存放音频输入设备名称动态字符串数组的指针。
-	UINT p_AdoInptDvcTotal = 0; //存放音频输入设备的总数。
-	IMMDeviceEnumerator * p_AdoInptDvcEnumPt = NULL; //存放音频输入设备枚举器的指针。
-	IMMDeviceCollection * p_AdoInptDvcClctPt = NULL; //存放音频输入设备收集器的指针。
-	IMMDevice * p_AdoInptDvcPt = NULL; //存放音频输入设备的指针。
-	IPropertyStore * p_PrptStorePt = NULL; //存放属性存储器的指针。
-	PROPVARIANT p_FriendlyNamePrptVariant = { 0 }; //存放友好名称字符串的属性。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	Vstr * * p_AdoInptDvcNameArrPtPt = NULL; //存放音频输入设备名称动态字符串数组指针。
+	UINT p_AdoInptDvcTotal = 0; //存放音频输入设备总数。
+	IMMDeviceEnumerator * p_AdoInptDvcEnumPt = NULL; //存放音频输入设备枚举器指针。
+	IMMDeviceCollection * p_AdoInptDvcClctPt = NULL; //存放音频输入设备收集器指针。
+	IMMDevice * p_AdoInptDvcPt = NULL; //存放音频输入设备指针。
+	IPropertyStore * p_PrptStorePt = NULL; //存放属性存储器指针。
+	PROPVARIANT p_FriendlyNamePrptVariant = { 0 }; //存放友好名称字符串属性。
 	HRESULT p_HRslt;
 	
 	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
-	PropVariantInit( &p_FriendlyNamePrptVariant ); //初始化友好名称字符串的属性。
+	PropVariantInit( &p_FriendlyNamePrptVariant ); //初始化友好名称字符串属性。
 	
 	//判断各个变量是否正确。
 	if( AdoInptDvcNameVstrArrPtPtPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输入设备名称动态字符串数组指针的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输入设备名称动态字符串数组指针指针不正确。" ) );
 		goto Out;
 	}
 	if( AdoInptDvcTotalPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输入设备总数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输入设备总数指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -357,38 +357,38 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT
 		goto Out;
 	}
 	
-	p_HRslt = p_AdoInptDvcEnumPt->EnumAudioEndpoints( eCapture, DEVICE_STATE_ACTIVE, &p_AdoInptDvcClctPt ); //获取音频输入设备收集器。只收集激活的音频输入设备。
+	p_HRslt = p_AdoInptDvcEnumPt->EnumAudioEndpoints( eCapture, DEVICE_STATE_ACTIVE, &p_AdoInptDvcClctPt ); //获取音频输入设备收集器。只收集激活音频输入设备。
 	if( p_HRslt != S_OK )
 	{
 		GetWinSysErrInfo( p_HRslt, ErrInfoVstrPt ), VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "获取音频输入设备收集器失败。原因：" ) );
 		goto Out;
 	}
 
-	p_AdoInptDvcClctPt->GetCount( &p_AdoInptDvcTotal ); //获取音频输入设备的总数。
+	p_AdoInptDvcClctPt->GetCount( &p_AdoInptDvcTotal ); //获取音频输入设备总数。
 	if( p_AdoInptDvcTotal > 0 )
 	{
 		p_AdoInptDvcTotal++; //递增一个默认音频输入设备。
 
-		//创建并清空音频输入设备名称动态字符串数组的内存块。
+		//创建并清空音频输入设备名称动态字符串数组内存块。
 		p_AdoInptDvcNameArrPtPt = ( Vstr * * )calloc( p_AdoInptDvcTotal, sizeof( Vstr * ) );
 		if( p_AdoInptDvcNameArrPtPt == NULL )
 		{
-			VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并清空音频输入设备名称动态字符串数组的内存块失败。" ) );
+			VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并清空音频输入设备名称动态字符串指针数组内存块失败。" ) );
 			goto Out;
 		}
 		
-		//获取默认音频输入设备的名称。
+		//获取默认音频输入设备名称。
 		{
-			p_HRslt = p_AdoInptDvcEnumPt->GetDefaultAudioEndpoint( eCapture, eConsole, &p_AdoInptDvcPt ); //初始化默认的音频输入设备。
-			if( p_HRslt == S_OK ) //如果初始化默认的音频输入设备成功。
+			p_HRslt = p_AdoInptDvcEnumPt->GetDefaultAudioEndpoint( eCapture, eConsole, &p_AdoInptDvcPt ); //初始化默认音频输入设备。
+			if( p_HRslt == S_OK ) //如果初始化默认音频输入设备成功。
 			{
 				p_HRslt = p_AdoInptDvcPt->OpenPropertyStore( STGM_READ, &p_PrptStorePt ); //初始化属性存储器。
 				
-				p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串的属性。
+				p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串属性。
 				
 				if( VstrInit( &p_AdoInptDvcNameArrPtPt[ 0 ], Utf16, , Cu16vstr( p_FriendlyNamePrptVariant.pwszVal ) ) != 0 )
 				{
-					VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输入设备名称的动态字符串失败。" ) );
+					VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输入设备名称动态字符串失败。" ) );
 					goto Out;
 				}
 				VstrIns( p_AdoInptDvcNameArrPtPt[ 0 ], 0, Cu8vstr( "默认：" ) );
@@ -397,25 +397,25 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT
 
 				p_AdoInptDvcPt->Release(); //销毁音频输入设备。
 			}
-			else //如果初始化默认的音频输入设备失败。
+			else //如果初始化默认音频输入设备失败。
 			{
-				GetWinSysErrInfo( p_HRslt, ErrInfoVstrPt ), VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化默认的音频输入设备失败。原因：" ) );
+				GetWinSysErrInfo( p_HRslt, ErrInfoVstrPt ), VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化默认音频输入设备失败。原因：" ) );
 				goto Out;
 			}
 		}
 
-		//获取全部音频输入设备的名称。
+		//获取全部音频输入设备名称。
 		for( UINT p_DvcNum = 1; p_DvcNum < p_AdoInptDvcTotal; p_DvcNum++ )
 		{
 			p_HRslt = p_AdoInptDvcClctPt->Item( p_DvcNum - 1, &p_AdoInptDvcPt ); //初始化音频输入设备。
 
 			p_HRslt = p_AdoInptDvcPt->OpenPropertyStore( STGM_READ, &p_PrptStorePt ); //初始化属性存储器。
 
-			p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串的属性。
+			p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串属性。
 
 			if( VstrInit( &p_AdoInptDvcNameArrPtPt[ p_DvcNum ], Utf16, , Cu16vstr( p_FriendlyNamePrptVariant.pwszVal ) ) != 0 )
 			{
-				VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输入设备名称的动态字符串失败。" ) );
+				VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输入设备名称动态字符串失败。" ) );
 				goto Out;
 			}
 
@@ -429,8 +429,8 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT
 
 	p_AdoInptDvcEnumPt->Release(); //销毁音频输入设备枚举器。
 
-	*AdoInptDvcNameVstrArrPtPtPt = p_AdoInptDvcNameArrPtPt; //设置音频输入设备名称动态字符串数组的指针。
-	*AdoInptDvcTotalPt = p_AdoInptDvcTotal; //设置音频输入设备的总数。
+	*AdoInptDvcNameVstrArrPtPtPt = p_AdoInptDvcNameArrPtPt; //设置音频输入设备名称动态字符串数组指针。
+	*AdoInptDvcTotalPt = p_AdoInptDvcTotal; //设置音频输入设备总数。
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -439,47 +439,47 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT
 	{
 		MediaPocsThrdDstoyDvcName( p_AdoInptDvcNameArrPtPt, p_AdoInptDvcTotal, NULL );
 	}
-	PropVariantClear( &p_FriendlyNamePrptVariant ); //销毁友好名称字符串的属性。
+	PropVariantClear( &p_FriendlyNamePrptVariant ); //销毁友好名称字符串属性。
 	CoUninitialize(); //销毁COM库。
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdGetAdoOtptDvcName
- * 功能说明：获取音频输出设备的名称。调用本函数成功后，必须手动调用MediaPocsThrdDstoyDvcName函数销毁。
- * 参数说明：AdoOtptDvcNameVstrArrPtPtPt：[输出]，存放音频输出设备名称动态字符串数组指针的指针，不能为NULL。
-			 AdoOtptDvcTotalPt：[输出]，存放音频输出设备总数的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：获取音频输出设备名称。调用本函数成功后，必须手动调用MediaPocsThrdDstoyDvcName函数销毁。
+ * 参数说明：AdoOtptDvcNameVstrArrPtPtPt：[输出]，存放音频输出设备名称动态字符串指针数组指针，不能为NULL。
+			 AdoOtptDvcTotalPt：[输出]，存放音频输出设备总数指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT * AdoOtptDvcTotalPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	Vstr * * p_AdoOtptDvcNameArrPtPt = NULL; //存放音频输出设备名称动态字符串数组的指针。
-	UINT p_AdoOtptDvcTotal = 0; //存放音频输出设备的总数。
-	IMMDeviceEnumerator * p_AdoOtptDvcEnumPt = NULL; //存放音频输出设备枚举器的指针。
-	IMMDeviceCollection * p_AdoOtptDvcClctPt = NULL; //存放音频输出设备收集器的指针。
-	IMMDevice * p_AdoOtptDvcPt = NULL; //存放音频输出设备的指针。
-	IPropertyStore * p_PrptStorePt = NULL; //存放属性存储器的指针。
-	PROPVARIANT p_FriendlyNamePrptVariant = { 0 }; //存放友好名称字符串的属性。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	Vstr * * p_AdoOtptDvcNameArrPtPt = NULL; //存放音频输出设备名称动态字符串数组指针。
+	UINT p_AdoOtptDvcTotal = 0; //存放音频输出设备总数。
+	IMMDeviceEnumerator * p_AdoOtptDvcEnumPt = NULL; //存放音频输出设备枚举器指针。
+	IMMDeviceCollection * p_AdoOtptDvcClctPt = NULL; //存放音频输出设备收集器指针。
+	IMMDevice * p_AdoOtptDvcPt = NULL; //存放音频输出设备指针。
+	IPropertyStore * p_PrptStorePt = NULL; //存放属性存储器指针。
+	PROPVARIANT p_FriendlyNamePrptVariant = { 0 }; //存放友好名称字符串属性。
 	HRESULT p_HRslt;
 	
 	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
-	PropVariantInit( &p_FriendlyNamePrptVariant ); //初始化友好名称字符串的属性。
+	PropVariantInit( &p_FriendlyNamePrptVariant ); //初始化友好名称字符串属性。
 
 	//判断各个变量是否正确。
 	if( AdoOtptDvcNameVstrArrPtPtPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出设备名称动态字符串数组指针的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出设备名称动态字符串数组指针指针不正确。" ) );
 		goto Out;
 	}
 	if( AdoOtptDvcTotalPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出设备总数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "音频输出设备总数指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -490,38 +490,38 @@ int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT
 		goto Out;
 	}
 
-	p_HRslt = p_AdoOtptDvcEnumPt->EnumAudioEndpoints( eRender, DEVICE_STATE_ACTIVE, &p_AdoOtptDvcClctPt ); //获取音频输出设备收集器。只收集激活的音频输出设备。
+	p_HRslt = p_AdoOtptDvcEnumPt->EnumAudioEndpoints( eRender, DEVICE_STATE_ACTIVE, &p_AdoOtptDvcClctPt ); //获取音频输出设备收集器。只收集激活音频输出设备。
 	if( p_HRslt != S_OK )
 	{
 		GetWinSysErrInfo( p_HRslt, ErrInfoVstrPt ), VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "获取音频输出设备收集器失败。原因：" ) );
 		goto Out;
 	}
 	
-	p_AdoOtptDvcClctPt->GetCount( &p_AdoOtptDvcTotal ); //获取音频输出设备的总数。
+	p_AdoOtptDvcClctPt->GetCount( &p_AdoOtptDvcTotal ); //获取音频输出设备总数。
 	if( p_AdoOtptDvcTotal > 0 )
 	{
 		p_AdoOtptDvcTotal++; //递增一个默认音频输出设备。
 
-		//创建并清空音频输出设备名称动态字符串数组的内存块。
+		//创建并清空音频输出设备名称动态字符串数组内存块。
 		p_AdoOtptDvcNameArrPtPt = ( Vstr * * )calloc( p_AdoOtptDvcTotal, sizeof( Vstr * ) );
 		if( p_AdoOtptDvcNameArrPtPt == NULL )
 		{
-			VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并清空音频输出设备名称动态字符串数组的内存块失败。" ) );
+			VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建并清空音频输出设备名称动态字符串指针数组内存块失败。" ) );
 			goto Out;
 		}
 		
-		//获取默认音频输出设备的名称。
+		//获取默认音频输出设备名称。
 		{
-			p_HRslt = p_AdoOtptDvcEnumPt->GetDefaultAudioEndpoint( eRender, eConsole, &p_AdoOtptDvcPt ); //初始化默认的音频输出设备。
-			if( p_HRslt == S_OK ) //如果初始化默认的音频输出设备成功。
+			p_HRslt = p_AdoOtptDvcEnumPt->GetDefaultAudioEndpoint( eRender, eConsole, &p_AdoOtptDvcPt ); //初始化默认音频输出设备。
+			if( p_HRslt == S_OK ) //如果初始化默认音频输出设备成功。
 			{
 				p_HRslt = p_AdoOtptDvcPt->OpenPropertyStore( STGM_READ, &p_PrptStorePt ); //初始化属性存储器。
 				
-				p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串的属性。
+				p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串属性。
 				
 				if( VstrInit( &p_AdoOtptDvcNameArrPtPt[ 0 ], Utf16, , Cu16vstr( p_FriendlyNamePrptVariant.pwszVal ) ) != 0 )
 				{
-					VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输出设备名称的动态字符串失败。" ) );
+					VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输出设备名称动态字符串失败。" ) );
 					goto Out;
 				}
 				VstrIns( p_AdoOtptDvcNameArrPtPt[ 0 ], 0, Cu8vstr( "默认：" ) );
@@ -530,25 +530,25 @@ int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT
 
 				p_AdoOtptDvcPt->Release(); //销毁音频输出设备。
 			}
-			else //如果初始化默认的音频输出设备失败。
+			else //如果初始化默认音频输出设备失败。
 			{
-				GetWinSysErrInfo( p_HRslt, ErrInfoVstrPt ), VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化默认的音频输出设备失败。原因：" ) );
+				GetWinSysErrInfo( p_HRslt, ErrInfoVstrPt ), VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化默认音频输出设备失败。原因：" ) );
 				goto Out;
 			}
 		}
 
-		//获取全部音频输出设备的名称。
+		//获取全部音频输出设备名称。
 		for( UINT p_DvcNum = 1; p_DvcNum < p_AdoOtptDvcTotal; p_DvcNum++ )
 		{
 			p_HRslt = p_AdoOtptDvcClctPt->Item( p_DvcNum - 1, &p_AdoOtptDvcPt ); //初始化音频输出设备。
 
 			p_HRslt = p_AdoOtptDvcPt->OpenPropertyStore( STGM_READ, &p_PrptStorePt ); //初始化属性存储器。
 
-			p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串的属性。
+			p_HRslt = p_PrptStorePt->GetValue( PKEY_Device_FriendlyName, &p_FriendlyNamePrptVariant ); //初始化友好名称字符串属性。
 
 			if( VstrInit( &p_AdoOtptDvcNameArrPtPt[ p_DvcNum ], Utf16, , Cu16vstr( p_FriendlyNamePrptVariant.pwszVal ) ) != 0 )
 			{
-				VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输出设备名称的动态字符串失败。" ) );
+				VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输出设备名称动态字符串失败。" ) );
 				goto Out;
 			}
 
@@ -562,8 +562,8 @@ int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT
 
 	p_AdoOtptDvcEnumPt->Release(); //销毁音频输出设备枚举器。
 
-	*AdoOtptDvcNameVstrArrPtPtPt = p_AdoOtptDvcNameArrPtPt; //设置音频输出设备名称动态字符串数组的指针。
-	*AdoOtptDvcTotalPt = p_AdoOtptDvcTotal; //设置音频输出设备的总数。
+	*AdoOtptDvcNameVstrArrPtPtPt = p_AdoOtptDvcNameArrPtPt; //设置音频输出设备名称动态字符串数组指针。
+	*AdoOtptDvcTotalPt = p_AdoOtptDvcTotal; //设置音频输出设备总数。
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -572,29 +572,29 @@ int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT
 	{
 		MediaPocsThrdDstoyDvcName( p_AdoOtptDvcNameArrPtPt, p_AdoOtptDvcTotal, NULL );
 	}
-	PropVariantClear( &p_FriendlyNamePrptVariant ); //销毁友好名称字符串的属性。
+	PropVariantClear( &p_FriendlyNamePrptVariant ); //销毁友好名称字符串属性。
 	CoUninitialize(); //销毁COM库。
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdGetVdoInptDvcName
- * 功能说明：获取视频输入设备的名称。调用本函数成功后，必须手动调用MediaPocsThrdDstoyDvcName函数销毁。
- * 参数说明：VdoInptDvcNameVstrArrPtPtPt：[输出]，存放视频输入设备名称动态字符串数组指针的指针，不能为NULL。
-			 VdoInptDvcTotalPt：[输出]，存放视频输入设备总数的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：获取视频输入设备名称。调用本函数成功后，必须手动调用MediaPocsThrdDstoyDvcName函数销毁。
+ * 参数说明：VdoInptDvcNameVstrArrPtPtPt：[输出]，存放视频输入设备名称动态字符串指针数组指针，不能为NULL。
+			 VdoInptDvcTotalPt：[输出]，存放视频输入设备总数指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT * VdoInptDvcTotalPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	Vstr * * p_VdoInptDvcNameArrPtPt = NULL; //存放视频输入设备名称动态字符串数组的指针。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	Vstr * * p_VdoInptDvcNameArrPtPt = NULL; //存放视频输入设备名称动态字符串数组指针。
 	Vstr * * p_TmpVstrPtPt = NULL;
-	UINT p_VdoInptDvcTotal = 0; //存放视频输入设备的总数。
+	UINT p_VdoInptDvcTotal = 0; //存放视频输入设备总数。
 	ICreateDevEnum * p_CreateDevEnumPt = NULL;
 	IEnumMoniker * p_EnumMonikerPt = NULL;
 	IMoniker * p_MonikerPt = NULL;
@@ -606,12 +606,12 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 	//判断各个变量是否正确。
 	if( VdoInptDvcNameVstrArrPtPtPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "视频输入设备名称动态字符串数组指针的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "视频输入设备名称动态字符串数组指针指针不正确。" ) );
 		goto Out;
 	}
 	if( VdoInptDvcTotalPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "视频输入设备总数的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "视频输入设备总数指针不正确。" ) );
 		goto Out;
 	}
 
@@ -636,14 +636,14 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 					p_TmpVstrPtPt = ( Vstr * * )realloc( p_VdoInptDvcNameArrPtPt, p_VdoInptDvcTotal * sizeof( Vstr * ) );
 					if( p_TmpVstrPtPt == NULL )
 					{
-						VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建视频输入设备名称动态字符串数组的内存块失败。" ) );
+						VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建视频输入设备名称动态字符串指针数组内存块失败。" ) );
 						goto Out;
 					}
 					p_VdoInptDvcNameArrPtPt = p_TmpVstrPtPt;
 					p_VdoInptDvcNameArrPtPt[p_VdoInptDvcTotal - 1] = NULL;
 					if( VstrInit( &p_VdoInptDvcNameArrPtPt[p_VdoInptDvcTotal - 1], Utf16, , Cu16vstr( varName.bstrVal ) ) != 0 )
 					{
-						VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建视频输入设备名称的动态字符串失败。" ) );
+						VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建视频输入设备名称动态字符串失败。" ) );
 						goto Out;
 					}
 				}
@@ -660,8 +660,8 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 	p_Ulong = p_CreateDevEnumPt->Release();
 	p_CreateDevEnumPt = NULL;
 
-	*VdoInptDvcNameVstrArrPtPtPt = p_VdoInptDvcNameArrPtPt; //设置视频输入设备名称动态字符串数组的指针。
-	*VdoInptDvcTotalPt = p_VdoInptDvcTotal; //设置视频输入设备的总数。
+	*VdoInptDvcNameVstrArrPtPtPt = p_VdoInptDvcNameArrPtPt; //设置视频输入设备名称动态字符串数组指针。
+	*VdoInptDvcTotalPt = p_VdoInptDvcTotal; //设置视频输入设备总数。
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -677,23 +677,23 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdDstoyDvcName
  * 功能说明：销毁设备名称动态字符串数组。
- * 参数说明：DvcNameArrPtPt：[输出]，存放设备名称动态字符串数组的指针，不能为NULL。
-			 DvcTotal：[输出]，存放设备的总数。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 参数说明：DvcNameArrPtPt：[输出]，存放设备名称动态字符串数组指针，不能为NULL。
+			 DvcTotal：[输出]，存放设备总数。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：无。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdDstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	UINT p_TmpUint;
 
 	//判断各个变量是否正确。
 	if( DvcNameArrPtPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设备名称动态字符串数组的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设备名称动态字符串数组指针不正确。" ) );
 		goto Out;
 	}
 
@@ -706,7 +706,7 @@ int MediaPocsThrdDstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * Er
 		}
 	}
 
-	free( DvcNameArrPtPt ); //销毁设备名称动态字符串数组的内存块。
+	free( DvcNameArrPtPt ); //销毁设备名称动态字符串指针数组内存块。
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -771,7 +771,7 @@ typedef enum
 
 	MediaMsgTypSetIsUsePrvntSysSleep,
 	MediaMsgTypSetIsSaveAdoVdoInptOtptToAviFile,
-	MediaMsgTypSaveStngToFile,
+	MediaMsgTypSaveStsToTxtFile,
 
 	MediaMsgTypRqirExit,
 
@@ -907,10 +907,10 @@ typedef struct
 typedef struct
 {
 	MediaMsgTyp m_MediaMsgTyp;
-	int32_t m_IsSaveAdoToWaveFile;
-	Vstr * m_SrcWaveFileFullPathVstrPt;
-	Vstr * m_RsltWaveFileFullPathVstrPt;
-	size_t m_WaveFileWrBufSzByt;
+	int32_t m_IsSave;
+	Vstr * m_SrcFullPathVstrPt;
+	Vstr * m_RsltFullPathVstrPt;
+	size_t m_WrBufSzByt;
 } MediaMsgAdoInptSetIsSaveAdoToWaveFile;
 typedef struct
 {
@@ -970,9 +970,9 @@ typedef struct
 typedef struct
 {
 	MediaMsgTyp m_MediaMsgTyp;
-	int32_t m_IsSaveAdoToWaveFile;
-	Vstr * m_SrcWaveFileFullPathVstrPt;
-	size_t m_WaveFileWrBufSzByt;
+	int32_t m_IsSave;
+	Vstr * m_SrcFullPathVstrPt;
+	size_t m_WrBufSzByt;
 } MediaMsgAdoOtptSetIsSaveAdoToWaveFile;
 typedef struct
 {
@@ -1079,7 +1079,7 @@ typedef struct
 {
 	MediaMsgTyp m_MediaMsgTyp;
 	Vstr * m_FullPathVstrPt;
-} MediaMsgSaveStngToFile;
+} MediaMsgSaveStsToTxtFile;
 typedef struct
 {
 	MediaMsgTyp m_MediaMsgTyp;
@@ -1123,26 +1123,26 @@ typedef struct
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetAdoInpt
- * 功能说明：媒体处理线程的设置音频输入。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程设置音频输入。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
              SmplRate：[输入]，存放采样频率，单位为赫兹，取值只能为8000、16000、32000、48000。
-			 FrmLenMsec：[输入]，存放帧的长度，单位为毫秒，取值只能为10、20、30。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 FrmLenMsec：[输入]，存放帧长度，单位为毫秒，取值只能为10、20、30。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetAdoInpt p_MediaMsgSetAdoInpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( SmplRate != 8000 ) && ( SmplRate != 16000 ) && ( SmplRate != 32000 ) && ( SmplRate != 48000 ) )
@@ -1152,7 +1152,7 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, 
 	}
 	if( ( FrmLenMsec <= 0 ) || ( FrmLenMsec % 10 != 0 ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧的长度不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧长度不正确。" ) );
 		goto Out;
 	}
 
@@ -1177,25 +1177,25 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc
- * 功能说明：媒体处理线程的音频输入设置是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 IsUseSystemAecNsAgc：[输入]，存放是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置是否使用系统自带声学回音消除器、噪音抑制器和自动增益控制器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 IsUseSystemAecNsAgc：[输入]，存放是否使用系统自带声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUseSystemAecNsAgc, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetIsUseSystemAecNsAgc p_MediaMsgAdoInptSetIsUseSystemAecNsAgc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -1219,24 +1219,24 @@ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseNoAec
- * 功能说明：媒体处理线程的音频输入设置不使用声学回音消除器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置不使用声学回音消除器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseNoAec p_MediaMsgAdoInptSetUseNoAec;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -1259,38 +1259,38 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, Vstr * Err
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexAec
- * 功能说明：媒体处理线程的音频输入设置要使用Speex声学回音消除器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 FilterLenMsec：[输入]，存放滤波器的长度，单位为毫秒。
+ * 功能说明：媒体处理线程音频输入设置要使用Speex声学回音消除器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 FilterLenMsec：[输入]，存放滤波器长度，单位为毫秒。
 			 IsUseRec：[输入]，存放是否使用残余回音消除，为非0表示要使用，为0表示不使用。
-			 EchoMutp：[输入]，存放在残余回音消除时，残余回音的倍数，倍数越大消除越强，取值区间为[0.0,100.0]。
-			 EchoCntu：[输入]，存放在残余回音消除时，残余回音的持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
-			 EchoSupes：[输入]，存放在残余回音消除时，残余回音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
-			 EchoSupesAct：[输入]，存放在残余回音消除时，有近端语音活动时残余回音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
+			 EchoMutp：[输入]，存放在残余回音消除时，残余回音倍数，倍数越大消除越强，取值区间为[0.0,100.0]。
+			 EchoCntu：[输入]，存放在残余回音消除时，残余回音持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
+			 EchoSupes：[输入]，存放在残余回音消除时，残余回音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
+			 EchoSupesAct：[输入]，存放在残余回音消除时，有近端语音活动时残余回音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
 			 IsSaveMemFile：[输入]，存放是否保存内存块到文件，为非0表示要保存，为0表示不保存。
-			 MemFileFullPathVstrPt：[输入]，存放内存块文件完整路径动态字符串的指针。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 MemFileFullPathVstrPt：[输入]，存放内存块文件完整路径动态字符串指针。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, int32_t IsSaveMemFile, const Vstr * MemFileFullPathStrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseSpeexAec p_MediaMsgAdoInptSetUseSpeexAec;
 	p_MediaMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( IsSaveMemFile != 0 ) && ( MemFileFullPathStrPt == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "内存块文件完整路径动态字符串的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "内存块文件完整路径动态字符串指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1329,27 +1329,27 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int32_t
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcAecm
- * 功能说明：媒体处理线程的音频输入设置要使用WebRtc定点版声学回音消除器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用WebRtc定点版声学回音消除器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsUseCNGMode：[输入]，存放是否使用舒适噪音生成模式，为非0表示要使用，为0表示不使用。
 			 EchoMode：[输入]，存放消除模式，消除模式越高消除越强，取值区间为[0,4]。
 			 Delay：[输入]，存放回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUseCNGMode, int32_t EchoMode, int32_t Delay, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseWebRtcAecm p_MediaMsgAdoInptSetUseWebRtcAecm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1375,38 +1375,38 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int32
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcAec
- * 功能说明：媒体处理线程的音频输入设置要使用WebRtc浮点版声学回音消除器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用WebRtc浮点版声学回音消除器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 EchoMode：[输入]，存放消除模式，消除模式越高消除越强，取值区间为[0,2]。
-			 Delay：[输入]，存放回音的延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+			 Delay：[输入]，存放回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 			 IsUseDelayAgstcMode：[输入]，存放是否使用回音延迟不可知模式，为非0表示要使用，为0表示不使用。
 			 IsUseExtdFilterMode：[输入]，存放是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 			 IsUseRefinedFilterAdaptAecMode：[输入]，存放是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
-			 IsUseAdaptAdjDelay：[输入]，存放是否使用自适应调节回音的延迟，为非0表示要使用，为0表示不使用。
+			 IsUseAdaptAdjDelay：[输入]，存放是否使用自适应调节回音延迟，为非0表示要使用，为0表示不使用。
 			 IsSaveMemFile：[输入]，存放是否保存内存块到文件，为非0表示要保存，为0表示不保存。
-			 MemFileFullPathVstrPt：[输入]，存放内存块文件完整路径动态字符串的指针。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 MemFileFullPathVstrPt：[输入]，存放内存块文件完整路径动态字符串指针。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, int32_t IsSaveMemFile, const Vstr * MemFileFullPathStrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseWebRtcAec p_MediaMsgAdoInptSetUseWebRtcAec;
 	p_MediaMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( IsSaveMemFile != 0 ) && ( MemFileFullPathStrPt == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "内存块文件完整路径动态字符串的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "内存块文件完整路径动态字符串指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1445,42 +1445,42 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexWebRtcAec
- * 功能说明：媒体处理线程的音频输入设置要使用SpeexWebRtc三重声学回音消除器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用SpeexWebRtc三重声学回音消除器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 WorkMode：[输入]，存放工作模式，为1表示Speex声学回音消除器+WebRtc定点版声学回音消除器，为2表示WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器，为3表示Speex声学回音消除器+WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器。
-			 SpeexAecFilterLenMsec：[输入]，存放Speex声学回音消除器滤波器的长度，单位为毫秒。
+			 SpeexAecFilterLenMsec：[输入]，存放Speex声学回音消除器滤波器长度，单位为毫秒。
 			 SpeexAecIsUseRec：[输入]，存放Speex声学回音消除器是否使用残余回音消除，为非0表示要使用，为0表示不使用。
-			 SpeexAecEchoMutp：[输入]，存放Speex声学回音消除器在残余回音消除时，残余回音的倍数，倍数越大消除越强，取值区间为[0.0,100.0]。
-			 SpeexAecEchoCntu：[输入]，存放Speex声学回音消除器在残余回音消除时，残余回音的持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
-			 SpeexAecEchoSupes：[输入]，存放Speex声学回音消除器在残余回音消除时，残余回音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
-			 SpeexAecEchoSupesAct：[输入]，存放Speex声学回音消除器在残余回音消除时，有近端语音活动时残余回音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
+			 SpeexAecEchoMutp：[输入]，存放Speex声学回音消除器在残余回音消除时，残余回音倍数，倍数越大消除越强，取值区间为[0.0,100.0]。
+			 SpeexAecEchoCntu：[输入]，存放Speex声学回音消除器在残余回音消除时，残余回音持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
+			 SpeexAecEchoSupes：[输入]，存放Speex声学回音消除器在残余回音消除时，残余回音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
+			 SpeexAecEchoSupesAct：[输入]，存放Speex声学回音消除器在残余回音消除时，有近端语音活动时残余回音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
 			 WebRtcAecmIsUseCNGMode：[输入]，存放WebRtc定点版声学回音消除器是否使用舒适噪音生成模式，为非0表示要使用，为0表示不使用。
-			 WebRtcAecmEchoMode：[输入]，存放WebRtc定点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,4]。
-			 WebRtcAecmDelay：[输入]，存放WebRtc定点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
-			 WebRtcAecEchoMode：[输入]，存放WebRtc浮点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,2]。
-			 WebRtcAecDelay：[输入]，存放WebRtc浮点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+			 WebRtcAecmEchoMode：[输入]，存放WebRtc定点版声学回音消除器消除模式，消除模式越高消除越强，取值区间为[0,4]。
+			 WebRtcAecmDelay：[输入]，存放WebRtc定点版声学回音消除器回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+			 WebRtcAecEchoMode：[输入]，存放WebRtc浮点版声学回音消除器消除模式，消除模式越高消除越强，取值区间为[0,2]。
+			 WebRtcAecDelay：[输入]，存放WebRtc浮点版声学回音消除器回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 			 WebRtcAecIsUseDelayAgstcMode：[输入]，存放WebRtc浮点版声学回音消除器是否使用回音延迟不可知模式，为非0表示要使用，为0表示不使用。
 			 WebRtcAecIsUseExtdFilterMode：[输入]，存放WebRtc浮点版声学回音消除器是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 			 WebRtcAecIsUseRefinedFilterAdaptAecMode：[输入]，存放WebRtc浮点版声学回音消除器是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
-			 WebRtcAecIsUseAdaptAdjDelay：[输入]，存放WebRtc浮点版声学回音消除器是否使用自适应调节回音的延迟，为非0表示要使用，为0表示不使用。
+			 WebRtcAecIsUseAdaptAdjDelay：[输入]，存放WebRtc浮点版声学回音消除器是否使用自适应调节回音延迟，为非0表示要使用，为0表示不使用。
 			 IsUseSameRoomAec：[输入]，存放是否使用同一房间声学回音消除，为非0表示要使用，为0表示不使用。
 			 SameRoomEchoMinDelay：[输入]，存放同一房间回音最小延迟，单位为毫秒，取值区间为[1,2147483647]。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int32_t WorkMode, int32_t SpeexAecFilterLenMsec, int32_t SpeexAecIsUseRec, float SpeexAecEchoMutp, float SpeexAecEchoCntu, int32_t SpeexAecEchoSupes, int32_t SpeexAecEchoSupesAct, int32_t WebRtcAecmIsUseCNGMode, int32_t WebRtcAecmEchoMode, int32_t WebRtcAecmDelay, int32_t WebRtcAecEchoMode, int32_t WebRtcAecDelay, int32_t WebRtcAecIsUseDelayAgstcMode, int32_t WebRtcAecIsUseExtdFilterMode, int32_t WebRtcAecIsUseRefinedFilterAdaptAecMode, int32_t WebRtcAecIsUseAdaptAdjDelay, int32_t IsUseSameRoomAec, int32_t SameRoomEchoMinDelay, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseSpeexWebRtcAec p_MediaMsgAdoInptSetUseSpeexWebRtcAec;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1521,24 +1521,24 @@ int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, i
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseNoNs
- * 功能说明：媒体处理线程的音频输入设置不使用噪音抑制器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置不使用噪音抑制器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseNoNs p_MediaMsgAdoInptSetUseNoNs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -1561,27 +1561,27 @@ int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrI
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexPrpocsNs
- * 功能说明：媒体处理线程的音频输入设置要使用Speex预处理器的噪音抑制。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用Speex预处理器的噪音抑制。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsUseNs：[输入]，存放是否使用噪音抑制，为非0表示要使用，为0表示不使用。
-			 NoiseSupes：[输入]，存放在噪音抑制时，噪音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
+			 NoiseSupes：[输入]，存放在噪音抑制时，噪音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
 			 IsUseDereverb：[输入]，存放是否使用混响音消除，为非0表示要使用，为0表示不使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseSpeexPrpocsNs p_MediaMsgAdoInptSetUseSpeexPrpocsNs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1607,25 +1607,25 @@ int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, in
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcNsx
- * 功能说明：媒体处理线程的音频输入设置要使用WebRtc定点版噪音抑制器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用WebRtc定点版噪音抑制器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
              PolicyMode：[输入]，存放策略模式，策略模式越高抑制越强，取值区间为[0,3]。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int32_t PolicyMode, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseWebRtcNsx p_MediaMsgAdoInptSetUseWebRtcNsx;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -1649,25 +1649,25 @@ int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcNs
- * 功能说明：媒体处理线程的音频输入设置要使用WebRtc浮点版噪音抑制器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用WebRtc浮点版噪音抑制器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
              PolicyMode：[输入]，存放策略模式，策略模式越高抑制越强，取值区间为[0,3]。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int32_t PolicyMode, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseWebRtcNs p_MediaMsgAdoInptSetUseWebRtcNs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1691,24 +1691,24 @@ int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int32_t
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseRNNoise
- * 功能说明：媒体处理线程的音频输入设置要使用RNNoise噪音抑制器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用RNNoise噪音抑制器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseRNNoise p_MediaMsgAdoInptSetUseRNNoise;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1731,33 +1731,33 @@ int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, Vstr * E
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsUseSpeexPrpocs
- * 功能说明：媒体处理线程的音频输入设置是否使用Speex预处理器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置是否使用Speex预处理器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
              IsUseSpeexPrpocs：[输入]，存放是否使用Speex预处理器，为非0表示要使用，为0表示不使用。
              IsUseVad：[输入]，存放是否使用语音活动检测，为非0表示要使用，为0表示不使用。
-			 VadProbStart：[输入]，存放在语音活动检测时，从无语音活动到有语音活动的判断百分比概率，概率越大越难判断为有语音活，取值区间为[0,100]。
-			 VadProbCntu：[输入]，存放在语音活动检测时，从有语音活动到无语音活动的判断百分比概率，概率越大越容易判断为无语音活动，取值区间为[0,100]。
+			 VadProbStart：[输入]，存放在语音活动检测时，从无语音活动到有语音活动判断百分比概率，概率越大越难判断为有语音活，取值区间为[0,100]。
+			 VadProbCntu：[输入]，存放在语音活动检测时，从有语音活动到无语音活动判断百分比概率，概率越大越容易判断为无语音活动，取值区间为[0,100]。
 			 IsUseAgc：[输入]，存放是否使用自动增益控制，为非0表示要使用，为0表示不使用。
-			 AgcLevel：[输入]，存放在自动增益控制时，增益的目标等级，目标等级越大增益越大，取值区间为[1,2147483647]。
-			 AgcIncrement：[输入]，存放在自动增益控制时，每秒最大增益的分贝值，分贝值越大增益越大，取值区间为[0,2147483647]。
-			 AgcDecrement：[输入]，存放在自动增益控制时，每秒最大减益的分贝值，分贝值越小减益越大，取值区间为[-2147483648,0]。
-			 AgcMaxGain：[输入]，存放在自动增益控制时，最大增益的分贝值，分贝值越大增益越大，取值区间为[0,2147483647]。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 AgcLevel：[输入]，存放在自动增益控制时，增益目标等级，目标等级越大增益越大，取值区间为[1,2147483647]。
+			 AgcIncrement：[输入]，存放在自动增益控制时，每秒最大增益分贝值，分贝值越大增益越大，取值区间为[0,2147483647]。
+			 AgcDecrement：[输入]，存放在自动增益控制时，每秒最大减益分贝值，分贝值越小减益越大，取值区间为[-2147483648,0]。
+			 AgcMaxGain：[输入]，存放在自动增益控制时，最大增益分贝值，分贝值越大增益越大，取值区间为[0,2147483647]。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUseSpeexPrpocs, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCntu, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetIsUseSpeexPrpocs p_MediaMsgAdoInptSetIsUseSpeexPrpocs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1789,24 +1789,24 @@ int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, in
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUsePcm
- * 功能说明：媒体处理线程的音频输入设置要使用PCM原始数据。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用PCM原始数据。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUsePcm p_MediaMsgAdoInptSetUsePcm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1829,28 +1829,28 @@ int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrIn
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexEncd
- * 功能说明：媒体处理线程的音频输入设置要使用Speex编码器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用Speex编码器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
              UseCbrOrVbr：[输入]，存放使用固定比特率还是动态比特率进行编码，为0表示要使用固定比特率，为非0表示要使用动态比特率。
              Qualt：[输入]，存放编码质量等级，质量等级越高音质越好、压缩率越低，取值区间为[0,10]。
              Cmplxt：[输入]，存放编码复杂度，复杂度越高压缩率不变、CPU使用率越高、音质越好，取值区间为[0,10]。
-             PlcExptLossRate：[输入]，存放在数据包丢失隐藏时，数据包的预计丢失概率，预计丢失概率越高抗网络抖动越强、压缩率越低，取值区间为[0,100]。
-             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             PlcExptLossRate：[输入]，存放在数据包丢失隐藏时，数据包预计丢失概率，预计丢失概率越高抗网络抖动越强、压缩率越低，取值区间为[0,100]。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int32_t UseCbrOrVbr, int32_t Qualt, int32_t Cmplxt, int32_t PlcExptLossRate, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseSpeexEncd p_MediaMsgAdoInptSetUseSpeexEncd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -1877,24 +1877,24 @@ int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseOpusEncd
- * 功能说明：媒体处理线程的音频输入设置要使用Opus编码器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置要使用Opus编码器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseOpusEncd p_MediaMsgAdoInptSetUseOpusEncd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -1917,37 +1917,37 @@ int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, Vstr * 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd
- * 功能说明：媒体处理线程的音频输入设置是否绘制音频波形到窗口。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 IsSaveAdoToWaveFile：[输入]，存放是否保存音频到Wave文件，非0表示要使用，0表示不使用。
-			 RsltWavfmWndHdl：[输入]，存放结果波形窗口的句柄。
-			 SrcWavfmWndHdl：[输入]，存放原始波形窗口的句柄。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置是否绘制音频波形到窗口。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 IsDrawAdoWavfmToWnd：[输入]，存放是否绘制音频波形到窗口，非0表示要使用，0表示不使用。
+			 RsltWavfmWndHdl：[输入]，存放结果波形窗口句柄。
+			 SrcWavfmWndHdl：[输入]，存放原始波形窗口句柄。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsDrawAdoWavfmToWnd, HWND SrcWavfmWndHdl, HWND RsltWavfmWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetIsDrawAdoWavfmToWnd p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( IsDrawAdoWavfmToWnd != 0 ) && ( SrcWavfmWndHdl == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始波形窗口的句柄不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始波形窗口句柄不正确。" ) );
 		goto Out;
 	}
 	if( ( IsDrawAdoWavfmToWnd != 0 ) && ( RsltWavfmWndHdl == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "结果波形窗口的句柄不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "结果波形窗口句柄不正确。" ) );
 		goto Out;
 	}
 	
@@ -1982,61 +1982,61 @@ int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile
- * 功能说明：媒体处理线程的音频输入设置是否保存音频到Wave文件。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 IsSaveAdoToWaveFile：[输入]，存放是否保存音频到Wave文件，非0表示要使用，0表示不使用。
-			 SrcWaveFileFullPathVstrPt：[输入]，存放原始Wave文件完整路径动态字符串的指针。
-			 RsltWaveFileFullPathVstrPt：[输入]，存放结果Wave文件完整路径动态字符串的指针。
-			 WaveFileWrBufSzByt：[输入]，存放Wave文件写入缓冲区的大小，单位为字节。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置是否保存音频到Wave文件。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 IsSave：[输入]，存放是否保存，非0表示要保存，0表示不保存。
+			 SrcFullPathVstrPt：[输入]，存放原始完整路径动态字符串指针。
+			 RsltFullPathVstrPt：[输入]，存放结果完整路径动态字符串指针。
+			 WrBufSzByt：[输入]，存放写入缓冲区大小，单位为字节。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int32_t IsSaveAdoToWaveFile, const Vstr * SrcWaveFileFullPathVstrPt, const Vstr * RsltWaveFileFullPathVstrPt, size_t WaveFileWrBufSzByt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int32_t IsSave, const Vstr * SrcFullPathVstrPt, const Vstr * RsltFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetIsSaveAdoToWaveFile p_MediaMsgAdoInptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt = NULL;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltWaveFileFullPathVstrPt = NULL;
+	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
+	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
-	if( ( IsSaveAdoToWaveFile != 0 ) && ( SrcWaveFileFullPathVstrPt == NULL ) )
+	if( ( IsSave != 0 ) && ( SrcFullPathVstrPt == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始Wave文件的完整路径动态字符串不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始完整路径动态字符串不正确。" ) );
 		goto Out;
 	}
-	if( ( IsSaveAdoToWaveFile != 0 ) && ( RsltWaveFileFullPathVstrPt == NULL ) )
+	if( ( IsSave != 0 ) && ( RsltFullPathVstrPt == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "结果Wave文件的完整路径动态字符串不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "结果完整路径动态字符串不正确。" ) );
 		goto Out;
 	}
 	
 	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_IsSaveAdoToWaveFile = IsSaveAdoToWaveFile;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt = NULL;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltWaveFileFullPathVstrPt = NULL;
-	if( IsSaveAdoToWaveFile != 0 )
+	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_IsSave = IsSave;
+	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
+	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt = NULL;
+	if( IsSave != 0 )
 	{
-		if( VstrInit( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt, Utf8, , SrcWaveFileFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt, Utf8, , SrcFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置原始Wave文件完整路径动态字符串失败。" ) );
 			goto Out;
 		}
-		if( VstrInit( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltWaveFileFullPathVstrPt, Utf8, , RsltWaveFileFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt, Utf8, , RsltFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置结果Wave文件完整路径动态字符串失败。" ) );
 			goto Out;
 		}
 	}
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_WaveFileWrBufSzByt = WaveFileWrBufSzByt;
+	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_WrBufSzByt = WrBufSzByt;
 	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
@@ -2048,8 +2048,8 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt );
-		if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltWaveFileFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltWaveFileFullPathVstrPt );
+		if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt );
+		if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt );
 	}
 
 	return p_Rslt;
@@ -2057,25 +2057,25 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseDvc
- * 功能说明：媒体处理线程的音频输入设置使用的设备。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ID：[输入]，存放标识符，取值范围为从1到音频输入设备的总数，为0表示使用默认设备。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输入设置使用的设备。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ID：[输入]，存放标识符，取值范围为从1到音频输入设备总数，为0表示使用默认设备。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetUseDvc p_MediaMsgAdoInptSetUseDvc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -2099,25 +2099,25 @@ int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vst
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsMute
- * 功能说明：媒体处理线程的音频输入设置是否静音。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输入设置是否静音。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsMute：[输入]，存放是否静音，为0表示有声音，为非0表示静音。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMute, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoInptSetIsMute p_MediaMsgAdoInptSetIsMute;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2141,26 +2141,26 @@ int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMu
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetAdoOtpt
- * 功能说明：媒体处理线程的设置音频输出。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程设置音频输出。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 SmplRate：[输入]，存放采样频率，单位为赫兹，取值只能为8000、16000、32000、48000。
-			 FrmLenMsec：[输入]，存放帧的长度，单位为毫秒，取值只能为10、20、30。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 FrmLenMsec：[输入]，存放帧长度，单位为毫秒，取值只能为10、20、30。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetAdoOtpt p_MediaMsgSetAdoOtpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( SmplRate != 8000 ) && ( SmplRate != 16000 ) && ( SmplRate != 32000 ) && ( SmplRate != 48000 ) )
@@ -2170,7 +2170,7 @@ int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, 
 	}
 	if( ( FrmLenMsec <= 0 ) || ( FrmLenMsec % 10 != 0 ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧的长度不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧长度不正确。" ) );
 		goto Out;
 	}
 	
@@ -2195,25 +2195,25 @@ int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t SmplRate, 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptAddStrm
- * 功能说明：媒体处理线程的音频输出添加流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输出添加流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptAddStrm p_MediaMsgAdoOtptAddStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2237,25 +2237,25 @@ int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmId
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptDelStrm
- * 功能说明：媒体处理线程的音频输出删除流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输出删除流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptDelStrm p_MediaMsgAdoOtptDelStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2279,25 +2279,25 @@ int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmId
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmUsePcm
- * 功能说明：媒体处理线程的音频输出设置流要使用PCM原始数据。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输出设置流要使用PCM原始数据。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetStrmUsePcm p_MediaMsgAdoOtptSetStrmUsePcm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2321,26 +2321,26 @@ int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int32_t 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmUseSpeexDecd
- * 功能说明：媒体处理线程的音频输出设置流要使用Speex解码器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
+ * 功能说明：媒体处理线程音频输出设置流要使用Speex解码器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
              IsUsePrcplEnhsmt：[输入]，存放是否使用知觉增强，为非0表示要使用，为0表示不使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmIdx, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetStrmUseSpeexDecd p_MediaMsgAdoOtptSetStrmUseSpeexDecd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2365,25 +2365,25 @@ int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, in
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmUseOpusDecd
- * 功能说明：媒体处理线程的音频输出设置流要使用Opus解码器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输出设置流要使用Opus解码器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetStrmUseOpusDecd p_MediaMsgAdoOtptSetStrmUseOpusDecd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2407,26 +2407,26 @@ int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmIsUse
- * 功能说明：媒体处理线程的音频输出设置流是否要使用。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
+ * 功能说明：媒体处理线程音频输出设置流是否要使用。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
 			 IsUse：[输入]，存放是否使用流，为0表示不使用，为非0表示要使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int32_t StrmIdx, int32_t IsUse, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetStrmIsUse p_MediaMsgAdoOtptSetStrmIsUse;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2451,31 +2451,31 @@ int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int32_t S
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd
- * 功能说明：媒体处理线程的音频输出设置是否绘制音频波形到窗口。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输出设置是否绘制音频波形到窗口。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsDrawAdoWavfmToWnd：[输入]，存放是否绘制音频波形到窗口，非0表示要绘制，0表示不绘制。
-			 SrcWavfmWndHdl：[输入]，存放原始波形窗口的句柄。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 SrcWavfmWndHdl：[输入]，存放原始波形窗口句柄。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsDrawAdoWavfmToWnd, HWND SrcWavfmWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( IsDrawAdoWavfmToWnd != 0 ) && ( SrcWavfmWndHdl == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始波形窗口的句柄不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始波形窗口句柄不正确。" ) );
 		goto Out;
 	}
 	
@@ -2500,48 +2500,48 @@ int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile
- * 功能说明：媒体处理线程的音频输出设置是否保存音频到Wave文件。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 IsSaveAdoToWaveFile：[输入]，存放是否保存音频到Wave文件，非0表示要使用，0表示不使用。
-			 SrcWaveFileFullPathVstrPt：[输入]，存放原始Wave文件完整路径动态字符串的指针。
-			 WaveFileWrBufSzByt：[输入]，存放Wave文件写入缓冲区的大小，单位为字节。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输出设置是否保存音频到Wave文件。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 IsSave：[输入]，存放是否保存音频到Wave文件，非0表示要使用，0表示不使用。
+			 SrcFullPathVstrPt：[输入]，存放原始Wave文件完整路径动态字符串指针。
+			 WaveFileWrBufSzByt：[输入]，存放Wave文件写入缓冲区大小，单位为字节。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int32_t IsSaveAdoToWaveFile, const Vstr * SrcWaveFileFullPathVstrPt, size_t WaveFileWrBufSzByt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int32_t IsSave, const Vstr * SrcFullPathVstrPt, size_t WaveFileWrBufSzByt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetIsSaveAdoToWaveFile p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt = NULL;
+	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
-	if( ( IsSaveAdoToWaveFile != 0 ) && ( SrcWaveFileFullPathVstrPt == NULL ) )
+	if( ( IsSave != 0 ) && ( SrcFullPathVstrPt == NULL ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始Wave文件的完整路径动态字符串不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始Wave文件完整路径动态字符串不正确。" ) );
 		goto Out;
 	}
 	
 	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_MediaMsgTyp = MediaMsgTypAdoOtptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_IsSaveAdoToWaveFile = IsSaveAdoToWaveFile;
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt = NULL;
-	if( IsSaveAdoToWaveFile != 0 )
+	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_IsSave = IsSave;
+	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
+	if( IsSave != 0 )
 	{
-		if( VstrInit( &p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt, Utf8, , SrcWaveFileFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt, Utf8, , SrcFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置原始Wave文件完整路径动态字符串失败。" ) );
 			goto Out;
 		}
 	}
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_WaveFileWrBufSzByt = WaveFileWrBufSzByt;
+	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_WrBufSzByt = WaveFileWrBufSzByt;
 	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
@@ -2553,32 +2553,32 @@ int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcWaveFileFullPathVstrPt );
+		if( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt );
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetUseDvc
- * 功能说明：媒体处理线程的音频输出设置使用的设备。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ID：[输入]，存放标识符，取值范围为从1到音频输出设备的总数，为0表示使用默认设备。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程音频输出设置使用的设备。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ID：[输入]，存放标识符，取值范围为从1到音频输出设备总数，为0表示使用默认设备。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetUseDvc p_MediaMsgAdoOtptSetUseDvc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2602,25 +2602,25 @@ int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vst
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetIsMute
- * 功能说明：媒体处理线程的音频输出设置是否静音。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程音频输出设置是否静音。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsMute：[输入]，存放是否静音，为0表示有声音，为非0表示静音。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMute, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAdoOtptSetIsMute p_MediaMsgAdoOtptSetIsMute;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2644,28 +2644,28 @@ int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMu
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetVdoInpt
- * 功能说明：媒体处理线程的设置视频输入。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程设置视频输入。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 MaxSmplRate：[输入]，存放最大采样频率，取值范围为[1,60]，实际帧率以视频输入设备支持的为准。
-			 FrmWidth：[输入]，存放帧的宽度，单位为像素。
-			 FrmHeight：[输入]，存放帧的高度，单位为像素。
-			 PrvwWndHdl：[输入]，存放预览窗口的句柄，可以为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 FrmWidth：[输入]，存放帧宽度，单位为像素，只能为偶数。
+			 FrmHeight：[输入]，存放帧高度，单位为像素，只能为偶数。
+			 PrvwWndHdl：[输入]，存放预览窗口句柄，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t MaxSmplRate, int32_t FrmWidth, int32_t FrmHeight, HWND PrvwWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoInpt p_MediaMsgSetVdoInpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( MaxSmplRate < 1 ) || ( MaxSmplRate > 60 ) )
@@ -2675,12 +2675,12 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t MaxSmplRat
 	}
 	if( ( FrmWidth <= 0 ) || ( ( FrmWidth & 1 ) != 0 ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧的宽度不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧宽度不正确。" ) );
 		goto Out;
 	}
 	if( ( FrmHeight <= 0 ) || ( ( FrmHeight & 1 ) != 0 ) )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧的高度不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧高度不正确。" ) );
 		goto Out;
 	}
 	
@@ -2707,24 +2707,24 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int32_t MaxSmplRat
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetUseYu12
- * 功能说明：媒体处理线程的视频输入设置要使用Yu12原始数据。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程视频输入设置要使用Yu12原始数据。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoInptUseYu12 p_MediaMsgSetVdoInptUseYu12;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2747,29 +2747,29 @@ int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrI
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetUseOpenH264Encd
- * 功能说明：媒体处理线程的视频输入设置要使用OpenH264编码器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程视频输入设置要使用OpenH264编码器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
              VdoType：[输入]，存放视频类型，为0表示实时摄像头视频，为1表示实时屏幕内容视频，为2表示非实时摄像头视频，为3表示非实时屏幕内容视频，为4表示其他视频。
              EncdBitrate：[输入]，存放编码后比特率，单位为bps。
              BitrateCtrlMode：[输入]，存放比特率控制模式，为0表示质量优先模式，为1表示比特率优先模式，为2表示缓冲区优先模式，为3表示时间戳优先模式。
              IDRFrmIntvl：[输入]，存放IDR帧间隔帧数，单位为个，为0表示仅第一帧为IDR帧，为大于0表示每隔这么帧就至少有一个IDR帧。
              Cmplxt：[输入]，存放复杂度，复杂度越高压缩率不变、CPU使用率越高、画质越好，取值区间为[0,2]。
-             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t IDRFrmIntvl, int32_t Cmplxt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoInptUseOpenH264Encd p_MediaMsgSetVdoInptUseOpenH264Encd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2797,25 +2797,25 @@ int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetUseDvc
- * 功能说明：媒体处理线程的视频输入设置使用的设备。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 ID：[输入]，存放标识符，取值范围为从0到视频输入设备的总数减一。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程视频输入设置使用的设备。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 ID：[输入]，存放标识符，取值范围为从0到视频输入设备总数减一。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoInptUseDvc p_MediaMsgSetVdoInptUseDvc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2839,25 +2839,25 @@ int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT ID, Vst
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetIsBlack
- * 功能说明：媒体处理线程的视频输入设置是否黑屏。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程视频输入设置是否黑屏。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsBlack：[输入]，存放是否黑屏，为0表示有图像，为非0表示黑屏。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlack, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoInptIsBlack p_MediaMsgSetVdoInptIsBlack;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2881,25 +2881,25 @@ int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlack
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptAddStrm
- * 功能说明：媒体处理线程的视频输出添加流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程视频输出添加流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgAddVdoOtptStrm p_MediaMsgAddVdoOtptStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2923,25 +2923,25 @@ int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmI
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptDelStrm
- * 功能说明：媒体处理线程的视频输出删除流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程视频输出删除流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgDelVdoOtptStrm p_MediaMsgDelVdoOtptStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -2965,26 +2965,26 @@ int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmI
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrm
- * 功能说明：媒体处理线程的视频输出设置流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 DspyWndHdl：[输入]，存放显示窗口的句柄，可以为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程视频输出设置流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 DspyWndHdl：[输入]，存放显示窗口句柄，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmIdx, HWND DspyWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoOtptStrm p_MediaMsgSetVdoOtptStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -3009,25 +3009,25 @@ int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmI
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmUseYu12
- * 功能说明：媒体处理线程的视频输出设置流要使用Yu12原始数据。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程视频输出设置流要使用Yu12原始数据。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoOtptStrmUseYu12 p_MediaMsgSetVdoOtptStrmUseYu12;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -3051,26 +3051,26 @@ int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, uint32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd
- * 功能说明：媒体处理线程的视频输出设置流要使用OpenH264解码器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
-             DecdThrdNum：[输入]，存放解码线程数，单位为个，为0表示直接在调用线程解码，为1或2或3表示解码子线程的数量。
-             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 功能说明：媒体处理线程视频输出设置流要使用OpenH264解码器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
+             DecdThrdNum：[输入]，存放解码子线程数量，单位为个，为0表示直接在调用线程解码，为1或2或3表示解码子线程数量。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmIdx, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoOtptStrmUseOpenH264Decd p_MediaMsgSetVdoOtptStrmUseOpenH264Decd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -3095,26 +3095,26 @@ int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmIsBlack
- * 功能说明：媒体处理线程的视频输出设置流是否黑屏。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
+ * 功能说明：媒体处理线程视频输出设置流是否黑屏。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
 			 IsBlack：[输入]，存放是否黑屏，为0表示有图像，为非0表示黑屏。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmIdx, int32_t IsBlack, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoOtptStrmIsBlack p_MediaMsgSetVdoOtptStrmIsBlack;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -3139,26 +3139,26 @@ int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, uint32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmIsUse
- * 功能说明：媒体处理线程的视频输出设置流是否使用。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-             StrmIdx：[输入]，存放流的索引。
+ * 功能说明：媒体处理线程视频输出设置流是否使用。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+             StrmIdx：[输入]，存放流索引。
 			 IsUse：[输入]，存放是否使用，为0表示不使用，为非0表示要使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, uint32_t StrmIdx, int32_t IsUse, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetVdoOtptStrmIsUse p_MediaMsgSetVdoOtptStrmIsUse;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -3183,28 +3183,28 @@ int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, uint32_t 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsUseAdoVdoInptOtpt
- * 功能说明：媒体处理线程的设置音视频输入输出是否使用。
- * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程设置音视频输入输出是否使用。
+ * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程指针，不能为NULL。
 			 IsUseAdoInpt：[输入]，存放音频输入是否使用，为0表示不使用，为非0表示要使用。
 			 IsUseAdoOtpt：[输入]，存放音频输出是否使用，为0表示不使用，为非0表示要使用。
 			 IsUseVdoInpt：[输入]，存放视频输入是否使用，为0表示不使用，为非0表示要使用。
 			 IsUseVdoOtpt：[输入]，存放视频输出是否使用，为0表示不使用，为非0表示要使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUseAdoInpt, int32_t IsUseAdoOtpt, int32_t IsUseVdoInpt, int32_t IsUseVdoOtpt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetIsUseAdoVdoInptOtpt p_MediaMsgSetIsUseAdoVdoInptOtpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -3231,26 +3231,26 @@ int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsPrintLogShowToast
- * 功能说明：媒体处理线程的设置是否打印Log日志、显示Toast。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程设置是否打印Log日志、显示Toast。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsPrintLog：[输入]，存放是否打印Log日志，为非0表示要打印，为0表示不打印。
 			 IsShowToast：[输入]，存放是否显示Toast，为非0表示要显示，为0表示不显示。
-			 ShowToastWndHdl：[输入]，存放显示Toast窗口的句柄，为NULL表示桌面窗口。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ShowToastWndHdl：[输入]，存放显示Toast窗口句柄，为NULL表示桌面窗口。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdSetIsPrintLogShowToast( MediaPocsThrd * MediaPocsThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -3270,27 +3270,27 @@ int MediaPocsThrdSetIsPrintLogShowToast( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsUsePrvntSysSleep
- * 功能说明：媒体处理线程的设置是否使用阻止系统睡眠。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：媒体处理线程设置是否使用阻止系统睡眠。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsPrintLog：[输入]，存放是否打印Log日志，为非0表示要打印，为0表示不打印。
 			 IsShowToast：[输入]，存放是否显示Toast，为非0表示要显示，为0表示不显示。
-			 ShowToastWndHdl：[输入]，存放显示Toast窗口的句柄，为NULL表示桌面窗口。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ShowToastWndHdl：[输入]，存放显示Toast窗口句柄，为NULL表示桌面窗口。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetIsUsePrvntSysSleep p_MediaMsgSetIsUsePrvntSysSleep;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 
@@ -3314,34 +3314,34 @@ int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int32_t
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile
- * 功能说明：媒体处理线程的设置是否保存音视频输入输出到Avi文件。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 FileFullPathVstrPt：[输入]，存放完整路径动态字符串的指针。
-			 WrBufSzByt：[输入]，存放写入缓冲区的大小，单位为字节。
+ * 功能说明：媒体处理线程设置是否保存音视频输入输出到Avi文件。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 FullPathVstrPt：[输入]，存放完整路径动态字符串指针。
+			 WrBufSzByt：[输入]，存放写入缓冲区大小，单位为字节。
 			 IsSaveAdoInpt：[输入]，存放是否保存音频输入，为非0表示要保存，为0表示不保存。
 			 IsSaveAdoOtpt：[输入]，存放是否保存音频输出，为非0表示要保存，为0表示不保存。
 			 IsSaveVdoInpt：[输入]，存放是否保存视频输入，为非0表示要保存，为0表示不保存。
 			 IsSaveVdoOtpt：[输入]，存放是否保存视频输出，为非0表示要保存，为0表示不保存。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrdPt, const Vstr * FileFullPathVstrPt, size_t WrBufSzByt, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrdPt, const Vstr * FullPathVstrPt, size_t WrBufSzByt, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgSetIsSaveAdoVdoInptOtptToAviFile p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile;
 	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
-	if( ( ( IsSaveAdoInpt != 0 ) || ( IsSaveAdoOtpt != 0 ) || ( IsSaveVdoInpt != 0 ) || ( IsSaveVdoOtpt != 0 ) ) && ( FileFullPathVstrPt == NULL ) )
+	if( ( ( IsSaveAdoInpt != 0 ) || ( IsSaveAdoOtpt != 0 ) || ( IsSaveVdoInpt != 0 ) || ( IsSaveVdoOtpt != 0 ) ) && ( FullPathVstrPt == NULL ) )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "完整路径动态字符串不正确。" ) );
 		goto Out;
@@ -3351,7 +3351,7 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt = NULL;
 	if( ( IsSaveAdoInpt != 0 ) || ( IsSaveAdoOtpt != 0 ) || ( IsSaveVdoInpt != 0 ) || ( IsSaveVdoOtpt != 0 ) )
 	{
-		if( VstrInit( &p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt, Utf8, , FileFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt, Utf8, , FullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置完整路径动态字符串失败。" ) );
 			goto Out;
@@ -3379,43 +3379,43 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：MediaPocsThrdSaveStngToFile
- * 功能说明：媒体处理线程的保存设置到文件。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 FullPathVstrPt：[输入]，存放完整路径动态字符串的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 函数名称：MediaPocsThrdSaveStsToTxtFile
+ * 功能说明：媒体处理线程保存状态到文件。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 FullPathVstrPt：[输入]，存放完整路径动态字符串指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSaveStngToFile( MediaPocsThrd * MediaPocsThrdPt, const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * MediaPocsThrdPt, const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSaveStngToFile p_MediaMsgSaveStngToFile;
-	p_MediaMsgSaveStngToFile.m_FullPathVstrPt = NULL;
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	MediaMsgSaveStsToTxtFile p_MediaMsgSaveStsToTxtFile;
+	p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( FullPathVstrPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "完整路径动态字符串的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "完整路径动态字符串指针不正确。" ) );
 		goto Out;
 	}
 	
-	p_MediaMsgSaveStngToFile.m_MediaMsgTyp = MediaMsgTypSaveStngToFile;
-	p_MediaMsgSaveStngToFile.m_FullPathVstrPt = NULL;
-	if( VstrInit( &p_MediaMsgSaveStngToFile.m_FullPathVstrPt, Utf8, , FullPathVstrPt ) != 0 )
+	p_MediaMsgSaveStsToTxtFile.m_MediaMsgTyp = MediaMsgTypSaveStsToTxtFile;
+	p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt = NULL;
+	if( VstrInit( &p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt, Utf8, , FullPathVstrPt ) != 0 )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置完整路径动态字符串失败。" ) );
 		goto Out;
 	}
-	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSaveStngToFile, sizeof( p_MediaMsgSaveStngToFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
+	if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( &p_MediaMsgSaveStsToTxtFile, sizeof( p_MediaMsgSaveStsToTxtFile ), NULL, 1, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
 		goto Out;
@@ -3426,21 +3426,21 @@ int MediaPocsThrdSaveStngToFile( MediaPocsThrd * MediaPocsThrdPt, const Vstr * F
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgSaveStngToFile.m_FullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgSaveStngToFile.m_FullPathVstrPt );
+		if( p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt );
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdPrvntSysSleepInitOrDstoy
- * 功能说明：初始化或销毁媒体处理线程的阻止系统睡眠。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：初始化或销毁媒体处理线程阻止系统睡眠。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
 			 IsUsePrvntSysSleep：[输入]，存放是否使用阻止系统睡眠，为非0表示要使用，为0表示不使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrd * MediaPocsThrdPt, int32_t IsInitPrvntSysSleep )
@@ -3460,22 +3460,22 @@ void MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrd * MediaPocsThrdPt, int
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * 函数名称：MediaPocsThrdStart
 * 功能说明：启动媒体处理线程。
-* 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+* 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
 * 返回说明：0：成功。
 			非0：失败。
 * 线程安全：是 或 否
-* 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+* 调用样例：填写调用此函数样例，并解释函数参数和返回值。
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt != NULL )
@@ -3504,25 +3504,25 @@ int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * 函数名称：MediaPocsThrdRqirExit
 * 功能说明：请求媒体处理线程退出。
-* 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+* 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
             ExitFlag：[输入]，存放退出标记，为0表示保持运行，为1表示请求退出，为2表示请求重启，为3表示请求重启但不执行用户定义的UserInit初始化函数和UserDstoy销毁函数。
 			IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示阻塞。
-			ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+			ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
 * 返回说明：0：成功。
 			非0：失败。
 * 线程安全：是 或 否
-* 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+* 调用样例：填写调用此函数样例，并解释函数参数和返回值。
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgRqirExit p_MediaMsgRqirExit;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	if( ( ExitFlag < 0 ) || ( ExitFlag > 3 ) )
@@ -3562,24 +3562,24 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int Is
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSendUserMsg
  * 功能说明：发送用户消息到媒体处理线程。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 MsgArgPt：[输入]，存放消息参数的指针。如果没有消息参数，则本参数为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+			 MsgArgPt：[输入]，存放消息参数指针。如果没有消息参数，则本参数为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, void * MsgArgPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaMsgUserMsg p_MediaMsgUserMsg;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ) );
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程指针不正确。" ) );
 		goto Out;
 	}
 	
@@ -3603,17 +3603,17 @@ int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, void * MsgArgPt, 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptAviFileWriterInit
- * 功能说明：初始化媒体处理线程的音视频输入输出Avi文件写入器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：初始化媒体处理线程音视频输入输出Avi文件写入器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt != 0 ) || ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt != 0 ) || ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt != 0 ) || ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt != 0 ) )
 	{
@@ -3621,16 +3621,16 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 		{
 			if( AviFileWriterInit( &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt, 5, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件 %vs 的Avi文件写入器成功。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件 %vs Avi文件写入器成功。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
 			}
 			else
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件 %vs 的Avi文件写入器失败。原因：%vs" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件 %vs Avi文件写入器失败。原因：%vs" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
 			}
 			uint64_t p_AdoVdoStartTimeStamp = FuncGetTickAsMsec();
 			AviFileWriterSetStartTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, p_AdoVdoStartTimeStamp, NULL );
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件时间线的起始时间戳为 %uz64d 。" ), p_AdoVdoStartTimeStamp );
+			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件时间线起始时间戳为 %uz64d 。" ), p_AdoVdoStartTimeStamp );
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx = UINT32_MAX;
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx = UINT32_MAX;
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx = UINT32_MAX;
@@ -3638,12 +3638,12 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoOtptEncdSrcStrmIdxMapPt = new std::map< uint32_t, uint32_t >;
 			if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoOtptEncdSrcStrmIdxMapPt == NULL )
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件视频输出已编码格式原始流的索引映射失败。原因：内存不足。" ) );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件视频输出已编码格式原始流索引映射失败。原因：内存不足。" ) );
 				goto Out;
 			}
 		}
 
-		if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt != 0 ) && ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset != 0 ) ) //如果要保存音频输入，且音频输入流时间戳要重置。
+		if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt != 0 ) //如果要保存音频输入。
 		{
 			if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx == UINT32_MAX )
 			{
@@ -3666,15 +3666,9 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 					goto Out;
 				}
 			}
-
-			AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec, NULL );
-			AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec, NULL );
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件音频输入Pcm格式原始结果流的当前时间戳为 %uz64d 。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec );
-
-			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 0; //设置音频输入流时间戳不重置。
 		}
 
-		if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt != 0 ) && ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset != 0 ) ) //如果要保存音频输出，且音频输出流时间戳要重置。
+		if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt != 0 ) //如果要保存音频输出。
 		{
 			if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx == UINT32_MAX )
 			{
@@ -3688,11 +3682,6 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 					goto Out;
 				}
 			}
-
-			AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec, NULL );
-			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件音频输出Pcm格式原始流的当前时间戳为 %uz64d 。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec );
-
-			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 0; //设置音频输出流时间戳不重置。
 		}
 
 		if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt != 0 ) && ( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) && ( MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd != 0 ) ) //如果要保存视频输入，且已初始化视频输入，且视频输入不使用Yu12原始数据。
@@ -3724,12 +3713,12 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy
- * 功能说明：销毁媒体处理线程的音视频输入输出Avi文件写入器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：销毁媒体处理线程音视频输入输出Avi文件写入器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：0：成功。
              非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrd * MediaPocsThrdPt )
@@ -3750,7 +3739,6 @@ void MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrd * MediaPocsThr
 		MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 0;
 		MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx = UINT32_MAX;
 		MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 0;
-		MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec = 0;
 		MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoInptEncdRsltStrmIdx = UINT32_MAX;
 		if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoOtptEncdSrcStrmIdxMapPt != NULL )
 		{
@@ -3762,19 +3750,19 @@ void MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrd * MediaPocsThr
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdTmpVarInit
- * 功能说明：初始化媒体处理线程的临时变量。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：初始化媒体处理线程临时变量。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
-	MediaPocsThrdPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程的临时变量。
+	MediaPocsThrdPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程临时变量。
 	if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 	{
 		MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt = NULL;
@@ -3788,7 +3776,7 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 			MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt = ( int16_t * )malloc( MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
 			if( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt == NULL )
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建音频输入Pcm格式结果帧的内存块失败。" ) );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建音频输入Pcm格式结果帧内存块失败。" ) );
 				goto Out;
 			}
 		}
@@ -3802,12 +3790,12 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 			MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt = ( int16_t * )malloc( MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
 			if( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt == NULL )
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建音频输入Pcm格式临时帧的内存块失败。" ) );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建音频输入Pcm格式临时帧内存块失败。" ) );
 				goto Out;
 			}
 		}
 		MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt = NULL;
-		MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmVoiceActSts = 1; //设置音频输入Pcm格式结果帧的语音活动状态为1，为了让在不使用语音活动检测的情况下永远都是有语音活动。
+		MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmVoiceActSts = 1; //设置音频输入Pcm格式结果帧语音活动状态为1，为了让在不使用语音活动检测情况下永远都是有语音活动。
 		if( MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd != 0 ) //如果音频输入不使用PCM原始数据。
 		{
 			if( ( MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt != NULL ) && ( _msize( MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt ) < MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ) )
@@ -3820,12 +3808,12 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 				MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt = ( uint8_t * )malloc( MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
 				if( MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt == NULL )
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建音频输入已编码格式结果帧的内存块失败。" ) );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：创建音频输入已编码格式结果帧内存块失败。" ) );
 					goto Out;
 				}
 			}
 			MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmLenByt = 0;
-			MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans = 1; //设置音频输入已编码格式结果帧是否需要传输为1，为了让在不使用非连续传输的情况下永远都是需要传输。
+			MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans = 1; //设置音频输入已编码格式结果帧是否需要传输为1，为了让在不使用非连续传输情况下永远都是需要传输。
 		}
 		else //如果音频输入要使用PCM原始数据。
 		{
@@ -3871,7 +3859,7 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 	}
 	MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt = NULL;
 	MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt = NULL;
-	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化媒体处理线程的临时变量成功。" ) );
+	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化媒体处理线程临时变量成功。" ) );
 
 	p_Rslt = 0; //设置本函数执行成功。
 
@@ -3885,19 +3873,19 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdTmpVarDstoy
- * 功能说明：销毁媒体处理线程的临时变量。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 功能说明：销毁媒体处理线程临时变量。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void MediaPocsThrdTmpVarDstoy( MediaPocsThrd * MediaPocsThrdPt )
 {
 	if( MediaPocsThrdPt->m_Thrd.m_IsInitThrdTmpVar != 0 )
 	{
-		MediaPocsThrdPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程的临时变量。
+		MediaPocsThrdPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程临时变量。
 		if( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt != NULL )
 		{
 			free( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt );
@@ -3928,23 +3916,23 @@ void MediaPocsThrdTmpVarDstoy( MediaPocsThrd * MediaPocsThrdPt )
 		MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans = 0;
 		MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt = NULL;
 		MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt = NULL;
-		if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：销毁媒体处理线程的临时变量成功。" ) );
+		if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：销毁媒体处理线程临时变量成功。" ) );
 	}
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptInit
  * 功能说明：初始化音视频输入输出。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	if( MediaPocsThrdPt->m_AdoOtpt.m_IsUse != 0 ) //如果要使用音频输出。在初始化音频输入前初始化音频输出，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
 	{
@@ -3953,7 +3941,6 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 			if( AdoOtptInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
 			MediaPocsThrdPt->m_AdoOtpt.m_IsInit = 1; //设置已初始化音频输出。
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
-			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec = FuncGetTickAsMsec(); //设置音视频输入输出Avi文件音频输入输出流的当前时间戳。在这里设置是为了防止音视频输入输出初始化时堆积大量帧，导致音视频输入输出Avi文件不同步。
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsUse == 0 ) //如果不使用音频输入。
 			{
 				MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
@@ -3969,7 +3956,6 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 					AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt ); //销毁并初始化音频输出设备和线程，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
 					if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
 					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
-					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec = FuncGetTickAsMsec(); //设置音视频输入输出Avi文件音频输入输出流的当前时间戳。在这里设置是为了防止音视频输入输出初始化时堆积大量帧，导致音视频输入输出Avi文件不同步。
 				} //如果音频输入已初始化，表示音频输入输出都已初始化，无需再销毁并初始化。
 			}
 		}
@@ -3991,7 +3977,6 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 			if( AdoInptInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out; //在音频输出初始化后再初始化音频输入，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
 			MediaPocsThrdPt->m_AdoInpt.m_IsInit = 1; //设置已初始化音频输入。
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec = FuncGetTickAsMsec(); //设置音视频输入输出Avi文件音频输入输出流的当前时间戳。在这里设置是为了防止音视频输入输出初始化时堆积大量帧，导致音视频输入输出Avi文件不同步。
 			MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
 		}
 		else //如果已初始化音频输入。
@@ -4006,19 +3991,17 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 						AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
 						if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
 						MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-						MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec = FuncGetTickAsMsec(); //设置音视频输入输出Avi文件音频输入输出流的当前时间戳。在这里设置是为了防止音视频输入输出初始化时堆积大量帧，导致音视频输入输出Avi文件不同步。
 					} //如果音频输入线程未开始音频输出线程，就不用管，等一会音频输入线程就会开始音频输出线程。
 				} //如果音频输出线程已开始，表示音频输入输出都已初始化，无需再销毁并初始化。
 			}
 			else //如果不使用音频输出。
 			{
-				if( ( MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_SystemAecNsAgcMediaObjPt != NULL ) ) //如果要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+				if( ( MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_SystemAecNsAgcMediaObjPt != NULL ) ) //如果要使用系统自带声学回音消除器、噪音抑制器和自动增益控制器。
 				{
-					AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt ); //销毁并初始化音频输入设备和线程，因为系统自带的声学回音消除器、噪音抑制器和自动增益控制器没有音频输出无法工作。
+					AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt ); //销毁并初始化音频输入设备和线程，因为系统自带声学回音消除器、噪音抑制器和自动增益控制器没有音频输出无法工作。
 					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
 					if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
 					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptOtptStrmCurTimeStampMsec = FuncGetTickAsMsec(); //设置音视频输入输出Avi文件音频输入输出流的当前时间戳。在这里设置是为了防止音视频输入输出初始化时堆积大量帧，导致音视频输入输出Avi文件不同步。
 				}
 				else
 				{
@@ -4085,11 +4068,11 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptDstoy
  * 功能说明：销毁音视频输入输出。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void MediaPocsThrdAdoVdoInptOtptDstoy( MediaPocsThrd * MediaPocsThrdPt )
@@ -4123,11 +4106,11 @@ void MediaPocsThrdAdoVdoInptOtptDstoy( MediaPocsThrd * MediaPocsThrdPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdRun
  * 功能说明：媒体处理线程主函数。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
@@ -4140,7 +4123,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 	CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
 
-	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：本地代码的指令集名称：%s。" ), ( sizeof( size_t ) == 4 ) ? "x86" : "x64" );
+	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：本地代码指令集名称：%s。" ), ( sizeof( size_t ) == 4 ) ? "x86" : "x64" );
 
 	MediaPocsThrdPt->m_RunFlag = MediaPocsThrd::RunFlagRun; //设置本线程运行标记为正在运行。
 	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：开始准备音视频输入输出帧处理。" ) );
@@ -4150,7 +4133,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 	//媒体处理循环开始。
 	while( true )
 	{
-		//因为IGlobalInterfaceTable::GetInterfaceFromGlobal会向创建此Com对象的单元套间线程发送消息，所以要求创建此Com对象的单元套间线程有消息处理，若没有，则IGlobalInterfaceTable::GetInterfaceFromGlobal会一直阻塞。
+		//因为IGlobalInterfaceTable::GetInterfaceFromGlobal会向创建此Com对象单元套间线程发送消息，所以要求创建此Com对象单元套间线程有消息处理，若没有，则IGlobalInterfaceTable::GetInterfaceFromGlobal会一直阻塞。
 		/*{
 			MSG msg;
 			if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) != 0 )
@@ -4160,8 +4143,8 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 			}
 		}*/
 
-		int p_MediaPocsRslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-		size_t p_MediaMsgCntnrElmTotal; //存放媒体消息容器的元素总数。
+		int p_MediaPocsRslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+		size_t p_MediaMsgCntnrElmTotal; //存放媒体消息容器元素总数。
 		MediaMsg p_MediaMsg;
 
 		{
@@ -4188,9 +4171,14 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 						if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 						{
-							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
+							{
+								if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+								MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
+							}
 							AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
 							if( AdoInptInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
+							MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 							if( MediaPocsThrdTmpVarInit( MediaPocsThrdPt ) != 0 ) goto OutMediaPocs;
 						}
 						break;
@@ -4208,8 +4196,13 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 						if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 						{
-							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
+							{
+								if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+								MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
+							}
 							if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
+							MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 						}
 						break;
 					}
@@ -4487,18 +4480,18 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						MediaMsgAdoInptSetIsSaveAdoToWaveFile * p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt = ( MediaMsgAdoInptSetIsSaveAdoToWaveFile * )&p_MediaMsg;
 						if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
-						MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_IsSaveAdoToWaveFile = p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_IsSaveAdoToWaveFile;
-						if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcWaveFileFullPathVstrPt != NULL )
+						MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_IsSave = p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_IsSave;
+						if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt != NULL )
 						{
-							VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt, p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcWaveFileFullPathVstrPt );
-							VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcWaveFileFullPathVstrPt );
+							VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcFullPathVstrPt, p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
+							VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
 						}
-						if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltWaveFileFullPathVstrPt != NULL )
+						if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt != NULL )
 						{
-							VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltWaveFileFullPathVstrPt, p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltWaveFileFullPathVstrPt );
-							VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltWaveFileFullPathVstrPt );
+							VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltFullPathVstrPt, p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt );
+							VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt );
 						}
-						MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_WaveFileWrBufSzByt = p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_WaveFileWrBufSzByt;
+						MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_WrBufSzByt = p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_WrBufSzByt;
 
 						if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptWaveFileWriterInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
 						break;
@@ -4528,8 +4521,13 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 						if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 						{
-							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+							if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
+							{
+								if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+								MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
+							}
 							if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
+							MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 						}
 						break;
 					}
@@ -4558,10 +4556,12 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 						{
 							if( AdoOtptInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+							MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
 							if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 							{
 								AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
 								if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
+								MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 							}
 							else
 							{
@@ -4618,13 +4618,13 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						MediaMsgAdoOtptSetIsSaveAdoToWaveFile * p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt = ( MediaMsgAdoOtptSetIsSaveAdoToWaveFile * )&p_MediaMsg;
 						if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoOtpt );
 
-						MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_IsSaveAdoToWaveFile = p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_IsSaveAdoToWaveFile;
-						if( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcWaveFileFullPathVstrPt != NULL )
+						MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_IsSave = p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_IsSave;
+						if( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt != NULL )
 						{
-							VstrCpy( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt, p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcWaveFileFullPathVstrPt );
-							VstrDstoy( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcWaveFileFullPathVstrPt );
+							VstrCpy( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcFullPathVstrPt, p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
+							VstrDstoy( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
 						}
-						MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_WaveFileWrBufSzByt = p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_WaveFileWrBufSzByt;
+						MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_WrBufSzByt = p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_WrBufSzByt;
 
 						if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptWaveFileWriterInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
 						break;
@@ -4654,9 +4654,11 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 						{
 							if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto OutMediaPocs;
+							MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
 							if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 							{
 								if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto OutMediaPocs;
+								MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 							}
 							else
 							{
@@ -4799,7 +4801,9 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					case MediaMsgTypSetIsUsePrvntSysSleep:
 					{
 						MediaMsgSetIsUsePrvntSysSleep * p_MediaMsgSetIsUsePrvntSysSleepPt = ( MediaMsgSetIsUsePrvntSysSleep * )&p_MediaMsg;
-						MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrdPt, p_MediaMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep );
+
+						MediaPocsThrdPt->m_IsUsePrvntSysSleep = p_MediaMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep;
+						MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrdPt, MediaPocsThrdPt->m_IsUsePrvntSysSleep );
 						break;
 					}
 					case MediaMsgTypSetIsSaveAdoVdoInptOtptToAviFile:
@@ -4821,214 +4825,214 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) if( MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrdPt ) != 0 ) goto OutMediaPocs;
 						break;
 					}
-					case MediaMsgTypSaveStngToFile:
+					case MediaMsgTypSaveStsToTxtFile:
 					{
-						MediaMsgSaveStngToFile * p_MediaMsgSaveStngToFilePt = ( MediaMsgSaveStngToFile * )&p_MediaMsg;
-						File * p_StngFilePt;
+						MediaMsgSaveStsToTxtFile * p_MediaMsgSaveStsToTxtFilePt = ( MediaMsgSaveStsToTxtFile * )&p_MediaMsg;
+						File * p_StsFilePt;
 
-						if( FileInitByPath( &p_StngFilePt, p_MediaMsgSaveStngToFilePt->m_FullPathVstrPt, NoRd_Wr, Create_AlExist_Clr, 4096, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						if( FileInitByPath( &p_StsFilePt, p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt, NoRd_Wr, Create_AlExist_Clr, 8192, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化设置文件 %vs 失败。原因：%vs" ), p_MediaMsgSaveStngToFilePt->m_FullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
-							VstrDstoy( p_MediaMsgSaveStngToFilePt->m_FullPathVstrPt );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化状态文件 %vs 失败。原因：%vs" ), p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
+							VstrDstoy( p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
 							goto OutMediaPocs;
 						}
 
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_IsPrintLog：%z32d\n" ), MediaPocsThrdPt->m_IsPrintLog );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_IsShowToast：%z32d\n" ), MediaPocsThrdPt->m_IsShowToast );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_ShowToastWndHdl：%#P\n" ), MediaPocsThrdPt->m_ShowToastWndHdl );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_IsUsePrvntSysSleep：%z32d\n" ), MediaPocsThrdPt->m_IsUsePrvntSysSleep );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_FullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsPrintLog：%z32d\n" ), MediaPocsThrdPt->m_IsPrintLog );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsShowToast：%z32d\n" ), MediaPocsThrdPt->m_IsShowToast );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_ShowToastWndHdl：%#P\n" ), MediaPocsThrdPt->m_ShowToastWndHdl );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsUsePrvntSysSleep：%z32d\n" ), MediaPocsThrdPt->m_IsUsePrvntSysSleep );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_FullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUse );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsInit );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SmplRate );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenData );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_FilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_FilterLenMsec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsUseRec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoMutp );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_EchoMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Delay );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_EchoMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Delay );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNsx.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsx.m_PolicyMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNs.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNs.m_PolicyMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseVad：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseVad );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbStart：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbStart );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcLevel：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcLevel );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Qualt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Qualt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Cmplxt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_IsDrawAdoWavfmToWnd：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDrawAdoWavfmToWnd );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_SrcWavfmWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcWavfmWndHdl );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_RsltWavfmWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltWavfmWndHdl );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_IsSaveAdoToWaveFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_IsSaveAdoToWaveFile );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_RsltWaveFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltWaveFileFullPathVstrPt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_WaveFileWrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_WaveFileWrBufSzByt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsMute );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUse );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsInit );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SmplRate );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenData );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_FilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_FilterLenMsec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsUseRec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoMutp );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_EchoMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Delay );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_EchoMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Delay );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNsx.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsx.m_PolicyMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNs.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNs.m_PolicyMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseVad：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseVad );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbStart：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbStart );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcLevel：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcLevel );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Qualt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Qualt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Cmplxt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_IsDrawAdoWavfmToWnd：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDrawAdoWavfmToWnd );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_SrcWavfmWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcWavfmWndHdl );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_RsltWavfmWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltWavfmWndHdl );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_IsSave：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_IsSave );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_SrcFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcFullPathVstrPt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_RsltFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_RsltFullPathVstrPt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFile.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_WrBufSzByt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsMute );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsUse );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsInit );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_SmplRate );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.m_CQueuePt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsUse );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsInit );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_SmplRate );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.m_CQueuePt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						{
-							AdoOtpt::Strm * p_AdoOtptStrmPt; //存放音频输出流的指针。
+							AdoOtpt::Strm * p_AdoOtptStrmPt; //存放音频输出流指针。
 							for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_AdoOtptStrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 							{
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Idx：%z32d\n" ), p_AdoOtptStrmPt->m_Idx );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), p_AdoOtptStrmPt->m_IsUse );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_UseWhatDecd：%z32d\n" ), p_AdoOtptStrmPt->m_UseWhatDecd );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SpeexDecd.m_IsUsePrcplEnhsmt：%z32d\n" ), p_AdoOtptStrmPt->m_SpeexDecd.m_IsUsePrcplEnhsmt );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Idx：%z32d\n" ), p_AdoOtptStrmPt->m_Idx );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), p_AdoOtptStrmPt->m_IsUse );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_UseWhatDecd：%z32d\n" ), p_AdoOtptStrmPt->m_UseWhatDecd );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SpeexDecd.m_IsUsePrcplEnhsmt：%z32d\n" ), p_AdoOtptStrmPt->m_SpeexDecd.m_IsUsePrcplEnhsmt );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 							}
-							FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmUseTotal：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmUseTotal );
-							FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+							FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmUseTotal：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmUseTotal );
+							FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						}
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_IsDrawAdoWavfmToWnd：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDrawAdoWavfmToWnd );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_SrcWavfmWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcWavfmWndHdl );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFile.m_IsSaveAdoToWaveFile：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_IsSaveAdoToWaveFile );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileFullPathVstrPt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFile.m_WaveFileWrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_WaveFileWrBufSzByt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_BufSzUnit：%uz32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_BufSzUnit );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsMute );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_IsDrawAdoWavfmToWnd：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDrawAdoWavfmToWnd );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_SrcWavfmWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcWavfmWndHdl );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFile.m_IsSave：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_IsSave );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFile.m_SrcFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcFullPathVstrPt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFile.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_WrBufSzByt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_BufSzUnit：%uz32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_BufSzUnit );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsMute );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsUse );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsInit );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_MaxSmplRate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmWidth：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmWidth );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmHeight：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmHeight );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Yu12FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_VdoInpt.m_Yu12FrmLenByt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_VdoType：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_VdoType );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_EncdBitrate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_EncdBitrate );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_Cmplxt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_PrvwWndHdl：%#P\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_IsBlack：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_IsBlack );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsUse );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsInit );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_MaxSmplRate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmWidth：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmWidth );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmHeight：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmHeight );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Yu12FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_VdoInpt.m_Yu12FrmLenByt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_VdoType：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_VdoType );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_EncdBitrate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_EncdBitrate );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_Cmplxt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_PrvwWndHdl：%#P\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_IsBlack：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_IsBlack );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsUse );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsInit );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.m_CQueuePt );
-						FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsUse );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsInit );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.m_CQueuePt );
+						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						{
-							VdoOtpt::Strm * p_VdoOtptStrmPt; //存放视频输出流的指针。
+							VdoOtpt::Strm * p_VdoOtptStrmPt; //存放视频输出流指针。
 							for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_VdoOtptStrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 							{
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Idx：%z32d\n" ), p_VdoOtptStrmPt->m_Idx );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_IsUse：%z32d\n" ), p_VdoOtptStrmPt->m_IsUse );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_UseWhatDecd：%z32d\n" ), p_VdoOtptStrmPt->m_UseWhatDecd );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_OpenH264Decd.m_DecdThrdNum：%z32d\n" ), p_VdoOtptStrmPt->m_OpenH264Decd.m_DecdThrdNum );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_DspyWndHdl：%#P\n" ), p_VdoOtptStrmPt->m_Dvc.m_DspyWndHdl );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_IsBlack：%z32d\n" ), p_VdoOtptStrmPt->m_Dvc.m_IsBlack );
-								FileFmtWrite( p_StngFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Idx：%z32d\n" ), p_VdoOtptStrmPt->m_Idx );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_IsUse：%z32d\n" ), p_VdoOtptStrmPt->m_IsUse );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_UseWhatDecd：%z32d\n" ), p_VdoOtptStrmPt->m_UseWhatDecd );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_OpenH264Decd.m_DecdThrdNum：%z32d\n" ), p_VdoOtptStrmPt->m_OpenH264Decd.m_DecdThrdNum );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_DspyWndHdl：%#P\n" ), p_VdoOtptStrmPt->m_Dvc.m_DspyWndHdl );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_IsBlack：%z32d\n" ), p_VdoOtptStrmPt->m_Dvc.m_IsBlack );
+								FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 							}
 						}
 
-						FileDstoy( p_StngFilePt, 1, NULL );
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：保存设置到文件 %vs 成功。" ), p_MediaMsgSaveStngToFilePt->m_FullPathVstrPt );
-						VstrDstoy( p_MediaMsgSaveStngToFilePt->m_FullPathVstrPt );
+						FileDstoy( p_StsFilePt, 1, NULL );
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：保存状态到文件 %vs 成功。" ), p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
+						VstrDstoy( p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
 						break;
 					}
 					case MediaMsgTypRqirExit:
@@ -5221,9 +5225,9 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				}
 
 				//取出音频输入Pcm格式原始帧和音频输出Pcm格式原始帧。
-				if( MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取音频输入Pcm格式原始帧容器的元素总数。
+				if( MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取音频输入Pcm格式原始帧容器元素总数。
 				else p_TmpSz1 = 0;
-				if( MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.GetTotal( &p_TmpSz2, 1, NULL ); //获取音频输出Pcm格式原始帧容器的元素总数。
+				if( MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_AdoOtpt.m_PcmSrcFrmCntnr.GetTotal( &p_TmpSz2, 1, NULL ); //获取音频输出Pcm格式原始帧容器元素总数。
 				else p_TmpSz2 = 0;
 				if( MediaPocsThrdPt->m_AdoInpt.m_IsCanUseAec != 0 ) //如果可以使用声学回音消除器。
 				{
@@ -5418,7 +5422,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							if( SpeexEncdPocs( MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt, &MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmLenByt, &MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans ) == 0 )
 							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用Speex编码器成功。音频输入已编码格式结果帧的长度：%uzd，是否需要传输：%z32d" ), MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmLenByt, MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans );
+								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用Speex编码器成功。音频输入已编码格式结果帧长度：%uzd，是否需要传输：%z32d" ), MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmLenByt, MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans );
 							}
 							else
 							{
@@ -5455,7 +5459,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 
 					//使用音频输入原始Wave文件写入器写入音频输入Pcm格式原始帧、音频输入结果Wave文件写入器写入音频输入Pcm格式结果帧。
-					if( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_IsSaveAdoToWaveFile != 0 )
+					if( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_IsSave != 0 )
 					{
 						if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoInpt.m_WaveFile.m_SrcWaveFileWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ) == 0 )
 						{
@@ -5478,7 +5482,17 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					//使用音视频输入输出Avi文件写入器写入音频输入Pcm格式原始帧、音频输入Pcm格式结果帧。
 					if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt != 0 )
 					{
-						//uint64_t p_Tick, p_CurTimeStamp; p_Tick = FuncGetTickAsMsec(); AviFileWriterAdoStrmGetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, &p_CurTimeStamp, NULL ); LOGFE( Cu8vstr( "音视频输入输出Avi文件音频输入帧时间戳：%uz64d  %uz64d  %z64d" ), p_Tick, p_CurTimeStamp, p_Tick - p_CurTimeStamp );
+						if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset != 0 ) //如果音视频输入输出Avi文件音频输入流时间戳要重置。
+						{
+							p_NowTickMsec = FuncGetTickAsMsec();
+
+							AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, p_NowTickMsec, NULL );
+							AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx, p_NowTickMsec, NULL );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件音频输入Pcm格式原始结果流当前时间戳为 %uz64d 。" ), p_NowTickMsec );
+
+							MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 0; //设置音视频输入输出Avi文件音频输入流时间戳不重置。
+						}
+
 						if( AviFileWriterAdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输入Pcm格式原始帧成功。" ) );
@@ -5495,6 +5509,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输入Pcm格式结果帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						}
+						//{ uint64_t p_Tick, p_CurTimeStamp; p_Tick = FuncGetTickAsMsec(); AviFileWriterAdoStrmGetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, &p_CurTimeStamp, NULL ); LOGFE( Cu8vstr( "音视频输入输出Avi文件音频输入帧时间戳：%uz64d  %uz64d  %z64d" ), p_Tick, p_CurTimeStamp, p_Tick - p_CurTimeStamp ); }
 					}
 
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 )
@@ -5522,7 +5537,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					}
 
 					//使用音频输出原始Wave文件写入器写入音频输出Pcm格式原始帧。
-					if( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_IsSaveAdoToWaveFile != 0 )
+					if( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_IsSave != 0 )
 					{
 						if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoOtpt.m_WaveFile.m_SrcWaveFileWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt ) == 0 )
 						{
@@ -5537,7 +5552,16 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					//使用音视频输入输出Avi文件写入器写入音频输出Pcm格式原始帧。
 					if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt != 0 )
 					{
-						//uint64_t p_Tick, p_CurTimeStamp; p_Tick = FuncGetTickAsMsec(); AviFileWriterAdoStrmGetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, &p_CurTimeStamp, NULL ); LOGFE( Cu8vstr( "音视频输入输出Avi文件音频输出帧时间戳：%uz64d  %uz64d  %z64d" ), p_Tick, p_CurTimeStamp, p_Tick - p_CurTimeStamp );
+						if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset != 0 ) //如果音视频输入输出Avi文件音频输出流时间戳要重置。
+						{
+							p_NowTickMsec = FuncGetTickAsMsec();
+
+							AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, p_NowTickMsec, NULL );
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件音频输出Pcm格式原始流当前时间戳为 %uz64d 。" ), p_NowTickMsec );
+
+							MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 0; //设置音视频输入输出Avi文件音频输出流时间戳不重置。
+						}
+
 						if( AviFileWriterAdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输出Pcm格式原始帧成功。" ) );
@@ -5546,6 +5570,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输出Pcm格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						}
+						//{ uint64_t p_Tick, p_CurTimeStamp; p_Tick = FuncGetTickAsMsec(); AviFileWriterAdoStrmGetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, &p_CurTimeStamp, NULL ); LOGFE( Cu8vstr( "音视频输入输出Avi文件音频输出帧时间戳：%uz64d  %uz64d  %z64d" ), p_Tick, p_CurTimeStamp, p_Tick - p_CurTimeStamp ); }
 					}
 
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 )
@@ -5557,7 +5582,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				} //处理音频输出帧结束。
 
 				//处理视频输入帧开始。
-				if( MediaPocsThrdPt->m_VdoInpt.m_FrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_VdoInpt.m_FrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输入帧容器的元素总数。
+				if( MediaPocsThrdPt->m_VdoInpt.m_FrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_VdoInpt.m_FrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输入帧容器元素总数。
 				else p_TmpSz1 = 0;
 				if( ( p_TmpSz1 > 0 ) && //如果视频输入帧容器中有帧了。
 					( ( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt != NULL ) || ( MediaPocsThrdPt->m_AdoInpt.m_PcmSrcFrmCntnr.m_CQueuePt == NULL ) ) ) //且已经处理了音频输入帧或不使用音频输入Pcm格式原始帧容器。
@@ -5568,7 +5593,6 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					//使用音视频输入输出Avi文件写入器写入视频输入已编码格式结果帧。
 					if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt != 0 ) && ( MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_EncdRsltFrmLenByt != 0 ) )
 					{
-						//LOGFE( Cu8vstr( "音视频输入输出Avi文件视频输入帧时间戳：%uz64d" ), MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_TimeStampMsec );
 						if( AviFileWriterVdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoInptEncdRsltStrmIdx, MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_TimeStampMsec, MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_EncdRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_EncdRsltFrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入视频输入已编码格式结果帧成功。" ) );
@@ -5577,6 +5601,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 						{
 							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入视频输入已编码格式结果帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 						}
+						//{ uint64_t p_CurTimeStamp; AviFileWriterVdoStrmGetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoInptEncdRsltStrmIdx, &p_CurTimeStamp, NULL ); LOGFE( Cu8vstr( "音视频输入输出Avi文件视频输入帧时间戳：%uz64d  %uz64d  %z64d" ), MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_TimeStampMsec, p_CurTimeStamp, MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_TimeStampMsec - p_CurTimeStamp ); }
 					}
 
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 )
@@ -5588,7 +5613,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 				} //处理视频输入帧结束。
 				
 				//处理视频输出帧开始。
-				if( MediaPocsThrdPt->m_VdoOtpt.m_FrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_VdoOtpt.m_FrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输出帧容器的元素总数。
+				if( MediaPocsThrdPt->m_VdoOtpt.m_FrmCntnr.m_CQueuePt != NULL ) MediaPocsThrdPt->m_VdoOtpt.m_FrmCntnr.GetTotal( &p_TmpSz1, 1, NULL ); //获取视频输出帧容器元素总数。
 				else p_TmpSz1 = 0;
 				if( p_TmpSz1 > 0 ) //如果视频输出帧容器中有帧了。
 				{
@@ -5621,7 +5646,6 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 						if( p_VdoOtptStrmAviFileIdx != UINT32_MAX )
 						{
-							//LOGFE( Cu8vstr( "音视频输入输出Avi文件视频输出帧时间戳：%uz64d" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec );
 							if( AviFileWriterVdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, p_VdoOtptStrmAviFileIdx, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_EncdSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_EncdSrcFrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 							{
 								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧成功。" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx );
@@ -5630,6 +5654,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 							{
 								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt );
 							}
+							//{ uint64_t p_CurTimeStamp; AviFileWriterVdoStrmGetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, p_VdoOtptStrmAviFileIdx, &p_CurTimeStamp, NULL ); LOGFE( Cu8vstr( "音视频输入输出Avi文件视频输出帧时间戳：%uz64d  %uz64d  %z64d" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec, p_CurTimeStamp, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec - p_CurTimeStamp ); }
 						}
 					}
 
@@ -5771,23 +5796,23 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt = NULL;
 				}
 
-				//如果音频输入设备已经关闭，就切换到默认的音频输入设备，并重启媒体处理线程。
+				//如果音频输入设备已经关闭，就切换到默认音频输入设备，并重启媒体处理线程。
 				if( MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsClos != 0 )
 				{
-					MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID = 0; //设置音频输入设备的标识符为默认的音频输入设备。
-					LOGFI( Cu8vstr( "媒体处理线程：音频输入设备已经关闭，切换到默认的音频输入设备，并重启媒体处理线程。" ) );
+					MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID = 0; //设置音频输入设备标识符为默认音频输入设备。
+					LOGFI( Cu8vstr( "媒体处理线程：音频输入设备已经关闭，切换到默认音频输入设备，并重启媒体处理线程。" ) );
 					MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL );
 				}
 
-				//如果音频输出设备已经关闭，就切换到默认的音频输出设备，并重启媒体处理线程。
+				//如果音频输出设备已经关闭，就切换到默认音频输出设备，并重启媒体处理线程。
 				if( MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsClos != 0 )
 				{
-					MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID = 0; //设置音频输出设备的标识符为默认的音频输出设备。
-					LOGFI( Cu8vstr( "媒体处理线程：音频输出设备已经关闭，切换到默认的音频输出设备，并重启媒体处理线程。" ) );
+					MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID = 0; //设置音频输出设备标识符为默认音频输出设备。
+					LOGFI( Cu8vstr( "媒体处理线程：音频输出设备已经关闭，切换到默认音频输出设备，并重启媒体处理线程。" ) );
 					MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL );
 				}
 
-				//如果视频输入设备已经关闭，就切换到默认的视频输入设备，并重启媒体处理线程。
+				//如果视频输入设备已经关闭，就切换到默认视频输入设备，并重启媒体处理线程。
 				if( MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_FilterGraphMediaEventPt != NULL )
 				{
 					long p_EventCode;
@@ -5795,8 +5820,8 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 					MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_FilterGraphMediaEventPt->GetEvent( &p_EventCode, &p_EventParam1, &p_EventParam2, 0 );
 					if( p_EventCode == EC_DEVICE_LOST )
 					{
-						MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID = 0; //设置视频输入设备的标识符为默认的视频输入设备。
-						LOGFI( Cu8vstr( "媒体处理线程：视频输入设备已经关闭，切换到默认的视频输入设备，并重启媒体处理线程。" ) );
+						MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID = 0; //设置视频输入设备标识符为默认视频输入设备。
+						LOGFI( Cu8vstr( "媒体处理线程：视频输入设备已经关闭，切换到默认视频输入设备，并重启媒体处理线程。" ) );
 						MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL );
 					}
 				}

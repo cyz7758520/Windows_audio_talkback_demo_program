@@ -70,6 +70,7 @@
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoInpt.cpp" />
@@ -79,6 +80,7 @@
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.rc" />
