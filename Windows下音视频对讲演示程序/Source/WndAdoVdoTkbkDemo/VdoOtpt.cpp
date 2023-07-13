@@ -1,6 +1,6 @@
 ﻿#include "VdoOtpt.h"
 
-typedef struct //视频输出线程参数。
+typedef struct //视频输出线程的参数。
 {
 	VdoOtpt * m_VdoOtptPt;
 	VdoOtpt::Strm * m_StrmPt;
@@ -10,21 +10,21 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptStrmDecdInit
- * 功能说明：初始化视频输出流解码器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化视频输出流的解码器。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
 	switch( StrmPt->m_UseWhatDecd )
 	{
@@ -60,16 +60,16 @@ int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptStrmDecdDstoy
- * 功能说明：销毁视频输出流解码器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁视频输出流的解码器。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptStrmDecdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
@@ -102,36 +102,36 @@ void VdoOtptStrmDecdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptStrmThrdInit
- * 功能说明：初始化视频输出流线程。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化视频输出流的线程。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int VdoOtptStrmThrdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	
-	//初始化线程临时变量。
+	//初始化线程的临时变量。
 	{
-		StrmPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程临时变量。
-		StrmPt->m_Thrd.m_BgraRlstFrmPt = ( uint8_t * )malloc( VdoOtptPt->m_FrmMaxWidth * VdoOtptPt->m_FrmMaxHeight * 4 * 3 ); //初始化Bgra8888格式结果帧指针。按照最高分辨率、Bgra8888格式来计算。
+		StrmPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程的临时变量。
+		StrmPt->m_Thrd.m_BgraRlstFrmPt = ( uint8_t * )malloc( VdoOtptPt->m_FrmMaxWidth * VdoOtptPt->m_FrmMaxHeight * 4 * 3 ); //初始化Bgra8888格式结果帧的指针。按照最高分辨率、Bgra8888格式来计算。
 		if( StrmPt->m_Thrd.m_BgraRlstFrmPt == NULL )
 		{
-			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：创建Bgra8888格式结果帧内存块失败。" ), StrmPt->m_Idx );
+			if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：创建Bgra8888格式结果帧的内存块失败。" ), StrmPt->m_Idx );
 			goto Out;
 		}
-		StrmPt->m_Thrd.m_FrmPt = NULL; //初始化帧指针。
+		StrmPt->m_Thrd.m_FrmPt = NULL; //初始化帧的指针。
 		StrmPt->m_Thrd.m_ElmTotal = 0; //初始化元素总数。
-		StrmPt->m_Thrd.m_LastTickMsec = 0; //初始化上次嘀嗒钟。
-		StrmPt->m_Thrd.m_NowTickMsec = 0; //初始化本次嘀嗒钟。
-		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：初始化线程临时变量成功。" ), StrmPt->m_Idx );
+		StrmPt->m_Thrd.m_LastTickMsec = 0; //初始化上次的嘀嗒钟。
+		StrmPt->m_Thrd.m_NowTickMsec = 0; //初始化本次的嘀嗒钟。
+		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：初始化线程的临时变量成功。" ), StrmPt->m_Idx );
 	}
 
 	//初始化线程。
@@ -163,16 +163,16 @@ int VdoOtptStrmThrdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptStrmThrdDstoy
- * 功能说明：销毁视频输出流线程。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁视频输出流的线程。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptStrmThrdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
@@ -187,20 +187,20 @@ void VdoOtptStrmThrdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：销毁线程成功。" ), StrmPt->m_Idx );
 	}
 
-	//销毁线程临时变量。
+	//销毁线程的临时变量。
 	if( StrmPt->m_Thrd.m_IsInitThrdTmpVar != 0 )
 	{
-		StrmPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程临时变量。
-		if( StrmPt->m_Thrd.m_BgraRlstFrmPt != NULL ) //销毁Bgra8888格式结果帧指针。
+		StrmPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程的临时变量。
+		if( StrmPt->m_Thrd.m_BgraRlstFrmPt != NULL ) //销毁Bgra8888格式结果帧的指针。
 		{
 			free( StrmPt->m_Thrd.m_BgraRlstFrmPt );
 			StrmPt->m_Thrd.m_BgraRlstFrmPt = NULL;
 		}
-		StrmPt->m_Thrd.m_FrmPt = NULL; //销毁帧指针。
+		StrmPt->m_Thrd.m_FrmPt = NULL; //销毁帧的指针。
 		StrmPt->m_Thrd.m_ElmTotal = 0; //销毁元素总数。
-		StrmPt->m_Thrd.m_LastTickMsec = 0; //销毁上次嘀嗒钟。
-		StrmPt->m_Thrd.m_NowTickMsec = 0; //销毁本次嘀嗒钟。
-		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：销毁线程临时变量成功。" ), StrmPt->m_Idx );
+		StrmPt->m_Thrd.m_LastTickMsec = 0; //销毁上次的嘀嗒钟。
+		StrmPt->m_Thrd.m_NowTickMsec = 0; //销毁本次的嘀嗒钟。
+		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：销毁线程的临时变量成功。" ), StrmPt->m_Idx );
 	}
 	
 	InvalidateRect( StrmPt->m_Dvc.m_DspyWndHdl, NULL, TRUE ); //重绘显示窗口。
@@ -208,21 +208,21 @@ void VdoOtptStrmThrdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptStrmInit
- * 功能说明：初始化视频输出流。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化视频输出的流。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int VdoOtptStrmInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	
 	if( VdoOtptStrmDecdInit( VdoOtptPt, StrmPt ) != 0 ) goto Out;
 	if( VdoOtptStrmThrdInit( VdoOtptPt, StrmPt ) != 0 ) goto Out;
@@ -239,16 +239,16 @@ int VdoOtptStrmInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptStrmDstoy
- * 功能说明：销毁视频输出流。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁视频输出的流。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptStrmDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
@@ -260,11 +260,11 @@ void VdoOtptStrmDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptThrdRun
  * 功能说明：视频输出线程主函数。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
@@ -282,7 +282,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 			if( p_StrmPt->m_Thrd.m_FrmPt == NULL ) //如果没获取一个空闲帧。
 			{
 				//获取一个空闲帧。
-				p_VdoOtptPt->m_IdleFrmCntnr.GetTotal( &p_StrmPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取空闲帧容器元素总数。
+				p_VdoOtptPt->m_IdleFrmCntnr.GetTotal( &p_StrmPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取空闲帧容器的元素总数。
 				if( p_StrmPt->m_Thrd.m_ElmTotal > 0 ) //如果空闲帧容器中有帧。
 				{
 					//从空闲帧容器中取出并删除第一个帧。
@@ -293,7 +293,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 				}
 				else //如果空闲帧容器中没有帧。
 				{
-					p_VdoOtptPt->m_FrmCntnr.GetTotal( &p_StrmPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取帧容器元素总数。
+					p_VdoOtptPt->m_FrmCntnr.GetTotal( &p_StrmPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取帧容器的元素总数。
 					if( p_StrmPt->m_Thrd.m_ElmTotal <= 20 )
 					{
 						//创建一个空闲帧。
@@ -488,19 +488,19 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptAddStrm
- * 功能说明：添加视频输出流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：添加视频输出的流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -523,18 +523,18 @@ void VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptDelStrm
- * 功能说明：删除视频输出流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：删除视频输出的流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptDelStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -550,20 +550,20 @@ void VdoOtptDelStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptSetVdoOtpt
- * 功能说明：设置视频输出流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：设置视频输出的流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
-			 DspyWndHdl：[输入]，存放显示窗口句柄，可以为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 DspyWndHdl：[输入]，存放显示窗口的句柄，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptSetStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, HWND DspyWndHdl )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -582,19 +582,19 @@ void VdoOtptSetStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, HWND DspyWndHdl )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptSetStrmUseYu12
- * 功能说明：设置视频输出流使用Yu12原始数据。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：设置视频输出的流使用Yu12原始数据。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptSetStrmUseYu12( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -613,20 +613,20 @@ void VdoOtptSetStrmUseYu12( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptSetStrmUseOpenH264Decd
- * 功能说明：设置视频输出流使用OpenH264解码器。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：设置视频输出的流使用OpenH264解码器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
-			 DecdThrdNum：[输入]，存放解码子线程数量，单位为个，为0表示直接在调用线程解码，为1或2或3表示解码子线程数量。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 DecdThrdNum：[输入]，存放解码子线程的数量，单位为个，为0表示直接在调用线程解码，为1或2或3表示解码子线程的数量。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptSetStrmUseOpenH264Decd( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t DecdThrdNum )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -646,20 +646,20 @@ void VdoOtptSetStrmUseOpenH264Decd( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptSetStrmIsBlack
- * 功能说明：设置视频输出流是否黑屏。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：设置视频输出的流是否黑屏。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
 			 IsBlack：[输入]，存放是否黑屏，为0表示有图像，为非0表示黑屏。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptSetStrmIsBlack( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsBlack )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -674,20 +674,20 @@ void VdoOtptSetStrmIsBlack( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsBla
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptSetStrmIsUse
- * 功能说明：设置视频输出流是否使用。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：设置视频输出的流是否使用。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
              IsUseStrm：[输入]，存放是否使用流，为0表示不使用，为非0表示要使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptSetStrmIsUse( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsUseStrm )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
 	//查找流索引。
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -734,25 +734,25 @@ void VdoOtptSetStrmIsUse( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsUseSt
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptInit
  * 功能说明：初始化视频输出。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int VdoOtptInit( VdoOtpt * VdoOtptPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
 
-	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始嘀嗒钟。
+	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始的嘀嗒钟。
 	
 	//初始化帧容器。
 	if( VdoOtptPt->m_FrmCntnr.Init( sizeof( VdoOtpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
@@ -786,7 +786,7 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
 
 	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
 	{
-		p_NowTickMsec = FuncGetTickAsMsec(); //记录初始化结束嘀嗒钟。
+		p_NowTickMsec = FuncGetTickAsMsec(); //记录初始化结束的嘀嗒钟。
 		LOGFI( Cu8vstr( "媒体处理线程：视频输出：初始化耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
 	}
 
@@ -803,25 +803,25 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：VdoOtptDstoy
  * 功能说明：销毁视频输出。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void VdoOtptDstoy( VdoOtpt * VdoOtptPt )
 {
-	VdoOtpt::Strm * p_StrmPt; //存放流指针。
-	VdoOtpt::Frm * p_FrmPt; //存放帧指针。
+	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
+	VdoOtpt::Frm * p_FrmPt; //存放帧的指针。
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
 	
-	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录销毁开始嘀嗒钟。
+	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录销毁开始的嘀嗒钟。
 	
 	for( size_t p_StrmNum = 0; VdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 	{
@@ -889,7 +889,7 @@ void VdoOtptDstoy( VdoOtpt * VdoOtptPt )
 
 	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
 	{
-		p_NowTickMsec = FuncGetTickAsMsec(); //记录销毁结束嘀嗒钟。
+		p_NowTickMsec = FuncGetTickAsMsec(); //记录销毁结束的嘀嗒钟。
 		LOGFI( Cu8vstr( "媒体处理线程：视频输出：销毁耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
 	}
 }

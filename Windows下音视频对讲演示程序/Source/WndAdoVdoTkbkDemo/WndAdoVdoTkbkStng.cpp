@@ -4,47 +4,47 @@
 #include "MyMediaPocsThrd.h"
 
 //全局变量。
-extern HINSTANCE g_IstnsHdl; //存放当前实例句柄。
-extern VstrCls g_ErrInfoVstr; //存放错误信息动态字符串指针。
-extern MyMediaPocsThrdCls * g_MyMediaPocsThrdPt; //存放媒体处理线程指针。
-extern HWND g_MainDlgWndHdl; //存放主对话框窗口句柄。
+extern HINSTANCE g_IstnsHdl; //存放当前实例的句柄。
+extern VstrCls g_ErrInfoVstr; //存放错误信息动态字符串的指针。
+extern MyMediaPocsThrdCls * g_MyMediaPocsThrdPt; //存放媒体处理线程的指针。
+extern HWND g_MainDlgWndHdl; //存放主对话框窗口的句柄。
 extern long g_MainDlgWndMinHeight; //存放主对话框窗口的最小高度，单位为像素。
 extern long g_MainDlgWndMinWidth; //存放主对话框窗口的最小宽度，单位为像素。
-extern HWND g_AdoInptDvcCbBoxWndHdl; //存放音频输入设备组合框窗口句柄。
-extern HWND g_AdoOtptDvcCbBoxWndHdl; //存放音频输出设备组合框窗口句柄。
-extern HWND g_VdoInptDvcCbBoxWndHdl; //存放视频输入设备组合框窗口句柄。
-extern HWND g_LogLtBoxWndHdl; //存放日志列表框窗口句柄。
-extern HWND g_VdoInptPrvwTxtWndHdl; //存放视频输入预览文本框窗口句柄。
-extern HWND g_VdoOtptDspyTxtWndHdl; //存放视频输出显示文本框窗口句柄。
+extern HWND g_AdoInptDvcCbBoxWndHdl; //存放音频输入设备组合框窗口的句柄。
+extern HWND g_AdoOtptDvcCbBoxWndHdl; //存放音频输出设备组合框窗口的句柄。
+extern HWND g_VdoInptDvcCbBoxWndHdl; //存放视频输入设备组合框窗口的句柄。
+extern HWND g_LogLtBoxWndHdl; //存放日志列表框窗口的句柄。
+extern HWND g_VdoInptPrvwTxtWndHdl; //存放视频输入预览文本框窗口的句柄。
+extern HWND g_VdoOtptDspyTxtWndHdl; //存放视频输出显示文本框窗口的句柄。
 extern long g_VdoTxtWndLeftMargin; //存放视频文本框窗口的左边距，单位为像素。
 extern long g_VdoTxtWndTopMargin; //存放视频文本框窗口的顶边距，单位为像素。
 extern long g_VdoTxtWndRightMargin; //存放视频文本框窗口的右边距，单位为像素。
 extern long g_VdoTxtWndBottomMargin; //存放视频文本框窗口的底边距，单位为像素。
 extern int g_VdoWndShowMode; //存放视频窗口的显示模式，为0表示正常，为1表示垂直最大化排列，为2表示水平最大化排列。
-extern HWND g_VdoInptPrvwWndHdl; //存放视频输入预览窗口句柄。
-extern HWND g_VdoOtptDspyWndHdl; //存放视频输出显示窗口句柄。
+extern HWND g_VdoInptPrvwWndHdl; //存放视频输入预览窗口的句柄。
+extern HWND g_VdoOtptDspyWndHdl; //存放视频输出显示窗口的句柄。
 
-extern HWND g_RqstCnctDlgWndHdl; //存放请求连接对话框窗口句柄。
-extern HWND g_PttDlgWndHdl; //存放一键即按即通对话框窗口句柄。
-extern HWND g_PttBtnWndHdl; //存放一键即按即通按钮窗口句柄。
-extern HWND g_XfrPrtclStngDlgWndHdl; //存放传输协议设置对话框窗口句柄。
-extern HWND g_StngDlgWndHdl; //存放设置对话框窗口句柄。
-extern HWND g_AjbStngDlgWndHdl; //存放自适应抖动缓冲器设置对话框窗口句柄。
-extern HWND g_SaveStsToTxtFileStngDlgWndHdl; //存放保存状态到Txt文件设置对话框窗口句柄。
-extern HWND g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl; //存放保存音视频输入输出到Avi文件设置对话框窗口句柄。
-extern HWND g_SpeexAecStngDlgWndHdl; //存放Speex声学回音消除器设置对话框窗口句柄。
-extern HWND g_WebRtcAecmStngDlgWndHdl; //存放WebRtc定点版声学回音消除器设置对话框窗口句柄。
-extern HWND g_WebRtcAecStngDlgWndHdl; //存放WebRtc浮点版声学回音消除器设置对话框窗口句柄。
-extern HWND g_SpeexWebRtcAecStngDlgWndHdl; //存放SpeexWebRtc三重声学回音消除器设置对话框窗口句柄。
-extern HWND g_SpeexPrpocsNsStngDlgWndHdl; //存放Speex预处理器的噪音抑制设置对话框窗口句柄。
-extern HWND g_WebRtcNsxStngDlgWndHdl; //存放WebRtc定点版噪音抑制器设置对话框窗口句柄。
-extern HWND g_WebRtcNsStngDlgWndHdl; //存放WebRtc浮点版噪音抑制器设置对话框窗口句柄。
-extern HWND g_SpeexPrpocsStngDlgWndHdl; //存放Speex预处理器的设置对话框窗口句柄。
-extern HWND g_SpeexCodecStngDlgWndHdl; //存放Speex编解码器设置对话框窗口句柄。
-extern HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl; //存放保存音频输入输出到Wave文件设置对话框窗口句柄。
-extern HWND g_OpenH264CodecStngDlgWndHdl; //存放OpenH264编码器设置对话框窗口句柄。
+extern HWND g_RqstCnctDlgWndHdl; //存放请求连接对话框窗口的句柄。
+extern HWND g_PttDlgWndHdl; //存放一键即按即通对话框窗口的句柄。
+extern HWND g_PttBtnWndHdl; //存放一键即按即通按钮窗口的句柄。
+extern HWND g_XfrPrtclStngDlgWndHdl; //存放传输协议设置对话框窗口的句柄。
+extern HWND g_StngDlgWndHdl; //存放设置对话框窗口的句柄。
+extern HWND g_AjbStngDlgWndHdl; //存放自适应抖动缓冲器设置对话框窗口的句柄。
+extern HWND g_SaveStsToTxtFileStngDlgWndHdl; //存放保存状态到Txt文件设置对话框窗口的句柄。
+extern HWND g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl; //存放保存音视频输入输出到Avi文件设置对话框窗口的句柄。
+extern HWND g_SpeexAecStngDlgWndHdl; //存放Speex声学回音消除器设置对话框窗口的句柄。
+extern HWND g_WebRtcAecmStngDlgWndHdl; //存放WebRtc定点版声学回音消除器设置对话框窗口的句柄。
+extern HWND g_WebRtcAecStngDlgWndHdl; //存放WebRtc浮点版声学回音消除器设置对话框窗口的句柄。
+extern HWND g_SpeexWebRtcAecStngDlgWndHdl; //存放SpeexWebRtc三重声学回音消除器设置对话框窗口的句柄。
+extern HWND g_SpeexPrpocsNsStngDlgWndHdl; //存放Speex预处理器的噪音抑制设置对话框窗口的句柄。
+extern HWND g_WebRtcNsxStngDlgWndHdl; //存放WebRtc定点版噪音抑制器设置对话框窗口的句柄。
+extern HWND g_WebRtcNsStngDlgWndHdl; //存放WebRtc浮点版噪音抑制器设置对话框窗口的句柄。
+extern HWND g_SpeexPrpocsStngDlgWndHdl; //存放Speex预处理器的设置对话框窗口的句柄。
+extern HWND g_SpeexCodecStngDlgWndHdl; //存放Speex编解码器设置对话框窗口的句柄。
+extern HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
+extern HWND g_OpenH264CodecStngDlgWndHdl; //存放OpenH264编码器设置对话框窗口的句柄。
 
-extern HWND g_TkbkStsWndHdl; //存放对讲状态窗口句柄。
+extern HWND g_TkbkStsWndHdl; //存放对讲状态窗口的句柄。
 
 void RefresAdoVdohDvc(); //刷新音视频设备。
 
@@ -173,7 +173,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "Stng" );
@@ -198,7 +198,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoVdoInptOtptToAviFile" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "Effect" );
 		p_TmpXMLElement2Pt->SetText(
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectLowRdBtnId ) == BST_CHECKED ) ? "Low" :
@@ -215,14 +215,14 @@ void SaveStngToXmlFile()
 					( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate32000RdBtnId ) == BST_CHECKED ) ? 32000 :
 						( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate48000RdBtnId ) == BST_CHECKED ) ? 48000 : 16000 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoFrmLen" );
 		p_TmpXMLElement2Pt->SetText(
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId ) == BST_CHECKED ) ? 10 :
 				( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen20msRdBtnId ) == BST_CHECKED ) ? 20 :
 					( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 20 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseSystemAecNsAgc" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -235,7 +235,7 @@ void SaveStngToXmlFile()
 						( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecRdBtnId ) == BST_CHECKED ) ? "WebRtcAec" :
 							( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexWebRtcAecRdBtnId ) == BST_CHECKED ) ? "SpeexWebRtcAec" : "SpeexWebRtcAec" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatNs" );
 		p_TmpXMLElement2Pt->SetText(
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoNsRdBtnId ) == BST_CHECKED ) ? "NoNs" :
@@ -244,22 +244,22 @@ void SaveStngToXmlFile()
 						( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcNsRdBtnId ) == BST_CHECKED ) ? "WebRtcNs" :
 							( IsDlgButtonChecked( g_StngDlgWndHdl, UseRNNoiseRdBtnId ) == BST_CHECKED ) ? "RNNoise" : "RNNoise" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseSpeexPrpocs" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoUseWhatCodec" );
 		p_TmpXMLElement2Pt->SetText(
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UsePcmRdBtnId ) == BST_CHECKED ) ? "Pcm" :
 				( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexCodecRdBtnId ) == BST_CHECKED ) ? "SpeexCodec" :
 					( IsDlgButtonChecked( g_StngDlgWndHdl, UseOpusCodecRdBtnId ) == BST_CHECKED ) ? "OpusCodec" : "SpeexCodec" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoInptOtptToWaveFile" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoSmplRate" );
 		p_TmpXMLElement2Pt->SetText(
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId ) == BST_CHECKED ) ? 12 :
@@ -267,31 +267,31 @@ void SaveStngToXmlFile()
 					( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate24RdBtnId ) == BST_CHECKED ) ? 24 :
 						( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate30RdBtnId ) == BST_CHECKED ) ? 30 : 24 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatVdoFrmSz" );
 		p_TmpXMLElement2Pt->SetText(
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId ) == BST_CHECKED ) ? "Prset" :
 				( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzOtherRdBtnId ) == BST_CHECKED ) ? "Other" : "Prset" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoFrmSzPrset" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoFrmSzOtherWidth" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoFrmSzOtherHeight" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoUseWhatCodec" );
 		p_TmpXMLElement2Pt->SetText(
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UseYu12RdBtnId ) == BST_CHECKED ) ? "Yu12" :
@@ -299,7 +299,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
 
-	//自己设计的自适应抖动缓冲器设置对话框。
+	//自适应抖动缓冲器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "AjbStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
@@ -315,7 +315,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AAjbMaxNeedBufFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AAjbMaxCntuLostFrmCnt" );
@@ -327,19 +327,19 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AAjbAdaptSensitivity" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VAjbMinNeedBufFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VAjbMaxNeedBufFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VAjbAdaptSensitivity" );
@@ -375,24 +375,24 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WrBufSzByt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoInpt" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoOtpt" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveVdoInpt" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveVdoOtpt" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//Speex声学回音消除器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SpeexAecStng" );
@@ -403,7 +403,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "FilterLenMsec" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseRec" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -419,29 +419,29 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoCntu" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoSupes" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoSupesAct" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveMemFile" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//WebRtc定点版声学回音消除器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "WebRtcAecmStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseCNGMode" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -458,18 +458,18 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//WebRtc浮点版声学回音消除器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "WebRtcAecStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+
 		GetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "Delay" );
@@ -479,7 +479,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseDelayAgstcMode" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseExtdFilterMode" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -496,7 +496,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//SpeexWebRtc三重声学回音消除器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SpeexWebRtcAecStng" );
@@ -508,13 +508,13 @@ void SaveStngToXmlFile()
 				( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? "WebRtcAecmWebRtcAec" :
 					( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? "SpeexAecWebRtcAecmWebRtcAec" : "SpeexAecWebRtcAecmWebRtcAec" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecFilterLenMsec" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+	
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecIsUseRec" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -530,19 +530,19 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecEchoCntu" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecEchoSupes" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecEchoSupesAct" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+	
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecmIsUseCNGMode" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -564,7 +564,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecEchoMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecDelay" );
@@ -574,7 +574,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecIsUseDelayAgstcMode" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+	
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecIsUseExtdFilterMode" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -590,19 +590,19 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseSameRoomAec" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SameRoomEchoMinDelay" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//Speex预处理器的噪音抑制设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SpeexPrpocsNsStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseNs" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -612,41 +612,41 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "NoiseSupes" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseDereverb" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseDereverbCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//WebRtc定点版噪音抑制器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "WebRtcNsxStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+	
 		GetDlgItemText( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "PolicyMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//WebRtc浮点版噪音抑制器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "WebRtcNsStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+	
 		GetDlgItemText( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "PolicyMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//Speex预处理器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SpeexPrpocsStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseVad" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseVadCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -656,47 +656,47 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VadProbStart" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VadProbCntu" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseAgc" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcLevel" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcIncrement" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcDecrement" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcMaxGain" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//Speex编解码器设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SpeexCodecStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexEncdUseCbrOrVbr" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId ) == BST_CHECKED ) ? "Cbr" : "Vbr" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -706,29 +706,29 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexEncdQualt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexEncdCmplxt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexEncdPlcExptLossRate" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexDecdIsUsePrcplEnhsmt" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexCodecStngDlgWndHdl, SpeexDecdIsUsePrcplEnhsmtCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
-					
+
 	//保存音频到Wave文件设置对话框。
 	{
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SaveAdoInptOtptToWaveFile" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoInpt" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -738,23 +738,23 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoInptSrcFullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoInptRsltFullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoOtpt" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoOtptSrcFullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-						
+
 		GetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WrBufSzByt" );
@@ -803,14 +803,15 @@ void SaveStngToXmlFile()
 	{
 		VstrCpy( p_U16TxtVstrPt, Cu16vstr( L"保存设置到Stng.xml文件成功。" ) );
 		LOGI( p_U16TxtVstrPt );
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 	else
 	{
 		VstrFmtCpy( p_U16TxtVstrPt, Cu16vstr( L"保存设置到Stng.xml文件失败。原因：%s。" ), p_XMLDocument.ErrorIDToName( p_XMLError ) );
 		LOGE( p_U16TxtVstrPt );
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
-	{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-
+	
 	Out:
 	if( p_U16TxtVstrPt != NULL )
 	{
@@ -849,1082 +850,1081 @@ void ReadStngFromXmlFile()
 	{
 		VstrCpy( p_U16TxtVstrPt, Cu16vstr( L"从Stng.xml文件读取设置成功。" ) );
 		LOGI( p_U16TxtVstrPt );
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 	else
 	{
 		VstrFmtCpy( p_U16TxtVstrPt, Cu16vstr( L"从Stng.xml文件读取设置失败。原因：%s。" ), p_XMLDocument.ErrorIDToName( p_XMLError ) );
 		LOGE( p_U16TxtVstrPt );
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+		goto Out;
 	}
-	{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	
-	if( p_XMLDocument.GetLineNum() > 0 ) //如果读取设置成功。
+	for( p_StngXMLElementPt = p_XMLDocument.FirstChildElement(); p_StngXMLElementPt != NULL; p_StngXMLElementPt = p_StngXMLElementPt->NextSiblingElement() )
 	{
-		for( p_StngXMLElementPt = p_XMLDocument.FirstChildElement(); p_StngXMLElementPt != NULL; p_StngXMLElementPt = p_StngXMLElementPt->NextSiblingElement() )
+		if( strcmp( p_StngXMLElementPt->Name(), "Stng" ) == 0 )
 		{
-			if( strcmp( p_StngXMLElementPt->Name(), "Stng" ) == 0 )
+			for( p_TmpXMLElement1Pt = p_StngXMLElementPt->FirstChildElement(); p_TmpXMLElement1Pt != NULL; p_TmpXMLElement1Pt = p_TmpXMLElement1Pt->NextSiblingElement() )
 			{
-				for( p_TmpXMLElement1Pt = p_StngXMLElementPt->FirstChildElement(); p_TmpXMLElement1Pt != NULL; p_TmpXMLElement1Pt = p_TmpXMLElement1Pt->NextSiblingElement() )
+				if( strcmp( p_TmpXMLElement1Pt->Name(), "Main" ) == 0 )
 				{
-					if( strcmp( p_TmpXMLElement1Pt->Name(), "Main" ) == 0 )
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatXfrPrtcl" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatXfrPrtcl" ) == 0 )
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Tcp" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Tcp" ) == 0 )
-								{
-									CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseTcpPrtclRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseUdpPrtclRdBtnId );
-								}
+								CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseTcpPrtclRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IPAddr" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_MainDlgWndHdl, IPAddrCbBoxId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseUdpPrtclRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "Port" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IPAddr" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_MainDlgWndHdl, IPAddrCbBoxId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "Port" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_MainDlgWndHdl, PortEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "TkbkMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Ado" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_MainDlgWndHdl, PortEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "TkbkMode" ) == 0 )
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Vdo" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Ado" ) == 0 )
-								{
-									CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Vdo" ) == 0 )
-								{
-									CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseVdoTkbkModeRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId );
-								}
+								CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseVdoTkbkModeRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptDvc" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptDvc" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptDvc" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptDvc" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoInptDvc" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptIsMute" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoInptDvc" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptIsMute" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptIsMute" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptIsMute" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoInptIsBlack" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoInptIsBlack" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoOtptIsBlack" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoOtptIsBlack" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_CHECKED );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "XfrPrtclStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "XfrPrtclStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "XfrMode" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "XfrMode" ) == 0 )
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Ptt" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Ptt" ) == 0 )
-								{
-									CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UsePttRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
-								}
+								CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UsePttRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "MaxCnctTimes" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_XfrPrtclStngDlgWndHdl, MaxCnctTimesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsAutoAllowCnct" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "MaxCnctTimes" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_XfrPrtclStngDlgWndHdl, MaxCnctTimesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsAutoAllowCnct" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_CHECKED );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "Stng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "Stng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatRecvOtptFrm" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatRecvOtptFrm" ) == 0 )
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Cntnr" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Cntnr" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseCntnrRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId, UseCntnrRecvOtptFrmRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseCntnrRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseCntnrRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId, UseCntnrRecvOtptFrmRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveStsToTxtFile" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsSaveStsToTxtFileCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsSaveStsToTxtFileCkBoxId, BST_CHECKED );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseCntnrRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId, UseAjbRecvOtptFrmRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsPrintLogShowToast" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveStsToTxtFile" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsSaveStsToTxtFileCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUsePrvntSysSleep" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsSaveStsToTxtFileCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoVdoInptOtptToAviFile" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsPrintLogShowToast" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "Effect" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Low" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectLowRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Mid" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectMidRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "High" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectHighRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Super" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectSuperRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectPremiumRdBtnId );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoSmplRate" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUsePrvntSysSleep" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "8000" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate8000RdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "16000" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate16000RdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "32000" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate32000RdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate48000RdBtnId );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoFrmLen" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "10" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen10msRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "20" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen20msRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen30msRdBtnId );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSystemAecNsAgc" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoVdoInptOtptToAviFile" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatAec" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "NoAec" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseNoAecRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexAec" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexAecRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcAecm" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAecmRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcAec" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAecRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexWebRtcAecRdBtnId );
-								}
+								CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatNs" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "Effect" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Low" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "NoNs" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseNoNsRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexPrpocsNs" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseSpeexPrpocsNsRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcNsx" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseWebRtcNsxRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcNs" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseWebRtcNsRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseRNNoiseRdBtnId );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectLowRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSpeexPrpocs" ) == 0 )
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Mid" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId, BST_CHECKED );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectMidRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoUseWhatCodec" ) == 0 )
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "High" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Pcm" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UsePcmRdBtnId, UseOpusCodecRdBtnId, UsePcmRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexCodec" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UsePcmRdBtnId, UseOpusCodecRdBtnId, UseSpeexCodecRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UsePcmRdBtnId, UseOpusCodecRdBtnId, UseOpusCodecRdBtnId );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectHighRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInptOtptToWaveFile" ) == 0 )
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Super" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId, BST_CHECKED );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectSuperRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoSmplRate" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "12" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate12RdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "15" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate15RdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "24" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate24RdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate30RdBtnId );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseEffectLowRdBtnId, UseEffectPremiumRdBtnId, UseEffectPremiumRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatVdoFrmSz" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoSmplRate" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "8000" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Prset" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId, UseVdoFrmSzOtherRdBtnId, UseVdoFrmSzPrsetRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId, UseVdoFrmSzOtherRdBtnId, UseVdoFrmSzOtherRdBtnId );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate8000RdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzPrset" ) == 0 )
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "16000" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "120×160" ) == 0 )
-								{
-									SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"120×160" );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "240×320" ) == 0 )
-								{
-									SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"240×320" );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "480×640" ) == 0 )
-								{
-									SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"480×640" );
-								}
-								else
-								{
-									SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"960×1280" );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate16000RdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzOtherWidth" ) == 0 )
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "32000" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate32000RdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzOtherHeight" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate48000RdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoUseWhatCodec" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoFrmLen" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "10" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Yu12" ) == 0 )
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseYu12RdBtnId, UseOpenH264CodecRdBtnId, UseYu12RdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_StngDlgWndHdl, UseYu12RdBtnId, UseOpenH264CodecRdBtnId, UseOpenH264CodecRdBtnId );
-								}
+								CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen10msRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "20" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen20msRdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen30msRdBtnId );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSystemAecNsAgc" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatAec" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "NoAec" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseNoAecRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexAec" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexAecRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcAecm" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAecmRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcAec" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAecRdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexWebRtcAecRdBtnId );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatNs" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "NoNs" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseNoNsRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexPrpocsNs" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseSpeexPrpocsNsRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcNsx" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseWebRtcNsxRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcNs" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseWebRtcNsRdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseRNNoiseRdBtnId );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSpeexPrpocs" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoUseWhatCodec" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Pcm" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UsePcmRdBtnId, UseOpusCodecRdBtnId, UsePcmRdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexCodec" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UsePcmRdBtnId, UseOpusCodecRdBtnId, UseSpeexCodecRdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UsePcmRdBtnId, UseOpusCodecRdBtnId, UseOpusCodecRdBtnId );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInptOtptToWaveFile" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoSmplRate" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "12" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate12RdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "15" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate15RdBtnId );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "24" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate24RdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId, UseVdoSmplRate30RdBtnId, UseVdoSmplRate30RdBtnId );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatVdoFrmSz" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Prset" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId, UseVdoFrmSzOtherRdBtnId, UseVdoFrmSzPrsetRdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId, UseVdoFrmSzOtherRdBtnId, UseVdoFrmSzOtherRdBtnId );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzPrset" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "120×160" ) == 0 )
+							{
+								SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"120×160" );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "240×320" ) == 0 )
+							{
+								SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"240×320" );
+							}
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "480×640" ) == 0 )
+							{
+								SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"480×640" );
+							}
+							else
+							{
+								SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )L"960×1280" );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzOtherWidth" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzOtherHeight" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoUseWhatCodec" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Yu12" ) == 0 )
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseYu12RdBtnId, UseOpenH264CodecRdBtnId, UseYu12RdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_StngDlgWndHdl, UseYu12RdBtnId, UseOpenH264CodecRdBtnId, UseOpenH264CodecRdBtnId );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "AjbStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "AjbStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMinNeedBufFrmCnt" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMinNeedBufFrmCnt" ) == 0 )
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMinNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMaxNeedBufFrmCnt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMaxCntuLostFrmCnt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbAdaptSensitivity" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbMinNeedBufFrmCnt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbMaxNeedBufFrmCnt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbAdaptSensitivity" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SaveStsToTxtFileStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "FullPath" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SaveStsToTxtFileStngDlgWndHdl, SaveStsToTxtFileFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SaveAdoVdoInptOtptToAviFileStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "FullPath" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WrBufSzByt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInpt" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMinNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMaxNeedBufFrmCnt" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMaxCntuLostFrmCnt" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoOtpt" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbAdaptSensitivity" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbMinNeedBufFrmCnt" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveVdoInpt" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbMaxNeedBufFrmCnt" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbAdaptSensitivity" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveVdoOtpt" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId, BST_CHECKED );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SaveStsToTxtFileStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexAecStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "FilterLenMsec" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "FullPath" ) == 0 )
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseRec" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SaveStsToTxtFileStngDlgWndHdl, SaveStsToTxtFileFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMutp" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoCntu" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoSupes" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoSupesAct" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveMemFile" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId, BST_CHECKED );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SaveAdoVdoInptOtptToAviFileStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcAecmStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseCNGMode" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "FullPath" ) == 0 )
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WrBufSzByt" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInpt" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMode" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "Delay" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcAecStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMode" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "Delay" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseDelayAgstcMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoOtpt" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveVdoInpt" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseExtdFilterMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveVdoOtpt" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseRefinedFilterAdaptAecMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseAdaptAdjDelay" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveMemFile" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId, BST_CHECKED );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexAecStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexWebRtcAecStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "WorkMode" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "FilterLenMsec" ) == 0 )
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexAecWebRtcAecm" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseRec" ) == 0 )
+							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcAecmWebRtcAec" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId, BST_CHECKED );
-								}
+								CheckRadioButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMutp" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckRadioButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoCntu" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecFilterLenMsec" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecIsUseRec" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoSupes" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoSupesAct" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoMutp" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoCntu" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoSupes" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoSupesAct" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmIsUseCNGMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveMemFile" ) == 0 )
+							else
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmEchoMode" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmDelay" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecEchoMode" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecDelay" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseDelayAgstcMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseExtdFilterMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseRefinedFilterAdaptAecMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseAdaptAdjDelay" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSameRoomAec" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SameRoomEchoMinDelay" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexPrpocsNsStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseNs" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "NoiseSupes" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseDereverb" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseDereverbCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseDereverbCkBoxId, BST_CHECKED );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcAecmStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcNsxStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "PolicyMode" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseCNGMode" ) == 0 )
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcNsStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "PolicyMode" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexPrpocsStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseVad" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseVadCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMode" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseVadCkBoxId, BST_CHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "Delay" ) == 0 )
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VadProbStart" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VadProbCntu" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseAgc" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcLevel" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcIncrement" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcDecrement" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcMaxGain" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexCodecStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdUseCbrOrVbr" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Cbr" ) == 0 )
+							{
+								CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseCbrRdBtnId );
+							}
+							else
+							{
+								CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseVbrRdBtnId );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdQualt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdQualtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdCmplxt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdPlcExptLossRate" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexDecdIsUsePrcplEnhsmt" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SpeexCodecStngDlgWndHdl, SpeexDecdIsUsePrcplEnhsmtCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SpeexCodecStngDlgWndHdl, SpeexDecdIsUsePrcplEnhsmtCkBoxId, BST_CHECKED );
 							}
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcAecStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SaveAdoInptOtptToWaveFile" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInpt" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMode" ) == 0 )
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "Delay" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseDelayAgstcMode" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseExtdFilterMode" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseRefinedFilterAdaptAecMode" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseAdaptAdjDelay" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveMemFile" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId, BST_CHECKED );
-								}
+								CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId, BST_CHECKED );
 							}
 						}
-					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexWebRtcAecStng" ) == 0 )
-					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptSrcFullPath" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "WorkMode" ) == 0 )
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptRsltFullPath" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoOtpt" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "SpeexAecWebRtcAecm" ) == 0 )
-								{
-									CheckRadioButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId );
-								}
-								else if( strcmp( p_TmpXMLElement2Pt->GetText(), "WebRtcAecmWebRtcAec" ) == 0 )
-								{
-									CheckRadioButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId );
-								}
+								CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId, BST_UNCHECKED );
 							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecFilterLenMsec" ) == 0 )
+							else
 							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecIsUseRec" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoMutp" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoCntu" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoSupes" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoSupesAct" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmIsUseCNGMode" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmEchoMode" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmDelay" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecEchoMode" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecDelay" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseDelayAgstcMode" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseExtdFilterMode" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseRefinedFilterAdaptAecMode" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseAdaptAdjDelay" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSameRoomAec" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SameRoomEchoMinDelay" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+								CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId, BST_CHECKED );
 							}
 						}
-					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexPrpocsNsStng" ) == 0 )
-					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptSrcFullPath" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseNs" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "NoiseSupes" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseDereverb" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseDereverbCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseDereverbCkBoxId, BST_CHECKED );
-								}
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WrBufSzByt" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcNsxStng" ) == 0 )
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "OpenH264Codec" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdVdoType" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "PolicyMode" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdVdoTypeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
-					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "WebRtcNsStng" ) == 0 )
-					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdEncdBitrate" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "PolicyMode" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdEncdBitrateEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
-					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexPrpocsStng" ) == 0 )
-					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdEncdBitrateCtrlMode" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseVad" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseVadCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseVadCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VadProbStart" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "VadProbCntu" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseAgc" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcLevel" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcIncrement" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcDecrement" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcMaxGain" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdBitrateCtrlModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
-					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SpeexCodecStng" ) == 0 )
-					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdIDRFrmIntvl" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdUseCbrOrVbr" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "Cbr" ) == 0 )
-								{
-									CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseCbrRdBtnId );
-								}
-								else
-								{
-									CheckRadioButton( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId, SpeexEncdUseVbrRdBtnId, SpeexEncdUseVbrRdBtnId );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdQualt" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdQualtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdCmplxt" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdPlcExptLossRate" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexDecdIsUsePrcplEnhsmt" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SpeexCodecStngDlgWndHdl, SpeexDecdIsUsePrcplEnhsmtCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SpeexCodecStngDlgWndHdl, SpeexDecdIsUsePrcplEnhsmtCkBoxId, BST_CHECKED );
-								}
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdIDRFrmIntvlEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
-					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "SaveAdoInptOtptToWaveFile" ) == 0 )
-					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdCmplxt" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInpt" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptSrcFullPath" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptRsltFullPath" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoOtpt" ) == 0 )
-							{
-								if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-								{
-									CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId, BST_UNCHECKED );
-								}
-								else
-								{
-									CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId, BST_CHECKED );
-								}
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptSrcFullPath" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "WrBufSzByt" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-						}
-					}
-					else if( strcmp( p_TmpXMLElement1Pt->Name(), "OpenH264Codec" ) == 0 )
-					{
-						for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
-						{
-							if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdVdoType" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdVdoTypeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdEncdBitrate" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdEncdBitrateEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdEncdBitrateCtrlMode" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdBitrateCtrlModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdIDRFrmIntvl" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdIDRFrmIntvlEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdCmplxt" ) == 0 )
-							{
-								VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-								SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdCmplxtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdCmplxtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
 				}
@@ -1950,14 +1950,15 @@ void DelStngXmlFile()
 	{
 		g_ErrInfoVstr.Cpy( Cu8vstr( "删除设置文件Stng.xml成功。" ) );
 		LOGI( g_ErrInfoVstr.m_VstrPt );
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 	else
 	{
 		GetWinSysErrInfo( GetLastError(), g_ErrInfoVstr.m_VstrPt );
 		g_ErrInfoVstr.Ins( 0, Cu8vstr( "删除设置文件Stng.xml失败。原因：" ) );
 		LOGE( g_ErrInfoVstr.m_VstrPt );
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
-	{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 }
 
 //重置设置。
@@ -2027,6 +2028,12 @@ void ResetStng()
 	//设置音频输入设备、音频输出设备。
 	RefresAdoVdohDvc();
 
+	//设置音频输入出是否静音、视频输入输出是否黑屏。
+	CheckDlgButton( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId, BST_UNCHECKED );
+	CheckDlgButton( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId, BST_UNCHECKED );
+	CheckDlgButton( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId, BST_UNCHECKED );
+	CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_UNCHECKED );
+
 	//设置是否绘制音频波形到窗口。
 	CheckDlgButton( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
 
@@ -2038,16 +2045,19 @@ void ResetStng()
 		CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_CHECKED );
 
-		SetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId ), L"640" );
-		SetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId ), L"480" );
+		//设置视频帧的大小。
 		SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_RESETCONTENT, ( WPARAM )0, ( LPARAM )0 );
 		SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"120×160" );
 		SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"240×320" );
 		SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"480×640" );
 		SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"960×1280" );
-
-		SendMessage( g_StngDlgWndHdl, WM_COMMAND, UseEffectSuperRdBtnId, 0 ); //默认效果等级：超。
+		SetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId ), L"640" );
+		SetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId ), L"480" );
 		
+		//设置使用什么效果等级。
+		SendMessage( g_StngDlgWndHdl, WM_COMMAND, UseEffectSuperRdBtnId, 0 );
+		
+		//设置自适应抖动缓冲器。
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMinNeedBufFrmCntEdTxtId ), L"5" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId ), L"20" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId ), L"20" );
@@ -2056,8 +2066,10 @@ void ResetStng()
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId ), L"24" );
 		SetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId ), L"1.0" );
 
+		//设置保存状态到Txt文件。
 		SetWindowText( GetDlgItem( g_SaveStsToTxtFileStngDlgWndHdl, SaveStsToTxtFileFullPathEdTxtId ), L"Sts.txt" );
 		
+		//设置保存音视频输入输出到Avi文件。
 		SetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId ), L"AdoVdoInptOtpt.avi" );
 		SetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId ), L"8192" );
 		CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId, BST_CHECKED );
@@ -2065,6 +2077,7 @@ void ResetStng()
 		CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId, BST_CHECKED );
 
+		//设置保存音频输入输出到Wave文件。
 		CheckDlgButton( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId, BST_CHECKED );
 		SetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId ), L"AdoInptSrc.wav" );
 		SetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId ), L"AdoInptRslt.wav" );

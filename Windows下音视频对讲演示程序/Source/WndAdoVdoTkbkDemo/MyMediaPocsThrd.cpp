@@ -4,7 +4,7 @@
 MyMediaPocsThrdCls::MyMediaPocsThrdCls( HWND MainDlgWndHdl )
 {
 	memset( &m_MainDlgWndHdl, 0, ( char * )&m_TmpByte3Sz + sizeof( m_TmpByte3Sz ) - ( char * )&m_MainDlgWndHdl );
-	m_MainDlgWndHdl = MainDlgWndHdl; //设置主对话框窗口句柄。
+	m_MainDlgWndHdl = MainDlgWndHdl; //设置主对话框窗口的句柄。
 	m_IsInterrupt = 0; //设置未中断。
 
 	m_LclTkbkMode = TkbkModeNone;
@@ -24,7 +24,7 @@ MyMediaPocsThrdCls::~MyMediaPocsThrdCls()
 //用户定义的初始化函数。
 int MyMediaPocsThrdCls::UserInit()
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	int p_RmtNodeAddrFamly; //存放远端节点的地址族，为4表示IPv4，为6表示IPv6，为0表示自动选择。
 	Vstr * p_LclNodeAddrVstrPt = NULL; //存放本地节点地址。
 	Vstr * p_LclNodePortVstrPt = NULL; //存放本地节点端口。
@@ -775,7 +775,7 @@ int MyMediaPocsThrdCls::UserInit()
 //用户定义的处理函数。
 int MyMediaPocsThrdCls::UserPocs()
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	size_t p_PktLenByt;
 	uint32_t p_TmpUint32;
 	size_t p_TmpCntnrElmTotal;
@@ -1349,7 +1349,7 @@ void MyMediaPocsThrdCls::SetTkbkMode()
 //用户定义的消息函数。
 int MyMediaPocsThrdCls::UserMsg( void * MsgArgPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
 	switch( ( ( UserMsgLclTkbkMode * )MsgArgPt )->m_UserMsgTyp )
 	{
@@ -1589,11 +1589,11 @@ void MyMediaPocsThrdCls::UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
 
 				if( m_TmpSz != 0 ) //如果接收音频输出帧容器的第一个输出帧为有语音活动。
 				{
-					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "从接收音频输出帧容器取出一个有语音活动的音频输出帧，帧长度：%uzd。" ), m_TmpSz );
+					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "从接收音频输出帧容器取出一个有语音活动的音频输出帧，帧的长度：%uzd。" ), m_TmpSz );
 				}
 				else //如果接收音频输出帧容器为空，或第一个音频输出帧为无语音活动。
 				{
-					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "从接收音频输出帧容器取出一个无语音活动的音频输出帧，帧长度：%uzd。" ), m_TmpSz );
+					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "从接收音频输出帧容器取出一个无语音活动的音频输出帧，帧的长度：%uzd。" ), m_TmpSz );
 				}
 
 				break;
@@ -1639,7 +1639,7 @@ void MyMediaPocsThrdCls::UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
 				if( m_TmpSz != AdoOtptPcmFrmLenUnit * sizeof( int16_t ) )
 				{
 					memset( AdoOtptPcmSrcFrmPt, 0, AdoOtptPcmFrmLenUnit * sizeof( int16_t ) );
-					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出帧长度不等于Pcm格式的长度。音频输出帧：%uzd，Pcm格式：%z32d。" ), m_TmpSz, AdoOtptPcmFrmLenUnit * sizeof( int16_t ) );
+					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出帧的长度不等于Pcm格式的长度。音频输出帧：%uzd，Pcm格式：%z32d。" ), m_TmpSz, AdoOtptPcmFrmLenUnit * sizeof( int16_t ) );
 				}
 				else
 				{
@@ -1651,7 +1651,7 @@ void MyMediaPocsThrdCls::UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
 			{
 				if( m_TmpSz > AdoOtptEncdSrcFrmSzByt )
 				{
-					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出帧长度已超过已编码格式的长度。音频输出帧：%uzd，已编码格式：%uzd。" ), m_TmpSz, AdoOtptEncdSrcFrmSzByt );
+					if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出帧的长度已超过已编码格式的长度。音频输出帧：%uzd，已编码格式：%uzd。" ), m_TmpSz, AdoOtptEncdSrcFrmSzByt );
 					*AdoOtptEncdSrcFrmLenBytPt = 0;
 				}
 				else
@@ -1765,7 +1765,7 @@ void MyMediaPocsThrdCls::UserWriteVdoOtptFrm( uint32_t VdoOtptStrmIdx,
 
 			if( m_TmpSz - 4 - 4 != *VdoOtptYu12SrcFrmWidthPt * *VdoOtptYu12SrcFrmHeightPt * 3 / 2 )
 			{
-				if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出帧长度不等于Yu12格式的长度。视频输出帧：%uzd，Yu12格式：%z32d。" ), m_TmpSz - 4 - 4, *VdoOtptYu12SrcFrmWidthPt * *VdoOtptYu12SrcFrmHeightPt * 3 / 2 );
+				if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出帧的长度不等于Yu12格式的长度。视频输出帧：%uzd，Yu12格式：%z32d。" ), m_TmpSz - 4 - 4, *VdoOtptYu12SrcFrmWidthPt * *VdoOtptYu12SrcFrmHeightPt * 3 / 2 );
 				*VdoOtptYu12SrcFrmWidthPt = 0;
 				*VdoOtptYu12SrcFrmHeightPt = 0;
 				return;
@@ -1779,7 +1779,7 @@ void MyMediaPocsThrdCls::UserWriteVdoOtptFrm( uint32_t VdoOtptStrmIdx,
 			if( m_TmpSz > VdoOtptEncdSrcFrmSzByt )
 			{
 				*VdoOtptEncdSrcFrmLenBytPt = 0;
-				if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出帧长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz, VdoOtptEncdSrcFrmSzByt );
+				if( m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd，已编码格式：%z32d。" ), m_TmpSz, VdoOtptEncdSrcFrmSzByt );
 				return;
 			}
 

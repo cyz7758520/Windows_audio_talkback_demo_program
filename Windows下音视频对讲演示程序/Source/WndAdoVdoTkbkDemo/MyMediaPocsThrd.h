@@ -35,14 +35,14 @@ typedef enum //对讲状态消息。
 class MyMediaPocsThrdCls : public MediaPocsThrdCls
 {
 public:
-	HWND m_MainDlgWndHdl; //存放主对话框窗口句柄。
-	HWND m_TkbkStsWndHdl; //存放对讲状态窗口句柄。
+	HWND m_MainDlgWndHdl; //存放主对话框窗口的句柄。
+	HWND m_TkbkStsWndHdl; //存放对讲状态窗口的句柄。
 	int m_IsInterrupt; //存放是否中断，为0表示未中断，为1表示已中断。
 
 	struct //存放网络。
 	{
-		Vstr * m_IPAddrVstrPt; //存放IP地址动态字符串指针。
-		Vstr * m_PortVstrPt; //存放端口动态字符串指针。
+		Vstr * m_IPAddrVstrPt; //存放IP地址动态字符串的指针。
+		Vstr * m_PortVstrPt; //存放端口动态字符串的指针。
 		int m_XfrMode; //存放传输模式，为0表示实时半双工（一键通），为1表示实时全双工。
 		int m_PttBtnIsDown; //存放一键即按即通按钮是否按下，为0表示弹起，为非0表示按下。
 		int m_MaxCnctTimes; //存放最大连接次数，取值区间为[1,2147483647]。
@@ -90,24 +90,24 @@ public:
 	struct //存放音频自适应抖动缓冲器。
 	{
 		AAjb * m_Pt; //存放指针。
-		int m_MinNeedBufFrmCnt; //存放最小需缓冲帧数量，单位个，必须大于0。
-		int m_MaxNeedBufFrmCnt; //存放最大需缓冲帧数量，单位个，必须大于最小需缓冲帧的数量。
+		int m_MinNeedBufFrmCnt; //存放最小需缓冲帧数量，单位为个帧，必须大于0。
+		int m_MaxNeedBufFrmCnt; //存放最大需缓冲帧数量，单位为个帧，必须大于等于最小需缓冲帧的数量。
 		int m_MaxCntuLostFrmCnt; //存放最大连续丢失帧的数量，单位为个帧，取值区间为[1,2147483647]，当连续丢失帧的数量超过最大时，认为是对方中途暂停发送。
 		float m_AdaptSensitivity; //存放自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]。
 	} m_AAjb;
 	struct //存放视频自适应抖动缓冲器。
 	{
 		VAjb * m_Pt; //存放指针。
-		int m_MinNeedBufFrmCnt; //存放最小需缓冲帧数量，单位个，必须大于0。
-		int m_MaxNeedBufFrmCnt; //存放最大需缓冲帧数量，单位个，必须大于最小需缓冲帧的数量。
+		int m_MinNeedBufFrmCnt; //存放最小需缓冲帧数量，单位为个帧，必须大于0。
+		int m_MaxNeedBufFrmCnt; //存放最大需缓冲帧数量，单位为个帧，必须大于等于最小需缓冲帧的数量。
 		float m_AdaptSensitivity; //存放自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]。
 	} m_VAjb;
 
-	int8_t * m_TmpBytePt; //存放临时数据指针。
+	int8_t * m_TmpBytePt; //存放临时数据的指针。
 	size_t m_TmpByteSz; //存放临时数据大小。
-	int8_t * m_TmpByte2Pt; //存放临时数据指针。
+	int8_t * m_TmpByte2Pt; //存放临时数据的指针。
 	size_t m_TmpByte2Sz; //存放临时数据大小。
-	int8_t * m_TmpByte3Pt; //存放临时数据指针。
+	int8_t * m_TmpByte3Pt; //存放临时数据的指针。
 	size_t m_TmpByte3Sz; //存放临时数据大小。
 	
 	typedef enum //我的媒体处理线程消息。

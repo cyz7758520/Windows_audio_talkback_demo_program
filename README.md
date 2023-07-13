@@ -123,6 +123,7 @@
 &emsp;&emsp;RNNoise：https://gitlab.xiph.org/xiph/rnnoise/-/blob/master/COPYING  
 &emsp;&emsp;OpenH264：https://github.com/cisco/openh264/blob/master/LICENSE  
 &emsp;&emsp;LibYUV：https://github.com/lemenkov/libyuv/blob/master/LICENSE  
+&emsp;&emsp;TinyXml2：https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt  
 
 # 感谢
 &emsp;&emsp;感谢 WELEN、善书、陈国福 对 Speex、WebRTC 的指点！  
@@ -184,7 +185,7 @@ ___
 &emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptPcmFrmLenUnit：\[输入\]，存放音频输出Pcm格式帧的长度，单位为采样单元。如果音频输出解码器不使用PCM原始数据，则本参数无意义。  
 &emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptEncdSrcFrmPt：\[输出\]，存放音频输出已编码格式原始帧的指针。如果音频输出解码器要使用PCM原始数据，则本参数为NULL。  
 &emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptEncdSrcFrmSzByt：\[输入\]，存放音频输出已编码格式原始帧的大小，单位为字节。如果音频输出解码器要使用PCM原始数据，则本参数无意义。  
-&emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptEncdSrcFrmLenBytPt：\[输出\]，存放音频输出已编码格式原始帧长度的指针，单位为字节。如果音频输出解码器要使用PCM原始数据，则本参数为NULL。  
+&emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptEncdSrcFrmLenBytPt：\[输出\]，存放音频输出已编码格式原始帧的长度的指针，单位为字节。如果音频输出解码器要使用PCM原始数据，则本参数为NULL。  
 返回说明：无。  
 ___
 函数名称：UserGetAdoOtptFrm  
@@ -206,7 +207,7 @@ ___
 &emsp;&emsp;&emsp;&emsp;&emsp;VdoOtptYu12SrcFrmHeightPt：\[输出\]，存放视频输出Yu12格式原始帧高度的指针，单位为像素。如果视频输出解码器不使用YU12原始数据，则本参数为NULL。  
 &emsp;&emsp;&emsp;&emsp;&emsp;VdoOtptEncdSrcFrmPt：\[输出\]，存放视频输出已编码格式原始帧的指针。如果视频输出解码器要使用YU12原始数据，则本参数为NULL。  
 &emsp;&emsp;&emsp;&emsp;&emsp;VdoOtptEncdSrcFrmSzByt：\[输入\]，存放视频输出已编码格式原始帧的大小，单位为字节。如果视频输出解码器要使用YU12原始数据，则本参数无意义。  
-&emsp;&emsp;&emsp;&emsp;&emsp;VdoOtptEncdSrcFrmLenBytPt：\[输出\]，输入时，存放视频输出已编码格式原始帧长度的指针，单位为字节。如果视频输出解码器要使用YU12原始数据，则本参数为NULL。  
+&emsp;&emsp;&emsp;&emsp;&emsp;VdoOtptEncdSrcFrmLenBytPt：\[输出\]，输入时，存放视频输出已编码格式原始帧的长度的指针，单位为字节。如果视频输出解码器要使用YU12原始数据，则本参数为NULL。  
 返回说明：无。  
 ___
 函数名称：UserGetVdoOtptFrm  

@@ -51,14 +51,14 @@ typedef struct MediaPocsThrd
 
 	int32_t m_IsPrintLog; //存放是否打印Log日志，为非0表示要打印，为0表示不打印。
 	int32_t m_IsShowToast; //存放是否显示Toast，为非0表示要显示，为0表示不显示。
-	HWND m_ShowToastWndHdl; //存放显示Toast窗口句柄，为NULL表示桌面窗口。
+	HWND m_ShowToastWndHdl; //存放显示Toast窗口的句柄，为NULL表示桌面窗口。
 
 	int32_t m_IsUsePrvntSysSleep; //存放是否使用阻止系统睡眠，为非0表示要使用，为0表示不使用。
 	
 	struct //存放音视频输入输出Avi文件。
 	{
-		AviFileWriter * m_WriterPt; //存放写入器指针。
-		Vstr * m_FullPathVstrPt; //存放完整路径动态字符串指针。
+		AviFileWriter * m_WriterPt; //存放写入器的指针。
+		Vstr * m_FullPathVstrPt; //存放完整路径动态字符串的指针。
 		size_t m_WrBufSzByt; //存放写入缓冲区大小，单位为字节。
 		int32_t m_IsSaveAdoInpt; //存放是否保存音频输入，为非0表示要保存，为0表示不保存。
 		int32_t m_IsSaveAdoOtpt; //存放是否保存音频输出，为非0表示要保存，为0表示不保存。
@@ -81,25 +81,25 @@ typedef struct MediaPocsThrd
 	struct //存放线程。
 	{
 		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程临时变量。
-		int16_t * m_AdoInptPcmSrcFrmPt; //存放音频输入Pcm格式原始帧指针。
-		int16_t * m_AdoInptPcmRsltFrmPt; //存放音频输入Pcm格式结果帧指针。
-		int16_t * m_AdoInptPcmTmpFrmPt; //存放音频输入Pcm格式临时帧指针。
-		int16_t * m_AdoOtptPcmSrcFrmPt; //存放音频输出Pcm格式原始帧指针。
+		int16_t * m_AdoInptPcmSrcFrmPt; //存放音频输入Pcm格式原始帧的指针。
+		int16_t * m_AdoInptPcmRsltFrmPt; //存放音频输入Pcm格式结果帧的指针。
+		int16_t * m_AdoInptPcmTmpFrmPt; //存放音频输入Pcm格式临时帧的指针。
+		int16_t * m_AdoOtptPcmSrcFrmPt; //存放音频输出Pcm格式原始帧的指针。
 		int32_t m_AdoInptPcmRsltFrmVoiceActSts; //存放音频输入Pcm格式结果帧语音活动状态，为非0表示有语音活动，为0表示无语音活动。
-		uint8_t * m_AdoInptEncdRsltFrmPt; //存放音频输入已编码格式结果帧指针，大小为 m_AdoInpt.m_FrmLenByt 字节。
-		size_t m_AdoInptEncdRsltFrmLenByt; //存放音频输入已编码格式结果帧长度，单位为字节。
+		uint8_t * m_AdoInptEncdRsltFrmPt; //存放音频输入已编码格式结果帧的指针，大小为 m_AdoInpt.m_FrmLenByt 字节。
+		size_t m_AdoInptEncdRsltFrmLenByt; //存放音频输入已编码格式结果帧的长度，单位为字节。
 		int32_t m_AdoInptEncdRsltFrmIsNeedTrans; //存放音频输入已编码格式结果帧是否需要传输，为非0表示需要传输，为0表示不要传输。
-		VdoInpt::Frm * m_VdoInptFrmPt; //存放视频输入帧指针。
-		VdoOtpt::Frm * m_VdoOtptFrmPt; //存放视频输出帧指针。
+		VdoInpt::Frm * m_VdoInptFrmPt; //存放视频输入帧的指针。
+		VdoOtpt::Frm * m_VdoOtptFrmPt; //存放视频输出帧的指针。
 
-		ThrdInfo * m_ThrdInfoPt; //存放线程信息指针。
+		ThrdInfo * m_ThrdInfoPt; //存放线程信息的指针。
 	} m_Thrd;
 
-	Vstr * m_ErrInfoVstrPt; //存放错误信息动态字符串指针。
+	Vstr * m_ErrInfoVstrPt; //存放错误信息动态字符串的指针。
 
 	//用户定义的相关回调函数。
 
-	//存放用户数据指针。注意：在C++的MediaPocsThrdCls类中，本变量存放this指针，请勿修改。
+	//存放用户数据的指针。注意：在C++的MediaPocsThrdCls类中，本变量存放this指针，请勿修改。
 	void * m_UserDataPt;
 	
 	//用户定义的初始化函数。
@@ -194,7 +194,7 @@ int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int32_
 int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int32_t IsSave, const Vstr * SrcFullPathVstrPt, const Vstr * RsltFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsDrawAdoWavfmToWnd, HWND AdoInptSrcWavfmWndHdl, HWND AdoInptRsltWavfmWndHdl, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsDrawAdoWavfmToWnd, HWND SrcWndHdl, HWND RsltWndHdl, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT AdoInptDvcID, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMute, Vstr * ErrInfoVstrPt );
@@ -209,7 +209,7 @@ int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int
 int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int32_t AdoOtptStrmIdx, int32_t IsUseAdoOtptStrm, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int32_t IsSave, const Vstr * SrcFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsDrawAdoWavfmToWnd, HWND AdoOtptSrcWavfmWndHdl, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int32_t IsDrawAdoWavfmToWnd, HWND SrcWndHdl, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, UINT AdoOtptDvcID, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int32_t IsMute, Vstr * ErrInfoVstrPt );
@@ -325,7 +325,7 @@ public:
 	int AdoInptSetUseOpusEncd( VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetUseOpusEncd( m_MediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int AdoInptSetIsSaveAdoToWaveFile( int32_t IsSave, const Vstr * SrcFullPathVstrPt, const Vstr * RsltFullPathVstrPt, size_t WrBufSzByt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( m_MediaPocsThrdPt, IsSave, SrcFullPathVstrPt, RsltFullPathVstrPt, WrBufSzByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int AdoInptSetIsDrawAdoWavfmToWnd( int32_t IsDrawAdoWavfmToWnd, HWND AdoInptSrcWavfmWndHdl, HWND AdoInptRsltWavfmWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( m_MediaPocsThrdPt, IsDrawAdoWavfmToWnd, AdoInptSrcWavfmWndHdl, AdoInptRsltWavfmWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int AdoInptSetIsDrawAdoWavfmToWnd( int32_t IsDraw, HWND SrcWndHdl, HWND RsltWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( m_MediaPocsThrdPt, IsDraw, SrcWndHdl, RsltWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int AdoInptSetUseDvc( UINT AdoInptDvcID, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetUseDvc( m_MediaPocsThrdPt, AdoInptDvcID, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoInptSetIsMute( int32_t IsMute, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsMute( m_MediaPocsThrdPt, IsMute, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
@@ -340,7 +340,7 @@ public:
 	int AdoOtptSetStrmIsUse( int32_t AdoOtptStrmIdx, int32_t IsUseAdoOtptStrm, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetStrmIsUse( m_MediaPocsThrdPt, AdoOtptStrmIdx, IsUseAdoOtptStrm, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int AdoOtptSetIsSaveAdoToWaveFile( int32_t IsSave, const Vstr * SrcFullPathVstrPt, size_t WrBufSzByt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( m_MediaPocsThrdPt, IsSave, SrcFullPathVstrPt, WrBufSzByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int AdoOtptSetIsDrawAdoWavfmToWnd( int32_t IsDrawAdoWavfmToWnd, HWND AdoOtptSrcWavfmWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( m_MediaPocsThrdPt, IsDrawAdoWavfmToWnd, AdoOtptSrcWavfmWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int AdoOtptSetIsDrawAdoWavfmToWnd( int32_t IsDraw, HWND SrcWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( m_MediaPocsThrdPt, IsDraw, SrcWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int AdoOtptSetUseDvc( UINT AdoOtptDvcID, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetUseDvc( m_MediaPocsThrdPt, AdoOtptDvcID, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoOtptSetIsMute( int32_t IsMute, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetIsMute( m_MediaPocsThrdPt, IsMute, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }

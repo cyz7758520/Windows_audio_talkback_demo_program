@@ -4,21 +4,21 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptStrmInit
- * 功能说明：初始化音频输出流。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化音频输出的流。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int AdoOtptStrmInit( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
 	//初始化解码器。
 	switch( StrmPt->m_UseWhatDecd )
@@ -32,7 +32,7 @@ int AdoOtptStrmInit( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 		{
 			if( AdoOtptPt->m_FrmLenMsec != 20 )
 			{
-				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：帧长度不为20毫秒不能使用Speex解码器。" ), StrmPt->m_Idx );
+				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：帧的长度不为20毫秒不能使用Speex解码器。" ), StrmPt->m_Idx );
 				goto Out;
 			}
 			if( SpeexDecdInit( &StrmPt->m_SpeexDecd.m_Pt, AdoOtptPt->m_SmplRate, StrmPt->m_SpeexDecd.m_IsUsePrcplEnhsmt ) == 0 )
@@ -65,16 +65,16 @@ int AdoOtptStrmInit( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptStrmDstoy
- * 功能说明：销毁音频输出流。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁音频输出的流。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
@@ -113,21 +113,21 @@ void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptAddStrm
- * 功能说明：添加音频输出流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：添加音频输出的流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptAddStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 {
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
-	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器互斥锁加锁。
+	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
 	//查找流索引。
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -148,25 +148,25 @@ void AdoOtptAddStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	p_StrmPt->m_UseWhatDecd = 0;
 
 	Out:
-	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器互斥锁解锁。
+	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptDelStrm
- * 功能说明：删除音频输出流。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：删除音频输出的流。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptDelStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 {
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
-	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器互斥锁加锁。
+	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
 	//查找流索引。
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -181,25 +181,25 @@ void AdoOtptDelStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	}
 
 	Out:
-	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器互斥锁解锁。
+	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptSetStrmUsePcm
- * 功能说明：设置音频输出流要使用PCM原始数据。
- * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+ * 功能说明：设置音频输出的流要使用PCM原始数据。
+ * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptSetStrmUsePcm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 {
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
-	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器互斥锁加锁。
+	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
 	//查找流索引。
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -216,26 +216,26 @@ void AdoOtptSetStrmUsePcm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	}
 
 	Out:
-	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器互斥锁解锁。
+	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptSetStrmUseSpeexDecd
- * 功能说明：设置音频输出流要使用Speex解码器。
- * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程指针，不能为NULL。
+ * 功能说明：设置音频输出的流要使用Speex解码器。
+ * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
              IsUsePrcplEnhsmt：[输出]，存放Speex解码器是否使用知觉增强，为非0表示要使用，为0表示不使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptSetStrmUseSpeexDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUsePrcplEnhsmt )
 {
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
-	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器互斥锁加锁。
+	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
 	//查找流索引。
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -253,25 +253,25 @@ void AdoOtptSetStrmUseSpeexDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t I
 	}
 	
 	Out:
-	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器互斥锁解锁。
+	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptSetStrmUseOpusDecd
- * 功能说明：设置音频输出流要使用Opus解码器。
- * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+ * 功能说明：设置音频输出的流要使用Opus解码器。
+ * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptSetStrmUseOpusDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 {
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
-	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器互斥锁加锁。
+	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
 	//查找流索引。
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -288,25 +288,25 @@ void AdoOtptSetStrmUseOpusDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	}
 	
 	Out:
-	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器互斥锁解锁。
+	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptSetStrmIsUse
- * 功能说明：设置音频输出流是否使用。
- * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+ * 功能说明：设置音频输出的流是否使用。
+ * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStrm )
 {
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	
-	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器互斥锁加锁。
+	AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
 	//查找流索引。
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -319,7 +319,7 @@ void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStr
 				{
 					if( AdoOtptPt->m_IsInit != 0 ) //如果已初始化音频输出。
 					{
-						if( AdoOtptStrmInit( AdoOtptPt, p_StrmPt ) == 0 ) //如果初始化音频输出流成功。
+						if( AdoOtptStrmInit( AdoOtptPt, p_StrmPt ) == 0 ) //如果初始化音频输出的流成功。
 						{
 							p_StrmPt->m_IsUse = 1;
 							AdoOtptPt->m_StrmUseTotal++;
@@ -354,27 +354,27 @@ void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStr
 	}
 	
 	Out:
-	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器互斥锁解锁。
+	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptStrmCntnrInit
- * 功能说明：初始化音频输出流容器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化音频输出的流容器。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int AdoOtptStrmCntnrInit( AdoOtpt * AdoOtptPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 
 	AdoOtptPt->m_StrmUseTotal = 0;
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
@@ -399,21 +399,21 @@ int AdoOtptStrmCntnrInit( AdoOtpt * AdoOtptPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptStrmCntnrDstoy
- * 功能说明：销毁音频输出流容器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁音频输出的流容器。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptStrmCntnrDstoy( AdoOtpt * AdoOtptPt )
 {
-	AdoOtpt::Strm * p_StrmPt; //存放流指针。
+	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 	{
@@ -428,25 +428,25 @@ void AdoOtptStrmCntnrDstoy( AdoOtpt * AdoOtptPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptWavfmInit
- * 功能说明：初始化音频输出波形器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化音频输出的波形。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int AdoOtptWavfmInit( AdoOtpt * AdoOtptPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
-	if( AdoOtptPt->m_Wavfm.m_IsDrawAdoWavfmToWnd != 0 )
+	if( AdoOtptPt->m_Wavfm.m_IsDraw != 0 )
 	{
-		if( AdoWavfmInit( &AdoOtptPt->m_Wavfm.m_SrcWavfmPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+		if( AdoWavfmInit( &AdoOtptPt->m_Wavfm.m_SrcPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化原始波形器成功。" ) );
 		}
@@ -469,23 +469,23 @@ int AdoOtptWavfmInit( AdoOtpt * AdoOtptPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptWavfmDstoy
- * 功能说明：销毁音频输出波形器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁音频输出的波形。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptWavfmDstoy( AdoOtpt * AdoOtptPt )
 {
-	if( AdoOtptPt->m_Wavfm.m_SrcWavfmPt != NULL )
+	if( AdoOtptPt->m_Wavfm.m_SrcPt != NULL )
 	{
-		if( AdoWavfmDstoy( AdoOtptPt->m_Wavfm.m_SrcWavfmPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+		if( AdoWavfmDstoy( AdoOtptPt->m_Wavfm.m_SrcPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁原始波形器成功。" ) );
 		}
@@ -493,37 +493,37 @@ void AdoOtptWavfmDstoy( AdoOtpt * AdoOtptPt )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：销毁原始波形器失败。原因：%vs" ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
-		AdoOtptPt->m_Wavfm.m_SrcWavfmPt = NULL;
+		AdoOtptPt->m_Wavfm.m_SrcPt = NULL;
 	}
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptWaveFileWriterInit
- * 功能说明：初始化音频输出Wave文件写入器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化音频输出的Wave文件写入器。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
-	if( AdoOtptPt->m_WaveFile.m_IsSave != 0 )
+	if( AdoOtptPt->m_WaveFileWriter.m_IsSave != 0 )
 	{
-		if( WaveFileWriterInit( &AdoOtptPt->m_WaveFile.m_SrcWaveFileWriterPt, AdoOtptPt->m_WaveFile.m_SrcFullPathVstrPt, AdoOtptPt->m_WaveFile.m_WrBufSzByt, 1, AdoOtptPt->m_SmplRate, 16 ) == 0 )
+		if( WaveFileWriterInit( &AdoOtptPt->m_WaveFileWriter.m_SrcPt, AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt, AdoOtptPt->m_WaveFileWriter.m_WrBufSzByt, 1, AdoOtptPt->m_SmplRate, 16 ) == 0 )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs Wave文件写入器成功。" ), AdoOtptPt->m_WaveFile.m_SrcFullPathVstrPt );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs 写入器成功。" ), AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
 		}
 		else
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs Wave文件写入器失败。" ), AdoOtptPt->m_WaveFile.m_SrcFullPathVstrPt );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs 写入器失败。" ), AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
 			goto Out;
 		}
 	}
@@ -540,23 +540,23 @@ int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptWaveFileWriterDstoy
- * 功能说明：销毁音频输出Wave文件写入器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁音频输出的Wave文件写入器。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt )
 {
-	if( AdoOtptPt->m_WaveFile.m_SrcWaveFileWriterPt != NULL )
+	if( AdoOtptPt->m_WaveFileWriter.m_SrcPt != NULL )
 	{
-		if( WaveFileWriterDstoy( AdoOtptPt->m_WaveFile.m_SrcWaveFileWriterPt ) == 0 )
+		if( WaveFileWriterDstoy( AdoOtptPt->m_WaveFileWriter.m_SrcPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁原始Wave文件写入器成功。" ) );
 		}
@@ -564,27 +564,27 @@ void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：销毁原始Wave文件写入器失败。" ) );
 		}
-		AdoOtptPt->m_WaveFile.m_SrcWaveFileWriterPt = NULL;
+		AdoOtptPt->m_WaveFileWriter.m_SrcPt = NULL;
 	}
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptDvcAndThrdInit
- * 功能说明：初始化音频输出设备和线程。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：初始化音频输出的设备和线程。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
 	//初始化设备。
 	{
@@ -597,7 +597,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 			goto Out;
 		}
 
-		if( AdoOtptPt->m_Dvc.m_ID == 0 ) //如果要使用默认设备。
+		if( AdoOtptPt->m_Dvc.m_ID == 0 ) //如果要使用默认的设备。
 		{
 			p_HRslt = AdoOtptPt->m_Dvc.m_EnumPt->GetDefaultAudioEndpoint( eRender, eConsole, &AdoOtptPt->m_Dvc.m_Pt ); //初始化设备。
 			if( p_HRslt != S_OK )
@@ -607,9 +607,9 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 				goto Out;
 			}
 		}
-		else //如果要使用指定设备。
+		else //如果要使用指定的设备。
 		{
-			p_HRslt = AdoOtptPt->m_Dvc.m_EnumPt->EnumAudioEndpoints( eRender, DEVICE_STATE_ACTIVE, &AdoOtptPt->m_Dvc.m_ClctPt ); //获取设备收集器。只收集激活设备。
+			p_HRslt = AdoOtptPt->m_Dvc.m_EnumPt->EnumAudioEndpoints( eRender, DEVICE_STATE_ACTIVE, &AdoOtptPt->m_Dvc.m_ClctPt ); //获取设备收集器。只收集激活的设备。
 			if( p_HRslt != S_OK )
 			{
 				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备收集器失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
@@ -625,17 +625,17 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 			}
 		}
 
-		p_HRslt = AdoOtptPt->m_Dvc.m_Pt->Activate( IID_IAudioClient, CLSCTX_INPROC_SERVER, NULL, ( void * * )&AdoOtptPt->m_Dvc.m_ClntPt ); //激活设备客户端接口。
+		p_HRslt = AdoOtptPt->m_Dvc.m_Pt->Activate( IID_IAudioClient, CLSCTX_INPROC_SERVER, NULL, ( void * * )&AdoOtptPt->m_Dvc.m_ClntPt ); //激活设备的客户端接口。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：激活设备客户端接口失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：激活设备的客户端接口失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
-		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetMixFormat( &AdoOtptPt->m_Dvc.m_WaveFmtExPt ); //获取设备格式。
+		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetMixFormat( &AdoOtptPt->m_Dvc.m_WaveFmtExPt ); //获取设备的格式。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备格式失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备的格式失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
@@ -663,37 +663,37 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 			goto Out;
 		}
 
-		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetBufferSize( &AdoOtptPt->m_Dvc.m_BufSzUnit ); //获取设备缓冲区大小。
+		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetBufferSize( &AdoOtptPt->m_Dvc.m_BufSzUnit ); //获取设备的缓冲区大小。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备缓冲区大小失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备的缓冲区大小失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
-		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetService( IID_IAudioRenderClient, ( void * * )&AdoOtptPt->m_Dvc.m_RndrClntPt ); //获取设备渲染客户端。
+		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetService( IID_IAudioRenderClient, ( void * * )&AdoOtptPt->m_Dvc.m_RndrClntPt ); //获取设备的渲染客户端。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备渲染客户端失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备的渲染客户端失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
 		p_HRslt = CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&AdoOtptPt->m_Dvc.m_GlblIntfcTablePt ); //初始化设备全局接口表。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化设备全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化设备的全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
-		p_HRslt = AdoOtptPt->m_Dvc.m_GlblIntfcTablePt->RegisterInterfaceInGlobal( AdoOtptPt->m_Dvc.m_RndrClntPt, IID_IAudioRenderClient, &AdoOtptPt->m_Dvc.m_RndrClntCookie ); //注册设备渲染客户端到全局接口表。
+		p_HRslt = AdoOtptPt->m_Dvc.m_GlblIntfcTablePt->RegisterInterfaceInGlobal( AdoOtptPt->m_Dvc.m_RndrClntPt, IID_IAudioRenderClient, &AdoOtptPt->m_Dvc.m_RndrClntCookie ); //注册设备的渲染客户端到全局接口表。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：注册设备渲染客户端到全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：注册设备的渲染客户端到全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
-		AdoOtptPt->m_Dvc.m_PcmBufFrmPt = NULL; //设置Pcm格式缓冲区帧指针。
-		AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit = AdoOtptPt->m_FrmLenMsec * AdoOtptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec / 1000; //设置Pcm格式缓冲区帧长度。
-		AdoOtptPt->m_Dvc.m_PcmBufFrmLenByt = AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit * sizeof( int16_t ); //设置Pcm格式缓冲区帧长度。
+		AdoOtptPt->m_Dvc.m_PcmBufFrmPt = NULL; //设置Pcm格式缓冲区帧的指针。
+		AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit = AdoOtptPt->m_FrmLenMsec * AdoOtptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec / 1000; //设置Pcm格式缓冲区帧的长度。
+		AdoOtptPt->m_Dvc.m_PcmBufFrmLenByt = AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit * sizeof( int16_t ); //设置Pcm格式缓冲区帧的长度。
 
 		if( SpeexResamplerInit( &AdoOtptPt->m_Dvc.m_PcmBufFrmSpeexResamplerPt, AdoOtptPt->m_SmplRate, AdoOtptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec, 3, NULL ) != 0 )
 		{
@@ -726,28 +726,28 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 		goto Out;
 	}
 
-	//初始化线程临时变量。
+	//初始化线程的临时变量。
 	{
-		AdoOtptPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程临时变量。
-		AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //初始化Pcm格式原始帧指针。
-		AdoOtptPt->m_Thrd.m_EncdSrcFrmPt = ( uint8_t * )malloc( AdoOtptPt->m_FrmLenByt ); //初始化已编码格式原始帧指针。
+		AdoOtptPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程的临时变量。
+		AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //初始化Pcm格式原始帧的指针。
+		AdoOtptPt->m_Thrd.m_EncdSrcFrmPt = ( uint8_t * )malloc( AdoOtptPt->m_FrmLenByt ); //初始化已编码格式原始帧的指针。
 		if( AdoOtptPt->m_Thrd.m_EncdSrcFrmPt == NULL )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：创建已编码格式原始帧内存块失败。" ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：创建已编码格式原始帧的内存块失败。" ) );
 			goto Out;
 		}
-		AdoOtptPt->m_Thrd.m_EncdSrcFrmSzByt = AdoOtptPt->m_FrmLenByt; //初始化已编码格式原始帧大小，单位为字节。
-		AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt = 0; //初始化已编码格式原始帧长度，单位为字节。
-		AdoOtptPt->m_Thrd.m_PcmMixFrmPt = ( int32_t * )malloc( AdoOtptPt->m_FrmLenByt ); //初始化Pcm格式混音帧指针。
+		AdoOtptPt->m_Thrd.m_EncdSrcFrmSzByt = AdoOtptPt->m_FrmLenByt; //初始化已编码格式原始帧的大小，单位为字节。
+		AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt = 0; //初始化已编码格式原始帧的长度，单位为字节。
+		AdoOtptPt->m_Thrd.m_PcmMixFrmPt = ( int32_t * )malloc( AdoOtptPt->m_FrmLenByt ); //初始化Pcm格式混音帧的指针。
 		if( AdoOtptPt->m_Thrd.m_PcmMixFrmPt == NULL )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：创建Pcm格式混音帧内存块失败。" ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：创建Pcm格式混音帧的内存块失败。" ) );
 			goto Out;
 		}
 		AdoOtptPt->m_Thrd.m_ElmTotal = 0; //初始化元素总数。
-		AdoOtptPt->m_Thrd.m_LastTickMsec = 0; //初始化上次嘀嗒钟。
-		AdoOtptPt->m_Thrd.m_NowTickMsec = 0; //初始化本次嘀嗒钟。
-		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：初始化线程临时变量成功。" ) );
+		AdoOtptPt->m_Thrd.m_LastTickMsec = 0; //初始化上次的嘀嗒钟。
+		AdoOtptPt->m_Thrd.m_NowTickMsec = 0; //初始化本次的嘀嗒钟。
+		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：初始化线程的临时变量成功。" ) );
 	}
 
 	//初始化线程。
@@ -777,16 +777,16 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptDvcAndThrdDstoy
- * 功能说明：销毁音频输出设备和线程。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 功能说明：销毁音频输出的设备和线程。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
@@ -802,27 +802,27 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁线程成功。" ) );
 	}
 
-	//销毁线程临时变量。
+	//销毁线程的临时变量。
 	if( AdoOtptPt->m_Thrd.m_IsInitThrdTmpVar != 0 )
 	{
-		AdoOtptPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程临时变量。
-		AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //销毁Pcm格式原始帧指针。
-		if( AdoOtptPt->m_Thrd.m_EncdSrcFrmPt != NULL ) //销毁已编码格式原始帧指针。
+		AdoOtptPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程的临时变量。
+		AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //销毁Pcm格式原始帧的指针。
+		if( AdoOtptPt->m_Thrd.m_EncdSrcFrmPt != NULL ) //销毁已编码格式原始帧的指针。
 		{
 			free( AdoOtptPt->m_Thrd.m_EncdSrcFrmPt );
 			AdoOtptPt->m_Thrd.m_EncdSrcFrmPt = NULL;
 		}
-		AdoOtptPt->m_Thrd.m_EncdSrcFrmSzByt = 0; //销毁已编码格式原始帧大小，单位为字节。
-		AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt = 0; //销毁已编码格式原始帧长度，单位为字节。
-		if( AdoOtptPt->m_Thrd.m_PcmMixFrmPt != NULL ) //销毁Pcm格式混音帧指针。
+		AdoOtptPt->m_Thrd.m_EncdSrcFrmSzByt = 0; //销毁已编码格式原始帧的大小，单位为字节。
+		AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt = 0; //销毁已编码格式原始帧的长度，单位为字节。
+		if( AdoOtptPt->m_Thrd.m_PcmMixFrmPt != NULL ) //销毁Pcm格式混音帧的指针。
 		{
 			free( AdoOtptPt->m_Thrd.m_PcmMixFrmPt );
 			AdoOtptPt->m_Thrd.m_PcmMixFrmPt = NULL;
 		}
 		AdoOtptPt->m_Thrd.m_ElmTotal = 0; //销毁元素总数。
-		AdoOtptPt->m_Thrd.m_LastTickMsec = 0; //销毁上次嘀嗒钟。
-		AdoOtptPt->m_Thrd.m_NowTickMsec = 0; //销毁本次嘀嗒钟。
-		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁线程临时变量成功。" ) );
+		AdoOtptPt->m_Thrd.m_LastTickMsec = 0; //销毁上次的嘀嗒钟。
+		AdoOtptPt->m_Thrd.m_NowTickMsec = 0; //销毁本次的嘀嗒钟。
+		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁线程的临时变量成功。" ) );
 	}
 
 	//销毁Pcm格式空闲帧容器。
@@ -871,28 +871,28 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 		AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit = 0;
 		AdoOtptPt->m_Dvc.m_PcmBufFrmLenByt = 0;
 		AdoOtptPt->m_Dvc.m_PcmBufFrmPt = NULL;
-		if( AdoOtptPt->m_Dvc.m_RndrClntCookie != 0 ) //销毁设备渲染客户端Cookie。
+		if( AdoOtptPt->m_Dvc.m_RndrClntCookie != 0 ) //销毁设备渲染客户端的Cookie。
 		{
 			AdoOtptPt->m_Dvc.m_GlblIntfcTablePt->RevokeInterfaceFromGlobal( AdoOtptPt->m_Dvc.m_RndrClntCookie );
 			AdoOtptPt->m_Dvc.m_RndrClntCookie = 0;
 		}
-		if( AdoOtptPt->m_Dvc.m_GlblIntfcTablePt != NULL ) //销毁设备全局接口表。
+		if( AdoOtptPt->m_Dvc.m_GlblIntfcTablePt != NULL ) //销毁设备的全局接口表。
 		{
 			AdoOtptPt->m_Dvc.m_GlblIntfcTablePt->Release();
 			AdoOtptPt->m_Dvc.m_GlblIntfcTablePt = NULL;
 		}
-		if( AdoOtptPt->m_Dvc.m_RndrClntPt != NULL ) //销毁设备渲染客户端。
+		if( AdoOtptPt->m_Dvc.m_RndrClntPt != NULL ) //销毁设备的渲染客户端。
 		{
 			AdoOtptPt->m_Dvc.m_RndrClntPt->Release();
 			AdoOtptPt->m_Dvc.m_RndrClntPt = NULL;
 		}
-		AdoOtptPt->m_Dvc.m_BufSzUnit = 0; //销毁设备缓冲区大小。
-		if( AdoOtptPt->m_Dvc.m_WaveFmtExPt != NULL ) //销毁设备格式。
+		AdoOtptPt->m_Dvc.m_BufSzUnit = 0; //销毁设备的缓冲区大小。
+		if( AdoOtptPt->m_Dvc.m_WaveFmtExPt != NULL ) //销毁设备的格式。
 		{
 			CoTaskMemFree( AdoOtptPt->m_Dvc.m_WaveFmtExPt );
 			AdoOtptPt->m_Dvc.m_WaveFmtExPt = NULL;
 		}
-		if( AdoOtptPt->m_Dvc.m_ClntPt != NULL ) //销毁设备客户端。
+		if( AdoOtptPt->m_Dvc.m_ClntPt != NULL ) //销毁设备的客户端。
 		{
 			AdoOtptPt->m_Dvc.m_ClntPt->Stop();
 			AdoOtptPt->m_Dvc.m_ClntPt->Release();
@@ -921,24 +921,24 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptInit
  * 功能说明：初始化音频输出。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int AdoOtptInit( AdoOtpt * AdoOtptPt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
 	
-	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始嘀嗒钟。
+	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始的嘀嗒钟。
 
 	if( AdoOtptStrmCntnrInit( AdoOtptPt ) != 0 ) goto Out;
 	if( AdoOtptWavfmInit( AdoOtptPt ) != 0 ) goto Out;
@@ -947,7 +947,7 @@ int AdoOtptInit( AdoOtpt * AdoOtptPt )
 
 	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
 	{
-		p_NowTickMsec = FuncGetTickAsMsec(); //记录初始化结束嘀嗒钟。
+		p_NowTickMsec = FuncGetTickAsMsec(); //记录初始化结束的嘀嗒钟。
 		LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
 	}
 
@@ -964,15 +964,15 @@ int AdoOtptInit( AdoOtpt * AdoOtptPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptDstoy
  * 功能说明：销毁音频输出。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数使用说明。
+ * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
+             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串指针，可以为NULL。
+             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void AdoOtptDstoy( AdoOtpt * AdoOtptPt )
@@ -980,7 +980,7 @@ void AdoOtptDstoy( AdoOtpt * AdoOtptPt )
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
 	
-	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录销毁开始嘀嗒钟。
+	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录销毁开始的嘀嗒钟。
 
 	AdoOtptDvcAndThrdDstoy( AdoOtptPt );
 	AdoOtptWaveFileWriterDstoy( AdoOtptPt );
@@ -989,7 +989,7 @@ void AdoOtptDstoy( AdoOtpt * AdoOtptPt )
 	
 	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
 	{
-		p_NowTickMsec = FuncGetTickAsMsec(); //记录销毁结束嘀嗒钟。
+		p_NowTickMsec = FuncGetTickAsMsec(); //记录销毁结束的嘀嗒钟。
 		LOGFI( Cu8vstr( "媒体处理线程：音频输出：销毁耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
 	}
 }
@@ -997,16 +997,16 @@ void AdoOtptDstoy( AdoOtpt * AdoOtptPt )
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptThrdRun
  * 功能说明：音频输出线程主函数。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程指针，不能为NULL。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
  * 线程安全：是 或 否
- * 调用样例：填写调用此函数样例，并解释函数参数和返回值。
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 {
-	IAudioRenderClient * p_DvcRndrClntPt; //存放设备渲染客户端指针。
+	IAudioRenderClient * p_DvcRndrClntPt; //存放设备渲染客户端的指针。
 	size_t p_TmpSz;
 	HRESULT p_HRslt;
 
@@ -1039,14 +1039,14 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 	while( 1 )
 	{
 		{
-			if( AdoOtptPt->m_Dvc.m_PcmBufFrmPt == NULL ) //如果还没有获取设备Pcm格式缓冲区。
+			if( AdoOtptPt->m_Dvc.m_PcmBufFrmPt == NULL ) //如果还没有获取设备的Pcm格式缓冲区。
 			{
-				p_HRslt = p_DvcRndrClntPt->GetBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, ( BYTE * * )&AdoOtptPt->m_Dvc.m_PcmBufFrmPt ); //获取设备Pcm格式缓冲区。
-				if( p_HRslt == S_OK ) //如果获取设备Pcm格式缓冲区成功。
+				p_HRslt = p_DvcRndrClntPt->GetBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, ( BYTE * * )&AdoOtptPt->m_Dvc.m_PcmBufFrmPt ); //获取设备的Pcm格式缓冲区。
+				if( p_HRslt == S_OK ) //如果获取设备的Pcm格式缓冲区成功。
 				{
 					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit：%uzd。" ), AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit );
 				}
-				else //如果获取设备Pcm格式缓冲区失败。
+				else //如果获取设备的Pcm格式缓冲区失败。
 				{
 					if( p_HRslt == AUDCLNT_E_DEVICE_INVALIDATED ) //如果设备已经关闭。
 					{
@@ -1060,7 +1060,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 					{
 						if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：AUDCLNT_E_BUFFER_ERROR。" ) );
 					}
-					else if( p_HRslt == AUDCLNT_E_BUFFER_TOO_LARGE ) //如果获取设备Pcm格式缓冲区还不够一帧。
+					else if( p_HRslt == AUDCLNT_E_BUFFER_TOO_LARGE ) //如果获取设备的Pcm格式缓冲区还不够一帧。
 					{
 						//if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：AUDCLNT_E_BUFFER_TOO_LARGE。" ) );
 						FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
@@ -1094,7 +1094,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 			}
 
 			//获取一个Pcm格式空闲帧。
-			AdoOtptPt->m_PcmIdleFrmCntnr.GetTotal( &AdoOtptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式空闲帧容器元素总数。
+			AdoOtptPt->m_PcmIdleFrmCntnr.GetTotal( &AdoOtptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式空闲帧容器的元素总数。
 			if( AdoOtptPt->m_Thrd.m_ElmTotal > 0 ) //如果Pcm格式空闲帧容器中有帧。
 			{
 				AdoOtptPt->m_PcmIdleFrmCntnr.GetHead( &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 1, NULL ); //从Pcm格式空闲帧容器中取出并删除第一个帧。
@@ -1102,7 +1102,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 			}
 			else //如果Pcm格式空闲帧容器中没有帧。
 			{
-				AdoOtptPt->m_PcmSrcFrmCntnr.GetTotal( &AdoOtptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式原始帧容器元素总数。
+				AdoOtptPt->m_PcmSrcFrmCntnr.GetTotal( &AdoOtptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式原始帧容器的元素总数。
 				if( AdoOtptPt->m_Thrd.m_ElmTotal <= 50 )
 				{
 					AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = ( int16_t * )calloc( AdoOtptPt->m_FrmLenByt, 1 ); //创建一个Pcm格式空闲帧。
@@ -1127,16 +1127,16 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) AdoOtptPt->m_Thrd.m_LastTickMsec = FuncGetTickAsMsec();
 
-			//调用用户定义写入音频输出帧函数，并解码成PCM原始数据，最后混音。
+			//调用用户定义的写入音频输出帧函数，并解码成PCM原始数据，最后混音。
 			{
-				AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器互斥锁加锁。
+				AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
 				if( AdoOtptPt->m_StrmUseTotal > 0 ) //如果有流要使用。
 				{
 					size_t p_StrmNum = 0;
-					AdoOtpt::Strm * p_StrmPt; //存放流指针。
+					AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 
-					for( ; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ ) //查找第一条要使用流。
+					for( ; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ ) //查找第一条要使用的流。
 					{
 						if( p_StrmPt->m_IsUse != 0 ) //如果该流为要使用。
 						{
@@ -1190,12 +1190,12 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 
 					if( AdoOtptPt->m_StrmUseTotal > 1 ) //如果有超过1条流要使用。
 					{
-						for( int p_TmpInt = 0; p_TmpInt < AdoOtptPt->m_FrmLenUnit; p_TmpInt++ ) //将第一个流Pcm格式原始帧复制到Pcm格式混音帧。
+						for( int p_TmpInt = 0; p_TmpInt < AdoOtptPt->m_FrmLenUnit; p_TmpInt++ ) //将第一个流的Pcm格式原始帧复制到Pcm格式混音帧。
 						{
 							AdoOtptPt->m_Thrd.m_PcmMixFrmPt[ p_TmpInt ] = AdoOtptPt->m_Thrd.m_PcmSrcFrmPt[ p_TmpInt ];
 						}
 
-						for( ; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ ) //查找其他要使用流。
+						for( ; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ ) //查找其他要使用的流。
 						{
 							if( p_StrmPt->m_IsUse != 0 ) //如果该流为要使用。
 							{
@@ -1259,7 +1259,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 					}
 				}
 
-				AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器互斥锁解锁。
+				AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 			}
 
 			//判断设备是否静音。在音频处理完后再设置静音，这样可以保证音频处理器的连续性。
@@ -1282,7 +1282,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 				}
 			}
 
-			p_DvcRndrClntPt->ReleaseBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, 0 ); //释放设备Pcm格式缓冲区。
+			p_DvcRndrClntPt->ReleaseBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, 0 ); //释放设备的Pcm格式缓冲区。
 			AdoOtptPt->m_Dvc.m_PcmBufFrmPt = NULL;
 
 			//放入本次Pcm格式原始帧到Pcm格式原始帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。

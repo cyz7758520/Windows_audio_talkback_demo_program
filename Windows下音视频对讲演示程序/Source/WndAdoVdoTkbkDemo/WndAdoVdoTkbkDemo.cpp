@@ -7,47 +7,47 @@
 #include "MyMediaPocsThrd.h"
 
 //全局变量。
-HINSTANCE g_IstnsHdl; //存放当前实例句柄。
-VstrCls g_ErrInfoVstr; //存放错误信息动态字符串指针。
-MyMediaPocsThrdCls * g_MyMediaPocsThrdPt = NULL; //存放媒体处理线程指针。
-HWND g_MainDlgWndHdl = NULL; //存放主对话框窗口句柄。
+HINSTANCE g_IstnsHdl; //存放当前实例的句柄。
+VstrCls g_ErrInfoVstr; //存放错误信息动态字符串的指针。
+MyMediaPocsThrdCls * g_MyMediaPocsThrdPt = NULL; //存放媒体处理线程的指针。
+HWND g_MainDlgWndHdl = NULL; //存放主对话框窗口的句柄。
 long g_MainDlgWndMinHeight = 0; //存放主对话框窗口的最小高度，单位为像素。
 long g_MainDlgWndMinWidth = 0; //存放主对话框窗口的最小宽度，单位为像素。
-HWND g_AdoInptDvcCbBoxWndHdl = NULL; //存放音频输入设备组合框窗口句柄。
-HWND g_AdoOtptDvcCbBoxWndHdl = NULL; //存放音频输出设备组合框窗口句柄。
-HWND g_VdoInptDvcCbBoxWndHdl = NULL; //存放视频输入设备组合框窗口句柄。
-HWND g_LogLtBoxWndHdl = NULL; //存放日志列表框窗口句柄。
-HWND g_VdoInptPrvwTxtWndHdl = NULL; //存放视频输入预览文本框窗口句柄。
-HWND g_VdoOtptDspyTxtWndHdl = NULL; //存放视频输出显示文本框窗口句柄。
+HWND g_AdoInptDvcCbBoxWndHdl = NULL; //存放音频输入设备组合框窗口的句柄。
+HWND g_AdoOtptDvcCbBoxWndHdl = NULL; //存放音频输出设备组合框窗口的句柄。
+HWND g_VdoInptDvcCbBoxWndHdl = NULL; //存放视频输入设备组合框窗口的句柄。
+HWND g_LogLtBoxWndHdl = NULL; //存放日志列表框窗口的句柄。
+HWND g_VdoInptPrvwTxtWndHdl = NULL; //存放视频输入预览文本框窗口的句柄。
+HWND g_VdoOtptDspyTxtWndHdl = NULL; //存放视频输出显示文本框窗口的句柄。
 long g_VdoTxtWndLeftMargin = 0; //存放视频文本框窗口的左边距，单位为像素。
 long g_VdoTxtWndTopMargin = 0; //存放视频文本框窗口的顶边距，单位为像素。
 long g_VdoTxtWndRightMargin = 0; //存放视频文本框窗口的右边距，单位为像素。
 long g_VdoTxtWndBottomMargin = 0; //存放视频文本框窗口的底边距，单位为像素。
 int g_VdoWndShowMode = 0; //存放视频窗口的显示模式，为0表示正常，为1表示垂直最大化排列，为2表示水平最大化排列。
-HWND g_VdoInptPrvwWndHdl = NULL; //存放视频输入预览窗口句柄。
-HWND g_VdoOtptDspyWndHdl = NULL; //存放视频输出显示窗口句柄。
+HWND g_VdoInptPrvwWndHdl = NULL; //存放视频输入预览窗口的句柄。
+HWND g_VdoOtptDspyWndHdl = NULL; //存放视频输出显示窗口的句柄。
 
-HWND g_RqstCnctDlgWndHdl = NULL; //存放请求连接对话框窗口句柄。
-HWND g_PttDlgWndHdl = NULL; //存放一键即按即通对话框窗口句柄。
-HWND g_PttBtnWndHdl = NULL; //存放一键即按即通按钮窗口句柄。
-HWND g_XfrPrtclStngDlgWndHdl = NULL; //存放传输协议设置对话框窗口句柄。
-HWND g_StngDlgWndHdl = NULL; //存放设置对话框窗口句柄。
-HWND g_AjbStngDlgWndHdl = NULL; //存放自适应抖动缓冲器设置对话框窗口句柄。
-HWND g_SaveStsToTxtFileStngDlgWndHdl = NULL; //存放保存状态到Txt文件设置对话框窗口句柄。
-HWND g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl = NULL; //存放保存音视频输入输出到Avi文件设置对话框窗口句柄。
-HWND g_SpeexAecStngDlgWndHdl = NULL; //存放Speex声学回音消除器设置对话框窗口句柄。
-HWND g_WebRtcAecmStngDlgWndHdl = NULL; //存放WebRtc定点版声学回音消除器设置对话框窗口句柄。
-HWND g_WebRtcAecStngDlgWndHdl = NULL; //存放WebRtc浮点版声学回音消除器设置对话框窗口句柄。
-HWND g_SpeexWebRtcAecStngDlgWndHdl = NULL; //存放SpeexWebRtc三重声学回音消除器设置对话框窗口句柄。
-HWND g_SpeexPrpocsNsStngDlgWndHdl = NULL; //存放Speex预处理器的噪音抑制设置对话框窗口句柄。
-HWND g_WebRtcNsxStngDlgWndHdl = NULL; //存放WebRtc定点版噪音抑制器设置对话框窗口句柄。
-HWND g_WebRtcNsStngDlgWndHdl = NULL; //存放WebRtc浮点版噪音抑制器设置对话框窗口句柄。
-HWND g_SpeexPrpocsStngDlgWndHdl = NULL; //存放Speex预处理器的设置对话框窗口句柄。
-HWND g_SpeexCodecStngDlgWndHdl = NULL; //存放Speex编解码器设置对话框窗口句柄。
-HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl = NULL; //存放保存音频输入输出到Wave文件设置对话框窗口句柄。
-HWND g_OpenH264CodecStngDlgWndHdl = NULL; //存放OpenH264编码器设置对话框窗口句柄。
+HWND g_RqstCnctDlgWndHdl = NULL; //存放请求连接对话框窗口的句柄。
+HWND g_PttDlgWndHdl = NULL; //存放一键即按即通对话框窗口的句柄。
+HWND g_PttBtnWndHdl = NULL; //存放一键即按即通按钮窗口的句柄。
+HWND g_XfrPrtclStngDlgWndHdl = NULL; //存放传输协议设置对话框窗口的句柄。
+HWND g_StngDlgWndHdl = NULL; //存放设置对话框窗口的句柄。
+HWND g_AjbStngDlgWndHdl = NULL; //存放自适应抖动缓冲器设置对话框窗口的句柄。
+HWND g_SaveStsToTxtFileStngDlgWndHdl = NULL; //存放保存状态到Txt文件设置对话框窗口的句柄。
+HWND g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl = NULL; //存放保存音视频输入输出到Avi文件设置对话框窗口的句柄。
+HWND g_SpeexAecStngDlgWndHdl = NULL; //存放Speex声学回音消除器设置对话框窗口的句柄。
+HWND g_WebRtcAecmStngDlgWndHdl = NULL; //存放WebRtc定点版声学回音消除器设置对话框窗口的句柄。
+HWND g_WebRtcAecStngDlgWndHdl = NULL; //存放WebRtc浮点版声学回音消除器设置对话框窗口的句柄。
+HWND g_SpeexWebRtcAecStngDlgWndHdl = NULL; //存放SpeexWebRtc三重声学回音消除器设置对话框窗口的句柄。
+HWND g_SpeexPrpocsNsStngDlgWndHdl = NULL; //存放Speex预处理器的噪音抑制设置对话框窗口的句柄。
+HWND g_WebRtcNsxStngDlgWndHdl = NULL; //存放WebRtc定点版噪音抑制器设置对话框窗口的句柄。
+HWND g_WebRtcNsStngDlgWndHdl = NULL; //存放WebRtc浮点版噪音抑制器设置对话框窗口的句柄。
+HWND g_SpeexPrpocsStngDlgWndHdl = NULL; //存放Speex预处理器的设置对话框窗口的句柄。
+HWND g_SpeexCodecStngDlgWndHdl = NULL; //存放Speex编解码器设置对话框窗口的句柄。
+HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl = NULL; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
+HWND g_OpenH264CodecStngDlgWndHdl = NULL; //存放OpenH264编解码器设置对话框窗口的句柄。
 
-HWND g_TkbkStsWndHdl = NULL; //存放对讲状态窗口句柄。
+HWND g_TkbkStsWndHdl = NULL; //存放对讲状态窗口的句柄。
 
 //刷新音视频设备。
 void RefresAdoVdohDvc()
@@ -295,7 +295,7 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 //窗口消息处理过程函数。
 INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	
 	UNREFERENCED_PARAMETER( lParam );
 	switch( message )
@@ -620,7 +620,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 						LOGI( Cu8vstr( "开始启动媒体处理线程。" ) );
 
-						//初始化媒体处理线程指针。
+						//初始化媒体处理线程的指针。
 						g_MyMediaPocsThrdPt = new MyMediaPocsThrdCls( g_MainDlgWndHdl );
 						if( g_MyMediaPocsThrdPt->Init( &g_ErrInfoVstr ) != 0 )
 						{
@@ -670,7 +670,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							g_MyMediaPocsThrdPt->m_UseWhatRecvOtptFrm = 0;
 						}
 						
-						//设置是否使用自己设计的自适应抖动缓冲器。
+						//设置是否使用自适应抖动缓冲器。
 						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseAjbRecvOtptFrmRdBtnId ) == BST_CHECKED )
 						{
 							g_MyMediaPocsThrdPt->m_UseWhatRecvOtptFrm = 1;
@@ -705,15 +705,15 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						//设置是否保存音视频输入输出到Avi文件。
 						if( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId ) == BST_CHECKED )
 						{
-							wchar_t p_FullPathU16trPt[ 1024 ];
+							wchar_t p_FullPathU16strPt[ 1024 ];
 							size_t p_WrBufSzByt;
 
-							GetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId ), p_FullPathU16trPt, SzOfArr( p_FullPathU16trPt ) );
+							GetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId ), p_FullPathU16strPt, SzOfArr( p_FullPathU16strPt ) );
 							GetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 							p_WrBufSzByt = _wtoi( p_TmpU16strPt );
 
 							g_MyMediaPocsThrdPt->SetIsSaveAdoVdoInptOtptToAviFile(
-								Cu16vstr( p_FullPathU16trPt ),
+								Cu16vstr( p_FullPathU16strPt ),
 								p_WrBufSzByt,
 								( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 								( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
@@ -733,7 +733,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 								( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 0,
 							&g_ErrInfoVstr );
 
-						//设置音频输入是否使用系统自带声学回音消除器、噪音抑制器和自动增益控制器。
+						//设置音频输入是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
 						g_MyMediaPocsThrdPt->AdoInptSetIsUseSystemAecNsAgc( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0, &g_ErrInfoVstr );
 
 						if( g_MyMediaPocsThrdPt->m_Ntwk.m_XfrMode == 0 ) //如果传输模式为实时半双工（一键通）。
@@ -991,18 +991,18 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						if( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) &&
 							( IsDlgButtonChecked( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId ) == BST_CHECKED ) )
 						{
-							wchar_t p_AdoInptSrcFullPathU16trPt[ 1024 ];
-							wchar_t p_AdoInptRsltFullPathU16trPt[ 1024 ];
+							wchar_t p_AdoInptSrcFullPathU16strPt[ 1024 ];
+							wchar_t p_AdoInptRsltFullPathU16strPt[ 1024 ];
 							size_t p_WrBufSzByt;
 
-							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId ), p_AdoInptSrcFullPathU16trPt, SzOfArr( p_AdoInptSrcFullPathU16trPt ) );
-							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId ), p_AdoInptRsltFullPathU16trPt, SzOfArr( p_AdoInptRsltFullPathU16trPt ) );
+							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId ), p_AdoInptSrcFullPathU16strPt, SzOfArr( p_AdoInptSrcFullPathU16strPt ) );
+							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId ), p_AdoInptRsltFullPathU16strPt, SzOfArr( p_AdoInptRsltFullPathU16strPt ) );
 							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 							p_WrBufSzByt = _wtoi( p_TmpU16strPt );
 
 							g_MyMediaPocsThrdPt->AdoInptSetIsSaveAdoToWaveFile( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																				Cu16vstr( p_AdoInptSrcFullPathU16trPt ),
-																				Cu16vstr( p_AdoInptRsltFullPathU16trPt ),
+																				Cu16vstr( p_AdoInptSrcFullPathU16strPt ),
+																				Cu16vstr( p_AdoInptRsltFullPathU16strPt ),
 																				p_WrBufSzByt,
 																				&g_ErrInfoVstr );
 						}
@@ -1061,15 +1061,15 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						if( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) &&
 							( IsDlgButtonChecked( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId ) == BST_CHECKED ) )
 						{
-							wchar_t p_AdoOtptSrcFullPathU16trPt[ 1024 ];
+							wchar_t p_AdoOtptSrcFullPathU16strPt[ 1024 ];
 							size_t p_WrBufSzByt;
 
-							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId ), p_AdoOtptSrcFullPathU16trPt, SzOfArr( p_AdoOtptSrcFullPathU16trPt ) );
+							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId ), p_AdoOtptSrcFullPathU16strPt, SzOfArr( p_AdoOtptSrcFullPathU16strPt ) );
 							GetWindowText( GetDlgItem( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 							p_WrBufSzByt = _wtoi( p_TmpU16strPt );
 
 							g_MyMediaPocsThrdPt->AdoOtptSetIsSaveAdoToWaveFile( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																				Cu16vstr( p_AdoOtptSrcFullPathU16trPt ),
+																				Cu16vstr( p_AdoOtptSrcFullPathU16strPt ),
 																				p_WrBufSzByt,
 																				&g_ErrInfoVstr );
 						}
@@ -1083,7 +1083,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 															   &g_ErrInfoVstr );
 						
 						//设置视频输入。
-						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId ) == BST_CHECKED ) //如果要使用预设的帧大小。
+						if( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId ) == BST_CHECKED ) //如果要使用预设的帧的大小。
 						{
 							g_MyMediaPocsThrdPt->SetVdoInpt(
 								( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId ) == BST_CHECKED ) ? 12 :
@@ -1101,7 +1101,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 								g_VdoInptPrvwWndHdl,
 								&g_ErrInfoVstr );
 						}
-						else //如果要使用其他的帧大小。
+						else //如果要使用其他的帧的大小。
 						{
 							int32_t p_VdoFrmSzOtherWidth;
 							int32_t p_VdoFrmSzOtherHeight;
@@ -1199,14 +1199,14 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 									( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? MyMediaPocsThrdCls::TkbkModeAdoVdo : MyMediaPocsThrdCls::TkbkModeNoChg;
 						g_MyMediaPocsThrdPt->SendUserMsg( p_UserMsgLclTkbkModePt, NULL );
 
-						//设置是否保存状态到文件。
+						//设置是否保存状态到Txt文件。
 						if( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveStsToTxtFileCkBoxId ) == BST_CHECKED )
 						{
-							wchar_t p_FullPathU16trPt[ 1024 ];
+							wchar_t p_FullPathU16strPt[ 1024 ];
 
-							GetWindowText( GetDlgItem( g_SaveStsToTxtFileStngDlgWndHdl, SaveStsToTxtFileFullPathEdTxtId ), p_FullPathU16trPt, SzOfArr( p_FullPathU16trPt ) );
+							GetWindowText( GetDlgItem( g_SaveStsToTxtFileStngDlgWndHdl, SaveStsToTxtFileFullPathEdTxtId ), p_FullPathU16strPt, SzOfArr( p_FullPathU16strPt ) );
 
-							g_MyMediaPocsThrdPt->SaveStsToTxtFile( Cu16vstr( p_FullPathU16trPt ),
+							g_MyMediaPocsThrdPt->SaveStsToTxtFile( Cu16vstr( p_FullPathU16strPt ),
 																   &g_ErrInfoVstr );
 						}
 
@@ -1703,9 +1703,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	//_CrtSetBreakAlloc( 711 );
 	#endif
 
-	g_IstnsHdl = hInstance; //设置当前实例句柄。
+	g_IstnsHdl = hInstance; //设置当前实例的句柄。
 	
-	FuncSetCurActPath( NULL, NULL ); //设置当前进程活动目录的路径为为当前进程可执行文件的上级路径。
+	FuncSetCurActPath( NULL, NULL ); //设置当前进程活动目录为当前进程可执行文件上级路径。
 	
 	//初始化错误信息动态字符串。
 	g_ErrInfoVstr.Init();
@@ -1780,12 +1780,12 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	
 	//设置句柄、高度、宽度、边距。
 	{
-		g_AdoInptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ); //设置音频输入设备组合框窗口句柄。
-		g_AdoOtptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ); //设置音频输出设备组合框窗口句柄。
-		g_VdoInptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ); //设置视频输入设备组合框窗口句柄。
-		g_LogLtBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, LogLtBoxId ); //设置日志列表框窗口句柄。
-		g_VdoInptPrvwTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoInptPrvwTxtId ); //设置视频输入预览文本框窗口句柄。
-		g_VdoOtptDspyTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoOtptDspyTxtId ); //设置视频输出显示文本框窗口句柄。
+		g_AdoInptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ); //设置音频输入设备组合框窗口的句柄。
+		g_AdoOtptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ); //设置音频输出设备组合框窗口的句柄。
+		g_VdoInptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ); //设置视频输入设备组合框窗口的句柄。
+		g_LogLtBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, LogLtBoxId ); //设置日志列表框窗口的句柄。
+		g_VdoInptPrvwTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoInptPrvwTxtId ); //设置视频输入预览文本框窗口的句柄。
+		g_VdoOtptDspyTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoOtptDspyTxtId ); //设置视频输出显示文本框窗口的句柄。
 		g_VdoInptPrvwWndHdl = g_VdoInptPrvwTxtWndHdl;
 		g_VdoOtptDspyWndHdl = g_VdoOtptDspyTxtWndHdl;
 
@@ -2018,7 +2018,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			}
 		}
 
-		LocalFree( p_Argv ); //销毁命令行参数指针数组。
+		LocalFree( p_Argv ); //销毁命令行参数的指针数组。
 	}
 	
     //主消息循环。

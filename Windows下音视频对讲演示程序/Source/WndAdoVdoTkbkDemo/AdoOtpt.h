@@ -7,16 +7,16 @@ typedef struct MediaPocsThrd MediaPocsThrd;
 
 typedef struct //音频输出。
 {
-	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程指针。
+	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程的指针。
 
 	int32_t m_IsUse; //存放是否使用音频输出，为0表示不使用，为非0表示要使用。
 	int32_t m_IsInit; //存放是否初始化音频输出，为0表示未初始化，为非0表示已初始化。
 
 	int32_t m_SmplRate; //存放采样频率，单位为赫兹，取值只能为8000、16000、32000、48000。
-	size_t m_FrmLenMsec; //存放帧长度，单位为毫秒，取值只能为10毫秒的倍数。
-	size_t m_FrmLenUnit; //存放帧长度，单位为采样单元，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
-	size_t m_FrmLenData; //存放帧长度，单位为采样数据，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
-	size_t m_FrmLenByt; //存放帧长度，单位为字节，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80*2、20毫秒为160*2、30毫秒为240*2，16000Hz的10毫秒为160*2、20毫秒为320*2、30毫秒为480*2，32000Hz的10毫秒为320*2、20毫秒为640*2、30毫秒为960*2，48000Hz的10毫秒为480*2、20毫秒为960*2、30毫秒为1440*2。
+	size_t m_FrmLenMsec; //存放帧的长度，单位为毫秒，取值只能为10毫秒的倍数。
+	size_t m_FrmLenUnit; //存放帧的长度，单位为采样单元，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
+	size_t m_FrmLenData; //存放帧的长度，单位为采样数据，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
+	size_t m_FrmLenByt; //存放帧的长度，单位为字节，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80*2、20毫秒为160*2、30毫秒为240*2，16000Hz的10毫秒为160*2、20毫秒为320*2、30毫秒为480*2，32000Hz的10毫秒为320*2、20毫秒为640*2、30毫秒为960*2，48000Hz的10毫秒为480*2、20毫秒为960*2、30毫秒为1440*2。
 	
 	typedef struct //存放流。
 	{
@@ -33,39 +33,39 @@ typedef struct //音频输出。
 		} m_SpeexDecd;
 	} Strm;
 	CQueueCls m_StrmCntnr; //存放流容器。
-	int32_t m_StrmUseTotal; //存放流要使用总数。
+	int32_t m_StrmUseTotal; //存放流要使用的总数。
 	
 	struct //存放波形器。
 	{
-		int32_t m_IsDrawAdoWavfmToWnd; //存放是否绘制音频波形到窗口，为非0表示要绘制，为0表示不绘制。
-		AdoWavfm * m_SrcWavfmPt; //存放原始波形器指针。
-		HWND m_SrcWavfmWndHdl; //存放原始波形窗口句柄。
+		int32_t m_IsDraw; //存放是否绘制，为非0表示要绘制，为0表示不绘制。
+		AdoWavfm * m_SrcPt; //存放原始的指针。
+		HWND m_SrcWndHdl; //存放原始窗口的句柄。
 	} m_Wavfm;
 
-	struct //存放Wave文件。
+	struct //存放Wave文件写入器。
 	{
-		int32_t m_IsSave; //存放是否保存，非0表示要保存，0表示不保存。
-		WaveFileWriter * m_SrcWaveFileWriterPt; //存放原始Wave文件写入器指针。
-		Vstr * m_SrcFullPathVstrPt; //存放原始完整路径动态字符串指针。
-		size_t m_WrBufSzByt; //存放写入缓冲区大小，单位为字节。
-	} m_WaveFile;
+		int32_t m_IsSave; //存放是否保存，为非0表示要保存，为0表示不保存。
+		WaveFileWriter * m_SrcPt; //存放原始的指针。
+		Vstr * m_SrcFullPathVstrPt; //存放原始完整路径动态字符串的指针。
+		size_t m_WrBufSzByt; //存放写入缓冲区的大小，单位为字节。
+	} m_WaveFileWriter;
 	
 	struct //存放设备。
 	{
-		UINT m_ID; //存放标识符，取值范围为从1到音频输出设备总数，为0表示使用默认设备。
-		IMMDeviceEnumerator * m_EnumPt; //存放枚举器指针。
-		IMMDeviceCollection * m_ClctPt; //存放收集器指针。
+		UINT m_ID; //存放标识符，取值范围为从1到音频输出设备的总数，为0表示使用默认设备。
+		IMMDeviceEnumerator * m_EnumPt; //存放枚举器的指针。
+		IMMDeviceCollection * m_ClctPt; //存放收集器的指针。
 		IMMDevice * m_Pt; //存放指针。
-		IAudioClient * m_ClntPt; //存放客户端指针。
-		WAVEFORMATEX * m_WaveFmtExPt; //存放格式指针。
+		IAudioClient * m_ClntPt; //存放客户端的指针。
+		WAVEFORMATEX * m_WaveFmtExPt; //存放格式的指针。
 		UINT32 m_BufSzUnit; //存放缓冲区大小，单位为采样单元。
-		IAudioRenderClient * m_RndrClntPt; //存放渲染客户端指针。
-		IGlobalInterfaceTable * m_GlblIntfcTablePt; //存放全局接口表指针。
-		DWORD m_RndrClntCookie; //存放渲染客户端Cookie。
-		int16_t * m_PcmBufFrmPt; //存放Pcm格式缓冲区帧指针。
-		size_t m_PcmBufFrmLenUnit; //存放Pcm格式缓冲区帧长度，单位为采样单元。
-		size_t m_PcmBufFrmLenByt; //存放Pcm格式缓冲区帧长度，单位为字节。
-		SpeexResamplerState * m_PcmBufFrmSpeexResamplerPt; //存放Pcm格式缓冲区帧Speex重采样器指针。
+		IAudioRenderClient * m_RndrClntPt; //存放渲染客户端的指针。
+		IGlobalInterfaceTable * m_GlblIntfcTablePt; //存放全局接口表的指针。
+		DWORD m_RndrClntCookie; //存放渲染客户端的Cookie。
+		int16_t * m_PcmBufFrmPt; //存放Pcm格式缓冲区帧的指针。
+		size_t m_PcmBufFrmLenUnit; //存放Pcm格式缓冲区帧的长度，单位为采样单元。
+		size_t m_PcmBufFrmLenByt; //存放Pcm格式缓冲区帧的长度，单位为字节。
+		SpeexResamplerState * m_PcmBufFrmSpeexResamplerPt; //存放Pcm格式缓冲区帧Speex重采样器的指针。
 		int32_t m_IsMute; //存放是否静音，为0表示有声音，为非0表示静音。
 		int32_t m_IsClos; //存放是否关闭，为0表示正常，为非0表示关闭。
 	} m_Dvc;
@@ -75,19 +75,19 @@ typedef struct //音频输出。
 	
 	struct //存放线程。
 	{
-		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程临时变量。
-		int16_t * m_PcmSrcFrmPt; //存放Pcm格式原始帧指针。
-		uint8_t * m_EncdSrcFrmPt; //存放已编码格式原始帧指针。
-		size_t m_EncdSrcFrmSzByt; //存放已编码格式原始帧大小，单位为字节。
-		size_t m_EncdSrcFrmLenByt; //存放已编码格式原始帧长度，单位为字节。
-		int32_t * m_PcmMixFrmPt; //存放Pcm格式混音帧指针。
+		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程的临时变量。
+		int16_t * m_PcmSrcFrmPt; //存放Pcm格式原始帧的指针。
+		uint8_t * m_EncdSrcFrmPt; //存放已编码格式原始帧的指针。
+		size_t m_EncdSrcFrmSzByt; //存放已编码格式原始帧的大小，单位为字节。
+		size_t m_EncdSrcFrmLenByt; //存放已编码格式原始帧的长度，单位为字节。
+		int32_t * m_PcmMixFrmPt; //存放Pcm格式混音帧的指针。
 		size_t m_ElmTotal; //存放元素总数。
-		uint64_t m_LastTickMsec; //存放上次嘀嗒钟，单位为毫秒。
-		uint64_t m_NowTickMsec; //存放本次嘀嗒钟，单位为毫秒。
+		uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
+		uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 
-		ThrdInfo * m_ThrdInfoPt; //存放线程信息指针。
+		ThrdInfo * m_ThrdInfoPt; //存放线程信息的指针。
 		int32_t m_ThrdIsStart; //存放线程是否开始，为0表示未开始，为1表示已开始。
-		int32_t m_ExitFlag; //存放退出标记，0表示保持运行，1表示请求退出。
+		int32_t m_ExitFlag; //存放退出标记，为0表示保持运行，为1表示请求退出。
 	} m_Thrd;
 } AdoOtpt;
 
@@ -106,10 +106,10 @@ void AdoOtptSetStrmUseOpusDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx );
 void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStrm );
 int AdoOtptStrmCntnrInit( AdoOtpt * AdoOtptPt );
 void AdoOtptStrmCntnrDstoy( AdoOtpt * AdoOtptPt );
-int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt );
-void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt );
 int AdoOtptWavfmInit( AdoOtpt * AdoOtptPt );
 void AdoOtptWavfmDstoy( AdoOtpt * AdoOtptPt );
+int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt );
+void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt );
 int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt );
 void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt );
 int AdoOtptInit( AdoOtpt * AdoOtptPt );

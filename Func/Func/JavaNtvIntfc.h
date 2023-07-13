@@ -27,8 +27,8 @@ __FUNC_DLLAPI__ int NewJavaStringClsObjByU8str( JNIEnv * env, const char * U8str
 #define GetJavaHTIntClsObjVal( env, HTIntClsObj, IntValPt ) GetJavaClsObjMbrVarVal( env, HTIntClsObj, NULL, 0, "m_Val", "I", IntValPt )
 #define SetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) SetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", GetDataTyp( *LongValPt ), LongValPt )
 #define GetJavaHTLongClsObjVal( env, HTLongClsObj, LongValPt ) GetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "J", LongValPt )
-#define SetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) SetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", GetDataTyp( *StringValPt ), StringValPt )
-#define GetJavaHTStringClsObjVal( env, HTLongClsObj, StringValPt ) GetJavaClsObjMbrVarVal( env, HTLongClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
+#define SetJavaHTStringClsObjVal( env, HTStringClsObj, StringValPt ) SetJavaClsObjMbrVarVal( env, HTStringClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", GetDataTyp( *StringValPt ), StringValPt )
+#define GetJavaHTStringClsObjVal( env, HTStringClsObj, StringValPt ) GetJavaClsObjMbrVarVal( env, HTStringClsObj, NULL, 0, "m_Val", "Ljava/lang/String;", StringValPt )
 
 __FUNC_DLLAPI__ int GetJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * * ByteArrPtPt );
 __FUNC_DLLAPI__ int DstoyJavaByteArrClsObj( JNIEnv * env, jbyteArray ByteArrClsObj, jbyte * ByteArrPt );

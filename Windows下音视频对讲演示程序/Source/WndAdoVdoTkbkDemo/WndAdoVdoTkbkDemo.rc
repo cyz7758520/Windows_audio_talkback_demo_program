@@ -55,7 +55,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年07月03日",IDC_STATIC,7,7,295,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2023年07月13日",IDC_STATIC,7,7,295,16
     LTEXT           "传输协议：",IDC_STATIC,7,35,58,8
     CONTROL         "TCP协议",UseTcpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,63,34,45,8
     CONTROL         "UDP协议",UseUdpPrtclRdBtnId,"Button",BS_AUTORADIOBUTTON,165,34,45,8
@@ -106,13 +106,13 @@ CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "传输协议\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
+    LTEXT           "传输模式：",IDC_STATIC,7,32,74,8
+    CONTROL         "实时半双工（一键通）",UsePttRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,78,31,96,10
+    CONTROL         "实时全双工",UseRtFdRdBtnId,"Button",BS_AUTORADIOBUTTON,195,31,56,10
     LTEXT           "最大连接次数，取值区间为[1,2147483647]：",IDC_STATIC,7,50,213,10
     EDITTEXT        MaxCnctTimesEdTxtId,231,48,71,14,ES_AUTOHSCROLL
     CONTROL         "自动允许连接",IsAutoAllowCnctCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,70,213,10
     DEFPUSHBUTTON   "确定",XfrPrtclStngOkBtnId,7,83,295,14
-    LTEXT           "传输模式：",IDC_STATIC,7,32,74,8
-    CONTROL         "实时半双工（一键通）",UsePttRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,78,31,96,10
-    CONTROL         "实时全双工",UseRtFdRdBtnId,"Button",BS_AUTORADIOBUTTON,195,31,56,10
 END
 
 StngDlgId DIALOGEX 0, 0, 309, 507
@@ -127,7 +127,7 @@ BEGIN
     PUSHBUTTON      "设置",AjbStngBtnId,252,40,50,14
     CONTROL         "保存状态到Txt文件",IsSaveStsToTxtFileCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,56,203,10
     PUSHBUTTON      "设置",SaveStsToTxtFileStngBtnId,252,54,50,14
-    CONTROL         "打印Log日志到可执行文件所在目录下的Log.txt文件中，并显示Toast",IsPrintLogShowToastCkBoxId,
+    CONTROL         "打印Log日志到Log.txt文件，并显示Toast",IsPrintLogShowToastCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,68,253,10
     CONTROL         "使用阻止系统休眠",IsUsePrvntSysSleepCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,80,253,10
     CONTROL         "保存音视频输入输出到Avi文件",IsSaveAdoVdoInptOtptToAviFileCkBoxId,
@@ -146,11 +146,11 @@ BEGIN
     CONTROL         "16k",UseAdoSmplRate16000RdBtnId,"Button",BS_AUTORADIOBUTTON,157,152,25,10
     CONTROL         "32k",UseAdoSmplRate32000RdBtnId,"Button",BS_AUTORADIOBUTTON,216,152,25,10
     CONTROL         "48k",UseAdoSmplRate48000RdBtnId,"Button",BS_AUTORADIOBUTTON,275,152,25,10
-    LTEXT           "帧长度：",IDC_STATIC,7,165,74,8
+    LTEXT           "帧的长度：",IDC_STATIC,7,165,74,8
     CONTROL         "10ms",UseAdoFrmLen10msRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,164,45,10
     CONTROL         "20ms",UseAdoFrmLen20msRdBtnId,"Button",BS_AUTORADIOBUTTON,163,164,45,10
     CONTROL         "30ms",UseAdoFrmLen30msRdBtnId,"Button",BS_AUTORADIOBUTTON,228,164,45,10
-    CONTROL         "使用系统自带声学回音消除器、噪音抑制器和自动增益控制器",IsUseSystemAecNsAgcCkBoxId,
+    CONTROL         "使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器",IsUseSystemAecNsAgcCkBoxId,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,179,295,9
     LTEXT           "声学回音消除器：",IDC_STATIC,7,222,74,8
     CONTROL         "不使用",UseNoAecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,192,137,10
@@ -188,7 +188,7 @@ BEGIN
     CONTROL         "15",UseVdoSmplRate15RdBtnId,"Button",BS_AUTORADIOBUTTON,159,431,20,10
     CONTROL         "24",UseVdoSmplRate24RdBtnId,"Button",BS_AUTORADIOBUTTON,220,431,20,10
     CONTROL         "30",UseVdoSmplRate30RdBtnId,"Button",BS_AUTORADIOBUTTON,281,431,20,10
-    LTEXT           "帧大小：",IDC_STATIC,7,445,74,8
+    LTEXT           "帧的大小：",IDC_STATIC,7,445,74,8
     CONTROL         "",UseVdoFrmSzPrsetRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,444,10,10
     COMBOBOX        VdoFrmSzPrsetCbBoxId,109,442,68,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_TRANSPARENT
     CONTROL         "",UseVdoFrmSzOtherRdBtnId,"Button",BS_AUTORADIOBUTTON,220,443,10,10
@@ -208,21 +208,53 @@ CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "自适应抖动缓冲器\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
-    LTEXT           "音频自适应抖动缓冲器的最小需缓冲帧的数量，单位为个帧，取值区间为[1,2147483647]：",IDC_STATIC,7,27,213,16
+    LTEXT           "音频自适应抖动缓冲器最小需缓冲帧数量，单位为个帧，取值区间为[1,2147483647]：",IDC_STATIC,7,27,213,16
     EDITTEXT        AAjbMinNeedBufFrmCntEdTxtId,231,28,71,14,ES_AUTOHSCROLL
-    LTEXT           "音频自适应抖动缓冲器的最大需缓冲帧的数量，单位为个帧，取值区间为[1,2147483647]，必须大于等于最小需缓冲帧的数量：",IDC_STATIC,7,52,213,27
+    LTEXT           "音频自适应抖动缓冲器最大需缓冲帧数量，单位为个帧，取值区间为[1,2147483647]，必须大于等于最小需缓冲帧数量：",IDC_STATIC,7,52,213,27
     EDITTEXT        AAjbMaxNeedBufFrmCntEdTxtId,231,58,71,14,ES_AUTOHSCROLL
-    LTEXT           "音频自适应抖动缓冲器的最大连续丢失帧的数量，单位为个帧，取值区间为[1,2147483647]，当连续丢失帧的数量超过最大时，认为是对方中途暂停发送：",IDC_STATIC,7,85,213,26
+    LTEXT           "音频自适应抖动缓冲器最大连续丢失帧数量，单位为个帧，取值区间为[1,2147483647]，当连续丢失帧数量超过最大时，认为是对方中途暂停发送：",IDC_STATIC,7,85,213,26
     EDITTEXT        AAjbMaxCntuLostFrmCntEdTxtId,231,91,71,14,ES_AUTOHSCROLL
-    LTEXT           "音频自适应抖动缓冲器的自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]：",IDC_STATIC,7,118,213,18
+    LTEXT           "音频自适应抖动缓冲器自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧数量越多，取值区间为[0.0,127.0]：",IDC_STATIC,7,118,213,18
     EDITTEXT        AAjbAdaptSensitivityEdTxtId,231,120,71,14,ES_AUTOHSCROLL
-    LTEXT           "视频自适应抖动缓冲器的最小需缓冲帧数量，单位个，必须大于0：",IDC_STATIC,7,147,213,16
+    LTEXT           "视频自适应抖动缓冲器最小需缓冲帧数量，单位为个帧，必须大于0：",IDC_STATIC,7,147,213,16
     EDITTEXT        VAjbMinNeedBufFrmCntEdTxtId,231,145,71,14,ES_AUTOHSCROLL
-    LTEXT           "视频自适应抖动缓冲器的最大需缓冲帧数量，单位个，必须大于最小需缓冲帧的数量：",IDC_STATIC,7,170,213,16
+    LTEXT           "视频自适应抖动缓冲器最大需缓冲帧数量，单位为个帧，必须大于等于最小需缓冲帧数量：",IDC_STATIC,7,170,213,16
     EDITTEXT        VAjbMaxNeedBufFrmCntEdTxtId,231,170,71,14,ES_AUTOHSCROLL
-    LTEXT           "视频自适应抖动缓冲器的自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧的数量越多，取值区间为[0.0,127.0]：",IDC_STATIC,7,193,213,18
+    LTEXT           "视频自适应抖动缓冲器自适应灵敏度，灵敏度越大自适应计算当前需缓冲帧数量越多，取值区间为[0.0,127.0]：",IDC_STATIC,7,193,213,18
     EDITTEXT        VAjbAdaptSensitivityEdTxtId,231,195,71,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "确定",AjbStngOkBtnId,7,220,295,14
+END
+
+SaveStsToTxtFileStngDlgId DIALOGEX 0, 0, 309, 71
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Windows下音频对讲演示程序"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CTEXT           "保存状态到Txt文件\n设置",-1,7,7,295,16,WS_TABSTOP
+    LTEXT           "状态Txt文件完整路径：",-1,7,32,213,9
+    EDITTEXT        SaveStsToTxtFileFullPathEdTxtId,231,30,71,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",SaveStsToTxtFileStngOkBtnId,7,50,295,14
+END
+
+SaveAdoVdoInptOtptToAviFileStngDlgId DIALOGEX 0, 0, 309, 146
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Windows下音频对讲演示程序"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CTEXT           "保存音视频输入输出到Avi文件\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
+    LTEXT           "音视频输入输出Avi文件完整路径：",IDC_STATIC,7,32,213,9
+    EDITTEXT        SaveAdoVdoInptOtptToAviFileFullPathEdTxtId,231,30,71,14,ES_AUTOHSCROLL
+    LTEXT           "写入缓冲区大小，单位为字节：",IDC_STATIC,7,50,213,9
+    EDITTEXT        SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId,231,48,71,14,ES_AUTOHSCROLL
+    CONTROL         "保存音频输入",SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,67,295,10
+    CONTROL         "保存音频输出",SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,81,295,10
+    CONTROL         "保存视频输入",SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,96,295,10
+    CONTROL         "保存视频输出",SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,110,295,10
+    DEFPUSHBUTTON   "确定",SaveAdoVdoInptOtptToAviFileStngOkBtnId,7,125,295,14
 END
 
 SpeexAecStngDlgId DIALOGEX 0, 0, 309, 224
@@ -231,7 +263,7 @@ CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "Speex声学回音消除器\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
-    LTEXT           "滤波器长度，单位为毫秒：",IDC_STATIC,7,35,213,8
+    LTEXT           "滤波器的长度，单位为毫秒：",IDC_STATIC,7,35,213,8
     EDITTEXT        SpeexAecFilterLenMsecEdTxtId,231,32,71,14,ES_AUTOHSCROLL
     CONTROL         "使用残余回音消除",SpeexAecIsUseRecCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,213,10
     LTEXT           "在残余回音消除时，残余回音倍数，倍数越大消除越强，取值区间为[0.0,100.0]：",IDC_STATIC,7,67,213,16
@@ -242,7 +274,7 @@ BEGIN
     EDITTEXT        SpeexAecEchoSupesEdTxtId,231,116,71,14,ES_AUTOHSCROLL
     LTEXT           "在残余回音消除时，有近端语音活动时残余回音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]：",IDC_STATIC,7,139,213,24
     EDITTEXT        SpeexAecEchoSupesActEdTxtId,231,144,71,14,ES_AUTOHSCROLL
-    CONTROL         "将Speex声学回音消除器的内存块保存到扩展目录下的SpeexAecMem文件中，以便缩短下一次初始化时的收敛时间",SpeexAecIsSaveMemFileCkBoxId,
+    CONTROL         "保存Speex声学回音消除器内存块到SpeexAecMem文件，以便缩短下一次初始化时收敛时间",SpeexAecIsSaveMemFileCkBoxId,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,171,213,24
     PUSHBUTTON      "删除内存块文件",SpeexAecDelMemFileBtnId,231,176,71,14
     DEFPUSHBUTTON   "确定",SpeexAecStngOkBtnId,7,203,295,14
@@ -277,7 +309,7 @@ BEGIN
     CONTROL         "使用精制滤波器自适应Aec模式",WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,107,213,8
     CONTROL         "使用自适应调节回音延迟",WebRtcAecIsUseAdaptAdjDelayCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,123,213,8
-    CONTROL         "将WebRtc浮点版声学回音消除器的内存块保存到扩展目录下的WebRtcAecMem文件中，以便缩短下一次初始化时的收敛时间",WebRtcAecIsSaveMemFileCkBoxId,
+    CONTROL         "保存WebRtc浮点版声学回音消除器内存块到WebRtcAecMem文件，以便缩短下一次初始化时收敛时间",WebRtcAecIsSaveMemFileCkBoxId,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,139,213,24
     PUSHBUTTON      "删除内存块文件",WebRtcAecDelMemFileBtnId,231,144,71,14
     DEFPUSHBUTTON   "确定",WebRtcAecStngOkBtnId,7,171,295,14
@@ -296,7 +328,7 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON | BS_MULTILINE,87,50,215,18
     CONTROL         "Speex声学回音消除器+WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器",SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId,
                     "Button",BS_AUTORADIOBUTTON | BS_MULTILINE,87,72,215,18
-    LTEXT           "Speex声学回音消除器滤波器长度，单位为毫秒：",IDC_STATIC,7,97,213,8
+    LTEXT           "Speex声学回音消除器滤波器的长度，单位为毫秒：",IDC_STATIC,7,97,213,8
     EDITTEXT        SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId,231,94,71,14,ES_AUTOHSCROLL
     CONTROL         "Speex声学回音消除器使用残余回音消除",SpeexWebRtcAecSpeexAecIsUseRecCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,213,10
@@ -310,13 +342,13 @@ BEGIN
     EDITTEXT        SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId,231,212,71,14,ES_AUTOHSCROLL
     CONTROL         "WebRtc定点版声学回音消除器使用舒适噪音生成模式",SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,239,213,8
-    LTEXT           "WebRtc定点版声学回音消除器消除模式，消除模式越高消除越强，取值区间为[0,4]：",IDC_STATIC,7,255,213,17
+    LTEXT           "WebRtc定点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,4]：",IDC_STATIC,7,255,213,17
     EDITTEXT        SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId,231,256,71,14,ES_AUTOHSCROLL
-    LTEXT           "WebRtc定点版声学回音消除器回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置：",IDC_STATIC,7,281,213,16
+    LTEXT           "WebRtc定点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置：",IDC_STATIC,7,281,213,16
     EDITTEXT        SpeexWebRtcAecWebRtcAecmDelayEdTxtId,231,282,71,14,ES_AUTOHSCROLL
-    LTEXT           "WebRtc浮点版声学回音消除器消除模式，消除模式越高消除越强，取值区间为[0,2]：",IDC_STATIC,7,309,213,8
+    LTEXT           "WebRtc浮点版声学回音消除器的消除模式，消除模式越高消除越强，取值区间为[0,2]：",IDC_STATIC,7,309,213,8
     EDITTEXT        SpeexWebRtcAecWebRtcAecEchoModeEdTxtId,231,306,71,14,ES_AUTOHSCROLL
-    LTEXT           "WebRtc浮点版声学回音消除器回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置：",IDC_STATIC,7,325,213,16
+    LTEXT           "WebRtc浮点版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置：",IDC_STATIC,7,325,213,16
     EDITTEXT        SpeexWebRtcAecWebRtcAecDelayEdTxtId,231,326,71,14,ES_AUTOHSCROLL
     CONTROL         "WebRtc浮点版声学回音消除器使用回音延迟不可知模式",SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,349,213,8
@@ -338,12 +370,12 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "确定",SpeexPrpocsNsStngOkBtnId,7,96,295,14
     CTEXT           "Speex预处理器的噪音抑制\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
     CONTROL         "使用噪音抑制",SpeexPrpocsIsUseNsCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,33,213,10
     LTEXT           "在噪音抑制时，噪音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]：",IDC_STATIC,7,51,213,16
     CONTROL         "使用混响音消除",SpeexPrpocsIsUseDereverbCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,77,213,10
     EDITTEXT        SpeexPrpocsNoiseSupesEdTxtId,231,52,71,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",SpeexPrpocsNsStngOkBtnId,7,96,295,14
 END
 
 WebRtcNsxStngDlgId DIALOGEX 0, 0, 309, 74
@@ -375,7 +407,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "Speex预处理器\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
     CONTROL         "使用语音活动检测",SpeexPrpocsIsUseVadCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,33,213,10
-    LTEXT           "在语音活动检测时，从无语音活动到有语音活动判断百分比概率，概率越大越难判断为有语音活，取值区间为[0,100]：",IDC_STATIC,7,51,213,24
+    LTEXT           "在语音活动检测时，从无语音活动到有语音活动判断百分比概率，概率越大越难判断为有语音活动，取值区间为[0,100]：",IDC_STATIC,7,51,213,24
     EDITTEXT        SpeexPrpocsVadProbStartEdTxtId,231,56,71,14,ES_AUTOHSCROLL
     LTEXT           "在语音活动检测时，从有语音活动到无语音活动判断百分比概率，概率越大越容易判断为无语音活动，取值区间为[0,100]：",IDC_STATIC,7,85,213,26
     EDITTEXT        SpeexPrpocsVadProbCntuEdTxtId,231,86,71,14,ES_AUTOHSCROLL
@@ -396,7 +428,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Speex编解码\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
+    CTEXT           "Speex编解码器\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
     LTEXT           "Speex编码器的编码方式：",IDC_STATIC,7,35,100,8
     CONTROL         "固定比特率",SpeexEncdUseCbrRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,34,56,10
     CONTROL         "可变比特率",SpeexEncdUseVbrRdBtnId,"Button",BS_AUTORADIOBUTTON,196,34,56,10
@@ -410,6 +442,27 @@ BEGIN
     DEFPUSHBUTTON   "确定",SpeexCodecStngOkBtnId,7,152,295,14
 END
 
+SaveAdoInptOtptToWaveFileStngDlgId DIALOGEX 0, 0, 309, 152
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Windows下音频对讲演示程序"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CTEXT           "保存音频输入输出到Wave文件\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
+    CONTROL         "保存音频输入",SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,25,295,10
+    LTEXT           "音频输入原始Wave文件完整路径：",IDC_STATIC,7,42,213,9
+    EDITTEXT        SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId,231,40,71,14,ES_AUTOHSCROLL
+    LTEXT           "音频输入结果Wave文件完整路径：",IDC_STATIC,7,61,213,9
+    EDITTEXT        SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId,231,59,71,14,ES_AUTOHSCROLL
+    CONTROL         "保存音频输出",SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,78,295,10
+    LTEXT           "音频输出原始Wave文件完整路径：",IDC_STATIC,7,94,213,9
+    EDITTEXT        SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId,231,92,71,14,ES_AUTOHSCROLL
+    LTEXT           "写入缓冲区大小，单位为字节：",IDC_STATIC,7,114,213,9
+    EDITTEXT        SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId,231,112,71,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",SaveAdoInptOtptToWaveFileStngOkBtnId,7,131,295,14
+END
+
 OpenH264CodecStngDlgId DIALOGEX 0, 0, 309, 181
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Windows下音频对讲演示程序"
@@ -418,11 +471,11 @@ BEGIN
     CTEXT           "OpenH264编解码器\n设置",IDC_STATIC,6,7,296,16,WS_TABSTOP
     LTEXT           "OpenH264编码器视频类型，为0表示实时摄像头视频，为1表示实时屏幕内容视频，为2表示非实时摄像头视频，为3表示非实时屏幕内容视频，为4表示其他视频：",IDC_STATIC,6,27,213,24
     EDITTEXT        OpenH264EncdVdoTypeEdTxtId,231,32,71,14,ES_AUTOHSCROLL
-    LTEXT           "OpenH264编码器编码后比特率，单位为bps：",IDC_STATIC,6,58,213,10
+    LTEXT           "OpenH264编码器编码后比特率，单位为KBps：",IDC_STATIC,6,58,213,10
     EDITTEXT        OpenH264EncdEncdBitrateEdTxtId,231,56,71,14,ES_AUTOHSCROLL
     LTEXT           "OpenH264编码器比特率控制模式，为0表示质量优先模式，为1表示比特率优先模式，为2表示缓冲区优先模式，为3表示时间戳优先模式：",IDC_STATIC,6,76,213,25
     EDITTEXT        OpenH264EncdBitrateCtrlModeEdTxtId,231,81,71,14,ES_AUTOHSCROLL
-    LTEXT           "OpenH264编码器IDR帧间隔帧数，单位为个，为0表示仅第一帧为IDR帧，为大于0表示每隔这么帧就至少有一个IDR帧：",IDC_STATIC,6,109,213,16
+    LTEXT           "OpenH264编码器IDR帧间隔帧数，单位为个帧，为0表示仅第一帧为IDR帧，为大于0表示每隔这么帧就至少有一个IDR帧：",IDC_STATIC,6,109,213,16
     EDITTEXT        OpenH264EncdIDRFrmIntvlEdTxtId,231,110,71,14,ES_AUTOHSCROLL
     LTEXT           "OpenH264编码器复杂度，复杂度越高压缩率不变、CPU使用率越高、画质越好，取值区间为[0,2]：",IDC_STATIC,8,135,213,16
     EDITTEXT        OpenH264EncdCmplxtEdTxtId,231,136,71,14,ES_AUTOHSCROLL
@@ -445,59 +498,6 @@ CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "一键即按即通",PttBtnId,7,7,109,37
-END
-
-SaveAdoVdoInptOtptToAviFileStngDlgId DIALOGEX 0, 0, 309, 146
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Windows下音频对讲演示程序"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CTEXT           "保存音视频输入输出到Avi文件\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
-    LTEXT           "音视频输入输出Avi文件完整路径：",IDC_STATIC,7,32,213,9
-    EDITTEXT        SaveAdoVdoInptOtptToAviFileFullPathEdTxtId,231,30,71,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "确定",SaveAdoVdoInptOtptToAviFileStngOkBtnId,7,125,295,14
-    CONTROL         "保存视频输出",SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,110,295,10
-    CONTROL         "保存视频输入",SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,96,295,10
-    CONTROL         "保存音频输出",SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,81,295,10
-    CONTROL         "保存音频输入",SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,67,295,10
-    EDITTEXT        SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId,231,48,71,14,ES_AUTOHSCROLL
-    LTEXT           "写入缓冲区大小，单位为字节：",IDC_STATIC,7,50,213,9
-END
-
-SaveAdoInptOtptToWaveFileStngDlgId DIALOGEX 0, 0, 309, 152
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Windows下音频对讲演示程序"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CTEXT           "保存音频输入输出到Wave文件\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
-    LTEXT           "音频输入原始Wave文件完整路径：",IDC_STATIC,7,42,213,9
-    EDITTEXT        SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId,231,40,71,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "确定",SaveAdoInptOtptToWaveFileStngOkBtnId,7,131,295,14
-    LTEXT           "音频输入结果Wave文件完整路径：",IDC_STATIC,7,61,213,9
-    EDITTEXT        SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId,231,59,71,14,ES_AUTOHSCROLL
-    CONTROL         "保存音频输入",SaveAdoInptOtptToWaveFileIsSaveAdoInptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,25,295,10
-    CONTROL         "保存音频输出",SaveAdoInptOtptToWaveFileIsSaveAdoOtptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,78,295,10
-    LTEXT           "音频输出原始Wave文件完整路径：",IDC_STATIC,7,94,213,9
-    EDITTEXT        SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId,231,92,71,14,ES_AUTOHSCROLL
-    LTEXT           "写入缓冲区大小，单位为字节：",IDC_STATIC,7,114,213,9
-    EDITTEXT        SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId,231,112,71,14,ES_AUTOHSCROLL
-END
-
-SaveStsToTxtFileStngDlgId DIALOGEX 0, 0, 309, 71
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Windows下音频对讲演示程序"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CTEXT           "保存状态到Txt文件\n设置",-1,7,7,295,16,WS_TABSTOP
-    LTEXT           "状态Txt文件完整路径：",-1,7,32,213,9
-    EDITTEXT        SaveStsToTxtFileFullPathEdTxtId,231,30,71,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "确定",SaveStsToTxtFileStngOkBtnId,7,50,295,14
 END
 
 
@@ -770,6 +770,11 @@ BEGIN
 END
 
 OpenH264CodecStngDlgId AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+SpeexAecStngDlgId AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
