@@ -39,8 +39,8 @@ extern "C"
 
 typedef struct MutexLock MutexLock;
 
-__FUNC_DLLAPI__ int MutexLocked( MutexLock * MutexLockPt, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int MutexUnlock( MutexLock * MutexLockPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ void MutexLocked( MutexLock * MutexLockPt );
+__FUNC_DLLAPI__ void MutexUnlock( MutexLock * MutexLockPt );
 
 #ifdef __cplusplus
 }

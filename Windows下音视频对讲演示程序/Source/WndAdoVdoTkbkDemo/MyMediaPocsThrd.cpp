@@ -1423,7 +1423,7 @@ void MyMediaPocsThrdCls::UserReadAdoVdoInptFrm( int16_t * AdoInptPcmSrcFrmPt, in
 				memcpy( m_TmpBytePt + 1 + 4, AdoInptPcmRsltFrmPt, m_MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ); //设置音频输入帧。
 				p_PktLenByt = 1 + 4 + m_MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt; //数据包长度 = 数据包类型 + 音频输入帧时间戳 + 音频输入Pcm格式帧。
 			}
-			else //如果本次音频输入帧为无语音活动，或不需要传输。
+			else //如果音频输入Pcm格式结果帧为无语音活动。
 			{
 				p_PktLenByt = 1 + 4; //数据包长度 = 数据包类型 + 音频输入帧时间戳。
 			}
@@ -1435,7 +1435,7 @@ void MyMediaPocsThrdCls::UserReadAdoVdoInptFrm( int16_t * AdoInptPcmSrcFrmPt, in
 				memcpy( m_TmpBytePt + 1 + 4, AdoInptEncdRsltFrmPt, AdoInptEncdRsltFrmLenByt ); //设置音频输入帧。
 				p_PktLenByt = 1 + 4 + AdoInptEncdRsltFrmLenByt; //数据包长度 = 数据包类型 + 音频输入帧时间戳 + 音频输入已编码格式帧。
 			}
-			else //如果本次音频输入帧为无语音活动，或不需要传输。
+			else //如果音频输入Pcm格式结果帧为无语音活动，或不需要传输。
 			{
 				p_PktLenByt = 1 + 4; //数据包长度 = 数据包类型 + 音频输入帧时间戳。
 			}

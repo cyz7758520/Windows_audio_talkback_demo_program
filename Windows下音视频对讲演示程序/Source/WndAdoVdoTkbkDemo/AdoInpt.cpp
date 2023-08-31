@@ -1631,7 +1631,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 						if( AdoInptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoInptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：本线程接收到设备关闭消息。" ) );
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：本线程接收到设备关闭消息。" ) );
 						}
 					}
 					goto OutPocs;
@@ -1673,7 +1673,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 						if( AdoInptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoInptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：本线程接收到设备关闭消息。" ) );
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：本线程接收到设备关闭消息。" ) );
 						}
 					}
 					else if( p_HRslt == AUDCLNT_S_BUFFER_EMPTY ) //如果设备的Pcm格式缓冲区当前为空，表示还需要等待。

@@ -146,6 +146,7 @@ void AdoOtptAddStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 	p_StrmPt->m_Idx = StrmIdx;
 	p_StrmPt->m_IsUse = 0;
 	p_StrmPt->m_UseWhatDecd = 0;
+	p_StrmPt->m_SpeexDecd.m_Pt = NULL;
 
 	Out:
 	AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
@@ -1053,7 +1054,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 						if( AdoOtptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoOtptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：本线程接收到设备关闭消息。" ) );
+							if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：本线程接收到设备关闭消息。" ) );
 						}
 					}
 					else if( p_HRslt == AUDCLNT_E_BUFFER_ERROR )

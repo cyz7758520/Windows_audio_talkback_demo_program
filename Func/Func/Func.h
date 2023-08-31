@@ -15,6 +15,8 @@
 #include <math.h>
 
 #ifdef __cplusplus
+#include <iostream>                       //std::cin、std::cout
+#include <string>
 #ifndef _LIBCPP_HAS_NO_THREADS
 #include <thread>                         //std::thread
 #endif
@@ -24,6 +26,7 @@
 #include <atomic>                         //std::atomic
 #include <cfloat>                         //FLT_MAX、DBL_MAX
 #include <typeinfo>
+using namespace std;
 #endif
 
 #if( defined __MS_VCXX__ )
@@ -57,13 +60,14 @@
 #include <Objbase.h>                      //CoInitialize、CoInitializeEx
 #include <shlwapi.h>                      //DLLVERSIONINFO
 #include <crtdbg.h>                       //_CrtSetBreakAlloc、_CrtSetDbgFlag、_CrtCheckMemory、_CrtDumpMemoryLeaks。
-
+#include <immintrin.h>                    //_mm_pause
 #include <io.h>                           //_open、_wopen
 #include <sys/stat.h>                     //struct stat、fstat、_stat64、_wstat64
 #include <sys/types.h>                    //ino_t、dev_t、off_t
 #include <fcntl.h>                        //O_RDONLY、O_WRONLY、O_Rd_Wr、O_APPEND、O_CREAT、O_TRUNC、O_EXCL、O_TEXT、O_BINARY、O_RAW、O_TEMPORARY、O_NOINHERIT、O_SEQUENTIAL、O_RANDOM
 
 #undef StrCpy
+#undef StrTrim
 #undef StrToInt
 
 //Windows Core Audio API的相关宏。
@@ -93,6 +97,7 @@
 #define _WIN32_IE        0xFFFF           //设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
 #include <windows.h>                      //包含整个Windows SDK支持的API
+#include <windowsx.h>                     //ComboBox_AddString、ComboBox_ResetContent
 #include <tchar.h>                        //_tmain、_tWinMain、TCHAR
 #include <process.h>                      //
 #include <psapi.h>                        //GetProcessImageFileName
@@ -100,11 +105,23 @@
 #include <lmerr.h>                        //NERR_BASE、MAX_NERR
 #include <wininet.h>                      //INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
 #include <pdhmsg.h>                       //PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
-//#include <Ws2tcpip.h>                   //不包含该头文件，因为会与Linux套接字相关声明相冲突
-//#include <Dshow.h>                      //不包含该头文件，因为会编译报错
+//#include <Ws2tcpip.h>                   //不包含该头文件，因为会与Linux套接字相关声明相冲突。
+//#include <conio.h>                      //不包含该头文件，因为Cygwin下没有。
+//#include <Dshow.h>                      //不包含该头文件，因为会编译报错。
 #include <mmsystem.h>                     //MMRESULT
+#include <mmdeviceapi.h>                  //IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
+#include <endpointvolume.h>
+#include <Propkey.h>
+//#include <wmcodecdsp.h>                   //CLSID_CWMAudioAEC
+//#include <dmort.h>                        //MoInitMediaType
+#include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
+#include <audiopolicy.h>                  //IAudioSessionControl、IAudioSessionManager
+#include <Functiondiscoverykeys_devpkey.h>//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
 #include <Objbase.h>                      //CoInitialize、CoInitializeEx
-
+#include <shlwapi.h>                      //DLLVERSIONINFO
+//#include <crtdbg.h>                     //不包含该头文件，因为Cygwin下没有。
+#include <immintrin.h>                    //_mm_pause
+#include <io.h>                           //_open、_wopen
 #include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
 #include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
 #include <netinet/tcp.h>                  //TCP_NODELAY
@@ -117,6 +134,17 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>                      //pthread_create、pthread_join
+
+#undef StrCpy
+#undef StrTrim
+#undef StrToInt
+
+//Windows Core Audio API的相关宏。
+#define CLSID_MMDeviceEnumerator __uuidof( MMDeviceEnumerator )
+#define IID_IMMDeviceEnumerator __uuidof( IMMDeviceEnumerator )
+#define IID_IAudioClient __uuidof( IAudioClient )
+#define IID_IAudioCaptureClient __uuidof( IAudioCaptureClient )
+#define IID_IAudioRenderClient __uuidof( IAudioRenderClient )
 #endif
 
 #if( defined __LINUX_GCC__ )
@@ -133,6 +161,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>                      //pthread_create、pthread_join
+#include <immintrin.h>                    //_mm_pause
 
 #define gettid() ( pid_t )syscall( SYS_gettid )
 
@@ -146,6 +175,7 @@ typedef int HANDLE;
 #include <netinet/tcp.h>                  //TCP_NODELAY
 #include <sys/select.h>                   //fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
 #include <asm/ioctls.h>                   //ioctl
+#include <sys/syscall.h>
 #include <sys/stat.h>                     //struct stat、fstat、chmod、fchmod、mkdir、stat
 #include <sys/time.h>                     //gettimeofday
 #include <fcntl.h>                        //open、fcntl
@@ -153,7 +183,9 @@ typedef int HANDLE;
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>                      //pthread_create、pthread_join
-#include <threads.h>                      //thrd_yield
+#if( ( defined __X86__ ) || ( defined __X64__ ) )
+#include <immintrin.h>                    //_mm_pause
+#endif
 
 typedef int HANDLE;
 #define Sleep( Msec ) usleep( ( Msec ) * 1000 )

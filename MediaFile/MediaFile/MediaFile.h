@@ -43,4 +43,6 @@
 
 #include "AviFileWriter.h"
 
+#include "TinyXml2.h"
+
 #endif
