@@ -1,19 +1,23 @@
 ﻿#include "Func.h"
 #include "WndAdoVdoTkbkDemo.h"
 #include "WndAdoVdoTkbkStng.h"
-#include "MyMediaPocsThrd.h"
+#include "MyNtwkMediaPocsThrd.h"
 
 //全局变量。
 extern HINSTANCE g_IstnsHdl; //存放当前实例的句柄。
 extern VstrCls g_ErrInfoVstr; //存放错误信息动态字符串的指针。
-extern MyMediaPocsThrdCls * g_MyMediaPocsThrdPt; //存放媒体处理线程的指针。
+extern MyNtwkMediaPocsThrdCls * g_MyNtwkMediaPocsThrdPt; //存放我的网络媒体处理线程的指针。
 extern HWND g_MainDlgWndHdl; //存放主对话框窗口的句柄。
 extern long g_MainDlgWndMinHeight; //存放主对话框窗口的最小高度，单位为像素。
 extern long g_MainDlgWndMinWidth; //存放主对话框窗口的最小宽度，单位为像素。
+extern HWND g_SrvrStngDlgWndHdl; //存放服务端设置对话框窗口的句柄。
+extern HWND g_CnctLstWndHdl; //存放连接列表窗口的句柄。
+extern HWND g_ClntStngDlgWndHdl; //存放客户端设置对话框窗口的句柄。
+extern HWND g_ClntLstWndHdl; //存放客户端列表窗口的句柄。
 extern HWND g_AdoInptDvcCbBoxWndHdl; //存放音频输入设备组合框窗口的句柄。
 extern HWND g_AdoOtptDvcCbBoxWndHdl; //存放音频输出设备组合框窗口的句柄。
 extern HWND g_VdoInptDvcCbBoxWndHdl; //存放视频输入设备组合框窗口的句柄。
-extern HWND g_LogLtBoxWndHdl; //存放日志列表框窗口的句柄。
+extern HWND g_LogLstBoxWndHdl; //存放日志列表框窗口的句柄。
 extern HWND g_VdoInptPrvwTxtWndHdl; //存放视频输入预览文本框窗口的句柄。
 extern HWND g_VdoOtptDspyTxtWndHdl; //存放视频输出显示文本框窗口的句柄。
 extern long g_VdoTxtWndLeftMargin; //存放视频文本框窗口的左边距，单位为像素。
@@ -23,11 +27,9 @@ extern long g_VdoTxtWndBottomMargin; //存放视频文本框窗口的底边距�
 extern int g_VdoWndShowMode; //存放视频窗口的显示模式，为0表示正常，为1表示垂直最大化排列，为2表示水平最大化排列。
 extern HWND g_VdoInptPrvwWndHdl; //存放视频输入预览窗口的句柄。
 extern HWND g_VdoOtptDspyWndHdl; //存放视频输出显示窗口的句柄。
-
-extern HWND g_RqstCnctDlgWndHdl; //存放请求连接对话框窗口的句柄。
 extern HWND g_PttDlgWndHdl; //存放一键即按即通对话框窗口的句柄。
 extern HWND g_PttBtnWndHdl; //存放一键即按即通按钮窗口的句柄。
-extern HWND g_XfrPrtclStngDlgWndHdl; //存放传输协议设置对话框窗口的句柄。
+
 extern HWND g_StngDlgWndHdl; //存放设置对话框窗口的句柄。
 extern HWND g_AjbStngDlgWndHdl; //存放自适应抖动缓冲器设置对话框窗口的句柄。
 extern HWND g_SaveStsToTxtFileStngDlgWndHdl; //存放保存状态到Txt文件设置对话框窗口的句柄。
@@ -42,9 +44,7 @@ extern HWND g_WebRtcNsStngDlgWndHdl; //存放WebRtc浮点版噪音抑制器设�
 extern HWND g_SpeexPrpocsStngDlgWndHdl; //存放Speex预处理器的设置对话框窗口的句柄。
 extern HWND g_SpeexCodecStngDlgWndHdl; //存放Speex编解码器设置对话框窗口的句柄。
 extern HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
-extern HWND g_OpenH264CodecStngDlgWndHdl; //存放OpenH264编码器设置对话框窗口的句柄。
-
-extern HWND g_TkbkStsWndHdl; //存放对讲状态窗口的句柄。
+extern HWND g_OpenH264CodecStngDlgWndHdl; //存放OpenH264编解码器设置对话框窗口的句柄。
 
 void RefresAdoVdohDvc(); //刷新音视频设备。
 
@@ -55,6 +55,7 @@ void SaveStngToXmlFile()
 	tinyxml2::XMLElement * p_StngXMLElementPt;
 	tinyxml2::XMLElement * p_TmpXMLElement1Pt;
 	tinyxml2::XMLElement * p_TmpXMLElement2Pt;
+	tinyxml2::XMLElement * p_TmpXMLElement3Pt;
 	tinyxml2::XMLError p_XMLError;
 	Vstr * p_U16TxtVstrPt = NULL;
 	Vstr * p_U8TxtVstrPt = NULL;
@@ -78,27 +79,43 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "Main" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatXfrPrtcl" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseTcpPrtclRdBtnId ) == BST_CHECKED ) ? "Tcp" : "Udp" );
-		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-
-		GetDlgItemText( g_MainDlgWndHdl, IPAddrCbBoxId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IPAddr" );
+		GetDlgItemText( g_MainDlgWndHdl, SrvrUrlCbBoxId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SrvrUrl" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
-		GetDlgItemText( g_MainDlgWndHdl, PortEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "Port" );
-		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
-		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		for( int p_Num = 0, p_ClntLstTotal = ListView_GetItemCount( g_ClntLstWndHdl ); p_Num < p_ClntLstTotal; p_Num++ )
+		{
+			p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "ClntLstItem" );
+			p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+
+			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 1, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+			VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, ,  );
+			p_TmpXMLElement3Pt = p_XMLDocument.NewElement( "Prtcl" );
+			p_TmpXMLElement3Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
+			p_TmpXMLElement2Pt->InsertEndChild( p_TmpXMLElement3Pt );
+				
+			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+			VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, ,  );
+			p_TmpXMLElement3Pt = p_XMLDocument.NewElement( "RmtNodeName" );
+			p_TmpXMLElement3Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
+			p_TmpXMLElement2Pt->InsertEndChild( p_TmpXMLElement3Pt );
+				
+			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 3, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+			VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, ,  );
+			p_TmpXMLElement3Pt = p_XMLDocument.NewElement( "RmtNodeSrvc" );
+			p_TmpXMLElement3Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
+			p_TmpXMLElement2Pt->InsertEndChild( p_TmpXMLElement3Pt );
+		}
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "TkbkMode" );
 		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "Ado" :
-				( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "Vdo" :
-					( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "AdoVdo" : "Ado" );
+			( IsDlgButtonChecked( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId ) == BST_CHECKED ) ? "None" :
+				( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "Ado" :
+					( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "Vdo" :
+						( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "AdoVdo" :
+							"Ado" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		{
@@ -108,7 +125,7 @@ void SaveStngToXmlFile()
 			if( p_TmpInt != CB_ERR )
 			{
 				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_GETLBTEXT, p_TmpInt, ( LPARAM )p_U16TxtVstrPt->m_Pt );
-				VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+				VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 				p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoInptDvc" );
 				p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 				p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -117,7 +134,7 @@ void SaveStngToXmlFile()
 			if( p_TmpInt != CB_ERR )
 			{
 				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_GETLBTEXT, p_TmpInt, ( LPARAM )p_U16TxtVstrPt->m_Pt );
-				VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+				VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 				p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoOtptDvc" );
 				p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 				p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -126,7 +143,7 @@ void SaveStngToXmlFile()
 			if( p_TmpInt != CB_ERR )
 			{
 				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_GETLBTEXT, p_TmpInt, ( LPARAM )p_U16TxtVstrPt->m_Pt );
-				VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+				VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 				p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoInptDvc" );
 				p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 				p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -154,23 +171,35 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
 
-	//传输协议设置对话框。
+	//服务端设置对话框。
 	{
-		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "XfrPrtclStng" );
+		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SrvrStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
-
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "XfrMode" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId ) == BST_CHECKED ) ? "Ptt" : "Rt" );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsAutoActCnct" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-
-		GetDlgItemText( g_XfrPrtclStngDlgWndHdl, MaxCnctTimesEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "MaxCnctTimes" );
+		
+		GetDlgItemText( g_SrvrStngDlgWndHdl, MaxCnctNumEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "MaxCnctNum" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsAutoAllowCnct" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+	}
+	
+	//客户端设置对话框。
+	{
+		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "ClntStng" );
+		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "XfrMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_ClntStngDlgWndHdl, UsePttRdBtnId ) == BST_CHECKED ) ? "Ptt" : "Rt" );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		GetDlgItemText( g_ClntStngDlgWndHdl, MaxCnctTimesEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "MaxCnctTimes" );
+		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
 
@@ -275,19 +304,19 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoFrmSzPrset" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoFrmSzOtherWidth" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoFrmSzOtherHeight" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -305,43 +334,43 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
 		GetDlgItemText( g_AjbStngDlgWndHdl, AAjbMinNeedBufFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AAjbMinNeedBufFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AAjbMaxNeedBufFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AAjbMaxCntuLostFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AAjbAdaptSensitivity" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VAjbMinNeedBufFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VAjbMaxNeedBufFrmCnt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VAjbAdaptSensitivity" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -353,7 +382,7 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
 		GetDlgItemText( g_SaveStsToTxtFileStngDlgWndHdl, SaveStsToTxtFileFullPathEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "FullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -365,13 +394,13 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
 		GetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "FullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WrBufSzByt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -399,7 +428,7 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
 		GetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "FilterLenMsec" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -409,25 +438,25 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoMutp" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoCntu" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoSupes" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoSupesAct" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -447,13 +476,13 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "Delay" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -465,13 +494,13 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
 		GetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "EchoMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "Delay" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -510,7 +539,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecFilterLenMsec" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -520,25 +549,25 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecEchoMutp" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecEchoCntu" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecEchoSupes" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexAecEchoSupesAct" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -548,25 +577,25 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecmEchoMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecmDelay" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecEchoMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WebRtcAecDelay" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -592,7 +621,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SameRoomEchoMinDelay" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -608,7 +637,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "NoiseSupes" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -624,7 +653,7 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 	
 		GetDlgItemText( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "PolicyMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -636,7 +665,7 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 	
 		GetDlgItemText( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "PolicyMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -652,13 +681,13 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VadProbStart" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VadProbCntu" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -668,25 +697,25 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcLevel" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcIncrement" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcDecrement" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AgcMaxGain" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -702,19 +731,19 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdQualtEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexEncdQualt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexEncdCmplxt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "SpeexEncdPlcExptLossRate" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -734,13 +763,13 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoInptSrcFullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoInptRsltFullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -750,13 +779,13 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoOtptSrcFullPath" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WrBufSzByt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -768,31 +797,31 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
 		GetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdVdoTypeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "OpenH264EncdVdoType" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdEncdBitrateEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "OpenH264EncdEncdBitrate" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdBitrateCtrlModeEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "OpenH264EncdBitrateCtrlMode" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdIDRFrmIntvlEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "OpenH264EncdIDRFrmIntvl" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdCmplxtEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
-		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "OpenH264EncdCmplxt" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
@@ -801,15 +830,15 @@ void SaveStngToXmlFile()
 	p_XMLError = p_XMLDocument.SaveFile( "Stng.xml" );
 	if( p_XMLError == tinyxml2::XML_SUCCESS )
 	{
-		VstrCpy( p_U16TxtVstrPt, Cu16vstr( L"保存设置到Stng.xml文件成功。" ) );
+		VstrCpy( p_U16TxtVstrPt, Cu16vstr( L"保存设置到Stng.xml文件成功。" ), , );
 		LOGI( p_U16TxtVstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 	else
 	{
 		VstrFmtCpy( p_U16TxtVstrPt, Cu16vstr( L"保存设置到Stng.xml文件失败。原因：%s。" ), p_XMLDocument.ErrorIDToName( p_XMLError ) );
 		LOGE( p_U16TxtVstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 	
 	Out:
@@ -821,6 +850,7 @@ void SaveStngToXmlFile()
 	{
 		VstrDstoy( p_U8TxtVstrPt );
 	}
+	return;
 }
 
 //从Xml文件读取设置。
@@ -830,6 +860,7 @@ void ReadStngFromXmlFile()
 	tinyxml2::XMLElement * p_StngXMLElementPt;
 	tinyxml2::XMLElement * p_TmpXMLElement1Pt;
 	tinyxml2::XMLElement * p_TmpXMLElement2Pt;
+	tinyxml2::XMLElement * p_TmpXMLElement3Pt;
 	tinyxml2::XMLError p_XMLError;
 	Vstr * p_U16TxtVstrPt = NULL;
 	Vstr * p_U8TxtVstrPt = NULL;
@@ -848,15 +879,15 @@ void ReadStngFromXmlFile()
 	p_XMLError = p_XMLDocument.LoadFile( "Stng.xml" );
 	if( p_XMLError == tinyxml2::XML_SUCCESS )
 	{
-		VstrCpy( p_U16TxtVstrPt, Cu16vstr( L"从Stng.xml文件读取设置成功。" ) );
+		VstrCpy( p_U16TxtVstrPt, Cu16vstr( L"从Stng.xml文件读取设置成功。" ), , );
 		LOGI( p_U16TxtVstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 	else
 	{
 		VstrFmtCpy( p_U16TxtVstrPt, Cu16vstr( L"从Stng.xml文件读取设置失败。原因：%s。" ), p_XMLDocument.ErrorIDToName( p_XMLError ) );
 		LOGE( p_U16TxtVstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , p_U16TxtVstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 		goto Out;
 	}
 	
@@ -870,55 +901,62 @@ void ReadStngFromXmlFile()
 				{
 					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatXfrPrtcl" ) == 0 )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "SrvrUrl" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Tcp" ) == 0 )
-							{
-								CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseTcpPrtclRdBtnId );
-							}
-							else
-							{
-								CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseUdpPrtclRdBtnId );
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
+							SetDlgItemText( g_MainDlgWndHdl, SrvrUrlCbBoxId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IPAddr" ) == 0 )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "ClntLstItem" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-							SetDlgItemText( g_MainDlgWndHdl, IPAddrCbBoxId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "Port" ) == 0 )
-						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-							SetDlgItemText( g_MainDlgWndHdl, PortEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+							MainDlgWndMsgClntLstAddItem * p_MainDlgWndMsgClntLstAddItemPt = ( MainDlgWndMsgClntLstAddItem * )malloc( sizeof( MainDlgWndMsgClntLstAddItem ) );
+							VstrInit( &p_MainDlgWndMsgClntLstAddItemPt->m_PrtclVstrPt, Utf16, ,  );
+							VstrInit( &p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeNameVstrPt, Utf16, ,  );
+							VstrInit( &p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeSrvcVstrPt, Utf16, ,  );
+							for( p_TmpXMLElement3Pt = p_TmpXMLElement2Pt->FirstChildElement(); p_TmpXMLElement3Pt != NULL; p_TmpXMLElement3Pt = p_TmpXMLElement3Pt->NextSiblingElement() )
+							{
+								if( strcmp( p_TmpXMLElement3Pt->Name(), "Prtcl" ) == 0 )
+								{
+									VstrCpy( p_MainDlgWndMsgClntLstAddItemPt->m_PrtclVstrPt, Cu8vstr( p_TmpXMLElement3Pt->GetText() ), , );
+								}
+								else if( strcmp( p_TmpXMLElement3Pt->Name(), "RmtNodeName" ) == 0 )
+								{
+									VstrCpy( p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeNameVstrPt, Cu8vstr( p_TmpXMLElement3Pt->GetText() ), , );
+								}
+								else if( strcmp( p_TmpXMLElement3Pt->Name(), "RmtNodeSrvc" ) == 0 )
+								{
+									VstrCpy( p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeSrvcVstrPt, Cu8vstr( p_TmpXMLElement3Pt->GetText() ), , );
+								}
+							}
+							SendMessage( g_MainDlgWndHdl, MainDlgWndMsgTypClntLstAddItem, ( WPARAM )p_MainDlgWndMsgClntLstAddItemPt, 0 );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "TkbkMode" ) == 0 )
 						{
 							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Ado" ) == 0 )
 							{
-								CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
+								CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
 							}
 							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Vdo" ) == 0 )
 							{
-								CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseVdoTkbkModeRdBtnId );
+								CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseVdoTkbkModeRdBtnId );
 							}
 							else
 							{
-								CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId );
+								CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId );
 							}
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptDvc" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptDvc" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoInptDvc" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptIsMute" ) == 0 )
@@ -967,7 +1005,29 @@ void ReadStngFromXmlFile()
 						}
 					}
 				}
-				else if( strcmp( p_TmpXMLElement1Pt->Name(), "XfrPrtclStng" ) == 0 )
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SrvrStng" ) == 0 )
+				{
+					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
+					{
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "IsAutoActCnct" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "MaxCnctNum" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
+							SetDlgItemText( g_SrvrStngDlgWndHdl, MaxCnctNumEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+					}
+				}
+				else if( strcmp( p_TmpXMLElement1Pt->Name(), "ClntStng" ) == 0 )
 				{
 					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
@@ -975,28 +1035,17 @@ void ReadStngFromXmlFile()
 						{
 							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Ptt" ) == 0 )
 							{
-								CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UsePttRdBtnId );
+								CheckRadioButton( g_ClntStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UsePttRdBtnId );
 							}
 							else
 							{
-								CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
+								CheckRadioButton( g_ClntStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
 							}
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "MaxCnctTimes" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
-							SetDlgItemText( g_XfrPrtclStngDlgWndHdl, MaxCnctTimesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
-						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsAutoAllowCnct" ) == 0 )
-						{
-							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-							{
-								CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_UNCHECKED );
-							}
-							else
-							{
-								CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_CHECKED );
-							}
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
+							SetDlgItemText( g_ClntStngDlgWndHdl, MaxCnctTimesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
 				}
@@ -1261,12 +1310,12 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzOtherWidth" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoFrmSzOtherHeight" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoUseWhatCodec" ) == 0 )
@@ -1288,37 +1337,37 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMinNeedBufFrmCnt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMinNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMaxNeedBufFrmCnt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbMaxCntuLostFrmCnt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AAjbAdaptSensitivity" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbMinNeedBufFrmCnt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbMaxNeedBufFrmCnt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VAjbAdaptSensitivity" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1329,7 +1378,7 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "FullPath" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveStsToTxtFileStngDlgWndHdl, SaveStsToTxtFileFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1340,12 +1389,12 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "FullPath" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WrBufSzByt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInpt" ) == 0 )
@@ -1400,7 +1449,7 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "FilterLenMsec" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseRec" ) == 0 )
@@ -1416,22 +1465,22 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMutp" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoCntu" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoSupes" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoSupesAct" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveMemFile" ) == 0 )
@@ -1464,12 +1513,12 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "Delay" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1480,12 +1529,12 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "EchoMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "Delay" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseDelayAgstcMode" ) == 0 )
@@ -1566,7 +1615,7 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecFilterLenMsec" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecIsUseRec" ) == 0 )
@@ -1582,22 +1631,22 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoMutp" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoCntu" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoSupes" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexAecEchoSupesAct" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmIsUseCNGMode" ) == 0 )
@@ -1613,22 +1662,22 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmEchoMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecmDelay" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecEchoMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecDelay" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WebRtcAecIsUseDelayAgstcMode" ) == 0 )
@@ -1688,7 +1737,7 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SameRoomEchoMinDelay" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1710,7 +1759,7 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "NoiseSupes" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseDereverb" ) == 0 )
@@ -1732,7 +1781,7 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "PolicyMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1743,7 +1792,7 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "PolicyMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1765,12 +1814,12 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VadProbStart" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VadProbCntu" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseAgc" ) == 0 )
@@ -1786,22 +1835,22 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcLevel" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcIncrement" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcDecrement" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AgcMaxGain" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1823,17 +1872,17 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdQualt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdQualtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdCmplxt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexEncdPlcExptLossRate" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "SpeexDecdIsUsePrcplEnhsmt" ) == 0 )
@@ -1866,12 +1915,12 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptSrcFullPath" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptSrcFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptRsltFullPath" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoInptRsltFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoOtpt" ) == 0 )
@@ -1887,12 +1936,12 @@ void ReadStngFromXmlFile()
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptSrcFullPath" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "WrBufSzByt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1903,27 +1952,27 @@ void ReadStngFromXmlFile()
 					{
 						if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdVdoType" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdVdoTypeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdEncdBitrate" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdEncdBitrateEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdEncdBitrateCtrlMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdBitrateCtrlModeEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdIDRFrmIntvl" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdIDRFrmIntvlEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "OpenH264EncdCmplxt" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ) );
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdCmplxtEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
 					}
@@ -1950,35 +1999,40 @@ void DelStngXmlFile()
 	{
 		g_ErrInfoVstr.Cpy( Cu8vstr( "删除设置文件Stng.xml成功。" ) );
 		LOGI( g_ErrInfoVstr.m_VstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 	else
 	{
 		GetWinSysErrInfo( GetLastError(), g_ErrInfoVstr.m_VstrPt );
 		g_ErrInfoVstr.Ins( 0, Cu8vstr( "删除设置文件Stng.xml失败。原因：" ) );
 		LOGE( g_ErrInfoVstr.m_VstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	}
 }
 
 //重置设置。
 void ResetStng()
 {
-	//设置使用什么传输协议。
-	CheckRadioButton( g_MainDlgWndHdl, UseTcpPrtclRdBtnId, UseUdpPrtclRdBtnId, UseUdpPrtclRdBtnId );
+	//设置服务端。
+	CheckDlgButton( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId, BST_CHECKED );
+	SetWindowText( GetDlgItem( g_SrvrStngDlgWndHdl, MaxCnctNumEdTxtId ), L"10" );
 
 	//设置传输协议。
-	CheckRadioButton( g_XfrPrtclStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
-	SetWindowText( GetDlgItem( g_XfrPrtclStngDlgWndHdl, MaxCnctTimesEdTxtId ), L"5" );
-	CheckDlgButton( g_XfrPrtclStngDlgWndHdl, IsAutoAllowCnctCkBoxId, BST_CHECKED );
+	CheckRadioButton( g_ClntStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
+	SetWindowText( GetDlgItem( g_ClntStngDlgWndHdl, MaxCnctTimesEdTxtId ), L"5" );
 	
-	//设置IP地址。
+	//设置服务端和客户端的Url。
 	{
-		SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_RESETCONTENT, ( WPARAM )0, ( LPARAM )0 ); //清空IP地址。
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_RESETCONTENT, ( WPARAM )0, ( LPARAM )0 ); //清空服务端Url组合框。
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_RESETCONTENT, ( WPARAM )0, ( LPARAM )0 ); //清空客户端的服务端Url组合框。
 
 		struct addrinfo p_LclNodeHintsAddrInfo; //存放本地节点条件地址信息结构体。
 		struct addrinfo * p_LclNodeAddrInfoListPt = NULL; //存放本地节点地址信息结构体链表指针。
 		wchar_t p_LclNodeAddrStrArr[ INET6_ADDRSTRLEN ]; //存放本地节点地址字符串的数组。
+		VstrCls p_LclNodeUrlVstr; //存放本地节点Url动态字符串。
+
+		//本地节点Url动态字符串初始化。
+		p_LclNodeUrlVstr.Init( Utf16 );
 
 		//初始化本地节点条件地址信息结构体。
 		p_LclNodeHintsAddrInfo.ai_canonname = NULL;
@@ -1986,44 +2040,74 @@ void ResetStng()
 		p_LclNodeHintsAddrInfo.ai_addr = NULL;
 		p_LclNodeHintsAddrInfo.ai_addrlen = 0;
 		p_LclNodeHintsAddrInfo.ai_flags = AI_PASSIVE; //获取用于调用bind()函数的地址信息。
-		p_LclNodeHintsAddrInfo.ai_family = AF_INET; //要获取IPv4地址簇的地址信息。
-		p_LclNodeHintsAddrInfo.ai_protocol = IPPROTO_UDP; //获取UDP协议的地址信息。
-		p_LclNodeHintsAddrInfo.ai_socktype = SOCK_DGRAM; //获取无序、不可靠、双向的非连接数据报类型的地址信息。
+		p_LclNodeHintsAddrInfo.ai_family = 0;
+		p_LclNodeHintsAddrInfo.ai_protocol = 0;
+		p_LclNodeHintsAddrInfo.ai_socktype = 0;
 
 		//根据指定的本地节点名称、本地节点服务、本地节点条件地址信息，获取本地节点符合条件的地址信息。
-		getaddrinfo( "", "", NULL, &p_LclNodeAddrInfoListPt );
+		getaddrinfo( "", "", &p_LclNodeHintsAddrInfo, &p_LclNodeAddrInfoListPt );
 
-		//设置IP地址组合框的内容为本地节点的IP地址。
+		//设置服务端Url组合框和客户端Url组合框的内容。
 		for( struct addrinfo * p_LclNodeAddrInfoListLoopPt = p_LclNodeAddrInfoListPt; p_LclNodeAddrInfoListLoopPt != NULL; p_LclNodeAddrInfoListLoopPt = p_LclNodeAddrInfoListLoopPt->ai_next )
 		{
 			if( ( ( struct sockaddr_in * )p_LclNodeAddrInfoListLoopPt->ai_addr )->sin_family == AF_INET ) //如果为IPv4的地址。
 			{
 				InetNtop( ( ( struct sockaddr_in * )p_LclNodeAddrInfoListLoopPt->ai_addr )->sin_family, &( ( ( struct sockaddr_in * )p_LclNodeAddrInfoListLoopPt->ai_addr )->sin_addr ), p_LclNodeAddrStrArr, SzOfArr( p_LclNodeAddrStrArr ) );
-				SendMessage( GetDlgItem( g_MainDlgWndHdl, IPAddrCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeAddrStrArr );
+				p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Tcp://%z16s:12345" ), p_LclNodeAddrStrArr );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+				p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Audp://%z16s:12345" ), p_LclNodeAddrStrArr );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
 			}
 		}
-		SendMessage( GetDlgItem( g_MainDlgWndHdl, IPAddrCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )L"0.0.0.0" );
-		SendMessage( GetDlgItem( g_MainDlgWndHdl, IPAddrCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )L"127.0.0.1" );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Tcp://0.0.0.0:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Audp://0.0.0.0:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Tcp://127.0.0.1:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Audp://127.0.0.1:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
 		for( struct addrinfo * p_LclNodeAddrInfoListLoopPt = p_LclNodeAddrInfoListPt; p_LclNodeAddrInfoListLoopPt != NULL; p_LclNodeAddrInfoListLoopPt = p_LclNodeAddrInfoListLoopPt->ai_next )
 		{
 			if( ( ( struct sockaddr_in * )p_LclNodeAddrInfoListLoopPt->ai_addr )->sin_family == AF_INET6 ) //如果为IPv6的地址。
 			{
 				InetNtop( ( ( struct sockaddr_in6 * )p_LclNodeAddrInfoListLoopPt->ai_addr )->sin6_family, &( ( ( struct sockaddr_in6 * )p_LclNodeAddrInfoListLoopPt->ai_addr )->sin6_addr ), p_LclNodeAddrStrArr, SzOfArr( p_LclNodeAddrStrArr ) );
-				SendMessage( GetDlgItem( g_MainDlgWndHdl, IPAddrCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeAddrStrArr );
+				p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Tcp://[%z16s]:12345" ), p_LclNodeAddrStrArr );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+				p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Audp://[%z16s]:12345" ), p_LclNodeAddrStrArr );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+				SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
 			}
 		}
-		SendMessage( GetDlgItem( g_MainDlgWndHdl, IPAddrCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )L"::" );
-		SendMessage( GetDlgItem( g_MainDlgWndHdl, IPAddrCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )L"::1" );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Tcp://[::]:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Audp://[::]:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Tcp://[::1]:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		p_LclNodeUrlVstr.FmtCpy( Cu8vstr( "Audp://[::1]:12345" ), p_LclNodeAddrStrArr );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_ADDSTRING, 0, ( LPARAM )p_LclNodeUrlVstr.m_VstrPt->m_Pt );
 
 		if( p_LclNodeAddrInfoListPt != NULL ) freeaddrinfo( p_LclNodeAddrInfoListPt ); //销毁本地节点地址信息结构体链表。
-		SendMessage( GetDlgItem( g_MainDlgWndHdl, IPAddrCbBoxId ), CB_SETCURSEL, 0, 0 ); //设置IP地址组合框默认选择第一个IP地址。
+
+		//设置默认选择项。
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId ), CB_SETCURSEL, 1, 0 ); //设置服务端Url组合框默认选择第二个Audp协议的Url。
+		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_SETCURSEL, 1, 0 ); //设置客户端Url组合框默认选择第二个Audp协议的Url。
 	}
 	
-	//设置端口。
-	SetWindowText( GetDlgItem( g_MainDlgWndHdl, PortEdTxtId ), L"12345" );
-
 	//设置使用什么对讲模式。
-	CheckRadioButton( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
+	CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
 	
 	//设置音频输入设备、音频输出设备。
 	RefresAdoVdohDvc();

@@ -46,9 +46,9 @@ extern "C"
 {
 #endif
 
-__FUNC_DLLAPI__ int LogInit( Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int LogInit();
 
-__FUNC_DLLAPI__ int LogOpenFile( const Vstr * LogFilePathVstrPt, size_t * FileNumPt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int LogOpenFile( const Vstr * LogFilePathVstrPt, size_t * FileNumPt, int IsSetDfltFile, Vstr * ErrInfoVstrPt );
 __FUNC_DLLAPI__ int LogSetDfltFile( size_t FileNum, Vstr * ErrInfoVstrPt );
 __FUNC_DLLAPI__ int LogSetLvl( int Lvl, Vstr * ErrInfoVstrPt );
 __FUNC_DLLAPI__ void LogSetHeadLst( LogHeadItem HeadItem, ... );

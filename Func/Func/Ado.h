@@ -14,6 +14,8 @@ __FUNC_DLLAPI__ int PcmInt16ToFlt32768( const int16_t * Int16PcmPt, float * Flt3
 __FUNC_DLLAPI__ int PcmInt16ToFlt1( const int16_t * Int16PcmPt, float * Flt1PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
 __FUNC_DLLAPI__ int PcmFlt32768ToInt16( const float * Flt32768PcmPt, int16_t * Int16PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
 __FUNC_DLLAPI__ int PcmFlt1ToInt16( const float * Flt1PcmPt, int16_t * Int16PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmInt32ToInt16( const int32_t * Int32PcmPt, int16_t * Int16PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
+__FUNC_DLLAPI__ int PcmInt16ToInt32( const int16_t * Int16PcmPt, int32_t * Int32PcmPt, size_t PcmLenData, Drct_t CnvrtDrct );
 
 __FUNC_DLLAPI__ void AdoOneBand32kInt16ToLHBand16kInt16( const int16_t OneBand32kInt16[ 320 ],
 														 int16_t LowBand16kInt16[ 160 ], int16_t HighBand16kInt16[ 160 ],

@@ -1,4 +1,5 @@
 ﻿#include "VdoOtpt.h"
+#include "MediaPocsThrd.h"
 
 typedef struct //视频输出线程的参数。
 {
@@ -14,7 +15,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt );
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -64,7 +65,7 @@ int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -106,7 +107,7 @@ void VdoOtptStrmDecdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -167,7 +168,7 @@ int VdoOtptStrmThrdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -212,7 +213,7 @@ void VdoOtptStrmThrdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -243,7 +244,7 @@ int VdoOtptStrmInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -469,7 +470,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 
         if( p_StrmPt->m_Thrd.m_ExitFlag == 1 ) //如果退出标记为请求退出。
         {
-            if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：本线程接收到退出请求，开始准备退出。" ), p_StrmPt->m_Idx );
+            if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输出线程：视频输出流索引 %uz32d：接收到退出请求。" ), p_StrmPt->m_Idx );
             goto Out;
         }
 
@@ -737,7 +738,7 @@ void VdoOtptSetStrmIsUse( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsUseSt
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -806,7 +807,7 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……

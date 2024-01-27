@@ -37,8 +37,16 @@ __FUNC_DLLAPI__ int StrTrim( char * SrcStrPt, const char * TrimStrPt, char TrimP
 
 //__FUNC_DLLAPI__ int MemCmp( const void * Buf1Pt, const void * Buf2Pt, size_t MemSzByt );
 
-__FUNC_DLLAPI__ void * MemCpy( void * DstPt, const void * SrcPt, size_t MemSzByt );
-//__FUNC_DLLAPI__ void * MemCpy_inline( void * DstPt, const void * SrcPt, size_t MemSzByt );
+#if( ( defined __MS_VCXX__ ) || ( __CYGWIN_GCC__ ) || ( __LINUX_GCC__ ) )
+#if( ( defined __X86__ ) || ( defined __X64__ ) )
+//__FUNC_DLLAPI__ void * __cdecl memcpy( void * DstPt, void const * SrcPt, size_t SzByt );
+//__FUNC_DLLAPI__ void * __cdecl memmove( void * DstPt, void const * SrcPt, size_t SzByt );
+__FUNC_DLLAPI__ void * __cdecl MemCpy( void * DstPt, void const * SrcPt, size_t SzByt );
+__FUNC_DLLAPI__ void * __cdecl MemCpyAvx( void * DstPt, void const * SrcPt, size_t SzByt );
+__FUNC_DLLAPI__ void * __cdecl MemCpySse2( void * DstPt, void const * SrcPt, size_t SzByt );
+#else
+#endif
+#endif
 
 //获取错误信息。
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
@@ -92,11 +100,23 @@ __FUNC_DLLAPI__ int _StrCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t DstStr
 	StrCpy( AstrPt, AstrChrSet, , IsWriteEnd, , SrcStrPt, SrcStrChrSet, SrcStrSzChr, SrcStrLenChrPt ); /*设置栈字符串。*/ \
 }
 
+//动态字符串复制并创建栈动态字符串。
+#define AvstrCpy( AvstrPt, AvstrChrSet, SrcVstrPt ) \
+{ \
+	const Vstr * _p_SrcVstrPt = SrcVstrPt; \
+	AvstrPt = ( Vstr * )alloca( sizeof( Vstr ) ); /*设置栈动态字符串的指针。*/ \
+	AvstrPt->m_SzChr = StrCpyMaxLenByt( AvstrChrSet, _p_SrcVstrPt->m_ChrSet, _p_SrcVstrPt->m_LenChr ); /*设置栈动态字符串的大小。*/ \
+	AvstrPt->m_Pt = alloca( AvstrPt->m_SzChr ); /*设置栈动态字符串缓冲区的指针。*/ \
+	AvstrPt->m_ChrSet = AvstrChrSet; /*设置栈动态字符串的字符集。*/ \
+	StrCpy( ( uint8_t * )AvstrPt->m_Pt, AvstrChrSet, AvstrPt->m_SzChr, 1, &AvstrPt->m_LenChr, _p_SrcVstrPt->m_Pt, _p_SrcVstrPt->m_ChrSet, _p_SrcVstrPt->m_SzChr, ); /*源始动态字符串复制到栈动态字符串。*/ \
+}
+
 //将变量格式化复制到字符串。
 __FUNC_DLLAPI__ int _StrFmtCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t DstStrSzChr, int32_t IsWriteEnd, size_t * DstStrLenChrPt, const void * FmtStrPt, ChrSet FmtStrChrSet, ... );
 #define StrFmtCpy( DstStrPt, DstStrChrSet, DstStrSzChr, IsWriteEnd, DstStrLenChrPt, FmtStrPt, FmtStrChrSet, ... ) \
        _StrFmtCpy( DEFARG( void *, DstStrPt, NULL ), DEFARG( ChrSet, DstStrChrSet, Utf8 ), DEFARG( size_t, DstStrSzChr, SIZE_MAX ), DEFARG( int32_t, IsWriteEnd, 1 ), DEFARG( size_t *, DstStrLenChrPt, NULL ), FmtStrPt, DEFARG( ChrSet, FmtStrChrSet, Utf8 ), __VA_ARGS__ )
 
+//将变量格式化复制并创建栈字符串。
 #define AstrFmtCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, ... ) \
 { \
     StrFmtCpy( , AstrChrSet, , IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, __VA_ARGS__ ); /*设置栈字符串的长度。*/ \
@@ -109,6 +129,7 @@ __FUNC_DLLAPI__ int _StrVaFmtCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t D
 #define StrVaFmtCpy( DstStrPt, DstStrChrSet, DstStrSzChr, IsWriteEnd, DstStrLenChrPt, FmtStrPt, FmtStrChrSet, VaLst ) \
        _StrVaFmtCpy( DEFARG( void *, DstStrPt, NULL ), DEFARG( ChrSet, DstStrChrSet, Utf8 ), DEFARG( size_t, DstStrSzChr, SIZE_MAX ), DEFARG( int32_t, IsWriteEnd, 1 ), DEFARG( size_t *, DstStrLenChrPt, NULL ), FmtStrPt, DEFARG( ChrSet, FmtStrChrSet, Utf8 ), VaLst )
 
+//将可变参数列表格式化复制并创建栈字符串。
 #define AstrVaFmtCpy( AstrPtType, AstrPt, AstrChrSet, IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, VaLst ) \
 { \
     StrVaFmtCpy( , AstrChrSet, , IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, VaLst ); /*设置栈字符串的长度。*/ \

@@ -1,4 +1,5 @@
 ﻿#include "AdoInpt.h"
+#include "MediaPocsThrd.h"
 
 DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt );
 
@@ -8,7 +9,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt );
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -125,7 +126,7 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -236,7 +237,7 @@ void AdoInptAecDstoy( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -287,7 +288,7 @@ void AdoInptSetIsCanUseAec( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -368,7 +369,7 @@ int AdoInptNsInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -446,7 +447,7 @@ void AdoInptNsDstoy( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -501,7 +502,7 @@ int AdoInptSpeexPrpocsInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -531,7 +532,7 @@ void AdoInptSpeexPrpocsDstoy( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -591,7 +592,7 @@ int AdoInptEncdInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -637,7 +638,7 @@ void AdoInptEncdDstoy( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -687,7 +688,7 @@ int AdoInptWavfmInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -729,7 +730,7 @@ void AdoInptWavfmDstoy( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -779,7 +780,7 @@ int AdoInptWaveFileWriterInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -821,7 +822,7 @@ void AdoInptWaveFileWriterDstoy( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -1240,7 +1241,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -1408,7 +1409,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -1454,7 +1455,7 @@ int AdoInptInit( AdoInpt * AdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -1535,8 +1536,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 	
 	if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：开始准备音频输入。" ) );
 
-	//自适应设置回音延迟。
-	if( AdoInptPt->m_IsCanUseAec != 0 ) //如果可以使用声学回音消除器，就自适应计算回音延迟，并设置到声学回音消除器。
+	if( AdoInptPt->m_IsCanUseAec != 0 ) //如果可以使用声学回音消除器，就自适应计算回音延迟，并设置到声学回音消除器。放在音频输入线程中计算，可以减少媒体处理线程的初始化时间。
 	{
 		int32_t p_AdoInptDelay; //存放音频输入延迟。
 		int32_t p_AdoOtptDelay; //存放音频输出延迟。
@@ -1631,7 +1631,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 						if( AdoInptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoInptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：本线程接收到设备关闭消息。" ) );
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收到设备关闭消息。" ) );
 						}
 					}
 					goto OutPocs;
@@ -1673,7 +1673,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 						if( AdoInptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoInptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：本线程接收到设备关闭消息。" ) );
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收到设备关闭消息。" ) );
 						}
 					}
 					else if( p_HRslt == AUDCLNT_S_BUFFER_EMPTY ) //如果设备的Pcm格式缓冲区当前为空，表示还需要等待。
@@ -1772,7 +1772,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 
 		if( AdoInptPt->m_Thrd.m_ExitFlag == 1 ) //如果退出标记为请求退出。
         {
-            if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：本线程接收到退出请求，开始准备退出。" ) );
+            if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：接收到退出请求。" ) );
             break;
         }
 	} //音频输入循环结束。

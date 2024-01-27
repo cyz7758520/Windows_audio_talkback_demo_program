@@ -1,7 +1,11 @@
-﻿#include "TinyXml2.h"
+﻿#pragma once
 
-#ifndef __WNDADOVDOTKBKSTNG_H__
-#define __WNDADOVDOTKBKSTNG_H__
+#include "TinyXml2.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 void SaveStngToXmlFile();
 void ReadStngFromXmlFile();
@@ -13,4 +17,6 @@ void EffectHigh();
 void EffectSuper();
 void EffectPremium();
 
+#ifdef __cplusplus
+}
 #endif

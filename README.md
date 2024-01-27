@@ -2,7 +2,8 @@
 # 必读说明
 
 # 简介
-&emsp;&emsp;本软件根据《道德经》为核心思想而设计，实现了两个设备之间进行音视频对讲，一般可用于楼宇对讲、智能门铃对讲、企业员工对讲、智能对讲机、以及类似于微信QQ音视频对讲的其他场景。本软件支持以下增强处理：  
+&emsp;&emsp;本软件根据《道德经》为核心思想而设计，实现了两个设备之间进行音视频对讲，实现了一个设备对多个设备进行广播对讲，一般可用于楼宇对讲、智能门铃对讲、企业员工对讲、智能对讲机、以及类似于微信QQ音视频对讲的其他场景。本软件支持以下增强处理：  
+&emsp;&emsp;* 支持同时与多个设备建立连接，并选择激活任一连接。  
 &emsp;&emsp;* 支持IPv4和IPv6的TCP和UDP协议传输，UDP协议支持可靠传输、支持连接中途更换IP不中断。  
 &emsp;&emsp;* 支持实时半双工（一键通）和实时全双工的音频或视频或音视频对讲。  
 &emsp;&emsp;* 支持8000Hz、16000Hz、32000Hz、48000Hz的音频。  
@@ -34,7 +35,9 @@
 &emsp;&emsp;准备两台安装了Windows 7及以上系统的设备（已适配到Windows 11），其中一台设备作为客户端可以连接到另一台作为服务端的设备（可以用Ping工具测试，建议两台设备在同一局域网内），且两台设备都安装相同版本的本软件。  
 
 # 开始
-&emsp;&emsp;在一台设备上直接点击创建服务端，再在另一台设备上将IP地址改为服务端设备的IP地址，并点击连接服务端，即可开始对讲，在任意一端点击中断，即可中断对讲。  
+&emsp;&emsp;1、在一台设备上直接点击服务端的创建按钮。  
+&emsp;&emsp;2、在另一台设备上将客户端的IP地址改为服务端设备的IP地址，并点击添加按钮。  
+&emsp;&emsp;3、在客户端列表里点击刚刚添加的IP地址，再点击连接按钮，即可开始对讲。  
 
 &emsp;&emsp;设置按钮：提供了各项功能的参数设置，大部分情况下都不需要修改，如果发现不适合某些设备，则需要根据设备情况修改。  
 &emsp;&emsp;保存设置按钮：将各项功能的参数保存到Stng.xml中，每次运行本软件时会自动读取设置。  
@@ -47,15 +50,17 @@
 # 移植
 &emsp;&emsp;如果需要在自己的软件中使用本软件的音视频功能，需要以下几个步骤：  
 &emsp;&emsp;**C语言：**  
-&emsp;&emsp;1、将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
-&emsp;&emsp;2、实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetAdoOtptFrm、UserWriteVdoOtptFrm、UserGetVdoOtptFrm这九个回调函数。  
-&emsp;&emsp;3、调用MediaPocsThrdInit()函数创建并初始化媒体处理线程，然后调用媒体处理线程的相关设置函数，最后调用MediaPocsThrdStart()函数启动媒体处理线程即可。  
+&emsp;&emsp;1、将qedit.h、AdoInpt.h、AdoInpt.cpp、AdoOtpt.h、AdoOtpt.cpp、VdoInpt.h、VdoInpt.cpp、VdoOtpt.h、VdoOtpt.cpp、TkbkNtwk.h、TkbkNtwk.cpp、BdctNtwk.h、BdctNtwk.cpp、MediaPocsThrd.h、MediaPocsThrd.cpp、NtwkMediaPocsThrd.h、NtwkMediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
+&emsp;&emsp;2、如果自己的软件已有传输协议：实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetAdoOtptFrm、UserWriteVdoOtptFrm、UserGetVdoOtptFrm这九个回调函数。  
+&emsp;&emsp;&emsp;&emsp;如果自己的软件没有传输协议：实现UserNtwkMediaPocsThrdInit、UserNtwkMediaPocsThrdDstoy、UserSrvrInit、UserSrvrDstoy、UserShowLog、UserShowToast、UserVibrate、UserCnctInit、UserCnctSts、UserCnctAct、UserCnctLclTkbkMode、UserCnctRmtTkbkMode、UserCnctDstoy这十三个回调函数。  
+&emsp;&emsp;3、调用MediaPocsThrdInit()或NtwkMediaPocsThrdInit()函数创建并初始化媒体处理线程，然后调用媒体处理线程的相关设置函数，最后调用MediaPocsThrdStart()函数启动媒体处理线程即可。  
 &emsp;&emsp;4、当需要媒体处理线程退出时，调用MediaPocsThrdRqirExit()函数即可。  
 &emsp;&emsp;**C++语言：**  
-&emsp;&emsp;1、将MediaPocsThrd.h、MediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
-&emsp;&emsp;2、继承MediaPocsThrd媒体处理线程类，实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetAdoOtptFrm、UserWriteVdoOtptFrm、UserGetVdoOtptFrm这九个回调成员函数。  
+&emsp;&emsp;1、将qedit.h、AdoInpt.h、AdoInpt.cpp、AdoOtpt.h、AdoOtpt.cpp、VdoInpt.h、VdoInpt.cpp、VdoOtpt.h、VdoOtpt.cpp、TkbkNtwk.h、TkbkNtwk.cpp、BdctNtwk.h、BdctNtwk.cpp、MediaPocsThrd.h、MediaPocsThrd.cpp、NtwkMediaPocsThrd.h、NtwkMediaPocsThrd.cpp和各个库文件夹复制到自己的软件中。  
+&emsp;&emsp;2、如果自己的软件已有传输协议：继承MediaPocsThrd媒体处理线程类，实现UserInit、UserPocs、UserDstoy、UserMsg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetAdoOtptFrm、UserWriteVdoOtptFrm、UserGetVdoOtptFrm这九个回调成员函数。  
+&emsp;&emsp;&emsp;&emsp;如果自己的软件没有传输协议：继承NtwkMediaPocsThrd媒体处理线程类，实现UserNtwkMediaPocsThrdInit、UserNtwkMediaPocsThrdDstoy、UserSrvrInit、UserSrvrDstoy、UserShowLog、UserShowToast、UserVibrate、UserCnctInit、UserCnctSts、UserCnctAct、UserCnctLclTkbkMode、UserCnctRmtTkbkMode、UserCnctDstoy这十三个回调成员函数。  
 &emsp;&emsp;3、new这个继承的类，然后调用类的相关设置成员函数，最后调用start()成员函数启动媒体处理线程即可。  
-&emsp;&emsp;4、当需要媒体处理线程退出时，调用MediaPocsThrdRqirExit()函数即可。  
+&emsp;&emsp;4、当需要媒体处理线程退出时，调用RqirExit()函数即可。  
 
 &emsp;&emsp;如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。  
 &emsp;&emsp;如果只移植部分功能，没有移植MediaPocsThrd媒体处理线程类，则效果可能不好，因为MediaPocsThrd类做了很多优化。  
@@ -66,10 +71,9 @@
 
 # 命令
 &emsp;&emsp;本软件支持通过命令行参数来设置，参数如下：  
-&emsp;&emsp;**-Tcp**：表示选择TCP协议。  
-&emsp;&emsp;**-Udp**：表示选择UDP协议。  
-&emsp;&emsp;**-Ip xx.xx.xx.xx**：表示设置IP地址。  
-&emsp;&emsp;**-Port xxx**：表示设置端口号。  
+&emsp;&emsp;**-SrvrUrl xx://xx.xx.xx.xx:xxxx**：表示设置服务端Url。  
+&emsp;&emsp;**-AddClntSrvrUrl xx://xx.xx.xx.xx:xxxx**：表示添加客户端的服务端Url。  
+&emsp;&emsp;**-None**：表示选择挂起对讲模式。  
 &emsp;&emsp;**-Ado**：表示选择音频对讲模式。  
 &emsp;&emsp;**-Vdo**：表示选择视频对讲模式。  
 &emsp;&emsp;**-AdoVdo**：表示选择音视频对讲模式。  
@@ -92,11 +96,11 @@
 &emsp;&emsp;**-HideWnd**：表示隐藏窗口。  
 &emsp;&emsp;**-MinWnd**：表示最小化窗口。  
 &emsp;&emsp;**-MaxWnd**：表示最大化窗口。  
-&emsp;&emsp;**-TkbkStsWndHdl**：表示设置对讲状态窗口的句柄为xxx（十进制）。  
-&emsp;&emsp;**-CreateSrvr**：表示创建服务端。本参数要放在所有参数的最后。  
-&emsp;&emsp;**-CnctSrvr**：表示连接服务端。本参数要放在所有参数的最后。  
+&emsp;&emsp;**-SrvrCreate**：表示创建服务端。本参数要放在所有参数的最后。  
+&emsp;&emsp;**-ClntCnct 0|1|2|x**：表示客户端连接服务端，数字为客户端列表序号。本参数要放在所有参数的最后。  
 
-&emsp;&emsp;例如：“Windows下音视频对讲演示程序.exe -Tcp -Ip 192.168.0.100 -Port 12345 -AdoVdo -VdoFrmSz 1280 960 -WndSz 1000 900 -CreateSrvr”：表示选择TCP协议，设置IP地址为192.168.0.100，设置端口号为12345，选择音视频对讲模式，设置视频帧的宽度为1280像素、高度为960像素。设置窗口的宽度为1000像素、高度为900像素，最后创建服务端。
+&emsp;&emsp;例如：“Windows下音视频对讲演示程序.exe -SrvrUrl Audp://192.168.0.100:12345 -AdoVdo -VdoFrmSz 1280 960 -WndSz 1000 900 -SrvrCreate”：表示设置服务端Url为高级UDP协议、IP地址为192.168.0.100、端口号为12345，选择音视频对讲模式，设置视频帧的宽度为1280像素、高度为960像素。设置窗口的宽度为1000像素、高度为900像素，最后创建服务端。  
+&emsp;&emsp;例如：“Windows下音视频对讲演示程序.exe -AddClntSrvrUrl Audp://192.168.0.100:12345 -AdoVdo -VdoFrmSz 1280 960 -WndSz 1000 900 -ClntCnct 0”：表示添加客户端的服务端Url为高级UDP协议、IP地址为192.168.0.100、端口号为12345，选择音视频对讲模式，设置视频帧的宽度为1280像素、高度为960像素。设置窗口的宽度为1000像素、高度为900像素，最后连接客户端列表序号为0的服务端。  
 
 # 注意
 &emsp;&emsp;从老版本更新到新版本时，类文件和库文件全部都要更新，不能只更新类文件或库文件，否则会导致意想不到的问题。  
@@ -111,12 +115,11 @@
 &emsp;&emsp;本人QQ号：280604597    赤勇玄心行天道  
 &emsp;&emsp;本人微信：qq280604597    赤勇玄心行天道  
 &emsp;&emsp;本人博客：http://www.cnblogs.com/gaoyaguo  
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://blog.csdn.net/cyz7758520?type=blog  
 &emsp;&emsp;Windows版源代码：https://github.com/cyz7758520/Windows_audio_talkback_demo_program  
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitee.com/chen_yi_ze/Windows_audio_talkback_demo_program  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitcode.net/cyz7758520/Windows_audio_talkback_demo_program  
 &emsp;&emsp;Android版源代码：https://github.com/cyz7758520/Android_audio_talkback_demo_program  
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitee.com/chen_yi_ze/Android_audio_talkback_demo_program  
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;https://gitcode.net/cyz7758520/Android_audio_talkback_demo_program  
 
 # 版权
 &emsp;&emsp;Speex：https://gitlab.xiph.org/xiph/speex/-/blob/master/COPYING  
@@ -221,4 +224,45 @@ ___
 &emsp;&emsp;&emsp;&emsp;&emsp;VdoOtptEncdSrcFrmPt：\[输入\]，存放视频输出已编码格式原始帧的指针。如果视频输出解码器要使用YU12原始数据，则本参数为NULL。  
 &emsp;&emsp;&emsp;&emsp;&emsp;VdoOtptEncdSrcFrmLenByt：\[输入\]，存放视频输出已编码格式原始帧的长度，单位为字节。如果视频输出解码器要使用YU12原始数据，则本参数无意义。  
 返回说明：无。  
+___
+### NtwkMediaPocsThrd网络媒体处理线程类的十三个回调函数
+___
+函数名称：UserNtwkMediaPocsThrdInit  
+功能说明：用户定义的网络媒体处理线程初始化函数。  
+___
+函数名称：UserNtwkMediaPocsThrdDstoy  
+功能说明：用户定义的网络媒体处理线程销毁函数。  
+___
+函数名称：UserSrvrInit  
+功能说明：用户定义的服务端初始化函数。  
+___
+函数名称：UserSrvrDstoy  
+功能说明：用户定义的服务端销毁函数。  
+___
+函数名称：UserShowLog  
+功能说明：用户定义的显示日志函数。  
+___
+函数名称：UserShowToast  
+功能说明：用户定义的显示Toast函数。  
+___
+函数名称：UserVibrate  
+功能说明：用户定义的振动函数。  
+___
+函数名称：UserCnctInit  
+功能说明：用户定义的连接初始化函数。  
+___
+函数名称：UserCnctSts  
+功能说明：用户定义的连接状态函数。  
+___
+函数名称：UserCnctAct  
+功能说明：用户定义的连接激活函数。  
+___
+函数名称：UserCnctLclTkbkMode  
+功能说明：用户定义的连接本端对讲模式函数。  
+___
+函数名称：UserCnctRmtTkbkMode  
+功能说明：用户定义的连接远端对讲模式函数。  
+___
+函数名称：UserCnctDstoy  
+功能说明：用户定义的连接销毁函数。  
 ___

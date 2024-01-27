@@ -1,12 +1,26 @@
-﻿#include "MediaPocsThrd.h"
+﻿#pragma once
 
-#ifndef __VDOINPT_H__
-#define __VDOINPT_H__
+#include "Func.h"
+#include "DataStruct.h"
+#include "SpeexDsp.h"
+#include "WebRtc.h"
+#include "SpeexWebRtcAec.h"
+#include "RNNoise.h"
+#include "Speex.h"
+#include "AdoWavfm.h"
+#include "LibYUV.h"
+#include "OpenH264.h"
+#include "MediaFile.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 typedef struct MediaPocsThrd MediaPocsThrd;
 typedef struct VdoInptThrd VdoInptThrd;
 
-typedef struct //视频输入。
+typedef struct VdoInpt //视频输入。
 {
 	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程的指针。
 
@@ -81,16 +95,9 @@ typedef struct //视频输入。
 	} m_Thrd;
 } VdoInpt;
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 int VdoInptInit( VdoInpt * VdoInptPt );
 void VdoInptDstoy( VdoInpt * VdoInptPt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

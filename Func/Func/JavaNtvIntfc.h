@@ -19,7 +19,8 @@ __FUNC_DLLAPI__ int GetJavaClsObjMbrVarVal( JNIEnv * env, jobject ClsObj, const 
 
 __FUNC_DLLAPI__ int CallJavaClsObjMbrFunc( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, int32_t IsStatic, const char * MbrFuncNameStrPt, const char * MbrFuncDataTypeSignStrPt, void * RtnValPt, ... );
 
-__FUNC_DLLAPI__ int NewJavaStringClsObjByU8str( JNIEnv * env, const char * U8strPt, jstring * StringClsObjPtPt );
+__FUNC_DLLAPI__ int NewJavaStringClsObjByU8str( JNIEnv * env, const uint8_t * U8strPt, jstring * StringClsObjPtPt );
+__FUNC_DLLAPI__ int NewJavaStringClsObjByU16str( JNIEnv * env, const uint16_t * U16strPt, jstring * StringClsObjPtPt );
 
 #define SetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) SetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", GetDataTyp( *ShortValPt ), ShortValPt )
 #define GetJavaHTShortClsObjVal( env, HTShortClsObj, ShortValPt ) GetJavaClsObjMbrVarVal( env, HTShortClsObj, NULL, 0, "m_Val", "S", ShortValPt )
@@ -46,12 +47,12 @@ __FUNC_DLLAPI__ int GetJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray Boolean
 __FUNC_DLLAPI__ int DstoyJavaBooleanArrClsObj( JNIEnv * env, jbooleanArray BooleanArrClsObj, jboolean * BooleanArrPt );
 __FUNC_DLLAPI__ int GetJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * * CharArrPtPt );
 __FUNC_DLLAPI__ int DstoyJavaCharArrClsObj( JNIEnv * env, jcharArray CharArrClsObj, jchar * CharArrPt );
-__FUNC_DLLAPI__ int GetJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * * CharArrPtPt );
-__FUNC_DLLAPI__ int DstoyJavaStringClsObjCharArr( JNIEnv * env, jstring StringClsObj, const jchar * CharArrPt );
-__FUNC_DLLAPI__ int GetJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const char * * U8strPtPt );
-__FUNC_DLLAPI__ int DstoyJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const char * U8strPt );
+__FUNC_DLLAPI__ int GetJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const uint8_t * * U8strPtPt );
+__FUNC_DLLAPI__ int DstoyJavaStringClsObjU8str( JNIEnv * env, jstring StringClsObj, const uint8_t * U8strPt );
+__FUNC_DLLAPI__ int GetJavaStringClsObjU16str( JNIEnv * env, jstring StringClsObj, const uint16_t * * CharArrPtPt );
+__FUNC_DLLAPI__ int DstoyJavaStringClsObjU16str( JNIEnv * env, jstring StringClsObj, const uint16_t * CharArrPt );
 
-__FUNC_DLLAPI__ int GetAndrdPkgName( JNIEnv * env, char * PkgNameU8strPt, size_t PkgNameU8strSzChr, size_t * PkgNameU8strLenChrPt );
+__FUNC_DLLAPI__ int GetAndrdPkgName( JNIEnv * env, uint8_t * PkgNameU8strPt, size_t PkgNameU8strSzChr, size_t * PkgNameU8strLenChrPt );
 #endif
 
 #ifdef __cplusplus

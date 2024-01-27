@@ -1,5 +1,6 @@
 ﻿#include "VdoInpt.h"
 #include "qedit.h"
+#include "MediaPocsThrd.h"
 
 void FreeMediaType( AM_MEDIA_TYPE& mt )
 {
@@ -341,7 +342,7 @@ public:
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -943,7 +944,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……

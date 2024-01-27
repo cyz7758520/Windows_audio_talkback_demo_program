@@ -62,10 +62,13 @@
   <ItemGroup>
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\AdoInpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\AdoOtpt.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\BdctNtwk.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MediaPocsThrd.h" />
-    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MyNtwkMediaPocsThrd.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\NtwkMediaPocsThrd.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\qedit.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\resource.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\TkbkNtwk.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.h" />
@@ -74,8 +77,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoInpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoOtpt.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\BdctNtwk.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MediaPocsThrd.cpp" />
-    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MyNtwkMediaPocsThrd.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\NtwkMediaPocsThrd.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\TkbkNtwk.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.cpp" />

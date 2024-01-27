@@ -39,10 +39,19 @@
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.h">
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.h">
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\MyNtwkMediaPocsThrd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\NtwkMediaPocsThrd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\BdctNtwk.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\TkbkNtwk.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,10 +74,19 @@
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MyMediaPocsThrd.cpp">
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.cpp">
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\NtwkMediaPocsThrd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MyNtwkMediaPocsThrd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\TkbkNtwk.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\BdctNtwk.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

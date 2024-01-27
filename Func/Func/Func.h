@@ -1,70 +1,72 @@
 ﻿#ifndef __FUNC_H__
 #define __FUNC_H__
 
-#include <stdio.h>                        //*printf、*scanf、fopen、fseek、fread、fwrite、fclose、SEEK_CUR、SEEK_END、SEEK_SET
-#include <stdlib.h>                       //*alloc、free、exit、system、rand
-#include <stddef.h>                       //size_t、wchar_t、NULL、offsetof
-#include <stdint.h>                       //int*_t、uint*_t、INT*_MAX、INT*_MIN、UINT*_MAX、UINT*_MIN
-#include <stdarg.h>                       //va_list、va_start、va_arg、va_end
-#include <time.h>                         //clock_t、time_t、struct tm、asctime、clock、ctime、difftime、gmtime、localtime、mktime、strftime、time
-#include <limits.h>                       //CHAR_BIT、SCHAR_MIN、SCHAR_MAX、UCHAR_MAX、CHAR_MIN、CHAR_MAX、MB_LEN_MAX、SHRT_MIN、SHRT_MAX、USHRT_MAX、INT_MIN、INT_MAX、UINT_MAX、LONG_MIN、LONG_MAX、ULONG_MAX、LLONG_MIN、LLONG_MIN、ULLONG_MAX
-#include <errno.h>                        //errno
-#include <string.h>                       //memchr、memcmp、memcpy、memmove、memset、strcat、strncat、strchr、strcmp、strncmp、strcoll、strcpy、strncpy、strcspn、strerror、strlen、strpbrk、strrchr、strspn、strstr、strtok、strxfrm
-#include <inttypes.h>                     //PRId*、PRIi*、PRIu*、PRIo*、PRIx*、PRIX*、SCNd*、SCNi*、SCNu*、SCNo*、SCNx*
-#include <locale.h>                       //setlocale
+#include <stdio.h>							//*printf、*scanf、fopen、fseek、fread、fwrite、fclose、SEEK_CUR、SEEK_END、SEEK_SET
+#include <stdlib.h>							//*alloc、free、exit、system、rand
+#include <stddef.h>							//size_t、wchar_t、NULL、offsetof
+#include <stdint.h>							//int*_t、uint*_t、INT*_MAX、INT*_MIN、UINT*_MAX、UINT*_MIN
+#include <stdarg.h>							//va_list、va_start、va_arg、va_end
+#include <time.h>							//clock_t、time_t、struct tm、asctime、clock、ctime、difftime、gmtime、localtime、mktime、strftime、time
+#include <limits.h>							//CHAR_BIT、SCHAR_MIN、SCHAR_MAX、UCHAR_MAX、CHAR_MIN、CHAR_MAX、MB_LEN_MAX、SHRT_MIN、SHRT_MAX、USHRT_MAX、INT_MIN、INT_MAX、UINT_MAX、LONG_MIN、LONG_MAX、ULONG_MAX、LLONG_MIN、LLONG_MIN、ULLONG_MAX
+#include <errno.h>							//errno
+#include <string.h>							//memchr、memcmp、memcpy、memmove、memset、strcat、strncat、strchr、strcmp、strncmp、strcoll、strcpy、strncpy、strcspn、strerror、strlen、strpbrk、strrchr、strspn、strstr、strtok、strxfrm
+#include <inttypes.h>						//PRId*、PRIi*、PRIu*、PRIo*、PRIx*、PRIX*、SCNd*、SCNi*、SCNu*、SCNo*、SCNx*
+#include <locale.h>							//setlocale
 #include <math.h>
 
 #ifdef __cplusplus
-#include <iostream>                       //std::cin、std::cout
+#include <iostream>							//std::cin、std::cout
 #include <string>
 #ifndef _LIBCPP_HAS_NO_THREADS
-#include <thread>                         //std::thread
+#include <thread>							//std::thread
 #endif
-#include <queue>                          //std::queue
-#include <list>                           //std::list
-#include <map>                            //std::map
-#include <atomic>                         //std::atomic
-#include <cfloat>                         //FLT_MAX、DBL_MAX
+#include <queue>							//std::queue
+#include <list>								//std::list
+#include <map>								//std::map
+#include <atomic>							//std::atomic
+#include <cfloat>							//FLT_MAX、DBL_MAX
 #include <typeinfo>
 using namespace std;
 #endif
 
 #if( defined __MS_VCXX__ )
-#include <winsdkver.h>                    //包含Windows SDK支持的最高版本Windows的相关宏
-#define _WIN32_WINNT     0xFFFF           //设置_WIN32_WINNT宏为最高版本Windows
-#define WINVER           0xFFFF           //设置WINVER宏为最高版本Windows
-#define NTDDI_VERSION    0xFFFFFFFF       //设置NTDDI_VERSION宏为最高版本Windows
-#define _WIN32_IE        0xFFFF           //设置_WIN32_IE宏为最高版本IE
-#define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
-#include <windows.h>                      //包含整个Windows SDK支持的API
-#include <windowsx.h>                     //ComboBox_AddString、ComboBox_ResetContent
-#include <tchar.h>                        //_tmain、_tWinMain、TCHAR
-#include <process.h>                      //
-#include <psapi.h>                        //GetProcessImageFileName
-#include <shellapi.h>                     //ShellExecute
-#include <lmerr.h>                        //NERR_BASE、MAX_NERR
-#include <wininet.h>                      //INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
-#include <pdhmsg.h>                       //PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
-#include <Ws2tcpip.h>                     //Windows套接字相关
-#include <conio.h>                        //getch、getche
-#include <Dshow.h>                        //waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
-#include <mmsystem.h>                     //MMRESULT
-#include <mmdeviceapi.h>                  //IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
+#include <winsdkver.h>						//包含Windows SDK支持的最高版本Windows的相关宏
+#define _WIN32_WINNT     0xFFFF				//设置_WIN32_WINNT宏为最高版本Windows
+#define WINVER           0xFFFF				//设置WINVER宏为最高版本Windows
+#define NTDDI_VERSION    0xFFFFFFFF			//设置NTDDI_VERSION宏为最高版本Windows
+#define _WIN32_IE        0xFFFF				//设置_WIN32_IE宏为最高版本IE
+#define WIN32_LEAN_AND_MEAN					//设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
+#include <windows.h>						//包含整个Windows SDK支持的API
+#include <windowsx.h>						//ComboBox_AddString、ComboBox_ResetContent
+#include <commctrl.h>						//ListView_InsertItem、ListView_DeleteItem、ListView_DeleteAllItems、ListView_SetItem、ListView_GetItem
+#include <isa_availability.h>				//__ISA_AVAILABLE_X86、__ISA_AVAILABLE_SSE2、__ISA_AVAILABLE_SSE42、__ISA_AVAILABLE_AVX、__ISA_AVAILABLE_ENFSTRG、__ISA_AVAILABLE_AVX2、__ISA_AVAILABLE_AVX512、__ISA_AVAILABLE_ARMNT、__ISA_AVAILABLE_NEON、__ISA_AVAILABLE_NEON_ARM64
+#include <tchar.h>							//_tmain、_tWinMain、TCHAR
+#include <process.h>						//
+#include <psapi.h>							//GetProcessImageFileName
+#include <shellapi.h>						//ShellExecute
+#include <lmerr.h>							//NERR_BASE、MAX_NERR
+#include <wininet.h>						//INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
+#include <pdhmsg.h>							//PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
+#include <Ws2tcpip.h>						//Windows套接字相关
+#include <conio.h>							//getch、getche
+#include <Dshow.h>							//waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
+#include <mmsystem.h>						//MMRESULT
+#include <mmdeviceapi.h>					//IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
 #include <endpointvolume.h>
 #include <Propkey.h>
-#include <wmcodecdsp.h>                   //CLSID_CWMAudioAEC
-#include <dmort.h>                        //MoInitMediaType
-#include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
-#include <audiopolicy.h>                  //IAudioSessionControl、IAudioSessionManager
-#include <Functiondiscoverykeys_devpkey.h>//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
-#include <Objbase.h>                      //CoInitialize、CoInitializeEx
-#include <shlwapi.h>                      //DLLVERSIONINFO
-#include <crtdbg.h>                       //_CrtSetBreakAlloc、_CrtSetDbgFlag、_CrtCheckMemory、_CrtDumpMemoryLeaks。
-#include <immintrin.h>                    //_mm_pause
-#include <io.h>                           //_open、_wopen
-#include <sys/stat.h>                     //struct stat、fstat、_stat64、_wstat64
-#include <sys/types.h>                    //ino_t、dev_t、off_t
-#include <fcntl.h>                        //O_RDONLY、O_WRONLY、O_Rd_Wr、O_APPEND、O_CREAT、O_TRUNC、O_EXCL、O_TEXT、O_BINARY、O_RAW、O_TEMPORARY、O_NOINHERIT、O_SEQUENTIAL、O_RANDOM
+#include <wmcodecdsp.h>						//CLSID_CWMAudioAEC
+#include <dmort.h>							//MoInitMediaType
+#include <Audioclient.h>					//IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
+#include <audiopolicy.h>					//IAudioSessionControl、IAudioSessionManager
+#include <Functiondiscoverykeys_devpkey.h>	//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
+#include <Objbase.h>						//CoInitialize、CoInitializeEx
+#include <shlwapi.h>						//DLLVERSIONINFO
+#include <crtdbg.h>							//_CrtSetBreakAlloc、_CrtSetDbgFlag、_CrtCheckMemory、_CrtDumpMemoryLeaks。
+#include <intrin.h>							//_mm_pause、__cpuid、__cpuidex
+#include <io.h>								//_open、_wopen
+#include <sys/stat.h>						//struct stat、fstat、_stat64、_wstat64
+#include <sys/types.h>						//ino_t、dev_t、off_t
+#include <fcntl.h>							//O_RDONLY、O_WRONLY、O_Rd_Wr、O_APPEND、O_CREAT、O_TRUNC、O_EXCL、O_TEXT、O_BINARY、O_RAW、O_TEMPORARY、O_NOINHERIT、O_SEQUENTIAL、O_RANDOM
 
 #undef StrCpy
 #undef StrTrim
@@ -90,50 +92,51 @@ using namespace std;
 #endif
 
 #if( defined __CYGWIN_GCC__ )
-#include <winsdkver.h>                    //包含Windows SDK支持的最高版本Windows的相关宏
-#define _WIN32_WINNT     0xFFFF           //设置_WIN32_WINNT宏为最高版本Windows
-#define WINVER           0xFFFF           //设置WINVER宏为最高版本Windows
-#define NTDDI_VERSION    0xFFFFFFFF       //设置NTDDI_VERSION宏为最高版本Windows
-#define _WIN32_IE        0xFFFF           //设置_WIN32_IE宏为最高版本IE
-#define WIN32_LEAN_AND_MEAN               //设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
-#include <windows.h>                      //包含整个Windows SDK支持的API
-#include <windowsx.h>                     //ComboBox_AddString、ComboBox_ResetContent
-#include <tchar.h>                        //_tmain、_tWinMain、TCHAR
-#include <process.h>                      //
-#include <psapi.h>                        //GetProcessImageFileName
-#include <shellapi.h>                     //ShellExecute
-#include <lmerr.h>                        //NERR_BASE、MAX_NERR
-#include <wininet.h>                      //INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
-#include <pdhmsg.h>                       //PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
-//#include <Ws2tcpip.h>                   //不包含该头文件，因为会与Linux套接字相关声明相冲突。
-//#include <conio.h>                      //不包含该头文件，因为Cygwin下没有。
-//#include <Dshow.h>                      //不包含该头文件，因为会编译报错。
-#include <mmsystem.h>                     //MMRESULT
-#include <mmdeviceapi.h>                  //IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
+#include <winsdkver.h>						//包含Windows SDK支持的最高版本Windows的相关宏
+#define _WIN32_WINNT     0xFFFF				//设置_WIN32_WINNT宏为最高版本Windows
+#define WINVER           0xFFFF				//设置WINVER宏为最高版本Windows
+#define NTDDI_VERSION    0xFFFFFFFF			//设置NTDDI_VERSION宏为最高版本Windows
+#define _WIN32_IE        0xFFFF				//设置_WIN32_IE宏为最高版本IE
+#define WIN32_LEAN_AND_MEAN					//设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
+#include <windows.h>						//包含整个Windows SDK支持的API
+#include <windowsx.h>						//ComboBox_AddString、ComboBox_ResetContent
+#include <tchar.h>							//_tmain、_tWinMain、TCHAR
+#include <process.h>						//
+#include <psapi.h>							//GetProcessImageFileName
+#include <shellapi.h>						//ShellExecute
+#include <lmerr.h>							//NERR_BASE、MAX_NERR
+#include <wininet.h>						//INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
+#include <pdhmsg.h>							//PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
+//#include <Ws2tcpip.h>						//不包含该头文件，因为会与Linux套接字相关声明相冲突。
+//#include <conio.h>						//不包含该头文件，因为Cygwin下没有。
+//#include <Dshow.h>						//不包含该头文件，因为会编译报错。
+#include <mmsystem.h>						//MMRESULT
+#include <mmdeviceapi.h>					//IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
 #include <endpointvolume.h>
 #include <Propkey.h>
-//#include <wmcodecdsp.h>                   //CLSID_CWMAudioAEC
-//#include <dmort.h>                        //MoInitMediaType
-#include <Audioclient.h>                  //IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
-#include <audiopolicy.h>                  //IAudioSessionControl、IAudioSessionManager
-#include <Functiondiscoverykeys_devpkey.h>//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
-#include <Objbase.h>                      //CoInitialize、CoInitializeEx
-#include <shlwapi.h>                      //DLLVERSIONINFO
-//#include <crtdbg.h>                     //不包含该头文件，因为Cygwin下没有。
-#include <immintrin.h>                    //_mm_pause
-#include <io.h>                           //_open、_wopen
-#include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
-#include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
-#include <netinet/tcp.h>                  //TCP_NODELAY
-#include <sys/select.h>                   //fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
-#include <sys/ioctl.h>                    //ioctl
-#include <sys/stat.h>                     //struct stat、fstat、chmod、fchmod、mkdir、stat
-#include <sys/time.h>                     //gettimeofday
-#include <fcntl.h>                        //open、fcntl
-#include <unistd.h>                       //getpid、getopt、close
+//#include <wmcodecdsp.h>					//CLSID_CWMAudioAEC
+//#include <dmort.h>						//MoInitMediaType
+#include <Audioclient.h>					//IAudioClient、IAudioCaptureClient、IAudioRenderClient、WAVE_FORMAT_EXTENSIBLE
+#include <audiopolicy.h>					//IAudioSessionControl、IAudioSessionManager
+#include <Functiondiscoverykeys_devpkey.h>	//PKEY_Device_FriendlyName、PKEY_Device_DeviceDesc、PKEY_DeviceInterface_FriendlyName
+#include <Objbase.h>						//CoInitialize、CoInitializeEx
+#include <shlwapi.h>						//DLLVERSIONINFO
+//#include <crtdbg.h>						//不包含该头文件，因为Cygwin下没有。
+#include <immintrin.h>						//_mm_pause
+#include <io.h>								//_open、_wopen
+#include <sys/types.h>						//ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
+#include <sys/socket.h>						//socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
+#include <netinet/tcp.h>					//TCP_NODELAY
+#include <sys/select.h>						//fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
+#include <sys/ioctl.h>						//ioctl
+#include <sys/stat.h>						//struct stat、fstat、chmod、fchmod、mkdir、stat
+#include <sys/time.h>						//gettimeofday
+#include <fcntl.h>							//open、fcntl
+#include <unistd.h>							//getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <pthread.h>                      //pthread_create、pthread_join
+#include <pthread.h>						//pthread_create、pthread_join
+#include <intrin.h>							//_mm_pause、__cpuid、__cpuidex
 
 #undef StrCpy
 #undef StrTrim
@@ -148,43 +151,46 @@ using namespace std;
 #endif
 
 #if( defined __LINUX_GCC__ )
-#include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
-#include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
-#include <netinet/tcp.h>                  //TCP_NODELAY
-#include <sys/select.h>                   //fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
-#include <sys/ioctl.h>                    //ioctl
+#include <sys/types.h>						//ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
+#include <sys/socket.h>						//socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
+#include <netinet/tcp.h>					//TCP_NODELAY
+#include <sys/select.h>						//fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
+#include <sys/ioctl.h>						//ioctl
 #include <sys/syscall.h>
-#include <sys/stat.h>                     //struct stat、fstat、chmod、fchmod、mkdir、stat
-#include <sys/time.h>                     //gettimeofday
-#include <fcntl.h>                        //open、fcntl
-#include <unistd.h>                       //getpid、getopt、close
+#include <sys/stat.h>						//struct stat、fstat、chmod、fchmod、mkdir、stat
+#include <sys/time.h>						//gettimeofday
+#include <fcntl.h>							//open、fcntl
+#include <unistd.h>							//getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <pthread.h>                      //pthread_create、pthread_join
-#include <immintrin.h>                    //_mm_pause
+#include <pthread.h>						//pthread_create、pthread_join
+#include <immintrin.h>						//_mm_pause
 
 #define gettid() ( pid_t )syscall( SYS_gettid )
 
 typedef int HANDLE;
 #define Sleep( Msec ) usleep( ( Msec ) * 1000 )
+
+#define __cdecl __attribute__( ( __cdecl__ ) )
+#define __stdcall __attribute__( ( __stdcall__ ) )
 #endif
 
 #if( defined __ANDROID_GCC__ )
-#include <sys/types.h>                    //ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
-#include <sys/socket.h>                   //socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
-#include <netinet/tcp.h>                  //TCP_NODELAY
-#include <sys/select.h>                   //fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
-#include <asm/ioctls.h>                   //ioctl
+#include <sys/types.h>						//ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
+#include <sys/socket.h>						//socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
+#include <netinet/tcp.h>					//TCP_NODELAY
+#include <sys/select.h>						//fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
+#include <asm/ioctls.h>						//ioctl
 #include <sys/syscall.h>
-#include <sys/stat.h>                     //struct stat、fstat、chmod、fchmod、mkdir、stat
-#include <sys/time.h>                     //gettimeofday
-#include <fcntl.h>                        //open、fcntl
-#include <unistd.h>                       //getpid、getopt、close
+#include <sys/stat.h>						//struct stat、fstat、chmod、fchmod、mkdir、stat
+#include <sys/time.h>						//gettimeofday
+#include <fcntl.h>							//open、fcntl
+#include <unistd.h>							//getpid、getopt、close
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <pthread.h>                      //pthread_create、pthread_join
+#include <pthread.h>						//pthread_create、pthread_join
 #if( ( defined __X86__ ) || ( defined __X64__ ) )
-#include <immintrin.h>                    //_mm_pause
+#include <immintrin.h>						//_mm_pause
 #endif
 
 typedef int HANDLE;
@@ -197,10 +203,14 @@ typedef int HANDLE;
 #include <android/native_window_jni.h>
 #endif
 
+#if( defined __KEIL_ARMC__ )
+#include <alloca.h>
+#endif
+
 #ifndef ssize_t
-#if( ( defined __X86__ ) || ( defined __ARMV7__ ) )
+#if( ( defined __X86__ ) || ( defined __ARMAT32__ ) )
 typedef int32_t ssize_t;
-#elif( ( defined __X64__ ) || ( defined __ARMV8__ ) )
+#elif( ( defined __X64__ ) || ( defined __ARMA64__ ) )
 typedef int64_t ssize_t;
 #endif
 #endif
@@ -383,9 +393,9 @@ typedef enum BufAutoAdjMeth
 #include "Vstr.h"
 #include "Log.h"
 #include "ThrdLock.h"
+#include "ChrStrMem.h"
 #include "Utf.h"
 #include "DateTime.h"
-#include "ChrStrMem.h"
 #include "File.h"
 #include "PocsThrd.h"
 #include "Toast.h"
@@ -395,6 +405,29 @@ typedef enum BufAutoAdjMeth
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
+//Func初始化函数。
+__FUNC_DLLAPI__ int FuncInit();
+
+//CPU信息。
+#if( ( defined __X86__ ) || ( defined __X64__ ) )
+__FUNC_DLLAPI__ void __cdecl GetCpuId( uint32_t Eax, uint32_t Ecx, uint32_t * EaxPt, uint32_t * EbxPt, uint32_t * EcxPt, uint32_t * EdxPt );
+__FUNC_DLLAPI__ extern char g_CpuNameStrArr[ 4 * 4 * 3 + 1 ]; //Cpu名称字符串数组。
+__FUNC_DLLAPI__ extern uint16_t g_CpuCacheLineSzByt; //Cpu缓存行的大小，单位为字节。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSupt64Bit; //Cpu是否支持64位。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptEnhancedFastStringsRepMovsbStosb; //Cpu是否支持增强的快速字符串Rep Movsb/Stosb指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptMMX; //Cpu是否支持MMX指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE; //Cpu是否支持SSE指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE2; //Cpu是否支持SSE2指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE3; //Cpu是否支持SSE3指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSSE3; //Cpu是否支持SSSE3指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE4_1; //Cpu是否支持SSE4.1指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE4_2; //Cpu是否支持SSE4.2指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptAVX; //Cpu是否支持AVX指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptAVX2; //Cpu是否支持AVX2指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptAVX512F; //Cpu是否支持AVX512F指令。
+#elif( ( defined __ARMAT32__ ) || ( defined __ARMA64__ ) )
 #endif
 
 //获取函数。

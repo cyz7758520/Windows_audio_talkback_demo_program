@@ -1,4 +1,5 @@
 ﻿#include "AdoOtpt.h"
+#include "MediaPocsThrd.h"
 
 DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt );
 
@@ -8,7 +9,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt );
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -69,7 +70,7 @@ int AdoOtptStrmInit( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -364,7 +365,7 @@ void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStr
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -404,7 +405,7 @@ int AdoOtptStrmCntnrInit( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -433,7 +434,7 @@ void AdoOtptStrmCntnrDstoy( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -474,7 +475,7 @@ int AdoOtptWavfmInit( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -504,7 +505,7 @@ void AdoOtptWavfmDstoy( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -545,7 +546,7 @@ int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -575,7 +576,7 @@ void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -782,7 +783,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -925,7 +926,7 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -968,7 +969,7 @@ int AdoOtptInit( AdoOtpt * AdoOtptPt )
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
              ……
-             ErrInfoVarStrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
              ……
@@ -1054,7 +1055,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 						if( AdoOtptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoOtptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：本线程接收到设备关闭消息。" ) );
+							if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：接收到设备关闭消息。" ) );
 						}
 					}
 					else if( p_HRslt == AUDCLNT_E_BUFFER_ERROR )
@@ -1303,7 +1304,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 
 		if( AdoOtptPt->m_Thrd.m_ExitFlag == 1 ) //如果退出标记为请求退出。
         {
-            if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：本线程接收到退出请求，开始准备退出。" ) );
+            if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：接收到退出请求。" ) );
             break;
         }
 	} //音频输出循环结束。

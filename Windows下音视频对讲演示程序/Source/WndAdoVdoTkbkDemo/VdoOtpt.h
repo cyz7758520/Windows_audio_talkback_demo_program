@@ -1,11 +1,25 @@
-﻿#include "MediaPocsThrd.h"
+﻿#pragma once
 
-#ifndef __VDOOTPT_H__
-#define __VDOOTPT_H__
+#include "Func.h"
+#include "DataStruct.h"
+#include "SpeexDsp.h"
+#include "WebRtc.h"
+#include "SpeexWebRtcAec.h"
+#include "RNNoise.h"
+#include "Speex.h"
+#include "AdoWavfm.h"
+#include "LibYUV.h"
+#include "OpenH264.h"
+#include "MediaFile.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 typedef struct MediaPocsThrd MediaPocsThrd;
 
-typedef struct //视频输出。
+typedef struct VdoOtpt //视频输出。
 {
 	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程的指针。
 
@@ -64,11 +78,6 @@ typedef struct //视频输出。
 	CQueueCls m_StrmCntnr; //存放流容器。
 } VdoOtpt;
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
 void VdoOtptStrmDecdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
 int VdoOtptStrmThrdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
@@ -87,6 +96,4 @@ void VdoOtptDstoy( VdoOtpt * VdoOtptPt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -37,6 +37,32 @@ __FUNC_DLLAPI__ int _StrU32CpyU16( uint32_t * DstU32strPt, size_t DstU32strSzChr
 #define StrU32CpyU16( DstU32strPt, DstU32strSzChr, IsWriteEnd, DstU32strLenChrPt, SrcU16strPt, SrcU16strSzChr, SrcU16strLenChrPt ) \
        _StrU32CpyU16( DEFARG( uint32_t *, DstU32strPt, NULL ), DEFARG( size_t, DstU32strSzChr, SIZE_MAX ), DEFARG( int32_t, IsWriteEnd, 1 ), DEFARG( size_t *, DstU32strLenChrPt, NULL ), ( const uint16_t * )( SrcU16strPt ), DEFARG( size_t, SrcU16strSzChr, SIZE_MAX ), DEFARG( size_t *, SrcU16strLenChrPt, NULL ) )
 
+//计算字符串复制后最大长度。
+inline size_t StrCpyMaxLenChr( ChrSet DstStrChrSet, ChrSet SrcStrChrSet, size_t SrcStrLenChr )
+{
+    if( DstStrChrSet == SrcStrChrSet ) return SrcStrLenChr;
+    if( SrcStrChrSet == Utf8 ) return SrcStrLenChr;
+    if( SrcStrChrSet == Utf16 )
+    {
+        if( DstStrChrSet == Utf8 ) return SrcStrLenChr * 3;
+        return SrcStrLenChr;
+    }
+    if( DstStrChrSet == Utf8 ) return SrcStrLenChr * 4;
+    return SrcStrLenChr * 2;
+}
+inline size_t StrCpyMaxLenByt( ChrSet DstStrChrSet, ChrSet SrcStrChrSet, size_t SrcStrLenChr )
+{
+    if( DstStrChrSet == SrcStrChrSet ) return SrcStrLenChr * DstStrChrSet;
+    if( SrcStrChrSet == Utf8 ) return SrcStrLenChr * DstStrChrSet;
+    if( SrcStrChrSet == Utf16 )
+    {
+        if( DstStrChrSet == Utf8 ) return SrcStrLenChr * 3;
+        return SrcStrLenChr * 4;
+    }
+    if( DstStrChrSet == Utf8 ) return SrcStrLenChr * 4;
+    return SrcStrLenChr * 4;
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -56,6 +56,7 @@ __AJB_DLLAPI__ int AAjbGetFrm( AAjb * AAjbPt, uint32_t * TimeStampPt, int8_t * F
 __AJB_DLLAPI__ int AAjbGetBufFrmCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFrmCntPt, int32_t * CurHaveBufInactFrmCntPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * MaxCntuLostFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int AAjbClear( AAjb * AAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__AJB_DLLAPI__ int AAjbReset( AAjb * AAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int AAjbDstoy( AAjb * AAjbPt, Vstr * ErrInfoVstrPt );
 
@@ -107,6 +108,7 @@ __AJB_DLLAPI__ int VAjbGetFrm( VAjb * VAjbPt, uint64_t CurTime, uint32_t * TimeS
 __AJB_DLLAPI__ int VAjbGetBufFrmCnt( VAjb * VAjbPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int VAjbClear( VAjb * VAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
+__AJB_DLLAPI__ int VAjbReset( VAjb * VAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int VAjbDstoy( VAjb * VAjbPt, Vstr * ErrInfoVstrPt );
 

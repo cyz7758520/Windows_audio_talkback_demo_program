@@ -1,11 +1,25 @@
-﻿#include "MediaPocsThrd.h"
+﻿#pragma once
 
-#ifndef __ADOOTPT_H__
-#define __ADOOTPT_H__
+#include "Func.h"
+#include "DataStruct.h"
+#include "SpeexDsp.h"
+#include "WebRtc.h"
+#include "SpeexWebRtcAec.h"
+#include "RNNoise.h"
+#include "Speex.h"
+#include "AdoWavfm.h"
+#include "LibYUV.h"
+#include "OpenH264.h"
+#include "MediaFile.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 typedef struct MediaPocsThrd MediaPocsThrd;
 
-typedef struct //音频输出。
+typedef struct AdoOtpt //音频输出。
 {
 	MediaPocsThrd * m_MediaPocsThrdPt; //存放媒体处理线程的指针。
 
@@ -91,11 +105,6 @@ typedef struct //音频输出。
 	} m_Thrd;
 } AdoOtpt;
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 int AdoOtptStrmInit( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt );
 void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt );
 void AdoOtptAddStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx );
@@ -117,6 +126,4 @@ void AdoOtptDstoy( AdoOtpt * AdoOtptPt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif
