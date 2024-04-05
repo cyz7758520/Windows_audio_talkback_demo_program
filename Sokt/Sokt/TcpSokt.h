@@ -1,7 +1,6 @@
-﻿#include "Sokt.h"
+﻿#pragma once
 
-#ifndef __TCPSOKT_H__
-#define __TCPSOKT_H__
+#include "Sokt.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -125,6 +124,4 @@ public:
 	
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpSrvrDstoy( m_TcpSrvrSoktPt, ErrInfoVstrPt ); m_TcpSrvrSoktPt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

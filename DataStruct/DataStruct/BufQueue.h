@@ -1,7 +1,6 @@
-﻿#include "DataStruct.h"
+﻿#pragma once
 
-#ifndef __BUFQUEUE_H__
-#define __BUFQUEUE_H__
+#include "DataStruct.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -11,6 +10,7 @@ extern "C"
 typedef struct BufQueue BufQueue;
 
 __DATASTRUCT_DLLAPI__ int BufQueueInit( BufQueue * * BufQueuePtPt, size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueDstoy( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int BufQueueLocked( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int BufQueueUnlock( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
@@ -29,8 +29,6 @@ __DATASTRUCT_DLLAPI__ int BufQueueGetLen( BufQueue * BufQueuePt, size_t * LenByt
 __DATASTRUCT_DLLAPI__ int BufQueueSetSz( BufQueue * BufQueuePt, size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int BufQueueGetSz( BufQueue * BufQueuePt, size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int BufQueueDstoy( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
-
 #ifdef __cplusplus
 }
 #endif
@@ -45,6 +43,7 @@ public:
 	~BufQueueCls() { Dstoy( NULL ); }
 
 	int Init( size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return BufQueueInit( &m_BufQueuePt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = BufQueueDstoy( m_BufQueuePt, ErrInfoVstrPt ); m_BufQueuePt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return BufQueueLocked( m_BufQueuePt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return BufQueueUnlock( m_BufQueuePt, ErrInfoVstrPt ); }
@@ -62,9 +61,5 @@ public:
 	int GetLen( size_t * LenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetLen( m_BufQueuePt, LenBytPt, IsAutoLock, ErrInfoVstrPt ); }
 	int SetSz( size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueSetSz( m_BufQueuePt, SzByt, IsAutoLock, ErrInfoVstrPt ); }
 	int GetSz( size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return BufQueueGetSz( m_BufQueuePt, SzBytPt, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = BufQueueDstoy( m_BufQueuePt, ErrInfoVstrPt ); m_BufQueuePt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __ADOWAVFM_H__
-#define __ADOWAVFM_H__
+#include "Func.h"
 
 //AdoWavfm项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_ADOWAVFM__ ) //如果正在编译AdoWavfm项目。
@@ -51,6 +50,4 @@ __ADOWAVFM_DLLAPI__ int AdoWavfmDstoy( AdoWavfm * AdoWavfmPt, Vstr * ErrInfoVstr
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

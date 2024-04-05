@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __SPEEX_H__
-#define __SPEEX_H__
+#include "Func.h"
 
 //Speex项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_SPEEX__ ) //如果正在编译Speex项目。
@@ -57,6 +56,4 @@ __SPEEX_DLLAPI__ int SpeexDecdDstoy( SpeexDecd * SpeexDecdPt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

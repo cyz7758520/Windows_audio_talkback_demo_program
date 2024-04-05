@@ -1,7 +1,6 @@
-﻿#include "DataStruct.h"
+﻿#pragma once
 
-#ifndef __CQUEUE_H__
-#define __CQUEUE_H__
+#include "DataStruct.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -11,6 +10,7 @@ extern "C"
 typedef struct CQueue CQueue;
 
 __DATASTRUCT_DLLAPI__ int CQueueInit( CQueue * * CQueuePtPt, size_t ElmDataLenByt, size_t ElmInitNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int CQueueDstoy( CQueue * CQueuePt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int CQueueLocked( CQueue * CQueuePt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int CQueueUnlock( CQueue * CQueuePt, Vstr * ErrInfoVstrPt );
@@ -31,8 +31,6 @@ __DATASTRUCT_DLLAPI__ int CQueueGetTotal( CQueue * CQueuePt, size_t * ElmTotalPt
 __DATASTRUCT_DLLAPI__ int CQueueSetSz( CQueue * CQueuePt, size_t SzNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int CQueueGetSz( CQueue * CQueuePt, size_t * SzNumPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int CQueueDstoy( CQueue * CQueuePt, Vstr * ErrInfoVstrPt );
-
 #ifdef __cplusplus
 }
 #endif
@@ -47,6 +45,7 @@ public:
 	~CQueueCls() { Dstoy( NULL ); }
 
 	int Init( size_t ElmDataLenByt, size_t ElmInitNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return CQueueInit( &m_CQueuePt, ElmDataLenByt, ElmInitNum, BufAutoExtdMeth, BufAutoExtdParm, ElmMaxNum, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = CQueueDstoy( m_CQueuePt, ErrInfoVstrPt ); m_CQueuePt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return CQueueLocked( m_CQueuePt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return CQueueUnlock( m_CQueuePt, ErrInfoVstrPt ); }
@@ -66,9 +65,5 @@ public:
 	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return CQueueGetTotal( m_CQueuePt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
 	int SetSz( size_t SzNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return CQueueSetSz( m_CQueuePt, SzNum, IsAutoLock, ErrInfoVstrPt ); }
 	int GetSz( size_t * SzNumPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return CQueueGetSz( m_CQueuePt, SzNumPt, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = CQueueDstoy( m_CQueuePt, ErrInfoVstrPt ); m_CQueuePt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __TOAST_H__
-#define __TOAST_H__
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -15,6 +14,4 @@ __FUNC_DLLAPI__ int ToastFmt( HWND SpecWndHdl, uint64_t TmotMesc, Vstr * ErrInfo
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

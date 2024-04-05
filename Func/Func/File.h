@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __FILE_H__
-#define __FILE_H__
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -82,6 +81,4 @@ __FUNC_DLLAPI__ int FuncPathRmvFileName( Vstr * FullPathVstrPt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

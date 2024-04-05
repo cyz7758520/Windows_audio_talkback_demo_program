@@ -1,7 +1,6 @@
-﻿#include "MediaFile.h"
+﻿#pragma once
 
-#ifndef __AVIFILEWRITER_H__
-#define __AVIFILEWRITER_H__
+#include "MediaFile.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -28,6 +27,4 @@ __MEDIAFILE_DLLAPI__ int AviFileWriterDstoy( AviFileWriter * AviFileWriterPt, Vs
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

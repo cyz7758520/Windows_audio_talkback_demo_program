@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __SPEEXWEBRTCAEC_H__
-#define __SPEEXWEBRTCAEC_H__
+#include "Func.h"
 
 #define SPEEXWEBRTCAEC_WORKMODE_SPEEXAEC_WEBRTCAECM 1 //SpeexWebRtc三重声学回音消除器的工作模式为Speex声学回音消除器+WebRtc定点版声学回音消除器。
 #define SPEEXWEBRTCAEC_WORKMODE_WEBRTCAECM_WEBRTCAEC 2 //SpeexWebRtc三重声学回音消除器的工作模式为WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器。
@@ -59,6 +58,4 @@ __SPEEXWEBRTCAEC_DLLAPI__ int SpeexWebRtcAecDstoy( SpeexWebRtcAec * SpeexWebRtcA
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

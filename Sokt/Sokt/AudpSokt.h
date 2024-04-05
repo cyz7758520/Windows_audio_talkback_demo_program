@@ -1,7 +1,6 @@
-﻿#include "Sokt.h"
+﻿#pragma once
 
-#ifndef __AUDPSOKT_H__
-#define __AUDPSOKT_H__
+#include "Sokt.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -76,6 +75,4 @@ public:
 
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AudpDstoy( m_AudpSoktPt, ErrInfoVstrPt ); m_AudpSoktPt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

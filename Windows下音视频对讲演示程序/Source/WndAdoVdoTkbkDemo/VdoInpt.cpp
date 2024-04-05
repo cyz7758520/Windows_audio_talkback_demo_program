@@ -100,10 +100,7 @@ public:
 			m_VdoInptPt->m_IdleFrmCntnr.GetTotal( &m_VdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取空闲帧容器的元素总数。
 			if( m_VdoInptPt->m_Thrd.m_ElmTotal > 0 ) //如果空闲帧容器中有帧。
 			{
-				//从空闲帧容器中取出并删除第一个帧。
-				{
-					m_VdoInptPt->m_IdleFrmCntnr.GetHead( &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 1, NULL );
-				}
+				m_VdoInptPt->m_IdleFrmCntnr.GetHead( &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 1, NULL ); //从空闲帧容器中取出并删除第一个帧。
 				if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )  LOGFI( Cu8vstr( "视频输入线程：从空闲帧容器中取出并删除第一个帧，空闲帧容器元素总数：%uzd。" ), m_VdoInptPt->m_Thrd.m_ElmTotal );
 			}
 			else //如果空闲帧容器中没有帧。

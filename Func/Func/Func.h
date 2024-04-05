@@ -1,5 +1,4 @@
-﻿#ifndef __FUNC_H__
-#define __FUNC_H__
+﻿#pragma once
 
 #include <stdio.h>							//*printf、*scanf、fopen、fseek、fread、fwrite、fclose、SEEK_CUR、SEEK_END、SEEK_SET
 #include <stdlib.h>							//*alloc、free、exit、system、rand
@@ -464,6 +463,4 @@ __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

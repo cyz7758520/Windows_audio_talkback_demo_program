@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __UTF_H__
-#define __UTF_H__
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -65,6 +64,4 @@ inline size_t StrCpyMaxLenByt( ChrSet DstStrChrSet, ChrSet SrcStrChrSet, size_t 
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

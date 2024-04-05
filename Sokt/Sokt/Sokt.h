@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __SOKT_H__
-#define __SOKT_H__
+#include "Func.h"
 
 //Sokt项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_SOKT__ ) //如果正在编译Sokt项目。
@@ -41,5 +40,3 @@
 #include "TcpSokt.h"
 #include "UdpSokt.h"
 #include "AudpSokt.h"
-
-#endif

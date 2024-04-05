@@ -1,7 +1,6 @@
-﻿#include "DataStruct.h"
+﻿#pragma once
 
-#ifndef __VLNKLST_H__
-#define __VLNKLST_H__
+#include "DataStruct.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -11,6 +10,7 @@ extern "C"
 typedef struct VLnkLst VLnkLst;
 
 __DATASTRUCT_DLLAPI__ int VLnkLstInit( VLnkLst * * VLnkLstPtPt, size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VLnkLstDstoy( VLnkLst * VLnkLstPt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int VLnkLstLocked( VLnkLst * VLnkLstPt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int VLnkLstUnlock( VLnkLst * VLnkLstPt, Vstr * ErrInfoVstrPt );
@@ -41,8 +41,6 @@ __DATASTRUCT_DLLAPI__ int VLnkLstGetTotal( VLnkLst * VLnkLstPt, size_t * ElmTota
 __DATASTRUCT_DLLAPI__ int VLnkLstSetSz( VLnkLst * VLnkLstPt, size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int VLnkLstGetSz( VLnkLst * VLnkLstPt, size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int VLnkLstDstoy( VLnkLst * VLnkLstPt, Vstr * ErrInfoVstrPt );
-
 #ifdef __cplusplus
 }
 #endif
@@ -57,6 +55,7 @@ public:
 	~VLnkLstCls() { Dstoy( NULL ); }
 
 	int Init( size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return VLnkLstInit( &m_VLnkLstPt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VLnkLstDstoy( m_VLnkLstPt, ErrInfoVstrPt ); m_VLnkLstPt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return VLnkLstLocked( m_VLnkLstPt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return VLnkLstUnlock( m_VLnkLstPt, ErrInfoVstrPt ); }
@@ -86,9 +85,5 @@ public:
 	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VLnkLstGetTotal( m_VLnkLstPt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
 	int SetSz( size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VLnkLstSetSz( m_VLnkLstPt, SzByt, IsAutoLock, ErrInfoVstrPt ); }
 	int GetSz( size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VLnkLstGetSz( m_VLnkLstPt, SzBytPt, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VLnkLstDstoy( m_VLnkLstPt, ErrInfoVstrPt ); m_VLnkLstPt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

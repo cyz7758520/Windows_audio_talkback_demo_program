@@ -24,32 +24,32 @@ int AdoOtptStrmInit( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 	//初始化解码器。
 	switch( StrmPt->m_UseWhatDecd )
 	{
-		case 0: //如果要使用PCM原始数据。
+		case 0: //如果要使用Pcm原始数据。
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：初始化PCM原始数据成功。" ), StrmPt->m_Idx );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：初始化Pcm原始数据成功。" ), StrmPt->m_Idx );
 			break;
 		}
 		case 1: //如果要使用Speex解码器。
 		{
 			if( AdoOtptPt->m_FrmLenMsec != 20 )
 			{
-				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：帧的长度不为20毫秒不能使用Speex解码器。" ), StrmPt->m_Idx );
+				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：帧的长度不为20毫秒不能使用Speex解码器。" ), StrmPt->m_Idx );
 				goto Out;
 			}
 			if( SpeexDecdInit( &StrmPt->m_SpeexDecd.m_Pt, AdoOtptPt->m_SmplRate, StrmPt->m_SpeexDecd.m_IsUsePrcplEnhsmt ) == 0 )
 			{
-				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：初始化Speex解码器成功。" ), StrmPt->m_Idx );
+				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：初始化Speex解码器成功。" ), StrmPt->m_Idx );
 			}
 			else
 			{
-				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：初始化Speex解码器失败。" ), StrmPt->m_Idx );
+				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：初始化Speex解码器失败。" ), StrmPt->m_Idx );
 				goto Out;
 			}
 			break;
 		}
 		case 2: //如果要使用Opus解码器。
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：暂不支持使用Opus解码器。" ), StrmPt->m_Idx );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：暂不支持使用Opus解码器。" ), StrmPt->m_Idx );
 			goto Out;
 		}
 	}
@@ -83,9 +83,9 @@ void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 	//销毁解码器。
 	switch( StrmPt->m_UseWhatDecd )
 	{
-		case 0: //如果要使用PCM原始数据。
+		case 0: //如果要使用Pcm原始数据。
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：销毁PCM原始数据成功。" ), StrmPt->m_Idx );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：销毁Pcm原始数据成功。" ), StrmPt->m_Idx );
 			break;
 		}
 		case 1: //如果要使用Speex解码器。
@@ -94,11 +94,11 @@ void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 			{
 				if( SpeexDecdDstoy( StrmPt->m_SpeexDecd.m_Pt ) == 0 )
 				{
-					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：销毁Speex解码器成功。" ), StrmPt->m_Idx );
+					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：销毁Speex解码器成功。" ), StrmPt->m_Idx );
 				}
 				else
 				{
-					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：销毁Speex解码器失败。" ), StrmPt->m_Idx );
+					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：销毁Speex解码器失败。" ), StrmPt->m_Idx );
 				}
 				StrmPt->m_SpeexDecd.m_Pt = NULL;
 			}
@@ -106,10 +106,12 @@ void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 		}
 		case 2: //如果要使用Opus编码器。
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引 %z32d：销毁Opus编码器成功。" ), StrmPt->m_Idx );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：销毁Opus编码器成功。" ), StrmPt->m_Idx );
 			break;
 		}
 	}
+
+	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：音频输出流销毁成功。" ), StrmPt->m_Idx );
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -176,7 +178,14 @@ void AdoOtptDelStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 		if( p_StrmPt->m_Idx == StrmIdx ) //如果流索引找到了。
 		{
 			//从流容器删除。
-			AdoOtptStrmDstoy( AdoOtptPt, p_StrmPt );
+			if( AdoOtptPt->m_IsInit != 0 ) //如果已初始化音频输出。
+			{
+				AdoOtptStrmDstoy( AdoOtptPt, p_StrmPt );
+			}
+			if( p_StrmPt->m_IsUse != 0 ) //如果要使用音频输出流。
+			{
+				AdoOtptPt->m_StrmUseTotal--;
+			}
 			AdoOtptPt->m_StrmCntnr.DelByNum( p_StrmNum, 0, NULL );
 			goto Out;
 		}
@@ -188,7 +197,7 @@ void AdoOtptDelStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoOtptSetStrmUsePcm
- * 功能说明：设置音频输出的流要使用PCM原始数据。
+ * 功能说明：设置音频输出的流要使用Pcm原始数据。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
@@ -321,17 +330,13 @@ void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStr
 				{
 					if( AdoOtptPt->m_IsInit != 0 ) //如果已初始化音频输出。
 					{
-						if( AdoOtptStrmInit( AdoOtptPt, p_StrmPt ) == 0 ) //如果初始化音频输出的流成功。
+						if( AdoOtptStrmInit( AdoOtptPt, p_StrmPt ) != 0 ) //如果初始化音频输出的流失败。
 						{
-							p_StrmPt->m_IsUse = 1;
-							AdoOtptPt->m_StrmUseTotal++;
+							goto Out;
 						}
 					}
-					else //如果未初始化音频输出。
-					{
-						p_StrmPt->m_IsUse = 1;
-						AdoOtptPt->m_StrmUseTotal++;
-					}
+					p_StrmPt->m_IsUse = 1;
+					AdoOtptPt->m_StrmUseTotal++;
 				}
 			}
 			else //如果不使用流。
@@ -341,14 +346,9 @@ void AdoOtptSetStrmIsUse( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t IsUseStr
 					if( AdoOtptPt->m_IsInit != 0 ) //如果已初始化音频输出。
 					{
 						AdoOtptStrmDstoy( AdoOtptPt, p_StrmPt );
-						p_StrmPt->m_IsUse = 0;
-						AdoOtptPt->m_StrmUseTotal--;
 					}
-					else //如果未初始化音频输出。
-					{
-						p_StrmPt->m_IsUse = 0;
-						AdoOtptPt->m_StrmUseTotal--;
-					}
+					p_StrmPt->m_IsUse = 0;
+					AdoOtptPt->m_StrmUseTotal--;
 				}
 			}
 			goto Out;
@@ -378,13 +378,11 @@ int AdoOtptStrmCntnrInit( AdoOtpt * AdoOtptPt )
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	AdoOtpt::Strm * p_StrmPt; //存放流的指针。
 
-	AdoOtptPt->m_StrmUseTotal = 0;
 	for( size_t p_StrmNum = 0; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 	{
 		if( p_StrmPt->m_IsUse != 0 )
 		{
 			if( AdoOtptStrmInit( AdoOtptPt, p_StrmPt ) != 0 ) goto Out;
-			AdoOtptPt->m_StrmUseTotal++;
 		}
 	}
 	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：初始化流容器成功。" ) );
@@ -424,7 +422,6 @@ void AdoOtptStrmCntnrDstoy( AdoOtpt * AdoOtptPt )
 			AdoOtptStrmDstoy( AdoOtptPt, p_StrmPt );
 		}
 	}
-	AdoOtptPt->m_StrmUseTotal = 0;
 	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁流容器成功。" ) );
 }
 
@@ -740,7 +737,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 		}
 		AdoOtptPt->m_Thrd.m_EncdSrcFrmSzByt = AdoOtptPt->m_FrmLenByt; //初始化已编码格式原始帧的大小，单位为字节。
 		AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt = 0; //初始化已编码格式原始帧的长度，单位为字节。
-		AdoOtptPt->m_Thrd.m_PcmMixFrmPt = ( int32_t * )malloc( AdoOtptPt->m_FrmLenByt ); //初始化Pcm格式混音帧的指针。
+		AdoOtptPt->m_Thrd.m_PcmMixFrmPt = ( int32_t * )malloc( AdoOtptPt->m_FrmLenByt * 2 ); //初始化Pcm格式混音帧的指针。这里乘以2是因为Pcm格式混音帧是32位的，而帧是16位的。
 		if( AdoOtptPt->m_Thrd.m_PcmMixFrmPt == NULL )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：创建Pcm格式混音帧的内存块失败。" ) );
@@ -1055,7 +1052,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 						if( AdoOtptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoOtptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：接收到设备关闭消息。" ) );
+							if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：接收设备关闭消息。" ) );
 						}
 					}
 					else if( p_HRslt == AUDCLNT_E_BUFFER_ERROR )
@@ -1129,7 +1126,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) AdoOtptPt->m_Thrd.m_LastTickMsec = FuncGetTickAsMsec();
 
-			//调用用户定义的写入音频输出帧函数，并解码成PCM原始数据，最后混音。
+			//调用用户定义的写入音频输出帧函数，并解码成Pcm原始数据，最后混音。
 			{
 				AdoOtptPt->m_StrmCntnr.Locked( NULL ); //流容器的互斥锁加锁。
 
@@ -1137,14 +1134,14 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 				{
 					size_t p_StrmNum = 0;
 					AdoOtpt::Strm * p_StrmPt; //存放流的指针。
-
+					
 					for( ; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ ) //查找第一条要使用的流。
 					{
 						if( p_StrmPt->m_IsUse != 0 ) //如果该流为要使用。
 						{
 							switch( p_StrmPt->m_UseWhatDecd ) //使用什么解码器。
 							{
-								case 0: //如果要使用PCM原始数据。
+								case 0: //如果要使用Pcm原始数据。
 								{
 									//调用用户定义的写入音频输出帧函数。
 									AdoOtptPt->m_MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( AdoOtptPt->m_MediaPocsThrdPt, p_StrmPt->m_Idx,
@@ -1167,11 +1164,11 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 									//使用Speex解码器。
 									if( SpeexDecdPocs( p_StrmPt->m_SpeexDecd.m_Pt, AdoOtptPt->m_Thrd.m_EncdSrcFrmPt, AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt, AdoOtptPt->m_Thrd.m_PcmSrcFrmPt ) == 0 )
 									{
-										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：音频输出流索引 %z32d：使用Speex解码器成功。" ), p_StrmPt->m_Idx );
+										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器成功。" ), p_StrmPt->m_Idx );
 									}
 									else
 									{
-										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引 %z32d：使用Speex解码器失败。" ), p_StrmPt->m_Idx );
+										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器失败。" ), p_StrmPt->m_Idx );
 									}
 
 									//调用用户定义的获取音频输出帧函数。
@@ -1182,28 +1179,28 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 								}
 								case 2: //如果要使用Opus编解码器。
 								{
-									if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引 %z32d：暂不支持使用Opus解码器。" ), p_StrmPt->m_Idx );
+									if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引%z32d：暂不支持使用Opus解码器。" ), p_StrmPt->m_Idx );
 								}
 							}
 
 							break;
 						}
 					}
-
+					
 					if( AdoOtptPt->m_StrmUseTotal > 1 ) //如果有超过1条流要使用。
 					{
 						for( int p_TmpInt = 0; p_TmpInt < AdoOtptPt->m_FrmLenUnit; p_TmpInt++ ) //将第一个流的Pcm格式原始帧复制到Pcm格式混音帧。
 						{
 							AdoOtptPt->m_Thrd.m_PcmMixFrmPt[ p_TmpInt ] = AdoOtptPt->m_Thrd.m_PcmSrcFrmPt[ p_TmpInt ];
 						}
-
+						
 						for( ; AdoOtptPt->m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_StrmPt, 0, 0, NULL ) == 0; p_StrmNum++ ) //查找其他要使用的流。
 						{
 							if( p_StrmPt->m_IsUse != 0 ) //如果该流为要使用。
 							{
 								switch( p_StrmPt->m_UseWhatDecd ) //使用什么解码器。
 								{
-									case 0: //如果要使用PCM原始数据。
+									case 0: //如果要使用Pcm原始数据。
 									{
 										//调用用户定义的写入音频输出帧函数。
 										AdoOtptPt->m_MediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( AdoOtptPt->m_MediaPocsThrdPt, p_StrmPt->m_Idx,
@@ -1226,11 +1223,11 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 										//使用Speex解码器。
 										if( SpeexDecdPocs( p_StrmPt->m_SpeexDecd.m_Pt, AdoOtptPt->m_Thrd.m_EncdSrcFrmPt, AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt, AdoOtptPt->m_Thrd.m_PcmSrcFrmPt ) == 0 )
 										{
-											if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：音频输出流索引 %z32d：使用Speex解码器成功。" ), p_StrmPt->m_Idx );
+											if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器成功。" ), p_StrmPt->m_Idx );
 										}
 										else
 										{
-											if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引 %z32d：使用Speex解码器失败。" ), p_StrmPt->m_Idx );
+											if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器失败。" ), p_StrmPt->m_Idx );
 										}
 
 										//调用用户定义的获取音频输出帧函数。
@@ -1241,7 +1238,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 									}
 									case 2: //如果要使用Opus编解码器。
 									{
-										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引 %z32d：暂不支持使用Opus解码器。" ), p_StrmPt->m_Idx );
+										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引%z32d：暂不支持使用Opus解码器。" ), p_StrmPt->m_Idx );
 									}
 								}
 
@@ -1251,7 +1248,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 								}
 							}
 						}
-
+						
 						for( int p_TmpInt = 0; p_TmpInt < AdoOtptPt->m_FrmLenUnit; p_TmpInt++ ) //将Pcm格式混音帧复制到Pcm格式原始帧。
 						{
 							if( AdoOtptPt->m_Thrd.m_PcmMixFrmPt[ p_TmpInt ] > 32767 ) AdoOtptPt->m_Thrd.m_PcmSrcFrmPt[ p_TmpInt ] = 32767;
@@ -1260,7 +1257,11 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 						}
 					}
 				}
-
+				else //如果没有流要使用。
+				{
+					memset( AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, 0, AdoOtptPt->m_FrmLenByt );
+				}
+				
 				AdoOtptPt->m_StrmCntnr.Unlock( NULL ); //流容器的互斥锁解锁。
 			}
 
@@ -1304,7 +1305,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 
 		if( AdoOtptPt->m_Thrd.m_ExitFlag == 1 ) //如果退出标记为请求退出。
         {
-            if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：接收到退出请求。" ) );
+            if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：接收退出请求。" ) );
             break;
         }
 	} //音频输出循环结束。

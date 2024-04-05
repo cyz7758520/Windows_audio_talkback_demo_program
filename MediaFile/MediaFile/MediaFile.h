@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __MEDIAFILE_H__
-#define __MEDIAFILE_H__
+#include "Func.h"
 
 //MediaFile项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_MEDIAFILE__ ) //如果正在编译MediaFile项目。
@@ -44,5 +43,3 @@
 #include "AviFileWriter.h"
 
 #include "TinyXml2.h"
-
-#endif

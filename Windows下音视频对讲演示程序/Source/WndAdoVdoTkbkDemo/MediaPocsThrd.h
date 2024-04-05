@@ -45,15 +45,14 @@ typedef struct MediaPocsThrd
 		ExitCodeNormal, //正常退出。
 		ExitCodeUserInit, //调用用户定义的初始化函数失败。
 		ExitCodeAdoVdoInptOtptInit, //音视频输入输出初始化失败。
-		ExitCodeMediaMsgPocs, //媒体消息处理失败。
+		ExitCodeThrdMsgPocs, //线程消息处理失败。
 		ExitCodeAdoVdoInptOtptPocs, //音视频输入输出处理失败。
 	} ExitCode;
 	ExitCode m_ExitCode; //存放退出码。
 	
 	int32_t m_LastCallUserInitOrDstoy; //存放上一次调用了用户定义的初始化函数或销毁函数，为0表示初始化函数，为1表示销毁函数。
-	int32_t m_ReadyExitCnt; //存放准备退出计数，为0表示不准备退出，大于0表示要准备退出。
 	
-	VQueueCls m_MediaMsgCntnr; //存放媒体消息容器。
+	MsgQueue * m_ThrdMsgQueuePt; //存放线程消息队列的指针。
 
 	int32_t m_IsPrintLog; //存放是否打印Log日志，为非0表示要打印，为0表示不打印。
 	int32_t m_IsShowToast; //存放是否显示Toast，为非0表示要显示，为0表示不显示。
@@ -121,7 +120,7 @@ typedef struct MediaPocsThrd
 	MediaPocsThrdUserDstoyFuncPt m_UserDstoyFuncPt;
 	
 	//用户定义的消息函数。
-	typedef int( __cdecl * MediaPocsThrdUserMsgFuncPt )( MediaPocsThrd * MediaPocsThrdPt, void * UserMsgPt );
+	typedef int( __cdecl * MediaPocsThrdUserMsgFuncPt )( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
 	MediaPocsThrdUserMsgFuncPt m_UserMsgFuncPt;
 
 	//用户定义的读取音视频输入帧函数。
@@ -202,7 +201,7 @@ int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t AdoOtptStrmIdx, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t AdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
@@ -224,7 +223,7 @@ int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int IsBlack, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t VdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t VdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, uint32_t VdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t VdoOtptStrmIdx, HWND DspyWndHdl, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t VdoOtptStrmIdx, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t VdoOtptStrmIdx, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt );
@@ -239,8 +238,8 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int IsBlockWait, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, void * UserMsgPt, size_t UserMsgLenByt, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int ExitFlag, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * UserMsgPt, size_t UserMsgLenByt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
@@ -265,7 +264,7 @@ public:
 	virtual void UserDstoy() = 0;
 	
 	//用户定义的消息函数。
-	virtual int UserMsg( void * UserMsgPt ) = 0;
+	virtual int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt ) = 0;
 
 	//用户定义的读取音视频输入帧函数。
 	virtual void UserReadAdoVdoInptFrm( int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
@@ -333,7 +332,7 @@ public:
 	int SetAdoOtpt( int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtpt( m_MediaPocsThrdPt, IsBlockWait, SmplRate, FrmLenMsec, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	
 	int AdoOtptAddStrm( int IsBlockWait, int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptAddStrm( m_MediaPocsThrdPt, IsBlockWait, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int AdoOtptDelStrm( int IsBlockWait, int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt )  { return MediaPocsThrdAdoOtptDelStrm( m_MediaPocsThrdPt, IsBlockWait, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int AdoOtptDelStrm( int IsBlockWait, int AddFirstOrLast, int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt )  { return MediaPocsThrdAdoOtptDelStrm( m_MediaPocsThrdPt, IsBlockWait, AddFirstOrLast, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoOtptSetStrmUsePcm( int IsBlockWait, int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetStrmUsePcm( m_MediaPocsThrdPt, IsBlockWait, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoOtptSetStrmUseSpeexDecd( int IsBlockWait, int32_t AdoOtptStrmIdx, int32_t IsUsePrcplEnhsmt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( m_MediaPocsThrdPt, IsBlockWait, AdoOtptStrmIdx, IsUsePrcplEnhsmt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoOtptSetStrmUseOpusDecd( int IsBlockWait, int32_t AdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetStrmUseOpusDecd( m_MediaPocsThrdPt, IsBlockWait, AdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
@@ -355,7 +354,7 @@ public:
 	int VdoInptSetIsBlack( int IsBlockWait, int IsBlack, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoInptSetIsBlack( m_MediaPocsThrdPt, IsBlockWait, IsBlack, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int VdoOtptAddStrm( int IsBlockWait, uint32_t VdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoOtptAddStrm( m_MediaPocsThrdPt, IsBlockWait, VdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int VdoOtptDelStrm( int IsBlockWait, uint32_t VdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoOtptDelStrm( m_MediaPocsThrdPt, IsBlockWait, VdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int VdoOtptDelStrm( int IsBlockWait, int AddFirstOrLast, uint32_t VdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoOtptDelStrm( m_MediaPocsThrdPt, IsBlockWait, AddFirstOrLast, VdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int VdoOtptSetStrm( int IsBlockWait, uint32_t VdoOtptStrmIdx, HWND DspyWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoOtptSetStrm( m_MediaPocsThrdPt, IsBlockWait, VdoOtptStrmIdx, DspyWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int VdoOtptSetStrmUseYu12( int IsBlockWait, uint32_t VdoOtptStrmIdx, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoOtptSetStrmUseYu12( m_MediaPocsThrdPt, IsBlockWait, VdoOtptStrmIdx, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int VdoOtptSetStrmUseOpenH264Decd( int IsBlockWait, uint32_t VdoOtptStrmIdx, int32_t DecdThrdNum, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( m_MediaPocsThrdPt, IsBlockWait, VdoOtptStrmIdx, DecdThrdNum, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
@@ -370,7 +369,7 @@ public:
 	int SaveStsToTxtFile( int IsBlockWait, const Vstr * FullPathVstrPt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSaveStsToTxtFile( m_MediaPocsThrdPt, IsBlockWait, FullPathVstrPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	
 	int Start( VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdStart( m_MediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int RqirExit( int ExitFlag, int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdRqirExit( m_MediaPocsThrdPt, ExitFlag, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendUserMsg( int IsBlockWait, void * UserMsgPt, size_t UserMsgLenByt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSendUserMsg( m_MediaPocsThrdPt, IsBlockWait, UserMsgPt, UserMsgLenByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int RqirExit( int IsBlockWait, int ExitFlag, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdRqirExit( m_MediaPocsThrdPt, IsBlockWait, ExitFlag, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSendUserMsg( m_MediaPocsThrdPt, IsBlockWait, MsgTyp, MsgPt, MsgLenByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 };
 #endif

@@ -1,7 +1,6 @@
-﻿#include "DataStruct.h"
+﻿#pragma once
 
-#ifndef __CLNKLST_H__
-#define __CLNKLST_H__
+#include "DataStruct.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -11,6 +10,7 @@ extern "C"
 typedef struct CLnkLst CLnkLst;
 
 __DATASTRUCT_DLLAPI__ int CLnkLstInit( CLnkLst * * CLnkLstPtPt, size_t ElmDataLenByt, size_t BufInitSzNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int CLnkLstDstoy( CLnkLst * CLnkLstPt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int CLnkLstLocked( CLnkLst * CLnkLstPt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int CLnkLstUnlock( CLnkLst * CLnkLstPt, Vstr * ErrInfoVstrPt );
@@ -41,8 +41,6 @@ __DATASTRUCT_DLLAPI__ int CLnkLstGetTotal( CLnkLst * CLnkLstPt, size_t * ElmTota
 __DATASTRUCT_DLLAPI__ int CLnkLstSetSz( CLnkLst * CLnkLstPt, size_t SzNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int CLnkLstGetSz( CLnkLst * CLnkLstPt, size_t * SzNumPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int CLnkLstDstoy( CLnkLst * CLnkLstPt, Vstr * ErrInfoVstrPt );
-
 #ifdef __cplusplus
 }
 #endif
@@ -57,6 +55,7 @@ public:
 	~CLnkLstCls() { Dstoy( NULL ); }
 
 	int Init( size_t ElmDataLenByt, size_t BufInitSzNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzNum, Vstr * ErrInfoVstrPt ) { return CLnkLstInit( &m_CLnkLstPt, ElmDataLenByt, BufInitSzNum, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzNum, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = CLnkLstDstoy( m_CLnkLstPt, ErrInfoVstrPt ); m_CLnkLstPt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return CLnkLstLocked( m_CLnkLstPt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return CLnkLstUnlock( m_CLnkLstPt, ErrInfoVstrPt ); }
@@ -86,9 +85,5 @@ public:
 	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return CLnkLstGetTotal( m_CLnkLstPt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
 	int SetSz( size_t SzNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return CLnkLstSetSz( m_CLnkLstPt, SzNum, IsAutoLock, ErrInfoVstrPt ); }
 	int GetSz( size_t * SzNumPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return CLnkLstGetSz( m_CLnkLstPt, SzNumPt, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = CLnkLstDstoy( m_CLnkLstPt, ErrInfoVstrPt ); m_CLnkLstPt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

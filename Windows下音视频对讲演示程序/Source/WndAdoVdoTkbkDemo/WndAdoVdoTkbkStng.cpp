@@ -1,12 +1,12 @@
 ﻿#include "Func.h"
 #include "WndAdoVdoTkbkDemo.h"
 #include "WndAdoVdoTkbkStng.h"
-#include "MyNtwkMediaPocsThrd.h"
+#include "MyClntMediaPocsThrd.h"
 
 //全局变量。
 extern HINSTANCE g_IstnsHdl; //存放当前实例的句柄。
 extern VstrCls g_ErrInfoVstr; //存放错误信息动态字符串的指针。
-extern MyNtwkMediaPocsThrdCls * g_MyNtwkMediaPocsThrdPt; //存放我的网络媒体处理线程的指针。
+extern MyClntMediaPocsThrdCls * g_MyClntMediaPocsThrdPt; //存放我的客户端媒体处理线程的指针。
 extern HWND g_MainDlgWndHdl; //存放主对话框窗口的句柄。
 extern long g_MainDlgWndMinHeight; //存放主对话框窗口的最小高度，单位为像素。
 extern long g_MainDlgWndMinWidth; //存放主对话框窗口的最小宽度，单位为像素。
@@ -90,32 +90,55 @@ void SaveStngToXmlFile()
 			p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "ClntLstItem" );
 			p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
-			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 1, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 0, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 			VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, ,  );
 			p_TmpXMLElement3Pt = p_XMLDocument.NewElement( "Prtcl" );
 			p_TmpXMLElement3Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 			p_TmpXMLElement2Pt->InsertEndChild( p_TmpXMLElement3Pt );
 				
-			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 1, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 			VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, ,  );
 			p_TmpXMLElement3Pt = p_XMLDocument.NewElement( "RmtNodeName" );
 			p_TmpXMLElement3Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 			p_TmpXMLElement2Pt->InsertEndChild( p_TmpXMLElement3Pt );
 				
-			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 3, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+			ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, ( LPWSTR )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 			VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, ,  );
 			p_TmpXMLElement3Pt = p_XMLDocument.NewElement( "RmtNodeSrvc" );
 			p_TmpXMLElement3Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 			p_TmpXMLElement2Pt->InsertEndChild( p_TmpXMLElement3Pt );
 		}
 
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "TkbkMode" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId ) == BST_CHECKED ) ? "None" :
-				( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "Ado" :
-					( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "Vdo" :
-						( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoVdoTkbkModeRdBtnId ) == BST_CHECKED ) ? "AdoVdo" :
-							"Ado" );
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseAdoInptTkbkMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoInptTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseAdoOtptTkbkMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoOtptTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseVdoInptTkbkMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoInptTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseVdoOtptTkbkMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoOtptTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoInptIsMute" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoOtptIsMute" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoInptIsBlack" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoOtptIsBlack" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		{
@@ -149,22 +172,6 @@ void SaveStngToXmlFile()
 				p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 			}
 		}
-
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoInptIsMute" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
-		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoOtptIsMute" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
-		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoInptIsBlack" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
-		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoOtptIsBlack" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
-		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsDrawAdoWavfm" ); //这里不加"ToWnd"是为了与Android端的"ToSurface"保持一致。
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
@@ -200,6 +207,10 @@ void SaveStngToXmlFile()
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "MaxCnctTimes" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsReferRmtTkbkModeSetTkbkMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_ClntStngDlgWndHdl, IsReferRmtTkbkModeSetTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
 
@@ -929,35 +940,49 @@ void ReadStngFromXmlFile()
 							}
 							SendMessage( g_MainDlgWndHdl, MainDlgWndMsgTypClntLstAddItem, ( WPARAM )p_MainDlgWndMsgClntLstAddItemPt, 0 );
 						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "TkbkMode" ) == 0 )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseAdoInptTkbkMode" ) == 0 )
 						{
-							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Ado" ) == 0 )
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
-							}
-							else if( strcmp( p_TmpXMLElement2Pt->GetText(), "Vdo" ) == 0 )
-							{
-								CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseVdoTkbkModeRdBtnId );
+								CheckDlgButton( g_MainDlgWndHdl, UseAdoInptTkbkModeCkBoxId, BST_UNCHECKED );
 							}
 							else
 							{
-								CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId );
+								CheckDlgButton( g_MainDlgWndHdl, UseAdoInptTkbkModeCkBoxId, BST_CHECKED );
 							}
 						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptDvc" ) == 0 )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseAdoOtptTkbkMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
-							SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseAdoOtptTkbkModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseAdoOtptTkbkModeCkBoxId, BST_CHECKED );
+							}
 						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptDvc" ) == 0 )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseVdoInptTkbkMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
-							SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseVdoInptTkbkModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseVdoInptTkbkModeCkBoxId, BST_CHECKED );
+							}
 						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoInptDvc" ) == 0 )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseVdoOtptTkbkMode" ) == 0 )
 						{
-							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
-							SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseVdoOtptTkbkModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseVdoOtptTkbkModeCkBoxId, BST_CHECKED );
+							}
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptIsMute" ) == 0 )
 						{
@@ -1003,6 +1028,32 @@ void ReadStngFromXmlFile()
 								CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_CHECKED );
 							}
 						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptDvc" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
+							SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoOtptDvc" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
+							SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "VdoInptDvc" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
+							SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsDrawAdoWavfm" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
+							}
+						}
 					}
 				}
 				else if( strcmp( p_TmpXMLElement1Pt->Name(), "SrvrStng" ) == 0 )
@@ -1046,6 +1097,17 @@ void ReadStngFromXmlFile()
 						{
 							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_ClntStngDlgWndHdl, MaxCnctTimesEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsReferRmtTkbkModeSetTkbkMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_ClntStngDlgWndHdl, IsReferRmtTkbkModeSetTkbkModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_ClntStngDlgWndHdl, IsReferRmtTkbkModeSetTkbkModeCkBoxId, BST_CHECKED );
+							}
 						}
 					}
 				}
@@ -2020,6 +2082,7 @@ void ResetStng()
 	//设置传输协议。
 	CheckRadioButton( g_ClntStngDlgWndHdl, UsePttRdBtnId, UseRtFdRdBtnId, UseRtFdRdBtnId );
 	SetWindowText( GetDlgItem( g_ClntStngDlgWndHdl, MaxCnctTimesEdTxtId ), L"5" );
+	CheckDlgButton( g_ClntStngDlgWndHdl, IsReferRmtTkbkModeSetTkbkModeCkBoxId, BST_CHECKED );
 	
 	//设置服务端和客户端的Url。
 	{
@@ -2107,16 +2170,19 @@ void ResetStng()
 	}
 	
 	//设置使用什么对讲模式。
-	CheckRadioButton( g_MainDlgWndHdl, UseNoneTkbkModeRdBtnId, UseAdoVdoTkbkModeRdBtnId, UseAdoTkbkModeRdBtnId );
+	CheckDlgButton( g_MainDlgWndHdl, UseAdoInptTkbkModeCkBoxId, BST_CHECKED );
+	CheckDlgButton( g_MainDlgWndHdl, UseAdoOtptTkbkModeCkBoxId, BST_CHECKED );
+	CheckDlgButton( g_MainDlgWndHdl, UseVdoInptTkbkModeCkBoxId, BST_UNCHECKED );
+	CheckDlgButton( g_MainDlgWndHdl, UseVdoOtptTkbkModeCkBoxId, BST_UNCHECKED );
 	
-	//设置音频输入设备、音频输出设备。
-	RefresAdoVdohDvc();
-
 	//设置音频输入出是否静音、视频输入输出是否黑屏。
 	CheckDlgButton( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId, BST_UNCHECKED );
 	CheckDlgButton( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId, BST_UNCHECKED );
 	CheckDlgButton( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId, BST_UNCHECKED );
 	CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_UNCHECKED );
+	
+	//设置音频输入设备、音频输出设备。
+	RefresAdoVdohDvc();
 
 	//设置是否绘制音频波形到窗口。
 	CheckDlgButton( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );

@@ -38,7 +38,7 @@ typedef struct AdoOtpt //音频输出。
 
 		int32_t m_IsUse; //存放是否使用流，为0表示不使用，为非0表示要使用。
 
-		int32_t m_UseWhatDecd; //存放使用什么解码器，为0表示PCM原始数据，为1表示Speex解码器，为2表示Opus解码器。
+		int32_t m_UseWhatDecd; //存放使用什么解码器，为0表示Pcm原始数据，为1表示Speex解码器，为2表示Opus解码器。
 
 		struct //存放Speex解码器。
 		{

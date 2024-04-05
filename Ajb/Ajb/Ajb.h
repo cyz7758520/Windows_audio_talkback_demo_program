@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __AJB_H__
-#define __AJB_H__
+#include "Func.h"
 
 //Ajb项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_AJB__ ) //如果正在编译Ajb项目。
@@ -139,6 +138,4 @@ public:
 
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VAjbDstoy( m_VAjbPt, ErrInfoVstrPt ); m_VAjbPt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

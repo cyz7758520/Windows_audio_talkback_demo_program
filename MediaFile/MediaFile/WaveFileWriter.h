@@ -1,7 +1,6 @@
-﻿#include "MediaFile.h"
+﻿#pragma once
 
-#ifndef __WAVEFILEWRITER_H__
-#define __WAVEFILEWRITER_H__
+#include "MediaFile.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -33,6 +32,4 @@ public:
 
 	int Dstoy() { int p_Rslt = WaveFileWriterDstoy( m_WaveFileWriterPt ); m_WaveFileWriterPt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif

@@ -546,9 +546,9 @@ int AdoInptEncdInit( AdoInpt * AdoInptPt )
 
 	switch( AdoInptPt->m_UseWhatEncd )
 	{
-		case 0: //如果要使用PCM原始数据。
+		case 0: //如果要使用Pcm原始数据。
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化PCM原始数据成功。" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm原始数据成功。" ) );
 			break;
 		}
 		case 1: //如果要使用Speex编码器。
@@ -604,9 +604,9 @@ void AdoInptEncdDstoy( AdoInpt * AdoInptPt )
 {
 	switch( AdoInptPt->m_UseWhatEncd )
 	{
-		case 0: //如果要使用PCM原始数据。
+		case 0: //如果要使用Pcm原始数据。
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁PCM原始数据成功。" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁Pcm原始数据成功。" ) );
 			break;
 		}
 		case 1: //如果要使用Speex编码器。
@@ -1631,7 +1631,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 						if( AdoInptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoInptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收到设备关闭消息。" ) );
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息，或系统自带的声学回音消除器、噪音抑制器和自动增益控制器不支持该设备。" ) );
 						}
 					}
 					goto OutPocs;
@@ -1640,7 +1640,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			else //如果不使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
 			{
 				//获取设备的缓冲区，并将Pcm格式缓冲区帧放入Pcm格式缓冲区帧的缓冲区队列。
-				p_HRslt = p_DvcCptrClntPt->GetBuffer( ( BYTE ** )&p_PcmBufFrmPt, &p_DvcBufLenUnit, &p_DvcBufFlag, NULL, NULL ); //获取设备的Pcm格式缓冲区。
+				p_HRslt = p_DvcCptrClntPt->GetBuffer( ( BYTE * * )&p_PcmBufFrmPt, &p_DvcBufLenUnit, &p_DvcBufFlag, NULL, NULL ); //获取设备的Pcm格式缓冲区。
 				if( p_HRslt == S_OK ) //如果获取设备的Pcm格式缓冲区成功。
 				{
 					p_DvcBufLenByt = p_DvcBufLenUnit * sizeof( int16_t );
@@ -1673,7 +1673,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 						if( AdoInptPt->m_Dvc.m_IsClos == 0 )
 						{
 							AdoInptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收到设备关闭消息。" ) );
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息。" ) );
 						}
 					}
 					else if( p_HRslt == AUDCLNT_S_BUFFER_EMPTY ) //如果设备的Pcm格式缓冲区当前为空，表示还需要等待。
@@ -1772,7 +1772,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 
 		if( AdoInptPt->m_Thrd.m_ExitFlag == 1 ) //如果退出标记为请求退出。
         {
-            if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：接收到退出请求。" ) );
+            if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：接收退出请求。" ) );
             break;
         }
 	} //音频输入循环结束。

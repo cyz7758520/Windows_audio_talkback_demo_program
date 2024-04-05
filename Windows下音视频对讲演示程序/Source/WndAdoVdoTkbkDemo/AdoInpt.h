@@ -134,7 +134,7 @@ typedef struct AdoInpt //存放音频输入。
 		int32_t m_AgcMaxGain; //存放在自动增益控制时，最大增益的分贝值，分贝值越大增益越大，取值区间为[0,2147483647]。
 	} m_SpeexPrpocs;
 
-	int32_t m_UseWhatEncd; //存放使用什么编码器，为0表示PCM原始数据，为1表示Speex编码器，为2表示Opus编码器。
+	int32_t m_UseWhatEncd; //存放使用什么编码器，为0表示Pcm原始数据，为1表示Speex编码器，为2表示Opus编码器。
 
 	struct //存放Speex编码器。
 	{

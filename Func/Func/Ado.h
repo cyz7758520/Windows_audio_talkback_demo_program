@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __ADO_H__
-#define __ADO_H__
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -58,6 +57,4 @@ __FUNC_DLLAPI__ int G711uDecdPocs( uint8_t * G711uFrmPt, size_t G711uFrmLenByt, 
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

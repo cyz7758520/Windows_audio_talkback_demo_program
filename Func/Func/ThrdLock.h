@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __THRDLOCK_H__
-#define __THRDLOCK_H__
+#include "Func.h"
 
 //互斥锁，内存初始时必须保证是全为0。
 #ifndef __cplusplus
@@ -76,6 +75,4 @@ __FUNC_DLLAPI__ int RdWrWrUnlock( RdWrLock * RdWrLockPt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

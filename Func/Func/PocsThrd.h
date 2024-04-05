@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __POCSTHRD_H__
-#define __POCSTHRD_H__
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -34,21 +33,29 @@ extern "C"
 
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 typedef struct ThrdInfo ThrdInfo;
+typedef enum ThrdRunSts //线程运行状态。
+{
+	ThrdRunStsNorun, //未开始运行。
+	ThrdRunStsRun, //正在运行。
+	ThrdRunStsExit, //已经退出。
+} ThrdRunSts;
 
 #if( defined __MS_VCXX__ )
 
-__FUNC_DLLAPI__ int ThrdInit( ThrdInfo * * ThrdInfoPtPt, DWORD ( WINAPI *ThrdFuncPt )( LPVOID Parm ), LPVOID ThrdFuncParm, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int ThrdGetHdl( ThrdInfo * ThrdInfoPt, HANDLE * ThrdHdlPt, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int ThrdGetId( ThrdInfo * ThrdInfoPt, DWORD * ThrdIdPt, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int ThrdWaitGetExitCode( ThrdInfo * ThrdInfoPt, DWORD * ThrdExitCodePt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ int ThrdInit( ThrdInfo * * ThrdInfoPtPt, DWORD( WINAPI * ThrdFuncPt )( LPVOID Parm ), LPVOID ThrdFuncParm, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ HANDLE ThrdGetHdl( ThrdInfo * ThrdInfoPt );
+__FUNC_DLLAPI__ DWORD ThrdGetId( ThrdInfo * ThrdInfoPt );
+__FUNC_DLLAPI__ DWORD ThrdGetExitCode( ThrdInfo * ThrdInfoPt, int IsBlockWait );
+__FUNC_DLLAPI__ ThrdRunSts ThrdGetRunSts( ThrdInfo * ThrdInfoPt );
 __FUNC_DLLAPI__ int ThrdWaitDstoy( ThrdInfo * ThrdInfoPt, Vstr * ErrInfoVstrPt );
 
 #elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 
 __FUNC_DLLAPI__ int ThrdInit( ThrdInfo * * ThrdInfoPtPt, void * ( *ThrdFuncPt )( void * Parm ), void * ThrdFuncParm, Vstr * ErrInfoVstrPt );
-__FUNC_DLLAPI__ int ThrdGetHdl( ThrdInfo * ThrdInfoPt, pthread_t * ThrdHdlPt, Vstr * ErrInfoVstrPt );
-//__FUNC_DLLAPI__ int ThrdGetId( ThrdInfo * ThrdInfoPt, pid_t * ThrdIdPt, Vstr * ErrInfoVstrPt ); pthread系列函数无法获取线程ID。
-__FUNC_DLLAPI__ int ThrdWaitGetExitCode( ThrdInfo * ThrdInfoPt, void * * ThrdExitCodePt, Vstr * ErrInfoVstrPt );
+__FUNC_DLLAPI__ pthread_t ThrdGetHdl( ThrdInfo * ThrdInfoPt );
+__FUNC_DLLAPI__ pid_t ThrdGetId( ThrdInfo * ThrdInfoPt );
+__FUNC_DLLAPI__ void * ThrdGetExitCode( ThrdInfo * ThrdInfoPt, int IsBlockWait );
+__FUNC_DLLAPI__ ThrdRunSts ThrdGetRunSts( ThrdInfo * ThrdInfoPt );
 __FUNC_DLLAPI__ int ThrdWaitDstoy( ThrdInfo * ThrdInfoPt, Vstr * ErrInfoVstrPt );
 
 #endif
@@ -57,6 +64,4 @@ __FUNC_DLLAPI__ int ThrdWaitDstoy( ThrdInfo * ThrdInfoPt, Vstr * ErrInfoVstrPt )
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

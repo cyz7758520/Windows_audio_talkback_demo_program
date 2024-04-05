@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __OPENH264_H__
-#define __OPENH264_H__
+#include "Func.h"
 
 //OpenH264项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_OPENH264__ ) //如果正在编译OpenH264项目。
@@ -65,6 +64,4 @@ __OPENH264_DLLAPI__ int OpenH264DecdDstoy( OpenH264Decd * OpenH264DecdPt, Vstr *
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

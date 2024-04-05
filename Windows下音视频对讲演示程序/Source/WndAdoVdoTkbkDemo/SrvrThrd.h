@@ -1,0 +1,226 @@
+﻿#pragma once
+
+#include "Func.h"
+#include "DataStruct.h"
+#include "Sokt.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+//服务端线程。
+typedef struct SrvrThrd
+{
+	MsgQueue * m_ThrdMsgQueuePt; //存放线程消息队列的指针。
+	
+	typedef enum PktTyp //数据包类型。
+	{
+		PktTypTkbkIdx, //对讲索引包。
+		PktTypTkbkMode, //对讲模式包。
+		PktTypAdoFrm, //音频输入输出帧包。
+		PktTypVdoFrm, //视频输入输出帧包。
+		PktTypExit, //退出包。
+	} PktTyp;
+	
+	typedef enum TkbkMode //对讲模式。
+	{
+		TkbkModeNone = 0, //空。
+		TkbkModeAdoInpt = 1, //音频输入。
+		TkbkModeAdoOtpt = 2, //音频输出。
+		TkbkModeVdoInpt = 4, //视频输入。
+		TkbkModeVdoOtpt = 8, //视频输出。
+		TkbkModeAdo = TkbkModeAdoInpt | TkbkModeAdoOtpt, //音频。
+		TkbkModeVdo = TkbkModeVdoInpt | TkbkModeVdoOtpt, //视频。
+		TkbkModeAdoVdo = TkbkModeAdo | TkbkModeVdo, //音视频。
+		TkbkModeNoChg = TkbkModeVdoOtpt << 1, //不变。
+	} TkbkMode;
+	
+	typedef enum CnctSts //连接状态。
+	{
+		CnctStsWait, //等待远端接受连接。
+		CnctStsCnct, //已连接。
+		CnctStsTmot, //超时未接收任何数据包。异常断开。
+		CnctStsDsct, //已断开。
+	} CnctSts;
+	
+    int32_t m_IsRqirExit; //存放是否请求退出，为0表示未请求退出，为1表示已请求退出。
+
+	int32_t m_IsPrintLog; //存放是否打印Log日志，为非0表示要打印，为0表示不打印。
+	int32_t m_IsShowToast; //存放是否显示Toast，为非0表示要显示，为0表示不显示。
+	HWND m_ShowToastWndHdl; //存放显示Toast窗口的句柄，为NULL表示桌面窗口。
+
+	int32_t m_IsUsePrvntSysSleep; //存放是否使用阻止系统睡眠，为非0表示要使用，为0表示不使用。
+	
+    int32_t m_SrvrIsInit; //存放服务端是否初始化，为0表示未初始化，为1表示已初始化。
+    TcpSrvrSokt * m_TcpSrvrSoktPt; //存放本端Tcp协议服务端套接字的指针。
+    AudpSokt * m_AudpSrvrSoktPt; //存放本端高级Udp协议服务端套接字的指针。
+    int32_t m_IsAutoRqirExit; //存放是否自动请求退出，为0表示手动，为1表示在所有连接销毁时自动请求退出，为2表示在所有连接和服务端都销毁时自动请求退出。
+	
+	typedef struct CnctInfo //连接信息。
+	{
+        size_t m_Idx; //存放索引，从0开始，连接信息容器的唯一索引，连接中途不会改变。
+        int32_t m_IsInit; //存放连接信息是否初始化，为0表示未初始化，为非0表示已初始化。
+        int32_t m_Num; //存放序号，从0开始，随着前面的连接销毁而递减。
+
+		int32_t m_IsTcpOrAudpPrtcl; //存放是否是Tcp或Udp协议，为0表示Tcp协议，为1表示高级Udp协议。
+		Vstr * m_RmtNodeNameVstrPt; //存放远端套接字绑定的远端节点名称动态字符串的指针。
+		Vstr * m_RmtNodeSrvcVstrPt; //存放远端套接字绑定的远端节点服务动态字符串的指针。
+		TcpClntSokt * m_TcpClntSoktPt; //存放本端Tcp协议客户端套接字的指针。
+		size_t m_AudpClntCnctIdx; //存放本端高级Udp协议客户端连接索引。
+		int32_t m_IsRqstDstoy; //存放是否请求销毁，为0表示未请求，为1表示已请求。
+		
+		int32_t m_CurCnctSts; //存放当前连接状态，为[-m_MaxCnctTimes,0]表示等待远端接受连接。
+		int32_t m_RmtTkbkMode; //存放远端对讲模式。
+
+		int32_t m_IsRecvExitPkt; //存放是否接收退出包，为0表示未接收，为1表示已接收。
+	} CnctInfo;
+	CQueue * m_CnctInfoCntnrPt; //存放连接信息容器的指针。
+    int32_t m_CnctInfoCurMaxNum; //存放连接信息的当前最大序号。
+	int32_t m_MaxCnctNum; //存放最大连接数。
+	
+	struct //存放线程。
+	{
+		Vstr * m_LclNodeAddrPt; //存放本地节点地址的指针。
+		Vstr * m_LclNodePortPt; //存放本地节点端口的指针。
+		Vstr * m_RmtNodeAddrPt; //存放远程节点地址的指针。
+		Vstr * m_RmtNodePortPt; //存放远程节点端口的指针。
+
+		int8_t * m_TmpBytePt; //存放临时数据的指针。
+		size_t m_TmpByteSz; //存放临时数据大小。
+	
+		ThrdInfo * m_ThrdInfoPt; //存放线程信息的指针。
+	} m_Thrd;
+	
+	Vstr * m_ErrInfoVstrPt; //存放错误信息动态字符串的指针。
+
+	//用户定义的相关回调函数。
+
+	//存放用户数据的指针。注意：在C++的SrvrThrdCls类中，本变量存放this指针，请勿修改。
+	void * m_UserDataPt;
+	
+	//用户定义的显示日志函数。
+	typedef void( __cdecl * SrvrThrdUserShowLogFuncPt )( SrvrThrd * SrvrThrdPt, Vstr * InfoVstrPt );
+	SrvrThrdUserShowLogFuncPt m_UserShowLogFuncPt;
+
+	//用户定义的显示Toast函数。
+	typedef void( __cdecl * SrvrThrdUserShowToastFuncPt )( SrvrThrd * SrvrThrdPt, Vstr * InfoVstrPt );
+	SrvrThrdUserShowToastFuncPt m_UserShowToastFuncPt;
+	
+	//用户定义的消息函数。
+	typedef int( __cdecl * SrvrThrdUserMsgFuncPt )( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+	SrvrThrdUserMsgFuncPt m_UserMsgFuncPt;
+	
+	//用户定义的服务端线程初始化函数。
+	typedef void( __cdecl * SrvrThrdUserSrvrThrdInitFuncPt )( SrvrThrd * SrvrThrdPt );
+	SrvrThrdUserSrvrThrdInitFuncPt m_UserSrvrThrdInitFuncPt;
+
+	//用户定义的服务端线程销毁函数。
+	typedef void( __cdecl * SrvrThrdUserSrvrThrdDstoyFuncPt )( SrvrThrd * SrvrThrdPt );
+	SrvrThrdUserSrvrThrdDstoyFuncPt m_UserSrvrThrdDstoyFuncPt;
+	
+	//用户定义的服务端初始化函数。
+	typedef void( __cdecl * SrvrThrdUserSrvrInitFuncPt )( SrvrThrd * SrvrThrdPt );
+	SrvrThrdUserSrvrInitFuncPt m_UserSrvrInitFuncPt;
+
+	//用户定义的服务端销毁函数。
+	typedef void( __cdecl * SrvrThrdUserSrvrDstoyFuncPt )( SrvrThrd * SrvrThrdPt );
+	SrvrThrdUserSrvrDstoyFuncPt m_UserSrvrDstoyFuncPt;
+	
+	//用户定义的连接初始化函数。
+	typedef void( __cdecl * SrvrThrdUserCnctInitFuncPt )( SrvrThrd * SrvrThrdPt, CnctInfo * CnctInfoPt, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt );
+	SrvrThrdUserCnctInitFuncPt m_UserCnctInitFuncPt;
+	
+	//用户定义的连接销毁函数。
+	typedef void( __cdecl * SrvrThrdUserCnctDstoyFuncPt )( SrvrThrd * SrvrThrdPt, CnctInfo * CnctInfoPt );
+	SrvrThrdUserCnctDstoyFuncPt m_UserCnctDstoyFuncPt;
+
+	//用户定义的连接状态函数。
+	typedef void( __cdecl * SrvrThrdUserCnctStsFuncPt )( SrvrThrd * SrvrThrdPt, CnctInfo * CnctInfoPt, int32_t CurCnctSts );
+	SrvrThrdUserCnctStsFuncPt m_UserCnctStsFuncPt;
+	
+	//用户定义的连接远端对讲模式函数。
+	typedef void( __cdecl * SrvrThrdUserCnctRmtTkbkModeFuncPt )( SrvrThrd * SrvrThrdPt, CnctInfo * CnctInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode );
+	SrvrThrdUserCnctRmtTkbkModeFuncPt m_UserCnctRmtTkbkModeFuncPt;
+} SrvrThrd;
+extern const char * const g_TkbkModeU8strArrPt[ 17 ];
+
+int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
+				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
+				  SrvrThrd::SrvrThrdUserSrvrThrdInitFuncPt UserSrvrThrdInitFuncPt, SrvrThrd::SrvrThrdUserSrvrThrdDstoyFuncPt UserSrvrThrdDstoyFuncPt,
+				  SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
+				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt,
+				  Vstr * ErrInfoVstrPt );
+int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
+
+int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt );
+int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt );
+
+int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
+int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
+int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt );
+int SrvrThrdSendSrvrInitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, Vstr * ErrInfoVstrPt );
+int SrvrThrdSendSrvrDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
+int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt );
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+class SrvrThrdCls
+{
+public:
+	SrvrThrd * m_SrvrThrdPt;
+
+	SrvrThrdCls() { m_SrvrThrdPt = NULL; }
+	~SrvrThrdCls() { Dstoy( NULL ); }
+	
+	//用户定义的显示日志函数。
+	virtual void UserShowLog( VstrCls * InfoVstrPt ) = 0;
+	
+	//用户定义的显示Toast函数。
+	virtual void UserShowToast( VstrCls * InfoVstrPt ) = 0;
+	
+	//用户定义的消息函数。
+	virtual int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt ) = 0;
+	
+	//用户定义的服务端线程初始化函数。
+	virtual void UserSrvrThrdInit() = 0;
+
+	//用户定义的服务端线程销毁函数。
+	virtual void UserSrvrThrdDstoy() = 0;
+	
+	//用户定义的服务端初始化函数。
+	virtual void UserSrvrInit() = 0;
+
+	//用户定义的服务端销毁函数。
+	virtual void UserSrvrDstoy() = 0;
+	
+	//用户定义的连接初始化函数。
+	virtual void UserCnctInit( SrvrThrd::CnctInfo * CnctInfoPt, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt ) = 0;
+	
+	//用户定义的连接销毁函数。
+	virtual void UserCnctDstoy( SrvrThrd::CnctInfo * CnctInfoPt ) = 0;
+
+	//用户定义的连接状态函数。
+	virtual void UserCnctSts( SrvrThrd::CnctInfo * CnctInfoPt, int32_t CurCnctSts ) = 0;
+	
+	//用户定义的连接远端对讲模式函数。
+	virtual void UserCnctRmtTkbkMode( SrvrThrd::CnctInfo * CnctInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode ) = 0;
+
+	int Init( VstrCls * ErrInfoVstrPt );
+	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = SrvrThrdDstoy( m_SrvrThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_SrvrThrdPt = NULL; return p_Rslt; }
+
+	int SetIsPrintLogShowToast( int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSetIsPrintLogShowToast( m_SrvrThrdPt, IsPrintLog, IsShowToast, ShowToastWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendSetIsUsePrvntSysSleepMsg( int IsBlockWait, int32_t IsUsePrvntSysSleep, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSetIsUsePrvntSysSleepMsg( m_SrvrThrdPt, IsBlockWait, IsUsePrvntSysSleep, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+
+	int Start( VstrCls * ErrInfoVstrPt ) { return SrvrThrdStart( m_SrvrThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendRqirExitMsg( int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendRqirExitMsg( m_SrvrThrdPt, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendUserMsg( m_SrvrThrdPt, IsBlockWait, MsgTyp, MsgPt, MsgLenByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+
+	int SendSrvrInitMsg( int IsBlockWait, int32_t IsTcpOrAudpPrtcl, VstrCls * LclNodeNameVstrPt, VstrCls * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSrvrInitMsg( m_SrvrThrdPt, IsBlockWait, IsTcpOrAudpPrtcl, ( LclNodeNameVstrPt != NULL ) ? LclNodeNameVstrPt->m_VstrPt : NULL, ( LclNodeSrvcVstrPt != NULL ) ? LclNodeSrvcVstrPt->m_VstrPt : NULL, MaxCnctNum, IsAutoRqirExit, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendSrvrDstoyMsg( int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSrvrDstoyMsg( m_SrvrThrdPt, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendCnctDstoyMsg( int IsBlockWait, int32_t CnctNum, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendCnctDstoyMsg( m_SrvrThrdPt, IsBlockWait, CnctNum, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+};
+#endif

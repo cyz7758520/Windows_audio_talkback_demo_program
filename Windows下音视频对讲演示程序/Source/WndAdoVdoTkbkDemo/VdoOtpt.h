@@ -84,7 +84,7 @@ int VdoOtptStrmThrdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
 void VdoOtptStrmThrdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
 int VdoOtptStrmInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
 void VdoOtptStrmDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt );
-void VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );
+int VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );
 void VdoOtptDelStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );
 void VdoOtptSetStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, HWND DspyWndHdl );
 void VdoOtptSetStrmUseYu12( VdoOtpt * VdoOtptPt, uint32_t StrmIdx );

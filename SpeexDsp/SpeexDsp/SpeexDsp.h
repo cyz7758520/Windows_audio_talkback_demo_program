@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __SPEEXDSP_H__
-#define __SPEEXDSP_H__
+#include "Func.h"
 
 //SpeexDsp项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_SPEEXDSP__ ) //如果正在编译SpeexDsp项目。
@@ -69,6 +68,4 @@ __SPEEXDSP_DLLAPI__ int SpeexResamplerDstoy( SpeexResamplerState * SpeexResample
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

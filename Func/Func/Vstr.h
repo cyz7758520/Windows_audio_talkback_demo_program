@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __VARSTR_H__
-#define __VARSTR_H__
+#include "Func.h"
 
 //动态字符串。
 typedef struct Vstr
@@ -177,6 +176,4 @@ inline Vstr * VstrRefToPt( const Vstr & VstrRef )
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

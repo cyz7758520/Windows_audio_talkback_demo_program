@@ -1,13 +1,12 @@
 ﻿#include "MediaPocsThrd.h"
 
-int MediaPocsThrdSendMediaMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, void * MediaMsgPt, size_t MediaMsgLenByt, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdOneMediaMsgPocs( MediaPocsThrd * MediaPocsThrdPt );
+extern "C" int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
 int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt );
 DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdInit
- * 功能说明：初始化媒体处理线程。
+ * 功能说明：媒体处理线程初始化。
  * 参数说明：MediaPocsThrdPtPt：[输出]，存放媒体处理线程的指针的指针，不能为NULL。
 			 UserDataPt：[输入]，存放用户数据的指针，可以为NULL。
 			 UserInitFuncPt：[输入]，存放用户定义的初始化函数的指针，不能为NULL。
@@ -104,11 +103,10 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 	}
 	
 	p_MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 1; //设置上一次调用了用户定义的销毁函数。
-	p_MediaPocsThrdPt->m_ReadyExitCnt = 1; //设置准备退出计数为1，当第一次处理调用用户定义的初始化函数消息时会递减。
 
-	if( p_MediaPocsThrdPt->m_MediaMsgCntnr.Init( 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( MsgQueueInit( &p_MediaPocsThrdPt->m_ThrdMsgQueuePt, NULL, p_MediaPocsThrdPt, ( MsgQueue::MsgQueueUserMsgPocsFuncPt )MediaPocsThrdThrdMsgPocs, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化媒体消息容器失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化线程消息队列失败。原因：" ) );
 		goto Out;
 	}
 
@@ -157,7 +155,7 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 
 	//初始化视频输出。
 	p_MediaPocsThrdPt->m_VdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输出的媒体处理线程的指针。
-	if( p_MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Init( sizeof( VdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( p_MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Init( sizeof( VdoOtpt::Strm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化视频输出流容器失败。原因：" ) );
 		goto Out;
@@ -202,7 +200,7 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * 函数名称：MediaPocsThrdDstoy
-* 功能说明：销毁媒体处理线程。
+* 功能说明：媒体处理线程销毁。
 * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
 * 返回说明：0：成功。
@@ -292,10 +290,10 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt = NULL;
 	}
 	
-	//销毁媒体消息容器。
-	if( MediaPocsThrdPt->m_MediaMsgCntnr.m_VQueuePt != NULL )
+	//销毁线程消息容器。
+	if( MediaPocsThrdPt->m_ThrdMsgQueuePt != NULL )
 	{
-		MediaPocsThrdPt->m_MediaMsgCntnr.Dstoy( NULL );
+		MsgQueueDstoy( MediaPocsThrdPt->m_ThrdMsgQueuePt, NULL );
 	}
 
 	//取消最小计时器分辨率。
@@ -721,92 +719,85 @@ int MediaPocsThrdDstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * Er
 	return p_Rslt;
 }
 
-typedef enum
+typedef enum ThrdMsgTyp
 {
-	MediaMsgTypSetAdoInpt,
-	MediaMsgTypAdoInptSetIsUseSystemAecNsAgc,
-	MediaMsgTypAdoInptSetUseNoAec,
-	MediaMsgTypAdoInptSetUseSpeexAec,
-	MediaMsgTypAdoInptSetUseWebRtcAecm,
-	MediaMsgTypAdoInptSetUseWebRtcAec,
-	MediaMsgTypAdoInptSetUseSpeexWebRtcAec,
-	MediaMsgTypAdoInptSetUseNoNs,
-	MediaMsgTypAdoInptSetUseSpeexPrpocsNs,
-	MediaMsgTypAdoInptSetUseWebRtcNsx,
-	MediaMsgTypAdoInptSetUseWebRtcNs,
-	MediaMsgTypAdoInptSetUseRNNoise,
-	MediaMsgTypAdoInptSetIsUseSpeexPrpocs,
-	MediaMsgTypAdoInptSetUsePcm,
-	MediaMsgTypAdoInptSetUseSpeexEncd,
-	MediaMsgTypAdoInptSetUseOpusEncd,
-	MediaMsgTypAdoInptSetIsSaveAdoToWaveFile,
-	MediaMsgTypAdoInptSetIsDrawAdoWavfmToWnd,
-	MediaMsgTypAdoInptSetUseDvc,
-	MediaMsgTypAdoInptSetIsMute,
+	ThrdMsgTypSetAdoInpt,
+	ThrdMsgTypAdoInptSetIsUseSystemAecNsAgc,
+	ThrdMsgTypAdoInptSetUseNoAec,
+	ThrdMsgTypAdoInptSetUseSpeexAec,
+	ThrdMsgTypAdoInptSetUseWebRtcAecm,
+	ThrdMsgTypAdoInptSetUseWebRtcAec,
+	ThrdMsgTypAdoInptSetUseSpeexWebRtcAec,
+	ThrdMsgTypAdoInptSetUseNoNs,
+	ThrdMsgTypAdoInptSetUseSpeexPrpocsNs,
+	ThrdMsgTypAdoInptSetUseWebRtcNsx,
+	ThrdMsgTypAdoInptSetUseWebRtcNs,
+	ThrdMsgTypAdoInptSetUseRNNoise,
+	ThrdMsgTypAdoInptSetIsUseSpeexPrpocs,
+	ThrdMsgTypAdoInptSetUsePcm,
+	ThrdMsgTypAdoInptSetUseSpeexEncd,
+	ThrdMsgTypAdoInptSetUseOpusEncd,
+	ThrdMsgTypAdoInptSetIsSaveAdoToWaveFile,
+	ThrdMsgTypAdoInptSetIsDrawAdoWavfmToWnd,
+	ThrdMsgTypAdoInptSetUseDvc,
+	ThrdMsgTypAdoInptSetIsMute,
 
-	MediaMsgTypSetAdoOtpt,
-	MediaMsgTypAdoOtptAddStrm,
-	MediaMsgTypAdoOtptDelStrm,
-	MediaMsgTypAdoOtptSetStrmUsePcm,
-	MediaMsgTypAdoOtptSetStrmUseSpeexDecd,
-	MediaMsgTypAdoOtptSetStrmUseOpusDecd,
-	MediaMsgTypAdoOtptSetStrmIsUse,
-	MediaMsgTypAdoOtptSetIsSaveAdoToWaveFile,
-	MediaMsgTypAdoOtptSetIsDrawAdoWavfmToWnd,
-	MediaMsgTypAdoOtptSetUseDvc,
-	MediaMsgTypAdoOtptSetIsMute,
+	ThrdMsgTypSetAdoOtpt,
+	ThrdMsgTypAdoOtptAddStrm,
+	ThrdMsgTypAdoOtptDelStrm,
+	ThrdMsgTypAdoOtptSetStrmUsePcm,
+	ThrdMsgTypAdoOtptSetStrmUseSpeexDecd,
+	ThrdMsgTypAdoOtptSetStrmUseOpusDecd,
+	ThrdMsgTypAdoOtptSetStrmIsUse,
+	ThrdMsgTypAdoOtptSetIsSaveAdoToWaveFile,
+	ThrdMsgTypAdoOtptSetIsDrawAdoWavfmToWnd,
+	ThrdMsgTypAdoOtptSetUseDvc,
+	ThrdMsgTypAdoOtptSetIsMute,
 
-	MediaMsgTypSetVdoInpt,
-	MediaMsgTypVdoInptSetUseYu12,
-	MediaMsgTypVdoInptSetUseOpenH264Encd,
-	MediaMsgTypVdoInptSetUseDvc,
-	MediaMsgTypVdoInptSetIsBlack,
+	ThrdMsgTypSetVdoInpt,
+	ThrdMsgTypVdoInptSetUseYu12,
+	ThrdMsgTypVdoInptSetUseOpenH264Encd,
+	ThrdMsgTypVdoInptSetUseDvc,
+	ThrdMsgTypVdoInptSetIsBlack,
 
-	MediaMsgTypVdoOtptAddStrm,
-	MediaMsgTypVdoOtptDelStrm,
-	MediaMsgTypVdoOtptSetStrm,
-	MediaMsgTypVdoOtptSetStrmUseYu12,
-	MediaMsgTypVdoOtptSetStrmUseOpenH264Decd,
-	MediaMsgTypVdoOtptSetStrmIsBlack,
-	MediaMsgTypVdoOtptSetStrmIsUse,
+	ThrdMsgTypVdoOtptAddStrm,
+	ThrdMsgTypVdoOtptDelStrm,
+	ThrdMsgTypVdoOtptSetStrm,
+	ThrdMsgTypVdoOtptSetStrmUseYu12,
+	ThrdMsgTypVdoOtptSetStrmUseOpenH264Decd,
+	ThrdMsgTypVdoOtptSetStrmIsBlack,
+	ThrdMsgTypVdoOtptSetStrmIsUse,
 
-	MediaMsgTypSetIsUseAdoVdoInptOtpt,
+	ThrdMsgTypSetIsUseAdoVdoInptOtpt,
 
-	MediaMsgTypSetIsUsePrvntSysSleep,
-	MediaMsgTypSetIsSaveAdoVdoInptOtptToAviFile,
-	MediaMsgTypSaveStsToTxtFile,
+	ThrdMsgTypSetIsUsePrvntSysSleep,
+	ThrdMsgTypSetIsSaveAdoVdoInptOtptToAviFile,
+	ThrdMsgTypSaveStsToTxtFile,
 
-	MediaMsgTypRqirExit,
+	ThrdMsgTypRqirExit,
 
-	MediaMsgTypUserInit,
-	MediaMsgTypUserDstoy,
-	MediaMsgTypUserMsg,
+	ThrdMsgTypUserInit,
+	ThrdMsgTypUserDstoy,
 
-	MediaMsgTypAdoVdoInptOtptInit,
-	MediaMsgTypAdoVdoInptOtptDstoy,
-} MediaMsgTyp;
+	ThrdMsgTypAdoVdoInptOtptInit,
+	ThrdMsgTypAdoVdoInptOtptDstoy,
+
+	ThrdMsgTypUserMsgMinVal = 100, //用户消息的最小值。
+} ThrdMsgTyp;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_SmplRate;
 	size_t m_FrmLenMsec;
-} MediaMsgSetAdoInpt;
+} ThrdMsgSetAdoInpt;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsUseSystemAecNsAgc;
-} MediaMsgAdoInptSetIsUseSystemAecNsAgc;
+} ThrdMsgAdoInptSetIsUseSystemAecNsAgc;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgAdoInptSetUseNoAec;
+} ThrdMsgAdoInptSetUseNoAec;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_FilterLenMsec;
 	int32_t m_IsUseRec;
 	float m_EchoMutp;
@@ -815,19 +806,15 @@ typedef struct
 	int32_t m_EchoSupesAct;
 	int32_t m_IsSaveMemFile;
 	Vstr * m_MemFileFullPathVstrPt;
-} MediaMsgAdoInptSetUseSpeexAec;
+} ThrdMsgAdoInptSetUseSpeexAec;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsUseCNGMode;
 	int32_t m_EchoMode;
 	int32_t m_Delay;
-} MediaMsgAdoInptSetUseWebRtcAecm;
+} ThrdMsgAdoInptSetUseWebRtcAecm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_EchoMode;
 	int32_t m_Delay;
 	int32_t m_IsUseDelayAgstcMode;
@@ -836,11 +823,9 @@ typedef struct
 	int32_t m_IsUseAdaptAdjDelay;
 	int32_t m_IsSaveMemFile;
 	Vstr * m_MemFileFullPathVstrPt;
-} MediaMsgAdoInptSetUseWebRtcAec;
+} ThrdMsgAdoInptSetUseWebRtcAec;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_WorkMode;
 	int32_t m_SpeexAecFilterLenMsec;
 	int32_t m_SpeexAecIsUseRec;
@@ -859,41 +844,29 @@ typedef struct
 	int32_t m_WebRtcAecIsUseAdaptAdjDelay;
 	int32_t m_IsUseSameRoomAec;
 	int32_t m_SameRoomEchoMinDelay;
-} MediaMsgAdoInptSetUseSpeexWebRtcAec;
+} ThrdMsgAdoInptSetUseSpeexWebRtcAec;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgAdoInptSetUseNoNs;
+} ThrdMsgAdoInptSetUseNoNs;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsUseNs;
 	int32_t m_NoiseSupes;
 	int32_t m_IsUseDereverb;
-} MediaMsgAdoInptSetUseSpeexPrpocsNs;
+} ThrdMsgAdoInptSetUseSpeexPrpocsNs;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_PolicyMode;
-} MediaMsgAdoInptSetUseWebRtcNsx;
+} ThrdMsgAdoInptSetUseWebRtcNsx;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_PolicyMode;
-} MediaMsgAdoInptSetUseWebRtcNs;
+} ThrdMsgAdoInptSetUseWebRtcNs;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgAdoInptSetUseRNNoise;
+} ThrdMsgAdoInptSetUseRNNoise;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsUseSpeexPrpocs;
 	int32_t m_IsUseVad;
 	int32_t m_VadProbStart;
@@ -903,375 +876,201 @@ typedef struct
 	int32_t m_AgcIncrement;
 	int32_t m_AgcDecrement;
 	int32_t m_AgcMaxGain;
-} MediaMsgAdoInptSetIsUseSpeexPrpocs;
+} ThrdMsgAdoInptSetIsUseSpeexPrpocs;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgAdoInptSetUsePcm;
+} ThrdMsgAdoInptSetUsePcm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_UseCbrOrVbr;
 	int32_t m_Qualt;
 	int32_t m_Cmplxt;
 	int32_t m_PlcExptLossRate;
-} MediaMsgAdoInptSetUseSpeexEncd;
+} ThrdMsgAdoInptSetUseSpeexEncd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgAdoInptSetUseOpusEncd;
+} ThrdMsgAdoInptSetUseOpusEncd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsSave;
 	Vstr * m_SrcFullPathVstrPt;
 	Vstr * m_RsltFullPathVstrPt;
 	size_t m_WrBufSzByt;
-} MediaMsgAdoInptSetIsSaveAdoToWaveFile;
+} ThrdMsgAdoInptSetIsSaveAdoToWaveFile;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsDraw;
 	HWND m_SrcWndHdl;
 	HWND m_RsltWndHdl;
-} MediaMsgAdoInptSetIsDrawAdoWavfmToWnd;
+} ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	UINT m_ID;
-} MediaMsgAdoInptSetUseDvc;
+} ThrdMsgAdoInptSetUseDvc;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsMute;
-} MediaMsgAdoInptSetIsMute;
+} ThrdMsgAdoInptSetIsMute;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_SmplRate;
 	size_t m_FrmLenMsec;
-} MediaMsgSetAdoOtpt;
+} ThrdMsgSetAdoOtpt;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
-} MediaMsgAdoOtptAddStrm;
+} ThrdMsgAdoOtptAddStrm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
-} MediaMsgAdoOtptDelStrm;
+} ThrdMsgAdoOtptDelStrm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
-} MediaMsgAdoOtptSetStrmUsePcm;
+} ThrdMsgAdoOtptSetStrmUsePcm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
 	int32_t m_IsUsePrcplEnhsmt;
-} MediaMsgAdoOtptSetStrmUseSpeexDecd;
+} ThrdMsgAdoOtptSetStrmUseSpeexDecd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
-} MediaMsgAdoOtptSetStrmUseOpusDecd;
+} ThrdMsgAdoOtptSetStrmUseOpusDecd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
 	int32_t m_IsUse;
-} MediaMsgAdoOtptSetStrmIsUse;
+} ThrdMsgAdoOtptSetStrmIsUse;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsSave;
 	Vstr * m_SrcFullPathVstrPt;
 	size_t m_WrBufSzByt;
-} MediaMsgAdoOtptSetIsSaveAdoToWaveFile;
+} ThrdMsgAdoOtptSetIsSaveAdoToWaveFile;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsDraw;
 	HWND m_SrcWndHdl;
-} MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd;
+} ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	UINT m_ID;
-} MediaMsgAdoOtptSetUseDvc;
+} ThrdMsgAdoOtptSetUseDvc;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsMute;
-} MediaMsgAdoOtptSetIsMute;
+} ThrdMsgAdoOtptSetIsMute;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_MaxSmplRate;
 	int32_t m_FrmWidth;
 	int32_t m_FrmHeight;
 	HWND m_PrvwWndHdl;
-} MediaMsgSetVdoInpt;
+} ThrdMsgSetVdoInpt;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgSetVdoInptUseYu12;
+} ThrdMsgSetVdoInptUseYu12;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_VdoType;
 	int32_t m_EncdBitrate;
 	int32_t m_BitrateCtrlMode;
 	int32_t m_IDRFrmIntvl;
 	int32_t m_Cmplxt;
-} MediaMsgSetVdoInptUseOpenH264Encd;
+} ThrdMsgSetVdoInptUseOpenH264Encd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	UINT m_ID;
-} MediaMsgSetVdoInptUseDvc;
+} ThrdMsgSetVdoInptUseDvc;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsBlack;
-} MediaMsgSetVdoInptIsBlack;
+} ThrdMsgSetVdoInptIsBlack;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
-} MediaMsgAddVdoOtptStrm;
+} ThrdMsgAddVdoOtptStrm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
-} MediaMsgDelVdoOtptStrm;
+} ThrdMsgDelVdoOtptStrm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
 	HWND m_DspyWndHdl;
-} MediaMsgSetVdoOtptStrm;
+} ThrdMsgSetVdoOtptStrm;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
-} MediaMsgSetVdoOtptStrmUseYu12;
+} ThrdMsgSetVdoOtptStrmUseYu12;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
 	int32_t m_DecdThrdNum;
-} MediaMsgSetVdoOtptStrmUseOpenH264Decd;
+} ThrdMsgSetVdoOtptStrmUseOpenH264Decd;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
 	int32_t m_IsBlack;
-} MediaMsgSetVdoOtptStrmIsBlack;
+} ThrdMsgSetVdoOtptStrmIsBlack;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_StrmIdx;
 	int32_t m_IsUse;
-} MediaMsgSetVdoOtptStrmIsUse;
+} ThrdMsgSetVdoOtptStrmIsUse;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsUsePrvntSysSleep;
-} MediaMsgSetIsUsePrvntSysSleep;
+} ThrdMsgSetIsUsePrvntSysSleep;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	Vstr * m_FullPathVstrPt;
 	size_t m_WrBufSzByt;
 	int32_t m_IsSaveAdoInpt;
 	int32_t m_IsSaveAdoOtpt;
 	int32_t m_IsSaveVdoInpt;
 	int32_t m_IsSaveVdoOtpt;
-} MediaMsgSetIsSaveAdoVdoInptOtptToAviFile;
+} ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	Vstr * m_FullPathVstrPt;
-} MediaMsgSaveStsToTxtFile;
+} ThrdMsgSaveStsToTxtFile;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_IsUseAdoInpt;
 	int32_t m_IsUseAdoOtpt;
 	int32_t m_IsUseVdoInpt;
 	int32_t m_IsUseVdoOtpt;
-} MediaMsgSetIsUseAdoVdoInptOtpt;
+} ThrdMsgSetIsUseAdoVdoInptOtpt;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	int32_t m_ExitFlag;
-	int32_t m_IsBlockWait;
-} MediaMsgRqirExit;
+} ThrdMsgRqirExit;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgUserInit;
+} ThrdMsgUserInit;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgUserDstoy;
+} ThrdMsgUserDstoy;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
 	uint8_t m_UserMsgArr[];
-} MediaMsgUserMsg;
+} ThrdMsgUserMsg;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgAdoVdoInptOtptInit;
+} ThrdMsgAdoVdoInptOtptInit;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-} MediaMsgAdoVdoInptOtptDstoy;
+} ThrdMsgAdoVdoInptOtptDstoy;
 typedef struct
 {
-	int * m_MediaMsgRsltPt;
-	MediaMsgTyp m_MediaMsgTyp;
-	uint8_t m_MsgArgArr[ sizeof( MediaMsgAdoInptSetUseSpeexWebRtcAec ) ];
-} MediaMsg;
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：MediaPocsThrdSendMediaMsg
- * 功能说明：媒体处理线程发送媒体消息。
- * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
-			 MediaMsgPt：[输入]，存放媒体消息的指针，不能为NULL。
-			 MediaMsgLenByt：[输入]，存放媒体消息的长度，单位为字节。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
- * 返回说明：0：成功。
-			 非0：失败。
- * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-int MediaPocsThrdSendMediaMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, void * MediaMsgPt, size_t MediaMsgLenByt, Vstr * ErrInfoVstrPt )
-{
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	int p_MediaMsgRslt;
-
-	//判断各个变量是否正确。
-	if( MediaPocsThrdPt == NULL )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ), , );
-		goto Out;
-	}
-	if( MediaMsgLenByt > sizeof( MediaMsg ) )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体消息的长度不正确。" ), , );
-		goto Out;
-	}
-
-	if( IsBlockWait != 0 ) //如果要阻塞等待。
-	{
-		p_MediaMsgRslt = 999;
-		( ( MediaMsg * )MediaMsgPt )->m_MediaMsgRsltPt = &p_MediaMsgRslt;
-	}
-	else
-	{
-		( ( MediaMsg * )MediaMsgPt )->m_MediaMsgRsltPt = NULL;
-	}
-	if( AddFirstOrLast == 0 )
-	{
-		if( MediaPocsThrdPt->m_MediaMsgCntnr.PutHead( MediaMsgPt, MediaMsgLenByt, NULL, 1, ErrInfoVstrPt ) != 0 )
-		{
-			VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
-			goto Out;
-		}
-	}
-	else
-	{
-		if( MediaPocsThrdPt->m_MediaMsgCntnr.PutTail( MediaMsgPt, MediaMsgLenByt, NULL, 1, ErrInfoVstrPt ) != 0 )
-		{
-			VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "放入媒体消息到媒体消息容器失败。原因：" ) );
-			goto Out;
-		}
-	}
-
-    if( IsBlockWait != 0 ) //如果要阻塞等待。
-    {
-		HANDLE p_MediaPocsThrdHdl;
-		DWORD p_MediaPocsThrdId;
-		DWORD p_MediaPocsThrdExitCode;
-
-		ThrdGetHdl( MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt, &p_MediaPocsThrdHdl, NULL ); //设置媒体处理线程的句柄。
-		ThrdGetId( MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt, &p_MediaPocsThrdId, NULL ); //设置媒体处理线程的标识。
-        if( ThrdGetCurId() != p_MediaPocsThrdId ) //如果发送媒体消息线程不是媒体处理线程。
-        {
-            do
-            {
-                FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
-				GetExitCodeThread( p_MediaPocsThrdHdl, &p_MediaPocsThrdExitCode ); //设置媒体处理线程的退出码。
-            } while( ( p_MediaPocsThrdExitCode == STILL_ACTIVE ) && ( p_MediaMsgRslt == 999 ) );
-        }
-        else //如果发送媒体消息线程是媒体处理线程。
-        {
-            do
-            {
-				MediaPocsThrdOneMediaMsgPocs( MediaPocsThrdPt );
-            } while( p_MediaMsgRslt == 999 );
-        }
-        p_Rslt = p_MediaMsgRslt; //返回媒体消息处理结果。
-    }
-    else //如果不阻塞等待。
-    {
-        p_Rslt = 0; //返回媒体消息处理结果为成功。因为要让设置函数返回成功。
-    }
-
-	Out:
-	return p_Rslt;
-}
+	uint8_t m_MsgArgArr[ sizeof( ThrdMsgAdoInptSetUseSpeexWebRtcAec ) ];
+} ThrdMsg;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetAdoInpt
- * 功能说明：媒体处理线程设置音频输入。
+ * 功能说明：媒体处理线程的设置音频输入。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              SmplRate：[输入]，存放采样频率，单位为赫兹，取值只能为8000、16000、32000、48000。
@@ -1286,7 +1085,7 @@ int MediaPocsThrdSendMediaMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait,
 int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetAdoInpt p_MediaMsgSetAdoInpt;
+	ThrdMsgSetAdoInpt p_ThrdMsgSetAdoInpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1305,12 +1104,11 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 		goto Out;
 	}
 
-	p_MediaMsgSetAdoInpt.m_MediaMsgTyp = MediaMsgTypSetAdoInpt;
-	p_MediaMsgSetAdoInpt.m_SmplRate = SmplRate;
-	p_MediaMsgSetAdoInpt.m_FrmLenMsec = FrmLenMsec;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetAdoInpt, sizeof( p_MediaMsgSetAdoInpt ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetAdoInpt.m_SmplRate = SmplRate;
+	p_ThrdMsgSetAdoInpt.m_FrmLenMsec = FrmLenMsec;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetAdoInpt, &p_ThrdMsgSetAdoInpt, sizeof( p_ThrdMsgSetAdoInpt ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1326,7 +1124,7 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc
- * 功能说明：媒体处理线程音频输入设置是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+ * 功能说明：媒体处理线程的音频输入设置是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsUseSystemAecNsAgc：[输入]，存放是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
@@ -1340,7 +1138,7 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseSystemAecNsAgc, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetIsUseSystemAecNsAgc p_MediaMsgAdoInptSetIsUseSystemAecNsAgc;
+	ThrdMsgAdoInptSetIsUseSystemAecNsAgc p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1349,11 +1147,10 @@ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt,
 		goto Out;
 	}
 
-	p_MediaMsgAdoInptSetIsUseSystemAecNsAgc.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsUseSystemAecNsAgc;
-	p_MediaMsgAdoInptSetIsUseSystemAecNsAgc.m_IsUseSystemAecNsAgc = IsUseSystemAecNsAgc;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetIsUseSystemAecNsAgc, sizeof( p_MediaMsgAdoInptSetIsUseSystemAecNsAgc ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc.m_IsUseSystemAecNsAgc = IsUseSystemAecNsAgc;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetIsUseSystemAecNsAgc, &p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc, sizeof( p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1369,7 +1166,7 @@ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseNoAec
- * 功能说明：媒体处理线程音频输入设置不使用声学回音消除器。
+ * 功能说明：媒体处理线程的音频输入设置不使用声学回音消除器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -1382,7 +1179,7 @@ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt,
 int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseNoAec p_MediaMsgAdoInptSetUseNoAec;
+	ThrdMsgAdoInptSetUseNoAec p_ThrdMsgAdoInptSetUseNoAec;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1391,10 +1188,9 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBloc
 		goto Out;
 	}
 
-	p_MediaMsgAdoInptSetUseNoAec.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseNoAec;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseNoAec, sizeof( p_MediaMsgAdoInptSetUseNoAec ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseNoAec, NULL, 0, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1410,7 +1206,7 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBloc
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexAec
- * 功能说明：媒体处理线程音频输入设置要使用Speex声学回音消除器。
+ * 功能说明：媒体处理线程的音频输入设置要使用Speex声学回音消除器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 FilterLenMsec：[输入]，存放滤波器的长度，单位为毫秒。
@@ -1431,8 +1227,8 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBloc
 int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, int32_t IsSaveMemFile, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseSpeexAec p_MediaMsgAdoInptSetUseSpeexAec;
-	p_MediaMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt = NULL;
+	ThrdMsgAdoInptSetUseSpeexAec p_ThrdMsgAdoInptSetUseSpeexAec;
+	p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1446,25 +1242,24 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsB
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseSpeexAec.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseSpeexAec;
-	p_MediaMsgAdoInptSetUseSpeexAec.m_FilterLenMsec = FilterLenMsec;
-	p_MediaMsgAdoInptSetUseSpeexAec.m_IsUseRec = IsUseRec;
-    p_MediaMsgAdoInptSetUseSpeexAec.m_EchoMutp = EchoMutp;
-    p_MediaMsgAdoInptSetUseSpeexAec.m_EchoCntu = EchoCntu;
-    p_MediaMsgAdoInptSetUseSpeexAec.m_EchoSupes = EchoSupes;
-    p_MediaMsgAdoInptSetUseSpeexAec.m_EchoSupesAct = EchoSupesAct;
-	p_MediaMsgAdoInptSetUseSpeexAec.m_IsSaveMemFile = IsSaveMemFile;
+	p_ThrdMsgAdoInptSetUseSpeexAec.m_FilterLenMsec = FilterLenMsec;
+	p_ThrdMsgAdoInptSetUseSpeexAec.m_IsUseRec = IsUseRec;
+    p_ThrdMsgAdoInptSetUseSpeexAec.m_EchoMutp = EchoMutp;
+    p_ThrdMsgAdoInptSetUseSpeexAec.m_EchoCntu = EchoCntu;
+    p_ThrdMsgAdoInptSetUseSpeexAec.m_EchoSupes = EchoSupes;
+    p_ThrdMsgAdoInptSetUseSpeexAec.m_EchoSupesAct = EchoSupesAct;
+	p_ThrdMsgAdoInptSetUseSpeexAec.m_IsSaveMemFile = IsSaveMemFile;
 	if( IsSaveMemFile != 0 )
 	{
-		if( VstrInit( &p_MediaMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt, Utf8, , MemFileFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt, Utf8, , MemFileFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置内存块文件完整路径动态字符串失败。" ), , );
 			goto Out;
 		}
 	}
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseSpeexAec, sizeof( p_MediaMsgAdoInptSetUseSpeexAec ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseSpeexAec, &p_ThrdMsgAdoInptSetUseSpeexAec, sizeof( p_ThrdMsgAdoInptSetUseSpeexAec ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1473,14 +1268,14 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsB
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt );
+		if( p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt );
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcAecm
- * 功能说明：媒体处理线程音频输入设置要使用WebRtc定点版声学回音消除器。
+ * 功能说明：媒体处理线程的音频输入设置要使用WebRtc定点版声学回音消除器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsUseCNGMode：[输入]，存放是否使用舒适噪音生成模式，为非0表示要使用，为0表示不使用。
@@ -1496,7 +1291,7 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsB
 int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseCNGMode, int32_t EchoMode, int32_t Delay, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseWebRtcAecm p_MediaMsgAdoInptSetUseWebRtcAecm;
+	ThrdMsgAdoInptSetUseWebRtcAecm p_ThrdMsgAdoInptSetUseWebRtcAecm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1505,13 +1300,12 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int I
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseWebRtcAecm.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseWebRtcAecm;
-	p_MediaMsgAdoInptSetUseWebRtcAecm.m_IsUseCNGMode = IsUseCNGMode;
-	p_MediaMsgAdoInptSetUseWebRtcAecm.m_EchoMode = EchoMode;
-	p_MediaMsgAdoInptSetUseWebRtcAecm.m_Delay = Delay;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseWebRtcAecm, sizeof( p_MediaMsgAdoInptSetUseWebRtcAecm ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetUseWebRtcAecm.m_IsUseCNGMode = IsUseCNGMode;
+	p_ThrdMsgAdoInptSetUseWebRtcAecm.m_EchoMode = EchoMode;
+	p_ThrdMsgAdoInptSetUseWebRtcAecm.m_Delay = Delay;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseWebRtcAecm, &p_ThrdMsgAdoInptSetUseWebRtcAecm, sizeof( p_ThrdMsgAdoInptSetUseWebRtcAecm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 	
@@ -1527,7 +1321,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int I
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcAec
- * 功能说明：媒体处理线程音频输入设置要使用WebRtc浮点版声学回音消除器。
+ * 功能说明：媒体处理线程的音频输入设置要使用WebRtc浮点版声学回音消除器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 EchoMode：[输入]，存放消除模式，消除模式越高消除越强，取值区间为[0,2]。
@@ -1548,8 +1342,8 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int I
 int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, int32_t IsSaveMemFile, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseWebRtcAec p_MediaMsgAdoInptSetUseWebRtcAec;
-	p_MediaMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt = NULL;
+	ThrdMsgAdoInptSetUseWebRtcAec p_ThrdMsgAdoInptSetUseWebRtcAec;
+	p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1563,25 +1357,24 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseWebRtcAec.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseWebRtcAec;
-	p_MediaMsgAdoInptSetUseWebRtcAec.m_EchoMode = EchoMode;
-    p_MediaMsgAdoInptSetUseWebRtcAec.m_Delay = Delay;
-    p_MediaMsgAdoInptSetUseWebRtcAec.m_IsUseDelayAgstcMode = IsUseDelayAgstcMode;
-    p_MediaMsgAdoInptSetUseWebRtcAec.m_IsUseExtdFilterMode = IsUseExtdFilterMode;
-    p_MediaMsgAdoInptSetUseWebRtcAec.m_IsUseRefinedFilterAdaptAecMode = IsUseRefinedFilterAdaptAecMode;
-    p_MediaMsgAdoInptSetUseWebRtcAec.m_IsUseAdaptAdjDelay = IsUseAdaptAdjDelay;
-	p_MediaMsgAdoInptSetUseWebRtcAec.m_IsSaveMemFile = IsSaveMemFile;
+	p_ThrdMsgAdoInptSetUseWebRtcAec.m_EchoMode = EchoMode;
+    p_ThrdMsgAdoInptSetUseWebRtcAec.m_Delay = Delay;
+    p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsUseDelayAgstcMode = IsUseDelayAgstcMode;
+    p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsUseExtdFilterMode = IsUseExtdFilterMode;
+    p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsUseRefinedFilterAdaptAecMode = IsUseRefinedFilterAdaptAecMode;
+    p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsUseAdaptAdjDelay = IsUseAdaptAdjDelay;
+	p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsSaveMemFile = IsSaveMemFile;
 	if( IsSaveMemFile != 0 )
 	{
-		if( VstrInit( &p_MediaMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt, Utf8, , MemFileFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt, Utf8, , MemFileFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置内存块文件完整路径动态字符串失败。" ), , );
 			goto Out;
 		}
 	}
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseWebRtcAec, sizeof( p_MediaMsgAdoInptSetUseWebRtcAec ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseWebRtcAec, &p_ThrdMsgAdoInptSetUseWebRtcAec, sizeof( p_ThrdMsgAdoInptSetUseWebRtcAec ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1590,14 +1383,14 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt );
+		if( p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt );
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexWebRtcAec
- * 功能说明：媒体处理线程音频输入设置要使用SpeexWebRtc三重声学回音消除器。
+ * 功能说明：媒体处理线程的音频输入设置要使用SpeexWebRtc三重声学回音消除器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 WorkMode：[输入]，存放工作模式，为1表示Speex声学回音消除器+WebRtc定点版声学回音消除器，为2表示WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器，为3表示Speex声学回音消除器+WebRtc定点版声学回音消除器+WebRtc浮点版声学回音消除器。
@@ -1628,7 +1421,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
 int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t WorkMode, int32_t SpeexAecFilterLenMsec, int32_t SpeexAecIsUseRec, float SpeexAecEchoMutp, float SpeexAecEchoCntu, int32_t SpeexAecEchoSupes, int32_t SpeexAecEchoSupesAct, int32_t WebRtcAecmIsUseCNGMode, int32_t WebRtcAecmEchoMode, int32_t WebRtcAecmDelay, int32_t WebRtcAecEchoMode, int32_t WebRtcAecDelay, int32_t WebRtcAecIsUseDelayAgstcMode, int32_t WebRtcAecIsUseExtdFilterMode, int32_t WebRtcAecIsUseRefinedFilterAdaptAecMode, int32_t WebRtcAecIsUseAdaptAdjDelay, int32_t IsUseSameRoomAec, int32_t SameRoomEchoMinDelay, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseSpeexWebRtcAec p_MediaMsgAdoInptSetUseSpeexWebRtcAec;
+	ThrdMsgAdoInptSetUseSpeexWebRtcAec p_ThrdMsgAdoInptSetUseSpeexWebRtcAec;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1637,28 +1430,27 @@ int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, i
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseSpeexWebRtcAec;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WorkMode = WorkMode;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecFilterLenMsec = SpeexAecFilterLenMsec;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecIsUseRec = SpeexAecIsUseRec;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoMutp = SpeexAecEchoMutp;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoCntu = SpeexAecEchoCntu;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoSupes = SpeexAecEchoSupes;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoSupesAct = SpeexAecEchoSupesAct;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode = WebRtcAecmIsUseCNGMode;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecmEchoMode = WebRtcAecmEchoMode;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecmDelay = WebRtcAecmDelay;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecEchoMode = WebRtcAecEchoMode;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecDelay = WebRtcAecDelay;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode = WebRtcAecIsUseDelayAgstcMode;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode = WebRtcAecIsUseExtdFilterMode;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode = WebRtcAecIsUseRefinedFilterAdaptAecMode;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay = WebRtcAecIsUseAdaptAdjDelay;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_IsUseSameRoomAec = IsUseSameRoomAec;
-	p_MediaMsgAdoInptSetUseSpeexWebRtcAec.m_SameRoomEchoMinDelay = SameRoomEchoMinDelay;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseSpeexWebRtcAec, sizeof( p_MediaMsgAdoInptSetUseSpeexWebRtcAec ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WorkMode = WorkMode;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecFilterLenMsec = SpeexAecFilterLenMsec;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecIsUseRec = SpeexAecIsUseRec;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoMutp = SpeexAecEchoMutp;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoCntu = SpeexAecEchoCntu;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoSupes = SpeexAecEchoSupes;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SpeexAecEchoSupesAct = SpeexAecEchoSupesAct;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode = WebRtcAecmIsUseCNGMode;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecmEchoMode = WebRtcAecmEchoMode;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecmDelay = WebRtcAecmDelay;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecEchoMode = WebRtcAecEchoMode;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecDelay = WebRtcAecDelay;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode = WebRtcAecIsUseDelayAgstcMode;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode = WebRtcAecIsUseExtdFilterMode;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode = WebRtcAecIsUseRefinedFilterAdaptAecMode;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay = WebRtcAecIsUseAdaptAdjDelay;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_IsUseSameRoomAec = IsUseSameRoomAec;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SameRoomEchoMinDelay = SameRoomEchoMinDelay;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseSpeexWebRtcAec, &p_ThrdMsgAdoInptSetUseSpeexWebRtcAec, sizeof( p_ThrdMsgAdoInptSetUseSpeexWebRtcAec ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1674,7 +1466,7 @@ int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, i
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseNoNs
- * 功能说明：媒体处理线程音频输入设置不使用噪音抑制器。
+ * 功能说明：媒体处理线程的音频输入设置不使用噪音抑制器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -1687,7 +1479,7 @@ int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, i
 int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseNoNs p_MediaMsgAdoInptSetUseNoNs;
+	ThrdMsgAdoInptSetUseNoNs p_ThrdMsgAdoInptSetUseNoNs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1696,10 +1488,9 @@ int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 		goto Out;
 	}
 
-	p_MediaMsgAdoInptSetUseNoNs.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseNoNs;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseNoNs, sizeof( p_MediaMsgAdoInptSetUseNoNs ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseNoNs, &p_ThrdMsgAdoInptSetUseNoNs, sizeof( p_ThrdMsgAdoInptSetUseNoNs ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1715,7 +1506,7 @@ int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexPrpocsNs
- * 功能说明：媒体处理线程音频输入设置要使用Speex预处理器的噪音抑制。
+ * 功能说明：媒体处理线程的音频输入设置要使用Speex预处理器的噪音抑制。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsUseNs：[输入]，存放是否使用噪音抑制，为非0表示要使用，为0表示不使用。
@@ -1731,7 +1522,7 @@ int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseSpeexPrpocsNs p_MediaMsgAdoInptSetUseSpeexPrpocsNs;
+	ThrdMsgAdoInptSetUseSpeexPrpocsNs p_ThrdMsgAdoInptSetUseSpeexPrpocsNs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1740,13 +1531,12 @@ int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, in
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseSpeexPrpocsNs.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseSpeexPrpocsNs;
-	p_MediaMsgAdoInptSetUseSpeexPrpocsNs.m_IsUseNs = IsUseNs;
-	p_MediaMsgAdoInptSetUseSpeexPrpocsNs.m_NoiseSupes = NoiseSupes;
-    p_MediaMsgAdoInptSetUseSpeexPrpocsNs.m_IsUseDereverb = IsUseDereverb;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseSpeexPrpocsNs, sizeof( p_MediaMsgAdoInptSetUseSpeexPrpocsNs ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetUseSpeexPrpocsNs.m_IsUseNs = IsUseNs;
+	p_ThrdMsgAdoInptSetUseSpeexPrpocsNs.m_NoiseSupes = NoiseSupes;
+    p_ThrdMsgAdoInptSetUseSpeexPrpocsNs.m_IsUseDereverb = IsUseDereverb;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseSpeexPrpocsNs, &p_ThrdMsgAdoInptSetUseSpeexPrpocsNs, sizeof( p_ThrdMsgAdoInptSetUseSpeexPrpocsNs ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1762,7 +1552,7 @@ int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, in
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcNsx
- * 功能说明：媒体处理线程音频输入设置要使用WebRtc定点版噪音抑制器。
+ * 功能说明：媒体处理线程的音频输入设置要使用WebRtc定点版噪音抑制器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              PolicyMode：[输入]，存放策略模式，策略模式越高抑制越强，取值区间为[0,3]。
@@ -1776,7 +1566,7 @@ int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, in
 int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t PolicyMode, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseWebRtcNsx p_MediaMsgAdoInptSetUseWebRtcNsx;
+	ThrdMsgAdoInptSetUseWebRtcNsx p_ThrdMsgAdoInptSetUseWebRtcNsx;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1785,11 +1575,10 @@ int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int Is
 		goto Out;
 	}
 
-	p_MediaMsgAdoInptSetUseWebRtcNsx.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseWebRtcNsx;
-	p_MediaMsgAdoInptSetUseWebRtcNsx.m_PolicyMode = PolicyMode;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseWebRtcNsx, sizeof( p_MediaMsgAdoInptSetUseWebRtcNsx ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetUseWebRtcNsx.m_PolicyMode = PolicyMode;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseWebRtcNsx, &p_ThrdMsgAdoInptSetUseWebRtcNsx, sizeof( p_ThrdMsgAdoInptSetUseWebRtcNsx ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1805,7 +1594,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcNs
- * 功能说明：媒体处理线程音频输入设置要使用WebRtc浮点版噪音抑制器。
+ * 功能说明：媒体处理线程的音频输入设置要使用WebRtc浮点版噪音抑制器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              PolicyMode：[输入]，存放策略模式，策略模式越高抑制越强，取值区间为[0,3]。
@@ -1819,7 +1608,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int Is
 int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t PolicyMode, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseWebRtcNs p_MediaMsgAdoInptSetUseWebRtcNs;
+	ThrdMsgAdoInptSetUseWebRtcNs p_ThrdMsgAdoInptSetUseWebRtcNs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1828,11 +1617,10 @@ int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int IsB
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseWebRtcNs.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseWebRtcNs;
-	p_MediaMsgAdoInptSetUseWebRtcNs.m_PolicyMode = PolicyMode;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseWebRtcNs, sizeof( p_MediaMsgAdoInptSetUseWebRtcNs ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetUseWebRtcNs.m_PolicyMode = PolicyMode;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseWebRtcNs, &p_ThrdMsgAdoInptSetUseWebRtcNs, sizeof( p_ThrdMsgAdoInptSetUseWebRtcNs ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1848,7 +1636,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseRNNoise
- * 功能说明：媒体处理线程音频输入设置要使用RNNoise噪音抑制器。
+ * 功能说明：媒体处理线程的音频输入设置要使用RNNoise噪音抑制器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -1861,7 +1649,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int IsB
 int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseRNNoise p_MediaMsgAdoInptSetUseRNNoise;
+	ThrdMsgAdoInptSetUseRNNoise p_ThrdMsgAdoInptSetUseRNNoise;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1870,10 +1658,9 @@ int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseRNNoise.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseRNNoise;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseRNNoise, sizeof( p_MediaMsgAdoInptSetUseRNNoise ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseRNNoise, &p_ThrdMsgAdoInptSetUseRNNoise, sizeof( p_ThrdMsgAdoInptSetUseRNNoise ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1889,7 +1676,7 @@ int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsUseSpeexPrpocs
- * 功能说明：媒体处理线程音频输入设置是否使用Speex预处理器。
+ * 功能说明：媒体处理线程的音频输入设置设置是否使用Speex预处理器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              IsUseSpeexPrpocs：[输入]，存放是否使用Speex预处理器，为非0表示要使用，为0表示不使用。
@@ -1911,7 +1698,7 @@ int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseSpeexPrpocs, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCntu, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetIsUseSpeexPrpocs p_MediaMsgAdoInptSetIsUseSpeexPrpocs;
+	ThrdMsgAdoInptSetIsUseSpeexPrpocs p_ThrdMsgAdoInptSetIsUseSpeexPrpocs;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1920,19 +1707,18 @@ int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, in
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsUseSpeexPrpocs;
-	p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_IsUseSpeexPrpocs = IsUseSpeexPrpocs;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_IsUseVad = IsUseVad;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_VadProbStart = VadProbStart;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_VadProbCntu = VadProbCntu;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_IsUseAgc = IsUseAgc;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_AgcLevel = AgcLevel;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_AgcIncrement = AgcIncrement;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_AgcDecrement = AgcDecrement;
-    p_MediaMsgAdoInptSetIsUseSpeexPrpocs.m_AgcMaxGain = AgcMaxGain;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetIsUseSpeexPrpocs, sizeof( p_MediaMsgAdoInptSetIsUseSpeexPrpocs ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_IsUseSpeexPrpocs = IsUseSpeexPrpocs;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_IsUseVad = IsUseVad;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_VadProbStart = VadProbStart;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_VadProbCntu = VadProbCntu;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_IsUseAgc = IsUseAgc;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_AgcLevel = AgcLevel;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_AgcIncrement = AgcIncrement;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_AgcDecrement = AgcDecrement;
+    p_ThrdMsgAdoInptSetIsUseSpeexPrpocs.m_AgcMaxGain = AgcMaxGain;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetIsUseSpeexPrpocs, &p_ThrdMsgAdoInptSetIsUseSpeexPrpocs, sizeof( p_ThrdMsgAdoInptSetIsUseSpeexPrpocs ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1948,7 +1734,7 @@ int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, in
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUsePcm
- * 功能说明：媒体处理线程音频输入设置要使用PCM原始数据。
+ * 功能说明：媒体处理线程的音频输入设置设置要使用Pcm原始数据。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -1961,7 +1747,7 @@ int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, in
 int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUsePcm p_MediaMsgAdoInptSetUsePcm;
+	ThrdMsgAdoInptSetUsePcm p_ThrdMsgAdoInptSetUsePcm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -1970,10 +1756,9 @@ int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUsePcm.m_MediaMsgTyp = MediaMsgTypAdoInptSetUsePcm;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUsePcm, sizeof( p_MediaMsgAdoInptSetUsePcm ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUsePcm, &p_ThrdMsgAdoInptSetUsePcm, sizeof( p_ThrdMsgAdoInptSetUsePcm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -1989,7 +1774,7 @@ int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseSpeexEncd
- * 功能说明：媒体处理线程音频输入设置要使用Speex编码器。
+ * 功能说明：媒体处理线程的音频输入设置设置要使用Speex编码器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              UseCbrOrVbr：[输入]，存放使用固定比特率还是动态比特率进行编码，为0表示要使用固定比特率，为非0表示要使用动态比特率。
@@ -2006,7 +1791,7 @@ int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t UseCbrOrVbr, int32_t Qualt, int32_t Cmplxt, int32_t PlcExptLossRate, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseSpeexEncd p_MediaMsgAdoInptSetUseSpeexEncd;
+	ThrdMsgAdoInptSetUseSpeexEncd p_ThrdMsgAdoInptSetUseSpeexEncd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2015,14 +1800,13 @@ int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int Is
 		goto Out;
 	}
 
-	p_MediaMsgAdoInptSetUseSpeexEncd.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseSpeexEncd;
-	p_MediaMsgAdoInptSetUseSpeexEncd.m_UseCbrOrVbr = UseCbrOrVbr;
-    p_MediaMsgAdoInptSetUseSpeexEncd.m_Qualt = Qualt;
-    p_MediaMsgAdoInptSetUseSpeexEncd.m_Cmplxt = Cmplxt;
-    p_MediaMsgAdoInptSetUseSpeexEncd.m_PlcExptLossRate = PlcExptLossRate;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseSpeexEncd, sizeof( p_MediaMsgAdoInptSetUseSpeexEncd ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetUseSpeexEncd.m_UseCbrOrVbr = UseCbrOrVbr;
+    p_ThrdMsgAdoInptSetUseSpeexEncd.m_Qualt = Qualt;
+    p_ThrdMsgAdoInptSetUseSpeexEncd.m_Cmplxt = Cmplxt;
+    p_ThrdMsgAdoInptSetUseSpeexEncd.m_PlcExptLossRate = PlcExptLossRate;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseSpeexEncd, &p_ThrdMsgAdoInptSetUseSpeexEncd, sizeof( p_ThrdMsgAdoInptSetUseSpeexEncd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2038,7 +1822,7 @@ int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseOpusEncd
- * 功能说明：媒体处理线程音频输入设置要使用Opus编码器。
+ * 功能说明：媒体处理线程的音频输入设置设置要使用Opus编码器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -2051,7 +1835,7 @@ int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int Is
 int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseOpusEncd p_MediaMsgAdoInptSetUseOpusEncd;
+	ThrdMsgAdoInptSetUseOpusEncd p_ThrdMsgAdoInptSetUseOpusEncd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2060,10 +1844,9 @@ int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, int IsB
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetUseOpusEncd.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseOpusEncd;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseOpusEncd, sizeof( p_MediaMsgAdoInptSetUseOpusEncd ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseOpusEncd, &p_ThrdMsgAdoInptSetUseOpusEncd, sizeof( p_ThrdMsgAdoInptSetUseOpusEncd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2079,7 +1862,7 @@ int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd
- * 功能说明：媒体处理线程音频输入设置是否绘制音频波形到窗口。
+ * 功能说明：媒体处理线程的音频输入设置设置是否绘制音频波形到窗口。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsDraw：[输入]，存放是否绘制音频波形到窗口，为非0表示要使用，为0表示不使用。
@@ -2095,7 +1878,7 @@ int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, int IsB
 int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsDraw, HWND SrcWndHdl, HWND RsltWndHdl, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetIsDrawAdoWavfmToWnd p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd;
+	ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2114,21 +1897,20 @@ int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsDrawAdoWavfmToWnd;
-	p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_IsDraw = IsDraw;
+	p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd.m_IsDraw = IsDraw;
 	if( IsDraw != 0 )
 	{
-		p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_SrcWndHdl = SrcWndHdl;
-		p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_RsltWndHdl = RsltWndHdl;
+		p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd.m_SrcWndHdl = SrcWndHdl;
+		p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd.m_RsltWndHdl = RsltWndHdl;
 	}
 	else
 	{
-		p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_SrcWndHdl = NULL;
-		p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd.m_RsltWndHdl = NULL;
+		p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd.m_SrcWndHdl = NULL;
+		p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd.m_RsltWndHdl = NULL;
 	}
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd, sizeof( p_MediaMsgAdoInptSetIsDrawAdoWavfmToWnd ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetIsDrawAdoWavfmToWnd, &p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd, sizeof( p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2145,7 +1927,7 @@ int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile
- * 功能说明：媒体处理线程音频输入设置是否保存音频到Wave文件。
+ * 功能说明：媒体处理线程的音频输入设置设置是否保存音频到Wave文件。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsSave：[输入]，存放是否保存，为非0表示要保存，为0表示不保存。
@@ -2162,9 +1944,9 @@ int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, const Vstr * RsltFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetIsSaveAdoToWaveFile p_MediaMsgAdoInptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt = NULL;
+	ThrdMsgAdoInptSetIsSaveAdoToWaveFile p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile;
+	p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
+	p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2183,25 +1965,24 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_IsSave = IsSave;
+	p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_IsSave = IsSave;
 	if( IsSave != 0 )
 	{
-		if( VstrInit( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt, Utf8, , SrcFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt, Utf8, , SrcFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置原始Wave文件完整路径动态字符串失败。" ), , );
 			goto Out;
 		}
-		if( VstrInit( &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt, Utf8, , RsltFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt, Utf8, , RsltFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置结果Wave文件完整路径动态字符串失败。" ), , );
 			goto Out;
 		}
 	}
-	p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_WrBufSzByt = WrBufSzByt;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_WrBufSzByt = WrBufSzByt;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetIsSaveAdoToWaveFile, &p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile, sizeof( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2210,8 +1991,8 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt );
-		if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt );
+		if( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt );
+		if( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt );
 	}
 
 	return p_Rslt;
@@ -2219,7 +2000,7 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetUseDvc
- * 功能说明：媒体处理线程音频输入设置使用的设备。
+ * 功能说明：媒体处理线程的音频输入设置设置使用的设备。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ID：[输入]，存放标识符，取值范围为从1到音频输入设备总数，为0表示使用默认设备。
@@ -2233,7 +2014,7 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, UINT ID, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetUseDvc p_MediaMsgAdoInptSetUseDvc;
+	ThrdMsgAdoInptSetUseDvc p_ThrdMsgAdoInptSetUseDvc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2242,11 +2023,10 @@ int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 		goto Out;
 	}
 
-	p_MediaMsgAdoInptSetUseDvc.m_MediaMsgTyp = MediaMsgTypAdoInptSetUseDvc;
-	p_MediaMsgAdoInptSetUseDvc.m_ID = ID;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetUseDvc, sizeof( p_MediaMsgAdoInptSetUseDvc ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetUseDvc.m_ID = ID;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseDvc, &p_ThrdMsgAdoInptSetUseDvc, sizeof( p_ThrdMsgAdoInptSetUseDvc ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2262,7 +2042,7 @@ int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoInptSetIsMute
- * 功能说明：媒体处理线程音频输入设置是否静音。
+ * 功能说明：媒体处理线程的音频输入设置设置是否静音。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsMute：[输入]，存放是否静音，为0表示有声音，为非0表示静音。
@@ -2276,7 +2056,7 @@ int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsMute, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoInptSetIsMute p_MediaMsgAdoInptSetIsMute;
+	ThrdMsgAdoInptSetIsMute p_ThrdMsgAdoInptSetIsMute;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2285,11 +2065,10 @@ int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 		goto Out;
 	}
 	
-	p_MediaMsgAdoInptSetIsMute.m_MediaMsgTyp = MediaMsgTypAdoInptSetIsMute;
-	p_MediaMsgAdoInptSetIsMute.m_IsMute = IsMute;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoInptSetIsMute, sizeof( p_MediaMsgAdoInptSetIsMute ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoInptSetIsMute.m_IsMute = IsMute;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetIsMute, &p_ThrdMsgAdoInptSetIsMute, sizeof( p_ThrdMsgAdoInptSetIsMute ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2305,7 +2084,7 @@ int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetAdoOtpt
- * 功能说明：媒体处理线程设置音频输出。
+ * 功能说明：媒体处理线程的设置音频输出。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 SmplRate：[输入]，存放采样频率，单位为赫兹，取值只能为8000、16000、32000、48000。
@@ -2320,7 +2099,7 @@ int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetAdoOtpt p_MediaMsgSetAdoOtpt;
+	ThrdMsgSetAdoOtpt p_ThrdMsgSetAdoOtpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2339,12 +2118,11 @@ int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 		goto Out;
 	}
 	
-	p_MediaMsgSetAdoOtpt.m_MediaMsgTyp = MediaMsgTypSetAdoOtpt;
-	p_MediaMsgSetAdoOtpt.m_SmplRate = SmplRate;
-	p_MediaMsgSetAdoOtpt.m_FrmLenMsec = FrmLenMsec;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetAdoOtpt, sizeof( p_MediaMsgSetAdoOtpt ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetAdoOtpt.m_SmplRate = SmplRate;
+	p_ThrdMsgSetAdoOtpt.m_FrmLenMsec = FrmLenMsec;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetAdoOtpt, &p_ThrdMsgSetAdoOtpt, sizeof( p_ThrdMsgSetAdoOtpt ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2360,7 +2138,7 @@ int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptAddStrm
- * 功能说明：媒体处理线程音频输出添加流。
+ * 功能说明：媒体处理线程的音频输出添加流。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -2374,7 +2152,7 @@ int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptAddStrm p_MediaMsgAdoOtptAddStrm;
+	ThrdMsgAdoOtptAddStrm p_ThrdMsgAdoOtptAddStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2383,11 +2161,10 @@ int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptAddStrm.m_MediaMsgTyp = MediaMsgTypAdoOtptAddStrm;
-	p_MediaMsgAdoOtptAddStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptAddStrm, sizeof( p_MediaMsgAdoOtptAddStrm ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptAddStrm.m_StrmIdx = StrmIdx;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptAddStrm, &p_ThrdMsgAdoOtptAddStrm, sizeof( p_ThrdMsgAdoOtptAddStrm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2403,9 +2180,10 @@ int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptDelStrm
- * 功能说明：媒体处理线程音频输出删除流。
+ * 功能说明：媒体处理线程的音频输出删除流。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
+			 AddFirstOrLast：[输入]，存放添加到消息队列第一个或最后一个，为0表示第一个，为1表示最后一个。
              StrmIdx：[输入]，存放流索引。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
@@ -2414,10 +2192,10 @@ int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptDelStrm p_MediaMsgAdoOtptDelStrm;
+	ThrdMsgAdoOtptDelStrm p_ThrdMsgAdoOtptDelStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2426,11 +2204,10 @@ int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptDelStrm.m_MediaMsgTyp = MediaMsgTypAdoOtptDelStrm;
-	p_MediaMsgAdoOtptDelStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptDelStrm, sizeof( p_MediaMsgAdoOtptDelStrm ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptDelStrm.m_StrmIdx = StrmIdx;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, AddFirstOrLast, ThrdMsgTypAdoOtptDelStrm, &p_ThrdMsgAdoOtptDelStrm, sizeof( p_ThrdMsgAdoOtptDelStrm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2446,7 +2223,7 @@ int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmUsePcm
- * 功能说明：媒体处理线程音频输出设置流要使用PCM原始数据。
+ * 功能说明：媒体处理线程的音频输出设置流要使用Pcm原始数据。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -2460,7 +2237,7 @@ int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetStrmUsePcm p_MediaMsgAdoOtptSetStrmUsePcm;
+	ThrdMsgAdoOtptSetStrmUsePcm p_ThrdMsgAdoOtptSetStrmUsePcm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2469,11 +2246,10 @@ int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetStrmUsePcm.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmUsePcm;
-	p_MediaMsgAdoOtptSetStrmUsePcm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetStrmUsePcm, sizeof( p_MediaMsgAdoOtptSetStrmUsePcm ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetStrmUsePcm.m_StrmIdx = StrmIdx;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetStrmUsePcm, &p_ThrdMsgAdoOtptSetStrmUsePcm, sizeof( p_ThrdMsgAdoOtptSetStrmUsePcm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2489,7 +2265,7 @@ int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmUseSpeexDecd
- * 功能说明：媒体处理线程音频输出设置流要使用Speex解码器。
+ * 功能说明：媒体处理线程的音频输出设置流要使用Speex解码器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -2504,7 +2280,7 @@ int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetStrmUseSpeexDecd p_MediaMsgAdoOtptSetStrmUseSpeexDecd;
+	ThrdMsgAdoOtptSetStrmUseSpeexDecd p_ThrdMsgAdoOtptSetStrmUseSpeexDecd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2513,12 +2289,11 @@ int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, in
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetStrmUseSpeexDecd.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmUseSpeexDecd;
-	p_MediaMsgAdoOtptSetStrmUseSpeexDecd.m_StrmIdx = StrmIdx;
-	p_MediaMsgAdoOtptSetStrmUseSpeexDecd.m_IsUsePrcplEnhsmt = IsUsePrcplEnhsmt;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetStrmUseSpeexDecd, sizeof( p_MediaMsgAdoOtptSetStrmUseSpeexDecd ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetStrmUseSpeexDecd.m_StrmIdx = StrmIdx;
+	p_ThrdMsgAdoOtptSetStrmUseSpeexDecd.m_IsUsePrcplEnhsmt = IsUsePrcplEnhsmt;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetStrmUseSpeexDecd, &p_ThrdMsgAdoOtptSetStrmUseSpeexDecd, sizeof( p_ThrdMsgAdoOtptSetStrmUseSpeexDecd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2534,7 +2309,7 @@ int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, in
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmUseOpusDecd
- * 功能说明：媒体处理线程音频输出设置流要使用Opus解码器。
+ * 功能说明：媒体处理线程的音频输出设置流要使用Opus解码器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -2548,7 +2323,7 @@ int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, in
 int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetStrmUseOpusDecd p_MediaMsgAdoOtptSetStrmUseOpusDecd;
+	ThrdMsgAdoOtptSetStrmUseOpusDecd p_ThrdMsgAdoOtptSetStrmUseOpusDecd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2557,11 +2332,10 @@ int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetStrmUseOpusDecd.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmUseOpusDecd;
-	p_MediaMsgAdoOtptSetStrmUseOpusDecd.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetStrmUseOpusDecd, sizeof( p_MediaMsgAdoOtptSetStrmUseOpusDecd ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetStrmUseOpusDecd.m_StrmIdx = StrmIdx;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetStrmUseOpusDecd, &p_ThrdMsgAdoOtptSetStrmUseOpusDecd, sizeof( p_ThrdMsgAdoOtptSetStrmUseOpusDecd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2577,7 +2351,7 @@ int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetStrmIsUse
- * 功能说明：媒体处理线程音频输出设置流是否要使用。
+ * 功能说明：媒体处理线程的音频输出设置流是否要使用。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -2592,7 +2366,7 @@ int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int
 int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, int32_t IsUse, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetStrmIsUse p_MediaMsgAdoOtptSetStrmIsUse;
+	ThrdMsgAdoOtptSetStrmIsUse p_ThrdMsgAdoOtptSetStrmIsUse;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2601,12 +2375,11 @@ int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetStrmIsUse.m_MediaMsgTyp = MediaMsgTypAdoOtptSetStrmIsUse;
-	p_MediaMsgAdoOtptSetStrmIsUse.m_StrmIdx = StrmIdx;
-	p_MediaMsgAdoOtptSetStrmIsUse.m_IsUse = IsUse;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetStrmIsUse, sizeof( p_MediaMsgAdoOtptSetStrmIsUse ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetStrmIsUse.m_StrmIdx = StrmIdx;
+	p_ThrdMsgAdoOtptSetStrmIsUse.m_IsUse = IsUse;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetStrmIsUse, &p_ThrdMsgAdoOtptSetStrmIsUse, sizeof( p_ThrdMsgAdoOtptSetStrmIsUse ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2622,7 +2395,7 @@ int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd
- * 功能说明：媒体处理线程音频输出设置是否绘制音频波形到窗口。
+ * 功能说明：媒体处理线程的音频输出设置是否绘制音频波形到窗口。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsDraw：[输入]，存放是否绘制，为非0表示要绘制，为0表示不绘制。
@@ -2637,7 +2410,7 @@ int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsDraw, HWND SrcWndHdl, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd;
+	ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2651,12 +2424,11 @@ int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_MediaMsgTyp = MediaMsgTypAdoOtptSetIsDrawAdoWavfmToWnd;
-	p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_IsDraw = IsDraw;
-	p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_SrcWndHdl = SrcWndHdl;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd, sizeof( p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_IsDraw = IsDraw;
+	p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd.m_SrcWndHdl = SrcWndHdl;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetIsDrawAdoWavfmToWnd, &p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd, sizeof( p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2672,7 +2444,7 @@ int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile
- * 功能说明：媒体处理线程音频输出设置是否保存音频到Wave文件。
+ * 功能说明：媒体处理线程的音频输出设置是否保存音频到Wave文件。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsSave：[输入]，存放是否保存，为非0表示要使用，为0表示不使用。
@@ -2688,8 +2460,8 @@ int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetIsSaveAdoToWaveFile p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
+	ThrdMsgAdoOtptSetIsSaveAdoToWaveFile p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile;
+	p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2703,20 +2475,19 @@ int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_MediaMsgTyp = MediaMsgTypAdoOtptSetIsSaveAdoToWaveFile;
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_IsSave = IsSave;
+	p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile.m_IsSave = IsSave;
 	if( IsSave != 0 )
 	{
-		if( VstrInit( &p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt, Utf8, , SrcFullPathVstrPt ) != 0 )
+		if( VstrInit( &p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt, Utf8, , SrcFullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置原始Wave文件完整路径动态字符串失败。" ), , );
 			goto Out;
 		}
 	}
-	p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_WrBufSzByt = WrBufSzByt;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile, sizeof( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile.m_WrBufSzByt = WrBufSzByt;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetIsSaveAdoToWaveFile, &p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile, sizeof( p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2725,14 +2496,14 @@ int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt );
+		if( p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt );
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetUseDvc
- * 功能说明：媒体处理线程音频输出设置使用的设备。
+ * 功能说明：媒体处理线程的音频输出设置使用的设备。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ID：[输入]，存放标识符，取值范围为从1到音频输出设备总数，为0表示使用默认设备。
@@ -2746,7 +2517,7 @@ int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, UINT ID, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetUseDvc p_MediaMsgAdoOtptSetUseDvc;
+	ThrdMsgAdoOtptSetUseDvc p_ThrdMsgAdoOtptSetUseDvc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2755,11 +2526,10 @@ int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetUseDvc.m_MediaMsgTyp = MediaMsgTypAdoOtptSetUseDvc;
-	p_MediaMsgAdoOtptSetUseDvc.m_ID = ID;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetUseDvc, sizeof( p_MediaMsgAdoOtptSetUseDvc ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetUseDvc.m_ID = ID;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetUseDvc, &p_ThrdMsgAdoOtptSetUseDvc, sizeof( p_ThrdMsgAdoOtptSetUseDvc ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2775,7 +2545,7 @@ int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoOtptSetIsMute
- * 功能说明：媒体处理线程音频输出设置是否静音。
+ * 功能说明：媒体处理线程的音频输出设置是否静音。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsMute：[输入]，存放是否静音，为0表示有声音，为非0表示静音。
@@ -2789,7 +2559,7 @@ int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsMute, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAdoOtptSetIsMute p_MediaMsgAdoOtptSetIsMute;
+	ThrdMsgAdoOtptSetIsMute p_ThrdMsgAdoOtptSetIsMute;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2798,11 +2568,10 @@ int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 		goto Out;
 	}
 	
-	p_MediaMsgAdoOtptSetIsMute.m_MediaMsgTyp = MediaMsgTypAdoOtptSetIsMute;
-	p_MediaMsgAdoOtptSetIsMute.m_IsMute = IsMute;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAdoOtptSetIsMute, sizeof( p_MediaMsgAdoOtptSetIsMute ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAdoOtptSetIsMute.m_IsMute = IsMute;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoOtptSetIsMute, &p_ThrdMsgAdoOtptSetIsMute, sizeof( p_ThrdMsgAdoOtptSetIsMute ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2835,7 +2604,7 @@ int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t MaxSmplRate, int32_t FrmWidth, int32_t FrmHeight, HWND PrvwWndHdl, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoInpt p_MediaMsgSetVdoInpt;
+	ThrdMsgSetVdoInpt p_ThrdMsgSetVdoInpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2859,14 +2628,13 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoInpt.m_MediaMsgTyp = MediaMsgTypSetVdoInpt;
-	p_MediaMsgSetVdoInpt.m_MaxSmplRate = MaxSmplRate;
-    p_MediaMsgSetVdoInpt.m_FrmWidth = FrmWidth;
-	p_MediaMsgSetVdoInpt.m_FrmHeight = FrmHeight;
-	p_MediaMsgSetVdoInpt.m_PrvwWndHdl = PrvwWndHdl;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoInpt, sizeof( p_MediaMsgSetVdoInpt ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoInpt.m_MaxSmplRate = MaxSmplRate;
+    p_ThrdMsgSetVdoInpt.m_FrmWidth = FrmWidth;
+	p_ThrdMsgSetVdoInpt.m_FrmHeight = FrmHeight;
+	p_ThrdMsgSetVdoInpt.m_PrvwWndHdl = PrvwWndHdl;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetVdoInpt, &p_ThrdMsgSetVdoInpt, sizeof( p_ThrdMsgSetVdoInpt ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2882,7 +2650,7 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetUseYu12
- * 功能说明：媒体处理线程视频输入设置要使用Yu12原始数据。
+ * 功能说明：媒体处理线程的视频输入设置要使用Yu12原始数据。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -2895,7 +2663,7 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoInptUseYu12 p_MediaMsgSetVdoInptUseYu12;
+	ThrdMsgSetVdoInptUseYu12 p_ThrdMsgSetVdoInptUseYu12;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2904,10 +2672,9 @@ int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoInptUseYu12.m_MediaMsgTyp = MediaMsgTypVdoInptSetUseYu12;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoInptUseYu12, sizeof( p_MediaMsgSetVdoInptUseYu12 ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoInptSetUseYu12, &p_ThrdMsgSetVdoInptUseYu12, sizeof( p_ThrdMsgSetVdoInptUseYu12 ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2923,7 +2690,7 @@ int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetUseOpenH264Encd
- * 功能说明：媒体处理线程视频输入设置要使用OpenH264编码器。
+ * 功能说明：媒体处理线程的视频输入设置要使用OpenH264编码器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              VdoType：[输入]，存放视频类型，为0表示实时摄像头视频，为1表示实时屏幕内容视频，为2表示非实时摄像头视频，为3表示非实时屏幕内容视频，为4表示其他视频。
@@ -2941,7 +2708,7 @@ int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t IDRFrmIntvl, int32_t Cmplxt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoInptUseOpenH264Encd p_MediaMsgSetVdoInptUseOpenH264Encd;
+	ThrdMsgSetVdoInptUseOpenH264Encd p_ThrdMsgSetVdoInptUseOpenH264Encd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2950,15 +2717,14 @@ int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoInptUseOpenH264Encd.m_MediaMsgTyp = MediaMsgTypVdoInptSetUseOpenH264Encd;
-	p_MediaMsgSetVdoInptUseOpenH264Encd.m_VdoType = VdoType;
-    p_MediaMsgSetVdoInptUseOpenH264Encd.m_EncdBitrate = EncdBitrate;
-    p_MediaMsgSetVdoInptUseOpenH264Encd.m_BitrateCtrlMode = BitrateCtrlMode;
-    p_MediaMsgSetVdoInptUseOpenH264Encd.m_IDRFrmIntvl = IDRFrmIntvl;
-	p_MediaMsgSetVdoInptUseOpenH264Encd.m_Cmplxt = Cmplxt;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoInptUseOpenH264Encd, sizeof( p_MediaMsgSetVdoInptUseOpenH264Encd ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoInptUseOpenH264Encd.m_VdoType = VdoType;
+    p_ThrdMsgSetVdoInptUseOpenH264Encd.m_EncdBitrate = EncdBitrate;
+    p_ThrdMsgSetVdoInptUseOpenH264Encd.m_BitrateCtrlMode = BitrateCtrlMode;
+    p_ThrdMsgSetVdoInptUseOpenH264Encd.m_IDRFrmIntvl = IDRFrmIntvl;
+	p_ThrdMsgSetVdoInptUseOpenH264Encd.m_Cmplxt = Cmplxt;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoInptSetUseOpenH264Encd, &p_ThrdMsgSetVdoInptUseOpenH264Encd, sizeof( p_ThrdMsgSetVdoInptUseOpenH264Encd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -2974,7 +2740,7 @@ int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetUseDvc
- * 功能说明：媒体处理线程视频输入设置使用的设备。
+ * 功能说明：媒体处理线程的视频输入设置使用的设备。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 ID：[输入]，存放标识符，取值范围为从0到视频输入设备总数减一。
@@ -2988,7 +2754,7 @@ int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int
 int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, UINT ID, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoInptUseDvc p_MediaMsgSetVdoInptUseDvc;
+	ThrdMsgSetVdoInptUseDvc p_ThrdMsgSetVdoInptUseDvc;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -2997,11 +2763,10 @@ int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoInptUseDvc.m_MediaMsgTyp = MediaMsgTypVdoInptSetUseDvc;
-	p_MediaMsgSetVdoInptUseDvc.m_ID = ID;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoInptUseDvc, sizeof( p_MediaMsgSetVdoInptUseDvc ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoInptUseDvc.m_ID = ID;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoInptSetUseDvc, &p_ThrdMsgSetVdoInptUseDvc, sizeof( p_ThrdMsgSetVdoInptUseDvc ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3017,7 +2782,7 @@ int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoInptSetIsBlack
- * 功能说明：媒体处理线程视频输入设置是否黑屏。
+ * 功能说明：媒体处理线程的视频输入设置是否黑屏。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsBlack：[输入]，存放是否黑屏，为0表示有图像，为非0表示黑屏。
@@ -3031,7 +2796,7 @@ int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int IsBlack, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoInptIsBlack p_MediaMsgSetVdoInptIsBlack;
+	ThrdMsgSetVdoInptIsBlack p_ThrdMsgSetVdoInptIsBlack;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3040,11 +2805,10 @@ int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoInptIsBlack.m_MediaMsgTyp = MediaMsgTypVdoInptSetIsBlack;
-	p_MediaMsgSetVdoInptIsBlack.m_IsBlack = IsBlack;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoInptIsBlack, sizeof( p_MediaMsgSetVdoInptIsBlack ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoInptIsBlack.m_IsBlack = IsBlack;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoInptSetIsBlack, &p_ThrdMsgSetVdoInptIsBlack, sizeof( p_ThrdMsgSetVdoInptIsBlack ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3060,7 +2824,7 @@ int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptAddStrm
- * 功能说明：媒体处理线程视频输出添加流。
+ * 功能说明：媒体处理线程的视频输出添加流。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -3074,7 +2838,7 @@ int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgAddVdoOtptStrm p_MediaMsgAddVdoOtptStrm;
+	ThrdMsgAddVdoOtptStrm p_ThrdMsgAddVdoOtptStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3083,11 +2847,10 @@ int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 		goto Out;
 	}
 	
-	p_MediaMsgAddVdoOtptStrm.m_MediaMsgTyp = MediaMsgTypVdoOtptAddStrm;
-	p_MediaMsgAddVdoOtptStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgAddVdoOtptStrm, sizeof( p_MediaMsgAddVdoOtptStrm ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgAddVdoOtptStrm.m_StrmIdx = StrmIdx;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoOtptAddStrm, &p_ThrdMsgAddVdoOtptStrm, sizeof( p_ThrdMsgAddVdoOtptStrm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3103,9 +2866,10 @@ int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptDelStrm
- * 功能说明：媒体处理线程视频输出删除流。
+ * 功能说明：媒体处理线程的视频输出删除流。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
+			 AddFirstOrLast：[输入]，存放添加到消息队列第一个或最后一个，为0表示第一个，为1表示最后一个。
              StrmIdx：[输入]，存放流索引。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
@@ -3114,10 +2878,10 @@ int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgDelVdoOtptStrm p_MediaMsgDelVdoOtptStrm;
+	ThrdMsgDelVdoOtptStrm p_ThrdMsgDelVdoOtptStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3126,11 +2890,10 @@ int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 		goto Out;
 	}
 	
-	p_MediaMsgDelVdoOtptStrm.m_MediaMsgTyp = MediaMsgTypVdoOtptDelStrm;
-	p_MediaMsgDelVdoOtptStrm.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgDelVdoOtptStrm, sizeof( p_MediaMsgDelVdoOtptStrm ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgDelVdoOtptStrm.m_StrmIdx = StrmIdx;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, AddFirstOrLast, ThrdMsgTypVdoOtptDelStrm, &p_ThrdMsgDelVdoOtptStrm, sizeof( p_ThrdMsgDelVdoOtptStrm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3146,7 +2909,7 @@ int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrm
- * 功能说明：媒体处理线程视频输出设置流。
+ * 功能说明：媒体处理线程的视频输出设置流。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -3161,7 +2924,7 @@ int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, HWND DspyWndHdl, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoOtptStrm p_MediaMsgSetVdoOtptStrm;
+	ThrdMsgSetVdoOtptStrm p_ThrdMsgSetVdoOtptStrm;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3170,12 +2933,11 @@ int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoOtptStrm.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrm;
-	p_MediaMsgSetVdoOtptStrm.m_StrmIdx = StrmIdx;
-	p_MediaMsgSetVdoOtptStrm.m_DspyWndHdl = DspyWndHdl;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoOtptStrm, sizeof( p_MediaMsgSetVdoOtptStrm ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoOtptStrm.m_StrmIdx = StrmIdx;
+	p_ThrdMsgSetVdoOtptStrm.m_DspyWndHdl = DspyWndHdl;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoOtptSetStrm, &p_ThrdMsgSetVdoOtptStrm, sizeof( p_ThrdMsgSetVdoOtptStrm ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3191,7 +2953,7 @@ int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmUseYu12
- * 功能说明：媒体处理线程视频输出设置流要使用Yu12原始数据。
+ * 功能说明：媒体处理线程的视频输出设置流要使用Yu12原始数据。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -3205,7 +2967,7 @@ int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoOtptStrmUseYu12 p_MediaMsgSetVdoOtptStrmUseYu12;
+	ThrdMsgSetVdoOtptStrmUseYu12 p_ThrdMsgSetVdoOtptStrmUseYu12;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3214,11 +2976,10 @@ int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsB
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoOtptStrmUseYu12.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmUseYu12;
-	p_MediaMsgSetVdoOtptStrmUseYu12.m_StrmIdx = StrmIdx;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoOtptStrmUseYu12, sizeof( p_MediaMsgSetVdoOtptStrmUseYu12 ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoOtptStrmUseYu12.m_StrmIdx = StrmIdx;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoOtptSetStrmUseYu12, &p_ThrdMsgSetVdoOtptStrmUseYu12, sizeof( p_ThrdMsgSetVdoOtptStrmUseYu12 ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3234,7 +2995,7 @@ int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd
- * 功能说明：媒体处理线程视频输出设置流要使用OpenH264解码器。
+ * 功能说明：媒体处理线程的视频输出设置流要使用OpenH264解码器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -3249,7 +3010,7 @@ int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsB
 int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoOtptStrmUseOpenH264Decd p_MediaMsgSetVdoOtptStrmUseOpenH264Decd;
+	ThrdMsgSetVdoOtptStrmUseOpenH264Decd p_ThrdMsgSetVdoOtptStrmUseOpenH264Decd;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3258,12 +3019,11 @@ int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt,
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoOtptStrmUseOpenH264Decd.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmUseOpenH264Decd;
-	p_MediaMsgSetVdoOtptStrmUseOpenH264Decd.m_StrmIdx = StrmIdx;
-	p_MediaMsgSetVdoOtptStrmUseOpenH264Decd.m_DecdThrdNum = DecdThrdNum;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoOtptStrmUseOpenH264Decd, sizeof( p_MediaMsgSetVdoOtptStrmUseOpenH264Decd ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoOtptStrmUseOpenH264Decd.m_StrmIdx = StrmIdx;
+	p_ThrdMsgSetVdoOtptStrmUseOpenH264Decd.m_DecdThrdNum = DecdThrdNum;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoOtptSetStrmUseOpenH264Decd, &p_ThrdMsgSetVdoOtptStrmUseOpenH264Decd, sizeof( p_ThrdMsgSetVdoOtptStrmUseOpenH264Decd ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3279,7 +3039,7 @@ int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmIsBlack
- * 功能说明：媒体处理线程视频输出设置流是否黑屏。
+ * 功能说明：媒体处理线程的视频输出设置流是否黑屏。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -3294,7 +3054,7 @@ int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt,
 int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, int32_t IsBlack, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoOtptStrmIsBlack p_MediaMsgSetVdoOtptStrmIsBlack;
+	ThrdMsgSetVdoOtptStrmIsBlack p_ThrdMsgSetVdoOtptStrmIsBlack;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3303,12 +3063,11 @@ int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsB
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoOtptStrmIsBlack.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmIsBlack;
-	p_MediaMsgSetVdoOtptStrmIsBlack.m_StrmIdx = StrmIdx;
-	p_MediaMsgSetVdoOtptStrmIsBlack.m_IsBlack = IsBlack;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoOtptStrmIsBlack, sizeof( p_MediaMsgSetVdoOtptStrmIsBlack ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoOtptStrmIsBlack.m_StrmIdx = StrmIdx;
+	p_ThrdMsgSetVdoOtptStrmIsBlack.m_IsBlack = IsBlack;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoOtptSetStrmIsBlack, &p_ThrdMsgSetVdoOtptStrmIsBlack, sizeof( p_ThrdMsgSetVdoOtptStrmIsBlack ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3324,7 +3083,7 @@ int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdVdoOtptSetStrmIsUse
- * 功能说明：媒体处理线程视频输出设置流是否使用。
+ * 功能说明：媒体处理线程的视频输出设置流是否使用。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              StrmIdx：[输入]，存放流索引。
@@ -3339,7 +3098,7 @@ int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsB
 int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, int32_t IsUse, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetVdoOtptStrmIsUse p_MediaMsgSetVdoOtptStrmIsUse;
+	ThrdMsgSetVdoOtptStrmIsUse p_ThrdMsgSetVdoOtptStrmIsUse;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3348,12 +3107,11 @@ int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 		goto Out;
 	}
 	
-	p_MediaMsgSetVdoOtptStrmIsUse.m_MediaMsgTyp = MediaMsgTypVdoOtptSetStrmIsUse;
-	p_MediaMsgSetVdoOtptStrmIsUse.m_StrmIdx = StrmIdx;
-	p_MediaMsgSetVdoOtptStrmIsUse.m_IsUse = IsUse;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetVdoOtptStrmIsUse, sizeof( p_MediaMsgSetVdoOtptStrmIsUse ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetVdoOtptStrmIsUse.m_StrmIdx = StrmIdx;
+	p_ThrdMsgSetVdoOtptStrmIsUse.m_IsUse = IsUse;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypVdoOtptSetStrmIsUse, &p_ThrdMsgSetVdoOtptStrmIsUse, sizeof( p_ThrdMsgSetVdoOtptStrmIsUse ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3369,7 +3127,7 @@ int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsUseAdoVdoInptOtpt
- * 功能说明：媒体处理线程设置音视频输入输出是否使用。
+ * 功能说明：媒体处理线程的设置音视频输入输出是否使用。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsUseAdoInpt：[输入]，存放音频输入是否使用，为0表示不使用，为非0表示要使用。
@@ -3386,7 +3144,7 @@ int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseAdoInpt, int32_t IsUseAdoOtpt, int32_t IsUseVdoInpt, int32_t IsUseVdoOtpt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetIsUseAdoVdoInptOtpt p_MediaMsgSetIsUseAdoVdoInptOtpt;
+	ThrdMsgSetIsUseAdoVdoInptOtpt p_ThrdMsgSetIsUseAdoVdoInptOtpt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3395,14 +3153,13 @@ int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int Is
 		goto Out;
 	}
 	
-	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_MediaMsgTyp = MediaMsgTypSetIsUseAdoVdoInptOtpt;
-	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_IsUseAdoInpt = IsUseAdoInpt;
-	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_IsUseAdoOtpt = IsUseAdoOtpt;
-	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_IsUseVdoInpt = IsUseVdoInpt;
-	p_MediaMsgSetIsUseAdoVdoInptOtpt.m_IsUseVdoOtpt = IsUseVdoOtpt;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetIsUseAdoVdoInptOtpt, sizeof( p_MediaMsgSetIsUseAdoVdoInptOtpt ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetIsUseAdoVdoInptOtpt.m_IsUseAdoInpt = IsUseAdoInpt;
+	p_ThrdMsgSetIsUseAdoVdoInptOtpt.m_IsUseAdoOtpt = IsUseAdoOtpt;
+	p_ThrdMsgSetIsUseAdoVdoInptOtpt.m_IsUseVdoInpt = IsUseVdoInpt;
+	p_ThrdMsgSetIsUseAdoVdoInptOtpt.m_IsUseVdoOtpt = IsUseVdoOtpt;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetIsUseAdoVdoInptOtpt, &p_ThrdMsgSetIsUseAdoVdoInptOtpt, sizeof( p_ThrdMsgSetIsUseAdoVdoInptOtpt ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3418,7 +3175,7 @@ int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsPrintLogShowToast
- * 功能说明：媒体处理线程设置是否打印Log日志、显示Toast。
+ * 功能说明：媒体处理线程的设置是否打印Log日志、显示Toast。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsPrintLog：[输入]，存放是否打印Log日志，为非0表示要打印，为0表示不打印。
 			 IsShowToast：[输入]，存放是否显示Toast，为非0表示要显示，为0表示不显示。
@@ -3457,7 +3214,7 @@ int MediaPocsThrdSetIsPrintLogShowToast( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsUsePrvntSysSleep
- * 功能说明：媒体处理线程设置是否使用阻止系统睡眠。
+ * 功能说明：媒体处理线程的设置是否使用阻止系统睡眠。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 IsPrintLog：[输入]，存放是否打印Log日志，为非0表示要打印，为0表示不打印。
@@ -3473,7 +3230,7 @@ int MediaPocsThrdSetIsPrintLogShowToast( MediaPocsThrd * MediaPocsThrdPt, int32_
 int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetIsUsePrvntSysSleep p_MediaMsgSetIsUsePrvntSysSleep;
+	ThrdMsgSetIsUsePrvntSysSleep p_ThrdMsgSetIsUsePrvntSysSleep;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3482,11 +3239,10 @@ int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsB
 		goto Out;
 	}
 
-	p_MediaMsgSetIsUsePrvntSysSleep.m_MediaMsgTyp = MediaMsgTypSetIsUsePrvntSysSleep;
-	p_MediaMsgSetIsUsePrvntSysSleep.m_IsUsePrvntSysSleep = IsUsePrvntSysSleep;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetIsUsePrvntSysSleep, sizeof( p_MediaMsgSetIsUsePrvntSysSleep ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetIsUsePrvntSysSleep.m_IsUsePrvntSysSleep = IsUsePrvntSysSleep;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetIsUsePrvntSysSleep, &p_ThrdMsgSetIsUsePrvntSysSleep, sizeof( p_ThrdMsgSetIsUsePrvntSysSleep ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3502,7 +3258,7 @@ int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile
- * 功能说明：媒体处理线程设置是否保存音视频输入输出到Avi文件。
+ * 功能说明：媒体处理线程的设置是否保存音视频输入输出到Avi文件。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 FullPathVstrPt：[输入]，存放完整路径动态字符串的指针。
@@ -3521,8 +3277,8 @@ int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsB
 int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, size_t WrBufSzByt, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSetIsSaveAdoVdoInptOtptToAviFile p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile;
-	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt = NULL;
+	ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile;
+	p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3536,23 +3292,22 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 		goto Out;
 	}
 	
-	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_MediaMsgTyp = MediaMsgTypSetIsSaveAdoVdoInptOtptToAviFile;
 	if( ( IsSaveAdoInpt != 0 ) || ( IsSaveAdoOtpt != 0 ) || ( IsSaveVdoInpt != 0 ) || ( IsSaveVdoOtpt != 0 ) )
 	{
-		if( VstrInit( &p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt, Utf8, , FullPathVstrPt ) != 0 )
+		if( VstrInit( &p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt, Utf8, , FullPathVstrPt ) != 0 )
 		{
 			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置完整路径动态字符串失败。" ), , );
 			goto Out;
 		}
 	}
-	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_WrBufSzByt = WrBufSzByt;
-	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveAdoInpt = IsSaveAdoInpt;
-	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveAdoOtpt = IsSaveAdoOtpt;
-	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveVdoInpt = IsSaveVdoInpt;
-	p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveVdoOtpt = IsSaveVdoOtpt;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile, sizeof( p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_WrBufSzByt = WrBufSzByt;
+	p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveAdoInpt = IsSaveAdoInpt;
+	p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveAdoOtpt = IsSaveAdoOtpt;
+	p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveVdoInpt = IsSaveVdoInpt;
+	p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_IsSaveVdoOtpt = IsSaveVdoOtpt;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetIsSaveAdoVdoInptOtptToAviFile, &p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile, sizeof( p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3561,14 +3316,14 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt );
+		if( p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt );
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdSaveStsToTxtFile
- * 功能说明：媒体处理线程保存状态到Txt文件。
+ * 功能说明：媒体处理线程的保存状态到Txt文件。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 FullPathVstrPt：[输入]，存放完整路径动态字符串的指针，不能为NULL。
@@ -3582,8 +3337,8 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgSaveStsToTxtFile p_MediaMsgSaveStsToTxtFile;
-	p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt = NULL;
+	ThrdMsgSaveStsToTxtFile p_ThrdMsgSaveStsToTxtFile;
+	p_ThrdMsgSaveStsToTxtFile.m_FullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3597,15 +3352,14 @@ int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 		goto Out;
 	}
 	
-	p_MediaMsgSaveStsToTxtFile.m_MediaMsgTyp = MediaMsgTypSaveStsToTxtFile;
-	if( VstrInit( &p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt, Utf8, , FullPathVstrPt ) != 0 )
+	if( VstrInit( &p_ThrdMsgSaveStsToTxtFile.m_FullPathVstrPt, Utf8, , FullPathVstrPt ) != 0 )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置完整路径动态字符串失败。" ), , );
 		goto Out;
 	}
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgSaveStsToTxtFile, sizeof( p_MediaMsgSaveStsToTxtFile ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSaveStsToTxtFile, &p_ThrdMsgSaveStsToTxtFile, sizeof( p_ThrdMsgSaveStsToTxtFile ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3614,14 +3368,14 @@ int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt != NULL ) VstrDstoy( p_MediaMsgSaveStsToTxtFile.m_FullPathVstrPt );
+		if( p_ThrdMsgSaveStsToTxtFile.m_FullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgSaveStsToTxtFile.m_FullPathVstrPt );
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdPrvntSysSleepInitOrDstoy
- * 功能说明：初始化或销毁媒体处理线程阻止系统睡眠。
+ * 功能说明：媒体处理线程的阻止系统睡眠初始化或销毁。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsUsePrvntSysSleep：[输入]，存放是否使用阻止系统睡眠，为非0表示要使用，为0表示不使用。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -3647,7 +3401,7 @@ void MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrd * MediaPocsThrdPt, int
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * 函数名称：MediaPocsThrdStart
-* 功能说明：启动媒体处理线程。
+* 功能说明：媒体处理线程启动。
 * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
 * 返回说明：0：成功。
@@ -3691,10 +3445,10 @@ int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * 函数名称：MediaPocsThrdRqirExit
-* 功能说明：请求媒体处理线程退出。
+* 功能说明：媒体处理线程请求退出。
 * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
-            ExitFlag：[输入]，存放退出标记，为0表示保持运行，为1表示请求退出，为2表示请求重启，为3表示请求重启但不执行用户定义的UserInit初始化函数和UserDstoy销毁函数。
 			IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
+            ExitFlag：[输入]，存放退出标记，为0表示保持运行，为1表示请求退出，为2表示请求重启，为3表示请求重启但不执行用户定义的UserInit初始化函数和UserDstoy销毁函数。
 			ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
 * 返回说明：0：成功。
 			非0：失败。
@@ -3702,10 +3456,10 @@ int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int IsBlockWait, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int ExitFlag, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgRqirExit p_MediaMsgRqirExit;
+	ThrdMsgRqirExit p_ThrdMsgRqirExit;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3719,22 +3473,11 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int Is
 		goto Out;
 	}
 	
-	p_MediaMsgRqirExit.m_MediaMsgTyp = MediaMsgTypRqirExit;
-	p_MediaMsgRqirExit.m_ExitFlag = ExitFlag;
-	p_MediaMsgRqirExit.m_IsBlockWait = IsBlockWait;
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, &p_MediaMsgRqirExit, sizeof( p_MediaMsgRqirExit ), ErrInfoVstrPt ) != 0 )
+	p_ThrdMsgRqirExit.m_ExitFlag = ExitFlag;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypRqirExit, &p_ThrdMsgRqirExit, sizeof( p_ThrdMsgRqirExit ), ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
-	}
-	MediaPocsThrdPt->m_ReadyExitCnt++; //设置准备退出计数递增。
-
-	if( IsBlockWait != 0 ) //如果需要阻塞等待。
-	{
-		if( ExitFlag == 1 ) //如果是请求退出。
-		{
-			ThrdWaitGetExitCode( MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt, NULL, NULL ); //等待媒体处理线程退出。
-		}
 	}
 
 	p_Rslt = 0; //设置本函数执行成功。
@@ -3752,7 +3495,8 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int Is
  * 功能说明：发送用户消息到媒体处理线程。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
-			 UserMsgPt：[输入]，存放消息参数指针。如果没有消息参数，则本参数为NULL。
+			 MsgTyp：[输入]，存放消息类型。
+			 MsgPt：[输入]，存放消息的指针。如果没有消息参数，则本参数为NULL。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -3760,11 +3504,9 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int ExitFlag, int Is
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, void * UserMsgPt, size_t UserMsgLenByt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	MediaMsgUserMsg * p_MediaMsgUserMsgPt;
-	size_t p_MediaMsgLenByt;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3773,13 +3515,9 @@ int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, 
 		goto Out;
 	}
 	
-	p_MediaMsgLenByt = sizeof( MediaMsgUserMsg ) + UserMsgLenByt;
-	p_MediaMsgUserMsgPt = ( MediaMsgUserMsg * )alloca( p_MediaMsgLenByt );
-	p_MediaMsgUserMsgPt->m_MediaMsgTyp = MediaMsgTypUserMsg;
-	memcpy( p_MediaMsgUserMsgPt->m_UserMsgArr, UserMsgPt, UserMsgLenByt );
-	if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, IsBlockWait, 1, p_MediaMsgUserMsgPt, p_MediaMsgLenByt, ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypUserMsgMinVal + MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ) != 0 )
 	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送媒体消息失败。原因：" ) );
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -3795,7 +3533,7 @@ int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptAviFileWriterInit
- * 功能说明：初始化媒体处理线程音视频输入输出Avi文件写入器。
+ * 功能说明：媒体处理线程的音视频输入输出Avi文件写入器初始化。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -3905,7 +3643,7 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy
- * 功能说明：销毁媒体处理线程音视频输入输出Avi文件写入器。
+ * 功能说明：媒体处理线程的音视频输入输出Avi文件写入器销毁。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
              非0：失败。
@@ -3942,7 +3680,7 @@ void MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrd * MediaPocsThr
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdTmpVarInit
- * 功能说明：初始化媒体处理线程临时变量。
+ * 功能说明：媒体处理线程的临时变量初始化。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -3988,7 +3726,7 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 		}
 		MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt = NULL;
 		MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmVoiceActSts = 1; //设置音频输入Pcm格式结果帧语音活动状态为1，为了让在不使用语音活动检测情况下永远都是有语音活动。
-		if( MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd != 0 ) //如果音频输入不使用PCM原始数据。
+		if( MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd != 0 ) //如果音频输入不使用Pcm原始数据。
 		{
 			if( ( MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt != NULL ) && ( _msize( MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt ) < MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ) )
 			{
@@ -4007,7 +3745,7 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 			MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmLenByt = 0;
 			MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans = 1; //设置音频输入已编码格式结果帧是否需要传输为1，为了让在不使用非连续传输情况下永远都是需要传输。
 		}
-		else //如果音频输入要使用PCM原始数据。
+		else //如果音频输入要使用Pcm原始数据。
 		{
 			if( MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt != NULL )
 			{
@@ -4065,7 +3803,7 @@ int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdTmpVarDstoy
- * 功能说明：销毁媒体处理线程临时变量。
+ * 功能说明：媒体处理线程的临时变量销毁。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -4114,7 +3852,7 @@ void MediaPocsThrdTmpVarDstoy( MediaPocsThrd * MediaPocsThrdPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptInit
- * 功能说明：初始化音视频输入输出。
+ * 功能说明：媒体处理线程的音视频输入输出初始化。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -4259,7 +3997,7 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptDstoy
- * 功能说明：销毁音视频输入输出。
+ * 功能说明：媒体处理线程的音视频输入输出销毁。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -4296,8 +4034,8 @@ void MediaPocsThrdAdoVdoInptOtptDstoy( MediaPocsThrd * MediaPocsThrdPt )
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：MediaPocsThrdOneMediaMsgPocs
- * 功能说明：媒体处理线程一条媒体消息处理。
+ * 函数名称：MediaPocsThrdThrdMsgPocs
+ * 功能说明：媒体处理线程的线程消息处理。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -4305,11 +4043,9 @@ void MediaPocsThrdAdoVdoInptOtptDstoy( MediaPocsThrd * MediaPocsThrdPt )
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdOneMediaMsgPocs( MediaPocsThrd * MediaPocsThrdPt )
+int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
 {
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为1表示媒体消息容器为空，为-1表示失败。
-	size_t p_MediaMsgCntnrElmTotal; //存放媒体消息容器元素总数。
-	MediaMsg p_MediaMsg;
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为1表示线程消息容器为空，为-1表示失败。
 	int32_t p_TmpInt32;
 
 	//因为IGlobalInterfaceTable::GetInterfaceFromGlobal会向创建此Com对象单元套间线程发送消息，所以要求创建此Com对象单元套间线程有消息处理，若没有，则IGlobalInterfaceTable::GetInterfaceFromGlobal会一直阻塞。
@@ -4322,1093 +4058,1067 @@ int MediaPocsThrdOneMediaMsgPocs( MediaPocsThrd * MediaPocsThrdPt )
 		}
 	}*/
 
-	MediaPocsThrdPt->m_MediaMsgCntnr.GetTotal( &p_MediaMsgCntnrElmTotal, 1, NULL ); //从媒体消息容器中取出并删除第一个媒体消息。
-	if( p_MediaMsgCntnrElmTotal > 0 ) //如果有媒体消息需要处理。
+	switch( MsgTyp )
 	{
-		MediaPocsThrdPt->m_MediaMsgCntnr.GetHead( &p_MediaMsg, sizeof( p_MediaMsg ), NULL, NULL, 1, 1, NULL );
-		switch( p_MediaMsg.m_MediaMsgTyp )
+		case ThrdMsgTypSetAdoInpt:
 		{
-			case MediaMsgTypSetAdoInpt:
+			ThrdMsgSetAdoInpt * p_ThrdMsgSetAdoInptPt = ( ThrdMsgSetAdoInpt * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
-				MediaMsgSetAdoInpt * p_MediaMsgSetAdoInptPt = ( MediaMsgSetAdoInpt * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_SmplRate = p_MediaMsgSetAdoInptPt->m_SmplRate;
-				MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec = p_MediaMsgSetAdoInptPt->m_FrmLenMsec;
-				MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit = MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec * MediaPocsThrdPt->m_AdoInpt.m_SmplRate / 1000;
-				MediaPocsThrdPt->m_AdoInpt.m_FrmLenData = MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit * 1;
-				MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt = MediaPocsThrdPt->m_AdoInpt.m_FrmLenData * sizeof( int16_t );
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
-					{
-						if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
-						MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
-					}
-					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
-					if( AdoInptInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-					if( MediaPocsThrdTmpVarInit( MediaPocsThrdPt ) != 0 ) goto Out;
-				}
-				break;
+				AdoInptDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
 			}
-			case MediaMsgTypAdoInptSetIsUseSystemAecNsAgc:
+
+			MediaPocsThrdPt->m_AdoInpt.m_SmplRate = p_ThrdMsgSetAdoInptPt->m_SmplRate;
+			MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec = p_ThrdMsgSetAdoInptPt->m_FrmLenMsec;
+			MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit = MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec * MediaPocsThrdPt->m_AdoInpt.m_SmplRate / 1000;
+			MediaPocsThrdPt->m_AdoInpt.m_FrmLenData = MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit * 1;
+			MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt = MediaPocsThrdPt->m_AdoInpt.m_FrmLenData * sizeof( int16_t );
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
-				MediaMsgAdoInptSetIsUseSystemAecNsAgc * p_MediaMsgAdoInptSetIsUseSystemAecNsAgcPt = ( MediaMsgAdoInptSetIsUseSystemAecNsAgc * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_IsUseSystemAecNsAgc = p_MediaMsgAdoInptSetIsUseSystemAecNsAgcPt->m_IsUseSystemAecNsAgc;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
-					{
-						if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
-						MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
-					}
-					if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseNoAec:
-			{
-				MediaMsgAdoInptSetUseNoAec * p_MediaMsgAdoInptSetUseNoAecPt = ( MediaMsgAdoInptSetUseNoAec * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 0;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseSpeexAec:
-			{
-				MediaMsgAdoInptSetUseSpeexAec * p_MediaMsgAdoInptSetUseSpeexAecPt = ( MediaMsgAdoInptSetUseSpeexAec * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 1;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_FilterLenMsec = p_MediaMsgAdoInptSetUseSpeexAecPt->m_FilterLenMsec;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsUseRec = p_MediaMsgAdoInptSetUseSpeexAecPt->m_IsUseRec;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoMutp = p_MediaMsgAdoInptSetUseSpeexAecPt->m_EchoMutp;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu = p_MediaMsgAdoInptSetUseSpeexAecPt->m_EchoCntu;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes = p_MediaMsgAdoInptSetUseSpeexAecPt->m_EchoSupes;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct = p_MediaMsgAdoInptSetUseSpeexAecPt->m_EchoSupesAct;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile = p_MediaMsgAdoInptSetUseSpeexAecPt->m_IsSaveMemFile;
-				if( p_MediaMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt != NULL )
-				{
-					VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt, p_MediaMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt, , );
-					VstrDstoy( p_MediaMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt );
-				}
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseWebRtcAecm:
-			{
-				MediaMsgAdoInptSetUseWebRtcAecm * p_MediaMsgAdoInptSetUseWebRtcAecmPt = ( MediaMsgAdoInptSetUseWebRtcAecm * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 2;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode = p_MediaMsgAdoInptSetUseWebRtcAecmPt->m_IsUseCNGMode;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_EchoMode = p_MediaMsgAdoInptSetUseWebRtcAecmPt->m_EchoMode;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Delay = p_MediaMsgAdoInptSetUseWebRtcAecmPt->m_Delay;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseWebRtcAec:
-			{
-				MediaMsgAdoInptSetUseWebRtcAec * p_MediaMsgAdoInptSetUseWebRtcAecPt = ( MediaMsgAdoInptSetUseWebRtcAec * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 3;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_EchoMode = p_MediaMsgAdoInptSetUseWebRtcAecPt->m_EchoMode;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Delay = p_MediaMsgAdoInptSetUseWebRtcAecPt->m_Delay;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode = p_MediaMsgAdoInptSetUseWebRtcAecPt->m_IsUseDelayAgstcMode;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode = p_MediaMsgAdoInptSetUseWebRtcAecPt->m_IsUseExtdFilterMode;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode = p_MediaMsgAdoInptSetUseWebRtcAecPt->m_IsUseRefinedFilterAdaptAecMode;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay = p_MediaMsgAdoInptSetUseWebRtcAecPt->m_IsUseAdaptAdjDelay;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile = p_MediaMsgAdoInptSetUseWebRtcAecPt->m_IsSaveMemFile;
-				if( p_MediaMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt != NULL )
-				{
-					VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt, p_MediaMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt, , );
-					VstrDstoy( p_MediaMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt );
-				}
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseSpeexWebRtcAec:
-			{
-				MediaMsgAdoInptSetUseSpeexWebRtcAec * p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt = ( MediaMsgAdoInptSetUseSpeexWebRtcAec * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 4;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WorkMode;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecFilterLenMsec;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecIsUseRec;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoMutp;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoCntu;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoSupes;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoSupesAct;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecmIsUseCNGMode;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecmEchoMode;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecmDelay;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecEchoMode;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecDelay;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseDelayAgstcMode;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseExtdFilterMode;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseRefinedFilterAdaptAecMode;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseAdaptAdjDelay;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_IsUseSameRoomAec;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay = p_MediaMsgAdoInptSetUseSpeexWebRtcAecPt->m_SameRoomEchoMinDelay;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseNoNs:
-			{
-				MediaMsgAdoInptSetUseNoNs * p_MediaMsgAdoInptSetUseNoNsPt = ( MediaMsgAdoInptSetUseNoNs * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 0;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseSpeexPrpocsNs:
-			{
-				MediaMsgAdoInptSetUseSpeexPrpocsNs * p_MediaMsgAdoInptSetUseSpeexPrpocsNsPt = ( MediaMsgAdoInptSetUseSpeexPrpocsNs * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 1;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs = p_MediaMsgAdoInptSetUseSpeexPrpocsNsPt->m_IsUseNs;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes = p_MediaMsgAdoInptSetUseSpeexPrpocsNsPt->m_NoiseSupes;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb = p_MediaMsgAdoInptSetUseSpeexPrpocsNsPt->m_IsUseDereverb;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseWebRtcNsx:
-			{
-				MediaMsgAdoInptSetUseWebRtcNsx * p_MediaMsgAdoInptSetUseWebRtcNsxPt = ( MediaMsgAdoInptSetUseWebRtcNsx * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 2;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsx.m_PolicyMode = p_MediaMsgAdoInptSetUseWebRtcNsxPt->m_PolicyMode;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseWebRtcNs:
-			{
-				MediaMsgAdoInptSetUseWebRtcNs * p_MediaMsgAdoInptSetUseWebRtcNsPt = ( MediaMsgAdoInptSetUseWebRtcNs * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 3;
-				MediaPocsThrdPt->m_AdoInpt.m_WebRtcNs.m_PolicyMode = p_MediaMsgAdoInptSetUseWebRtcNsPt->m_PolicyMode;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseRNNoise:
-			{
-				MediaMsgAdoInptSetUseRNNoise * p_MediaMsgAdoInptSetUseRNNoisePt = ( MediaMsgAdoInptSetUseRNNoise * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 4;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetIsUseSpeexPrpocs:
-			{
-				MediaMsgAdoInptSetIsUseSpeexPrpocs * p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt = ( MediaMsgAdoInptSetIsUseSpeexPrpocs * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_IsUseSpeexPrpocs;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseVad = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_IsUseVad;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbStart = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_VadProbStart;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_VadProbCntu;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_IsUseAgc;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcLevel = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcLevel;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcIncrement;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcDecrement;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain = p_MediaMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcMaxGain;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmVoiceActSts = 1;
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetUsePcm:
-			{
-				MediaMsgAdoInptSetUsePcm * p_MediaMsgAdoInptSetUsePcmPt = ( MediaMsgAdoInptSetUsePcm * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 0;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptEncdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseSpeexEncd:
-			{
-				MediaMsgAdoInptSetUseSpeexEncd * p_MediaMsgAdoInptSetUseSpeexEncdPt = ( MediaMsgAdoInptSetUseSpeexEncd * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 1;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr = p_MediaMsgAdoInptSetUseSpeexEncdPt->m_UseCbrOrVbr;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Qualt = p_MediaMsgAdoInptSetUseSpeexEncdPt->m_Qualt;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Cmplxt = p_MediaMsgAdoInptSetUseSpeexEncdPt->m_Cmplxt;
-				MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate = p_MediaMsgAdoInptSetUseSpeexEncdPt->m_PlcExptLossRate;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptEncdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseOpusEncd:
-			{
-				MediaMsgAdoInptSetUseOpusEncd * p_MediaMsgAdoInptSetUseOpusEncdPt = ( MediaMsgAdoInptSetUseOpusEncd * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 2;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptEncdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
-				break;
-			}
-			case MediaMsgTypAdoInptSetIsSaveAdoToWaveFile:
-			{
-				MediaMsgAdoInptSetIsSaveAdoToWaveFile * p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt = ( MediaMsgAdoInptSetIsSaveAdoToWaveFile * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_IsSave = p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_IsSave;
-				if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt != NULL )
-				{
-					VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt, p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt, , );
-					VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
-				}
-				if( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt != NULL )
-				{
-					VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_RsltFullPathVstrPt, p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt, , );
-					VstrDstoy( p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt );
-				}
-				MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_WrBufSzByt = p_MediaMsgAdoInptSetIsSaveAdoToWaveFilePt->m_WrBufSzByt;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptWaveFileWriterInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypAdoInptSetIsDrawAdoWavfmToWnd:
-			{
-				MediaMsgAdoInptSetIsDrawAdoWavfmToWnd * p_MediaMsgAdoInptSetIsDrawAdoWavfmToWndPt = ( MediaMsgAdoInptSetIsDrawAdoWavfmToWnd * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptWavfmDstoy( &MediaPocsThrdPt->m_AdoInpt );
-
-				MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDraw = p_MediaMsgAdoInptSetIsDrawAdoWavfmToWndPt->m_IsDraw;
-				MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcWndHdl = p_MediaMsgAdoInptSetIsDrawAdoWavfmToWndPt->m_SrcWndHdl;
-				MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltWndHdl = p_MediaMsgAdoInptSetIsDrawAdoWavfmToWndPt->m_RsltWndHdl;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptWavfmInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypAdoInptSetUseDvc:
-			{
-				MediaMsgAdoInptSetUseDvc * p_MediaMsgAdoInptSetUseDvcPt = ( MediaMsgAdoInptSetUseDvc * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
-				}
-
-				MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID = p_MediaMsgAdoInptSetUseDvcPt->m_ID;
-
-				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-				{
-					if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
-					{
-						if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
-						MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
-					}
-					if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-				}
-				break;
-			}
-			case MediaMsgTypAdoInptSetIsMute:
-			{
-				MediaMsgAdoInptSetIsMute * p_MediaMsgAdoInptSetIsMutePt = ( MediaMsgAdoInptSetIsMute * )&p_MediaMsg;
-
-				MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsMute = p_MediaMsgAdoInptSetIsMutePt->m_IsMute;
-				break;
-			}
-			case MediaMsgTypSetAdoOtpt:
-			{
-				MediaMsgSetAdoOtpt * p_MediaMsgSetAdoOtptPt = ( MediaMsgSetAdoOtpt * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
-				{
-					if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					AdoOtptDstoy( &MediaPocsThrdPt->m_AdoOtpt );
-				}
-
-				MediaPocsThrdPt->m_AdoOtpt.m_SmplRate = p_MediaMsgSetAdoOtptPt->m_SmplRate;
-				MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec = p_MediaMsgSetAdoOtptPt->m_FrmLenMsec;
-				MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit = MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec * MediaPocsThrdPt->m_AdoOtpt.m_SmplRate / 1000;
-				MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData = MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit * 1;
-				MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt = MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData * sizeof( int16_t );
-
-				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
-				{
-					if( AdoOtptInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
-					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
-					if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-					{
-						AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
-						if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-						MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-					}
-					else
-					{
-						MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
-						MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
-					}
-				}
-				break;
-			}
-			case MediaMsgTypAdoOtptAddStrm:
-			{
-				MediaMsgAdoOtptAddStrm * p_MediaMsgAdoOtptAddStrmPt = ( MediaMsgAdoOtptAddStrm * )&p_MediaMsg;
-
-				AdoOtptAddStrm( &MediaPocsThrdPt->m_AdoOtpt, p_MediaMsgAdoOtptAddStrmPt->m_StrmIdx );
-				break;
-			}
-			case MediaMsgTypAdoOtptDelStrm:
-			{
-				MediaMsgAdoOtptDelStrm * p_MediaMsgAdoOtptDelStrmPt = ( MediaMsgAdoOtptDelStrm * )&p_MediaMsg;
-
-				AdoOtptDelStrm( &MediaPocsThrdPt->m_AdoOtpt, p_MediaMsgAdoOtptDelStrmPt->m_StrmIdx );
-				break;
-			}
-			case MediaMsgTypAdoOtptSetStrmUsePcm:
-			{
-				MediaMsgAdoOtptSetStrmUsePcm * p_MediaMsgAdoOtptSetStrmUsePcmPt = ( MediaMsgAdoOtptSetStrmUsePcm * )&p_MediaMsg;
-
-				AdoOtptSetStrmUsePcm( &MediaPocsThrdPt->m_AdoOtpt, p_MediaMsgAdoOtptSetStrmUsePcmPt->m_StrmIdx );
-				break;
-			}
-			case MediaMsgTypAdoOtptSetStrmUseSpeexDecd:
-			{
-				MediaMsgAdoOtptSetStrmUseSpeexDecd * p_MediaMsgAdoOtptSetStrmUseSpeexDecdPt = ( MediaMsgAdoOtptSetStrmUseSpeexDecd * )&p_MediaMsg;
-
-				AdoOtptSetStrmUseSpeexDecd( &MediaPocsThrdPt->m_AdoOtpt, p_MediaMsgAdoOtptSetStrmUseSpeexDecdPt->m_StrmIdx, p_MediaMsgAdoOtptSetStrmUseSpeexDecdPt->m_IsUsePrcplEnhsmt );
-				break;
-			}
-			case MediaMsgTypAdoOtptSetStrmUseOpusDecd:
-			{
-				MediaMsgAdoOtptSetStrmUseOpusDecd * p_MediaMsgAdoOtptSetStrmUseOpusDecdPt = ( MediaMsgAdoOtptSetStrmUseOpusDecd * )&p_MediaMsg;
-
-				AdoOtptSetStrmUseOpusDecd( &MediaPocsThrdPt->m_AdoOtpt, p_MediaMsgAdoOtptSetStrmUseOpusDecdPt->m_StrmIdx );
-				break;
-			}
-			case MediaMsgTypAdoOtptSetStrmIsUse:
-			{
-				MediaMsgAdoOtptSetStrmIsUse * p_MediaMsgAdoOtptSetStrmIsUsePt = ( MediaMsgAdoOtptSetStrmIsUse * )&p_MediaMsg;
-
-				AdoOtptSetStrmIsUse( &MediaPocsThrdPt->m_AdoOtpt, p_MediaMsgAdoOtptSetStrmIsUsePt->m_StrmIdx, p_MediaMsgAdoOtptSetStrmIsUsePt->m_IsUse );
-				break;
-			}
-			case MediaMsgTypAdoOtptSetIsSaveAdoToWaveFile:
-			{
-				MediaMsgAdoOtptSetIsSaveAdoToWaveFile * p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt = ( MediaMsgAdoOtptSetIsSaveAdoToWaveFile * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoOtpt );
-
-				MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_IsSave = p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_IsSave;
-				if( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt != NULL )
-				{
-					VstrCpy( MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_SrcFullPathVstrPt, p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt, , );
-					VstrDstoy( p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
-				}
-				MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_WrBufSzByt = p_MediaMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_WrBufSzByt;
-
-				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptWaveFileWriterInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypAdoOtptSetIsDrawAdoWavfmToWnd:
-			{
-				MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd * p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWndPt = ( MediaMsgAdoOtptSetIsDrawAdoWavfmToWnd * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptWavfmDstoy( &MediaPocsThrdPt->m_AdoOtpt );
-
-				MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDraw = p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWndPt->m_IsDraw;
-				MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcWndHdl = p_MediaMsgAdoOtptSetIsDrawAdoWavfmToWndPt->m_SrcWndHdl;
-
-				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptWavfmInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypAdoOtptSetUseDvc:
-			{
-				MediaMsgAdoOtptSetUseDvc * p_MediaMsgAdoOtptSetUseDvcPt = ( MediaMsgAdoOtptSetUseDvc * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
-				{
-					if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
-					AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
-				}
-
-				MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID = p_MediaMsgAdoOtptSetUseDvcPt->m_ID;
-
 				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 				{
 					if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
 					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
-					if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
-					{
-						if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
-						MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
-					}
-					else
-					{
-						MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
-						MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
-					}
 				}
-				break;
+				AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
+				if( AdoInptInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
+				if( MediaPocsThrdTmpVarInit( MediaPocsThrdPt ) != 0 ) goto Out;
 			}
-			case MediaMsgTypAdoOtptSetIsMute:
+			break;
+		}
+		case ThrdMsgTypAdoInptSetIsUseSystemAecNsAgc:
+		{
+			ThrdMsgAdoInptSetIsUseSystemAecNsAgc * p_ThrdMsgAdoInptSetIsUseSystemAecNsAgcPt = ( ThrdMsgAdoInptSetIsUseSystemAecNsAgc * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
-				MediaMsgAdoOtptSetIsMute * p_MediaMsgAdoOtptSetIsMutePt = ( MediaMsgAdoOtptSetIsMute * )&p_MediaMsg;
-
-				MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsMute = p_MediaMsgAdoOtptSetIsMutePt->m_IsMute;
-				break;
+				AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
 			}
-			case MediaMsgTypSetVdoInpt:
+
+			MediaPocsThrdPt->m_AdoInpt.m_IsUseSystemAecNsAgc = p_ThrdMsgAdoInptSetIsUseSystemAecNsAgcPt->m_IsUseSystemAecNsAgc;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
-				MediaMsgSetVdoInpt * p_MediaMsgSetVdoInptPt = ( MediaMsgSetVdoInpt * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
-
-				MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate = p_MediaMsgSetVdoInptPt->m_MaxSmplRate;
-				MediaPocsThrdPt->m_VdoInpt.m_FrmWidth = p_MediaMsgSetVdoInptPt->m_FrmWidth;
-				MediaPocsThrdPt->m_VdoInpt.m_FrmHeight = p_MediaMsgSetVdoInptPt->m_FrmHeight;
-				MediaPocsThrdPt->m_VdoInpt.m_Yu12FrmLenByt = p_MediaMsgSetVdoInptPt->m_FrmWidth * p_MediaMsgSetVdoInptPt->m_FrmHeight * 3 / 2;
-				MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl = p_MediaMsgSetVdoInptPt->m_PrvwWndHdl;
-
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypVdoInptSetUseYu12:
-			{
-				MediaMsgSetVdoInptUseYu12 * p_MediaMsgSetVdoInptUseYu12Pt = ( MediaMsgSetVdoInptUseYu12 * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
-
-				MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd = 0;
-
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypVdoInptSetUseOpenH264Encd:
-			{
-				MediaMsgSetVdoInptUseOpenH264Encd * p_MediaMsgSetVdoInptUseOpenH264EncdPt = ( MediaMsgSetVdoInptUseOpenH264Encd * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
-
-				MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd = 1;
-				MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_VdoType = p_MediaMsgSetVdoInptUseOpenH264EncdPt->m_VdoType;
-				MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_EncdBitrate = p_MediaMsgSetVdoInptUseOpenH264EncdPt->m_EncdBitrate;
-				MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode = p_MediaMsgSetVdoInptUseOpenH264EncdPt->m_BitrateCtrlMode;
-				MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl = p_MediaMsgSetVdoInptUseOpenH264EncdPt->m_IDRFrmIntvl;
-				MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_Cmplxt = p_MediaMsgSetVdoInptUseOpenH264EncdPt->m_Cmplxt;
-
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypVdoInptSetUseDvc:
-			{
-				MediaMsgSetVdoInptUseDvc * p_MediaMsgSetVdoInptUseDvcPt = ( MediaMsgSetVdoInptUseDvc * )&p_MediaMsg;
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
-
-				MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID = p_MediaMsgSetVdoInptUseDvcPt->m_ID;
-
-				if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
-				break;
-			}
-			case MediaMsgTypVdoInptSetIsBlack:
-			{
-				MediaMsgSetVdoInptIsBlack * p_MediaMsgSetVdoInptIsBlackPt = ( MediaMsgSetVdoInptIsBlack * )&p_MediaMsg;
-
-				MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_IsBlack = p_MediaMsgSetVdoInptIsBlackPt->m_IsBlack;
-				break;
-			}
-			case MediaMsgTypVdoOtptAddStrm:
-			{
-				MediaMsgAddVdoOtptStrm * p_MediaMsgAddVdoOtptStrmPt = ( MediaMsgAddVdoOtptStrm * )&p_MediaMsg;
-
-				VdoOtptAddStrm( &MediaPocsThrdPt->m_VdoOtpt, p_MediaMsgAddVdoOtptStrmPt->m_StrmIdx );
-				break;
-			}
-			case MediaMsgTypVdoOtptDelStrm:
-			{
-				MediaMsgDelVdoOtptStrm * p_MediaMsgDelVdoOtptStrmPt = ( MediaMsgDelVdoOtptStrm * )&p_MediaMsg;
-
-				VdoOtptDelStrm( &MediaPocsThrdPt->m_VdoOtpt, p_MediaMsgDelVdoOtptStrmPt->m_StrmIdx );
-				break;
-			}
-			case MediaMsgTypVdoOtptSetStrm:
-			{
-				MediaMsgSetVdoOtptStrm * p_MediaMsgSetVdoOtptStrmPt = ( MediaMsgSetVdoOtptStrm * )&p_MediaMsg;
-
-				VdoOtptSetStrm( &MediaPocsThrdPt->m_VdoOtpt, p_MediaMsgSetVdoOtptStrmPt->m_StrmIdx, p_MediaMsgSetVdoOtptStrmPt->m_DspyWndHdl );
-				break;
-			}
-			case MediaMsgTypVdoOtptSetStrmUseYu12:
-			{
-				MediaMsgSetVdoOtptStrmUseYu12 * p_MediaMsgSetVdoOtptStrmUseYu12Pt = ( MediaMsgSetVdoOtptStrmUseYu12 * )&p_MediaMsg;
-
-				VdoOtptSetStrmUseYu12( &MediaPocsThrdPt->m_VdoOtpt, p_MediaMsgSetVdoOtptStrmUseYu12Pt->m_StrmIdx );
-				break;
-			}
-			case MediaMsgTypVdoOtptSetStrmUseOpenH264Decd:
-			{
-				MediaMsgSetVdoOtptStrmUseOpenH264Decd * p_MediaMsgSetVdoOtptStrmUseOpenH264DecdPt = ( MediaMsgSetVdoOtptStrmUseOpenH264Decd * )&p_MediaMsg;
-
-				VdoOtptSetStrmUseOpenH264Decd( &MediaPocsThrdPt->m_VdoOtpt, p_MediaMsgSetVdoOtptStrmUseOpenH264DecdPt->m_StrmIdx, p_MediaMsgSetVdoOtptStrmUseOpenH264DecdPt->m_DecdThrdNum );
-				break;
-			}
-			case MediaMsgTypVdoOtptSetStrmIsBlack:
-			{
-				MediaMsgSetVdoOtptStrmIsBlack * p_MediaMsgSetVdoOtptStrmIsBlackPt = ( MediaMsgSetVdoOtptStrmIsBlack * )&p_MediaMsg;
-
-				VdoOtptSetStrmIsBlack( &MediaPocsThrdPt->m_VdoOtpt, p_MediaMsgSetVdoOtptStrmIsBlackPt->m_StrmIdx, p_MediaMsgSetVdoOtptStrmIsBlackPt->m_IsBlack );
-				break;
-			}
-			case MediaMsgTypVdoOtptSetStrmIsUse:
-			{
-				MediaMsgSetVdoOtptStrmIsUse * p_MediaMsgSetVdoOtptStrmIsUsePt = ( MediaMsgSetVdoOtptStrmIsUse * )&p_MediaMsg;
-
-				VdoOtptSetStrmIsUse( &MediaPocsThrdPt->m_VdoOtpt, p_MediaMsgSetVdoOtptStrmIsUsePt->m_StrmIdx, p_MediaMsgSetVdoOtptStrmIsUsePt->m_IsUse );
-				break;
-			}
-			case MediaMsgTypSetIsUseAdoVdoInptOtpt:
-			{
-				MediaMsgSetIsUseAdoVdoInptOtpt * p_MediaMsgSetIsUseAdoVdoInptOtptPt = ( MediaMsgSetIsUseAdoVdoInptOtpt * )&p_MediaMsg;
-
-				if( p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoInpt >= 0 ) MediaPocsThrdPt->m_AdoInpt.m_IsUse = p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoInpt;
-				if( p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoOtpt >= 0 ) MediaPocsThrdPt->m_AdoOtpt.m_IsUse = p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoOtpt;
-				if( p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoInpt >= 0 ) MediaPocsThrdPt->m_VdoInpt.m_IsUse = p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoInpt;
-				if( p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoOtpt >= 0 ) MediaPocsThrdPt->m_VdoOtpt.m_IsUse = p_MediaMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoOtpt;
-
-				MediaMsgAdoVdoInptOtptInit p_MediaMsgSetIsUseAdoVdoInptOtpt;
-				p_MediaMsgSetIsUseAdoVdoInptOtpt.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptInit;
-				if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgSetIsUseAdoVdoInptOtpt, sizeof( p_MediaMsgSetIsUseAdoVdoInptOtpt ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-					goto Out;
+					if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
+					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
 				}
-				break;
+				if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 			}
-			case MediaMsgTypSetIsUsePrvntSysSleep:
-			{
-				MediaMsgSetIsUsePrvntSysSleep * p_MediaMsgSetIsUsePrvntSysSleepPt = ( MediaMsgSetIsUsePrvntSysSleep * )&p_MediaMsg;
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseNoAec:
+		{
+			ThrdMsgAdoInptSetUseNoAec * p_ThrdMsgAdoInptSetUseNoAecPt = ( ThrdMsgAdoInptSetUseNoAec * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
-				MediaPocsThrdPt->m_IsUsePrvntSysSleep = p_MediaMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep;
-				MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrdPt, MediaPocsThrdPt->m_IsUsePrvntSysSleep );
-				break;
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 0;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
 			}
-			case MediaMsgTypSetIsSaveAdoVdoInptOtptToAviFile:
-			{
-				MediaMsgSetIsSaveAdoVdoInptOtptToAviFile * p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt = ( MediaMsgSetIsSaveAdoVdoInptOtptToAviFile * )&p_MediaMsg;
-				//MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrdPt ); //这里不用销毁。
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseSpeexAec:
+		{
+			ThrdMsgAdoInptSetUseSpeexAec * p_ThrdMsgAdoInptSetUseSpeexAecPt = ( ThrdMsgAdoInptSetUseSpeexAec * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
-				if( p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_FullPathVstrPt != NULL )
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 1;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_FilterLenMsec = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_FilterLenMsec;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsUseRec = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_IsUseRec;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoMutp = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_EchoMutp;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_EchoCntu;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_EchoSupes;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_EchoSupesAct;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_IsSaveMemFile;
+			if( p_ThrdMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt != NULL )
+			{
+				VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt, p_ThrdMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt, , );
+				VstrDstoy( p_ThrdMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt );
+			}
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseWebRtcAecm:
+		{
+			ThrdMsgAdoInptSetUseWebRtcAecm * p_ThrdMsgAdoInptSetUseWebRtcAecmPt = ( ThrdMsgAdoInptSetUseWebRtcAecm * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 2;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode = p_ThrdMsgAdoInptSetUseWebRtcAecmPt->m_IsUseCNGMode;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_EchoMode = p_ThrdMsgAdoInptSetUseWebRtcAecmPt->m_EchoMode;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Delay = p_ThrdMsgAdoInptSetUseWebRtcAecmPt->m_Delay;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseWebRtcAec:
+		{
+			ThrdMsgAdoInptSetUseWebRtcAec * p_ThrdMsgAdoInptSetUseWebRtcAecPt = ( ThrdMsgAdoInptSetUseWebRtcAec * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 3;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_EchoMode = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_EchoMode;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Delay = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_Delay;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsUseDelayAgstcMode;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsUseExtdFilterMode;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsUseRefinedFilterAdaptAecMode;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsUseAdaptAdjDelay;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsSaveMemFile;
+			if( p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt != NULL )
+			{
+				VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt, p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt, , );
+				VstrDstoy( p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt );
+			}
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseSpeexWebRtcAec:
+		{
+			ThrdMsgAdoInptSetUseSpeexWebRtcAec * p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt = ( ThrdMsgAdoInptSetUseSpeexWebRtcAec * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 4;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WorkMode;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecFilterLenMsec;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecIsUseRec;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoMutp;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoCntu;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoSupes;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecEchoSupesAct;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecmIsUseCNGMode;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecmEchoMode;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecmDelay;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecEchoMode;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecDelay;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseDelayAgstcMode;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseExtdFilterMode;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseRefinedFilterAdaptAecMode;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseAdaptAdjDelay;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_IsUseSameRoomAec;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SameRoomEchoMinDelay;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseNoNs:
+		{
+			ThrdMsgAdoInptSetUseNoNs * p_ThrdMsgAdoInptSetUseNoNsPt = ( ThrdMsgAdoInptSetUseNoNs * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+			}
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 0;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseSpeexPrpocsNs:
+		{
+			ThrdMsgAdoInptSetUseSpeexPrpocsNs * p_ThrdMsgAdoInptSetUseSpeexPrpocsNsPt = ( ThrdMsgAdoInptSetUseSpeexPrpocsNs * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+			}
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 1;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs = p_ThrdMsgAdoInptSetUseSpeexPrpocsNsPt->m_IsUseNs;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes = p_ThrdMsgAdoInptSetUseSpeexPrpocsNsPt->m_NoiseSupes;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb = p_ThrdMsgAdoInptSetUseSpeexPrpocsNsPt->m_IsUseDereverb;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseWebRtcNsx:
+		{
+			ThrdMsgAdoInptSetUseWebRtcNsx * p_ThrdMsgAdoInptSetUseWebRtcNsxPt = ( ThrdMsgAdoInptSetUseWebRtcNsx * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+			}
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 2;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsx.m_PolicyMode = p_ThrdMsgAdoInptSetUseWebRtcNsxPt->m_PolicyMode;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseWebRtcNs:
+		{
+			ThrdMsgAdoInptSetUseWebRtcNs * p_ThrdMsgAdoInptSetUseWebRtcNsPt = ( ThrdMsgAdoInptSetUseWebRtcNs * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+			}
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 3;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcNs.m_PolicyMode = p_ThrdMsgAdoInptSetUseWebRtcNsPt->m_PolicyMode;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseRNNoise:
+		{
+			ThrdMsgAdoInptSetUseRNNoise * p_ThrdMsgAdoInptSetUseRNNoisePt = ( ThrdMsgAdoInptSetUseRNNoise * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+			}
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs = 4;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptNsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetIsUseSpeexPrpocs:
+		{
+			ThrdMsgAdoInptSetIsUseSpeexPrpocs * p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt = ( ThrdMsgAdoInptSetIsUseSpeexPrpocs * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_IsUseSpeexPrpocs;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseVad = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_IsUseVad;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbStart = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_VadProbStart;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_VadProbCntu;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_IsUseAgc;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcLevel = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcLevel;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcIncrement;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcDecrement;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_AgcMaxGain;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( AdoInptSpeexPrpocsInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmVoiceActSts = 1;
+			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUsePcm:
+		{
+			ThrdMsgAdoInptSetUsePcm * p_ThrdMsgAdoInptSetUsePcmPt = ( ThrdMsgAdoInptSetUsePcm * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 0;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptEncdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseSpeexEncd:
+		{
+			ThrdMsgAdoInptSetUseSpeexEncd * p_ThrdMsgAdoInptSetUseSpeexEncdPt = ( ThrdMsgAdoInptSetUseSpeexEncd * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 1;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr = p_ThrdMsgAdoInptSetUseSpeexEncdPt->m_UseCbrOrVbr;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Qualt = p_ThrdMsgAdoInptSetUseSpeexEncdPt->m_Qualt;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Cmplxt = p_ThrdMsgAdoInptSetUseSpeexEncdPt->m_Cmplxt;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate = p_ThrdMsgAdoInptSetUseSpeexEncdPt->m_PlcExptLossRate;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptEncdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseOpusEncd:
+		{
+			ThrdMsgAdoInptSetUseOpusEncd * p_ThrdMsgAdoInptSetUseOpusEncdPt = ( ThrdMsgAdoInptSetUseOpusEncd * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 2;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptEncdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
+			break;
+		}
+		case ThrdMsgTypAdoInptSetIsSaveAdoToWaveFile:
+		{
+			ThrdMsgAdoInptSetIsSaveAdoToWaveFile * p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt = ( ThrdMsgAdoInptSetIsSaveAdoToWaveFile * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_IsSave = p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_IsSave;
+			if( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt != NULL )
+			{
+				VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt, p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt, , );
+				VstrDstoy( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
+			}
+			if( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt != NULL )
+			{
+				VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_RsltFullPathVstrPt, p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt, , );
+				VstrDstoy( p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_RsltFullPathVstrPt );
+			}
+			MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_WrBufSzByt = p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_WrBufSzByt;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptWaveFileWriterInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypAdoInptSetIsDrawAdoWavfmToWnd:
+		{
+			ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd * p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWndPt = ( ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptWavfmDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDraw = p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWndPt->m_IsDraw;
+			MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcWndHdl = p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWndPt->m_SrcWndHdl;
+			MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltWndHdl = p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWndPt->m_RsltWndHdl;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) if( AdoInptWavfmInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseDvc:
+		{
+			ThrdMsgAdoInptSetUseDvc * p_ThrdMsgAdoInptSetUseDvcPt = ( ThrdMsgAdoInptSetUseDvc * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
+			}
+
+			MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID = p_ThrdMsgAdoInptSetUseDvcPt->m_ID;
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+			{
+				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 				{
-					VstrCpy( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_FullPathVstrPt, , );
-					VstrDstoy( p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_FullPathVstrPt );
+					if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
+					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
 				}
-				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt = p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_WrBufSzByt;
-				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt = p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveAdoInpt;
-				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt = p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveAdoOtpt;
-				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt = p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveVdoInpt;
-				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt = p_MediaMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveVdoOtpt;
-
-				if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) if( MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrdPt ) != 0 ) goto Out;
-				break;
+				if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 			}
-			case MediaMsgTypSaveStsToTxtFile:
+			break;
+		}
+		case ThrdMsgTypAdoInptSetIsMute:
+		{
+			ThrdMsgAdoInptSetIsMute * p_ThrdMsgAdoInptSetIsMutePt = ( ThrdMsgAdoInptSetIsMute * )MsgPt;
+
+			MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsMute = p_ThrdMsgAdoInptSetIsMutePt->m_IsMute;
+			break;
+		}
+		case ThrdMsgTypSetAdoOtpt:
+		{
+			ThrdMsgSetAdoOtpt * p_ThrdMsgSetAdoOtptPt = ( ThrdMsgSetAdoOtpt * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 			{
-				MediaMsgSaveStsToTxtFile * p_MediaMsgSaveStsToTxtFilePt = ( MediaMsgSaveStsToTxtFile * )&p_MediaMsg;
-				File * p_StsFilePt;
+				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				AdoOtptDstoy( &MediaPocsThrdPt->m_AdoOtpt );
+			}
 
-				if( FileInitByPath( &p_StsFilePt, p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt, NoRd_Wr, Create_AlExist_Clr, 8192, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+			MediaPocsThrdPt->m_AdoOtpt.m_SmplRate = p_ThrdMsgSetAdoOtptPt->m_SmplRate;
+			MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec = p_ThrdMsgSetAdoOtptPt->m_FrmLenMsec;
+			MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit = MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec * MediaPocsThrdPt->m_AdoOtpt.m_SmplRate / 1000;
+			MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData = MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit * 1;
+			MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt = MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData * sizeof( int16_t );
+
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
+			{
+				if( AdoOtptInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
+				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
+				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化状态文件 %vs 失败。原因：%vs" ), p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
-					VstrDstoy( p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
-					goto Out;
+					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
+					if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
 				}
+				else
+				{
+					MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
+					MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
+				}
+			}
+			break;
+		}
+		case ThrdMsgTypAdoOtptAddStrm:
+		{
+			ThrdMsgAdoOtptAddStrm * p_ThrdMsgAdoOtptAddStrmPt = ( ThrdMsgAdoOtptAddStrm * )MsgPt;
 
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsPrintLog：%z32d\n" ), MediaPocsThrdPt->m_IsPrintLog );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsShowToast：%z32d\n" ), MediaPocsThrdPt->m_IsShowToast );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_ShowToastWndHdl：%#P\n" ), MediaPocsThrdPt->m_ShowToastWndHdl );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsUsePrvntSysSleep：%z32d\n" ), MediaPocsThrdPt->m_IsUsePrvntSysSleep );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_FullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			AdoOtptAddStrm( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptAddStrmPt->m_StrmIdx );
+			break;
+		}
+		case ThrdMsgTypAdoOtptDelStrm:
+		{
+			ThrdMsgAdoOtptDelStrm * p_ThrdMsgAdoOtptDelStrmPt = ( ThrdMsgAdoOtptDelStrm * )MsgPt;
+
+			AdoOtptDelStrm( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptDelStrmPt->m_StrmIdx );
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetStrmUsePcm:
+		{
+			ThrdMsgAdoOtptSetStrmUsePcm * p_ThrdMsgAdoOtptSetStrmUsePcmPt = ( ThrdMsgAdoOtptSetStrmUsePcm * )MsgPt;
+
+			AdoOtptSetStrmUsePcm( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmUsePcmPt->m_StrmIdx );
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetStrmUseSpeexDecd:
+		{
+			ThrdMsgAdoOtptSetStrmUseSpeexDecd * p_ThrdMsgAdoOtptSetStrmUseSpeexDecdPt = ( ThrdMsgAdoOtptSetStrmUseSpeexDecd * )MsgPt;
+
+			AdoOtptSetStrmUseSpeexDecd( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmUseSpeexDecdPt->m_StrmIdx, p_ThrdMsgAdoOtptSetStrmUseSpeexDecdPt->m_IsUsePrcplEnhsmt );
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetStrmUseOpusDecd:
+		{
+			ThrdMsgAdoOtptSetStrmUseOpusDecd * p_ThrdMsgAdoOtptSetStrmUseOpusDecdPt = ( ThrdMsgAdoOtptSetStrmUseOpusDecd * )MsgPt;
+
+			AdoOtptSetStrmUseOpusDecd( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmUseOpusDecdPt->m_StrmIdx );
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetStrmIsUse:
+		{
+			ThrdMsgAdoOtptSetStrmIsUse * p_ThrdMsgAdoOtptSetStrmIsUsePt = ( ThrdMsgAdoOtptSetStrmIsUse * )MsgPt;
+
+			AdoOtptSetStrmIsUse( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmIsUsePt->m_StrmIdx, p_ThrdMsgAdoOtptSetStrmIsUsePt->m_IsUse );
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetIsSaveAdoToWaveFile:
+		{
+			ThrdMsgAdoOtptSetIsSaveAdoToWaveFile * p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt = ( ThrdMsgAdoOtptSetIsSaveAdoToWaveFile * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoOtpt );
+
+			MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_IsSave = p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_IsSave;
+			if( p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt != NULL )
+			{
+				VstrCpy( MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_SrcFullPathVstrPt, p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt, , );
+				VstrDstoy( p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_SrcFullPathVstrPt );
+			}
+			MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_WrBufSzByt = p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_WrBufSzByt;
+
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptWaveFileWriterInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetIsDrawAdoWavfmToWnd:
+		{
+			ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd * p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWndPt = ( ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptWavfmDstoy( &MediaPocsThrdPt->m_AdoOtpt );
+
+			MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDraw = p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWndPt->m_IsDraw;
+			MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcWndHdl = p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWndPt->m_SrcWndHdl;
+
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) if( AdoOtptWavfmInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetUseDvc:
+		{
+			ThrdMsgAdoOtptSetUseDvc * p_ThrdMsgAdoOtptSetUseDvcPt = ( ThrdMsgAdoOtptSetUseDvc * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
+			{
+				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
+				AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
+			}
+
+			MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID = p_ThrdMsgAdoOtptSetUseDvcPt->m_ID;
+
+			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
+			{
+				if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
+				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输出流时间戳要重置。
+				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
+				{
+					if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。
+				}
+				else
+				{
+					MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
+					MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
+				}
+			}
+			break;
+		}
+		case ThrdMsgTypAdoOtptSetIsMute:
+		{
+			ThrdMsgAdoOtptSetIsMute * p_ThrdMsgAdoOtptSetIsMutePt = ( ThrdMsgAdoOtptSetIsMute * )MsgPt;
+
+			MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsMute = p_ThrdMsgAdoOtptSetIsMutePt->m_IsMute;
+			break;
+		}
+		case ThrdMsgTypSetVdoInpt:
+		{
+			ThrdMsgSetVdoInpt * p_ThrdMsgSetVdoInptPt = ( ThrdMsgSetVdoInpt * )MsgPt;
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
+
+			MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate = p_ThrdMsgSetVdoInptPt->m_MaxSmplRate;
+			MediaPocsThrdPt->m_VdoInpt.m_FrmWidth = p_ThrdMsgSetVdoInptPt->m_FrmWidth;
+			MediaPocsThrdPt->m_VdoInpt.m_FrmHeight = p_ThrdMsgSetVdoInptPt->m_FrmHeight;
+			MediaPocsThrdPt->m_VdoInpt.m_Yu12FrmLenByt = p_ThrdMsgSetVdoInptPt->m_FrmWidth * p_ThrdMsgSetVdoInptPt->m_FrmHeight * 3 / 2;
+			MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl = p_ThrdMsgSetVdoInptPt->m_PrvwWndHdl;
+
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypVdoInptSetUseYu12:
+		{
+			ThrdMsgSetVdoInptUseYu12 * p_ThrdMsgSetVdoInptUseYu12Pt = ( ThrdMsgSetVdoInptUseYu12 * )MsgPt;
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
+
+			MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd = 0;
+
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypVdoInptSetUseOpenH264Encd:
+		{
+			ThrdMsgSetVdoInptUseOpenH264Encd * p_ThrdMsgSetVdoInptUseOpenH264EncdPt = ( ThrdMsgSetVdoInptUseOpenH264Encd * )MsgPt;
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
+
+			MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd = 1;
+			MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_VdoType = p_ThrdMsgSetVdoInptUseOpenH264EncdPt->m_VdoType;
+			MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_EncdBitrate = p_ThrdMsgSetVdoInptUseOpenH264EncdPt->m_EncdBitrate;
+			MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode = p_ThrdMsgSetVdoInptUseOpenH264EncdPt->m_BitrateCtrlMode;
+			MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl = p_ThrdMsgSetVdoInptUseOpenH264EncdPt->m_IDRFrmIntvl;
+			MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_Cmplxt = p_ThrdMsgSetVdoInptUseOpenH264EncdPt->m_Cmplxt;
+
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypVdoInptSetUseDvc:
+		{
+			ThrdMsgSetVdoInptUseDvc * p_ThrdMsgSetVdoInptUseDvcPt = ( ThrdMsgSetVdoInptUseDvc * )MsgPt;
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
+
+			MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID = p_ThrdMsgSetVdoInptUseDvcPt->m_ID;
+
+			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypVdoInptSetIsBlack:
+		{
+			ThrdMsgSetVdoInptIsBlack * p_ThrdMsgSetVdoInptIsBlackPt = ( ThrdMsgSetVdoInptIsBlack * )MsgPt;
+
+			MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_IsBlack = p_ThrdMsgSetVdoInptIsBlackPt->m_IsBlack;
+			break;
+		}
+		case ThrdMsgTypVdoOtptAddStrm:
+		{
+			ThrdMsgAddVdoOtptStrm * p_ThrdMsgAddVdoOtptStrmPt = ( ThrdMsgAddVdoOtptStrm * )MsgPt;
+
+			VdoOtptAddStrm( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgAddVdoOtptStrmPt->m_StrmIdx );
+			break;
+		}
+		case ThrdMsgTypVdoOtptDelStrm:
+		{
+			ThrdMsgDelVdoOtptStrm * p_ThrdMsgDelVdoOtptStrmPt = ( ThrdMsgDelVdoOtptStrm * )MsgPt;
+
+			VdoOtptDelStrm( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgDelVdoOtptStrmPt->m_StrmIdx );
+			break;
+		}
+		case ThrdMsgTypVdoOtptSetStrm:
+		{
+			ThrdMsgSetVdoOtptStrm * p_ThrdMsgSetVdoOtptStrmPt = ( ThrdMsgSetVdoOtptStrm * )MsgPt;
+
+			VdoOtptSetStrm( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmPt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmPt->m_DspyWndHdl );
+			break;
+		}
+		case ThrdMsgTypVdoOtptSetStrmUseYu12:
+		{
+			ThrdMsgSetVdoOtptStrmUseYu12 * p_ThrdMsgSetVdoOtptStrmUseYu12Pt = ( ThrdMsgSetVdoOtptStrmUseYu12 * )MsgPt;
+
+			VdoOtptSetStrmUseYu12( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmUseYu12Pt->m_StrmIdx );
+			break;
+		}
+		case ThrdMsgTypVdoOtptSetStrmUseOpenH264Decd:
+		{
+			ThrdMsgSetVdoOtptStrmUseOpenH264Decd * p_ThrdMsgSetVdoOtptStrmUseOpenH264DecdPt = ( ThrdMsgSetVdoOtptStrmUseOpenH264Decd * )MsgPt;
+
+			VdoOtptSetStrmUseOpenH264Decd( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmUseOpenH264DecdPt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmUseOpenH264DecdPt->m_DecdThrdNum );
+			break;
+		}
+		case ThrdMsgTypVdoOtptSetStrmIsBlack:
+		{
+			ThrdMsgSetVdoOtptStrmIsBlack * p_ThrdMsgSetVdoOtptStrmIsBlackPt = ( ThrdMsgSetVdoOtptStrmIsBlack * )MsgPt;
+
+			VdoOtptSetStrmIsBlack( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmIsBlackPt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmIsBlackPt->m_IsBlack );
+			break;
+		}
+		case ThrdMsgTypVdoOtptSetStrmIsUse:
+		{
+			ThrdMsgSetVdoOtptStrmIsUse * p_ThrdMsgSetVdoOtptStrmIsUsePt = ( ThrdMsgSetVdoOtptStrmIsUse * )MsgPt;
+
+			VdoOtptSetStrmIsUse( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmIsUsePt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmIsUsePt->m_IsUse );
+			break;
+		}
+		case ThrdMsgTypSetIsUseAdoVdoInptOtpt:
+		{
+			ThrdMsgSetIsUseAdoVdoInptOtpt * p_ThrdMsgSetIsUseAdoVdoInptOtptPt = ( ThrdMsgSetIsUseAdoVdoInptOtpt * )MsgPt;
+
+			if( p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoInpt >= 0 ) MediaPocsThrdPt->m_AdoInpt.m_IsUse = p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoInpt;
+			if( p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoOtpt >= 0 ) MediaPocsThrdPt->m_AdoOtpt.m_IsUse = p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoOtpt;
+			if( p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoInpt >= 0 ) MediaPocsThrdPt->m_VdoInpt.m_IsUse = p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoInpt;
+			if( p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoOtpt >= 0 ) MediaPocsThrdPt->m_VdoOtpt.m_IsUse = p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseVdoOtpt;
+
+			ThrdMsgAdoVdoInptOtptInit p_ThrdMsgSetIsUseAdoVdoInptOtpt;
+			if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptInit, &p_ThrdMsgSetIsUseAdoVdoInptOtpt, sizeof( p_ThrdMsgSetIsUseAdoVdoInptOtpt ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+			{
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+				goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypSetIsUsePrvntSysSleep:
+		{
+			ThrdMsgSetIsUsePrvntSysSleep * p_ThrdMsgSetIsUsePrvntSysSleepPt = ( ThrdMsgSetIsUsePrvntSysSleep * )MsgPt;
+
+			MediaPocsThrdPt->m_IsUsePrvntSysSleep = p_ThrdMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep;
+			MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrdPt, MediaPocsThrdPt->m_IsUsePrvntSysSleep );
+			break;
+		}
+		case ThrdMsgTypSetIsSaveAdoVdoInptOtptToAviFile:
+		{
+			ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile * p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt = ( ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile * )MsgPt;
+			//MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrdPt ); //这里不用销毁。
+
+			if( p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_FullPathVstrPt != NULL )
+			{
+				VstrCpy( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_FullPathVstrPt, , );
+				VstrDstoy( p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_FullPathVstrPt );
+			}
+			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt = p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_WrBufSzByt;
+			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt = p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveAdoInpt;
+			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt = p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveAdoOtpt;
+			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt = p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveVdoInpt;
+			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt = p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_IsSaveVdoOtpt;
+
+			if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) if( MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrdPt ) != 0 ) goto Out;
+			break;
+		}
+		case ThrdMsgTypSaveStsToTxtFile:
+		{
+			ThrdMsgSaveStsToTxtFile * p_ThrdMsgSaveStsToTxtFilePt = ( ThrdMsgSaveStsToTxtFile * )MsgPt;
+			File * p_StsFilePt;
+
+			if( FileInitByPath( &p_StsFilePt, p_ThrdMsgSaveStsToTxtFilePt->m_FullPathVstrPt, NoRd_Wr, Create_AlExist_Clr, 8192, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+			{
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化状态文件 %vs 失败。原因：%vs" ), p_ThrdMsgSaveStsToTxtFilePt->m_FullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
+				VstrDstoy( p_ThrdMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
+				goto Out;
+			}
+
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsPrintLog：%z32d\n" ), MediaPocsThrdPt->m_IsPrintLog );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsShowToast：%z32d\n" ), MediaPocsThrdPt->m_IsShowToast );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_ShowToastWndHdl：%#P\n" ), MediaPocsThrdPt->m_ShowToastWndHdl );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_IsUsePrvntSysSleep：%z32d\n" ), MediaPocsThrdPt->m_IsUsePrvntSysSleep );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_FullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt：%z32d\n" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUse );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsInit );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SmplRate );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenData );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_FilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_FilterLenMsec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsUseRec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoMutp );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_EchoMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Delay );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_EchoMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Delay );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNsx.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsx.m_PolicyMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNs.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNs.m_PolicyMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseVad：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseVad );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbStart：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbStart );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcLevel：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcLevel );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Qualt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Qualt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Cmplxt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_IsDraw：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDraw );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_SrcWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcWndHdl );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_RsltWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltWndHdl );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_IsSave：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_IsSave );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_RsltFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_RsltFullPathVstrPt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_WrBufSzByt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsMute );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUse );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsInit );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SmplRate );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenData );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_FilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_FilterLenMsec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsUseRec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoMutp );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_EchoMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Delay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_EchoMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Delay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseDelayAgstcMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoMutp );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoCntu );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupes );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmEchoMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecmDelay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecEchoMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecDelay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatNs );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseNs );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_NoiseSupes );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocsNs.m_IsUseDereverb );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNsx.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsx.m_PolicyMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcNs.m_PolicyMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcNs.m_PolicyMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseVad：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseVad );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbStart：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbStart );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_VadProbCntu );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseAgc );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcLevel：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcLevel );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcIncrement );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcDecrement );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_AgcMaxGain );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_UseCbrOrVbr );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Qualt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Qualt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Cmplxt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_PlcExptLossRate );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_IsDraw：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDraw );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_SrcWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcWndHdl );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Wavfm.m_RsltWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltWndHdl );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_IsSave：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_IsSave );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_RsltFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_RsltFullPathVstrPt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WaveFileWriter.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_WrBufSzByt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsMute );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsUse );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsInit );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_SmplRate );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.m_CQueuePt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsUse );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_IsInit );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SmplRate：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_SmplRate );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenMsec：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenUnit：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenData );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.m_CQueuePt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			{
+				AdoOtpt::Strm * p_AdoOtptStrmPt; //存放音频输出流的指针。
+				for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_AdoOtptStrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
 				{
-					AdoOtpt::Strm * p_AdoOtptStrmPt; //存放音频输出流的指针。
-					for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_AdoOtptStrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
-					{
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Idx：%z32d\n" ), p_AdoOtptStrmPt->m_Idx );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), p_AdoOtptStrmPt->m_IsUse );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_UseWhatDecd：%z32d\n" ), p_AdoOtptStrmPt->m_UseWhatDecd );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SpeexDecd.m_IsUsePrcplEnhsmt：%z32d\n" ), p_AdoOtptStrmPt->m_SpeexDecd.m_IsUsePrcplEnhsmt );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-					}
-					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmUseTotal：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmUseTotal );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Idx：%z32d\n" ), p_AdoOtptStrmPt->m_Idx );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_IsUse：%z32d\n" ), p_AdoOtptStrmPt->m_IsUse );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_UseWhatDecd：%z32d\n" ), p_AdoOtptStrmPt->m_UseWhatDecd );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_SpeexDecd.m_IsUsePrcplEnhsmt：%z32d\n" ), p_AdoOtptStrmPt->m_SpeexDecd.m_IsUsePrcplEnhsmt );
 					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 				}
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_IsDraw：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDraw );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_SrcWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcWndHdl );
+				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_StrmUseTotal：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_StrmUseTotal );
 				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFileWriter.m_IsSave：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_IsSave );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFileWriter.m_SrcFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_SrcFullPathVstrPt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFileWriter.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_WrBufSzByt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_BufSzUnit：%uz32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_BufSzUnit );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsMute );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			}
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_IsDraw：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDraw );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Wavfm.m_SrcWndHdl：%#P\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcWndHdl );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFileWriter.m_IsSave：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_IsSave );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFileWriter.m_SrcFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_SrcFullPathVstrPt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_WaveFileWriter.m_WrBufSzByt：%uzd\n" ), MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_WrBufSzByt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_BufSzUnit：%uz32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_BufSzUnit );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoOtpt.m_Dvc.m_IsMute：%z32d\n" ), MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsMute );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsUse );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsInit );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_MaxSmplRate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmWidth：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmWidth );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmHeight：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmHeight );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Yu12FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_VdoInpt.m_Yu12FrmLenByt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_VdoType：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_VdoType );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_EncdBitrate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_EncdBitrate );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_Cmplxt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_PrvwWndHdl：%#P\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_IsBlack：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_IsBlack );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsUse );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_IsInit );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_MaxSmplRate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmWidth：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmWidth );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_FrmHeight：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_FrmHeight );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Yu12FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_VdoInpt.m_Yu12FrmLenByt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_UseWhatEncd：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_VdoType：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_VdoType );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_EncdBitrate：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_EncdBitrate );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_BitrateCtrlMode );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_IDRFrmIntvl );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_OpenH264Encd.m_Cmplxt：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_OpenH264Encd.m_Cmplxt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_ID：%ud\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_PrvwWndHdl：%#P\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoInpt.m_Dvc.m_IsBlack：%z32d\n" ), MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_IsBlack );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 						
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsUse );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsInit );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.m_CQueuePt );
-				FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-				{
-					VdoOtpt::Strm * p_VdoOtptStrmPt; //存放视频输出流的指针。
-					for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, NULL, ( void * * )&p_VdoOtptStrmPt, 0, 0, NULL ) == 0; p_StrmNum++ )
-					{
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Idx：%z32d\n" ), p_VdoOtptStrmPt->m_Idx );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_IsUse：%z32d\n" ), p_VdoOtptStrmPt->m_IsUse );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_UseWhatDecd：%z32d\n" ), p_VdoOtptStrmPt->m_UseWhatDecd );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_OpenH264Decd.m_DecdThrdNum：%z32d\n" ), p_VdoOtptStrmPt->m_OpenH264Decd.m_DecdThrdNum );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_DspyWndHdl：%#P\n" ), p_VdoOtptStrmPt->m_Dvc.m_DspyWndHdl );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_IsBlack：%z32d\n" ), p_VdoOtptStrmPt->m_Dvc.m_IsBlack );
-						FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-					}
-				}
-
-				FileDstoy( p_StsFilePt, 1, NULL );
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：保存状态到Txt文件 %vs 成功。" ), p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
-				VstrDstoy( p_MediaMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
-				break;
-			}
-			case MediaMsgTypRqirExit:
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsUse：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsUse );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_IsInit：%z32d\n" ), MediaPocsThrdPt->m_VdoOtpt.m_IsInit );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_CQueuePt：%#P\n" ), MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.m_CQueuePt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 			{
-				MediaMsgRqirExit * p_MediaMsgRqirExitPt = ( MediaMsgRqirExit * )&p_MediaMsg;
-
-				switch( p_MediaMsgRqirExitPt->m_ExitFlag )
+				VdoOtpt::Strm * p_VdoOtptStrmPt; //存放视频输出流的指针。
+				for( size_t p_StrmNum = 0; MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, &p_VdoOtptStrmPt, NULL, 0, 0, NULL ) == 0; p_StrmNum++ )
 				{
-					case 1: //请求退出。
-					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：接收到退出请求：退出。" ) );
-						
-						//执行顺序：媒体销毁，用户销毁并退出。
-						if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数。
-						{
-							MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
-							p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-							if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-								goto Out;
-							}
-							MediaMsgUserDstoy p_MediaMsgUserDstoy;
-							p_MediaMsgUserDstoy.m_MediaMsgTyp = MediaMsgTypUserDstoy;
-							if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-								goto Out;
-							}
-						}
-						else //如果上一次调用了用户定义的销毁函数，就不再进行媒体销毁，用户销毁。
-						{
-							MediaPocsThrdPt->m_ReadyExitCnt--; //设置准备退出计数递减。因为在请求退出时递增了。
-						}
-						break;
-					}
-					case 2: //请求重启。
-					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：接收到退出请求：重启。" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Idx：%z32d\n" ), p_VdoOtptStrmPt->m_Idx );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_IsUse：%z32d\n" ), p_VdoOtptStrmPt->m_IsUse );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_UseWhatDecd：%z32d\n" ), p_VdoOtptStrmPt->m_UseWhatDecd );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_OpenH264Decd.m_DecdThrdNum：%z32d\n" ), p_VdoOtptStrmPt->m_OpenH264Decd.m_DecdThrdNum );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_DspyWndHdl：%#P\n" ), p_VdoOtptStrmPt->m_Dvc.m_DspyWndHdl );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_VdoOtpt.m_StrmCntnr.m_Dvc.m_IsBlack：%z32d\n" ), p_VdoOtptStrmPt->m_Dvc.m_IsBlack );
+					FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+				}
+			}
 
-						//执行顺序：媒体销毁，用户销毁，用户初始化，媒体初始化。
-						if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数。
-						{
-							MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
-							p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-							if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-								goto Out;
-							}
-							MediaMsgUserDstoy p_MediaMsgUserDstoy;
-							p_MediaMsgUserDstoy.m_MediaMsgTyp = MediaMsgTypUserDstoy;
-							if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-							{
-								if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-								goto Out;
-							}
-						}
-						else //如果上一次调用了用户定义的销毁函数，就不再进行媒体销毁，用户销毁。
-						{
-							MediaPocsThrdPt->m_ReadyExitCnt--; //设置准备退出计数递减。因为在请求退出时递增了。
-						}
-						MediaMsgUserInit p_MediaMsgUserInit;
-						p_MediaMsgUserInit.m_MediaMsgTyp = MediaMsgTypUserInit;
-						if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgUserInit, sizeof( p_MediaMsgUserInit ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-							goto Out;
-						}
-						MediaMsgAdoVdoInptOtptInit p_MediaMsgAdoVdoInptOtptInit;
-						p_MediaMsgAdoVdoInptOtptInit.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptInit;
-						if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgAdoVdoInptOtptInit, sizeof( p_MediaMsgAdoVdoInptOtptInit ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-							goto Out;
-						}
-						break;
-					}
-					case 3: //请求重启但不执行用户定义的UserInit初始化函数和UserDstoy销毁函数。
-					{
-						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：接收到退出请求：重启但不执行用户定义的UserInit初始化函数和UserDstoy销毁函数。" ) );
-
-						//执行顺序：媒体销毁，媒体初始化。
-						MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
-						p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-						if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-							goto Out;
-						}
-						MediaMsgAdoVdoInptOtptInit p_MediaMsgAdoVdoInptOtptInit;
-						p_MediaMsgAdoVdoInptOtptInit.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptInit;
-						if( MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgAdoVdoInptOtptInit, sizeof( p_MediaMsgAdoVdoInptOtptInit ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-						{
-							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送媒体消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-							goto Out;
-						}
-						MediaPocsThrdPt->m_ReadyExitCnt--; //设置准备退出计数递减。因为在请求退出时递增了。
-						break;
-					}
-				}
-				break;
-			}
-			case MediaMsgTypUserInit:
-			{
-				MediaMsgUserInit * p_MediaMsgUserInitPt = ( MediaMsgUserInit * )&p_MediaMsg;
-
-				MediaPocsThrdPt->m_ExitCode = MediaPocsThrd::ExitCodeNormal; //清空退出码。
-				MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 0; //设置上一次调用了用户定义的初始化函数。
-				MediaPocsThrdPt->m_ReadyExitCnt--; //设置准备退出计数递减。因为在请求退出时递增了。
-				p_TmpInt32 = MediaPocsThrdPt->m_UserInitFuncPt( MediaPocsThrdPt ); //调用用户定义的初始化函数。
-				if( p_TmpInt32 == 0 )
-				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的初始化函数成功。返回值：%d。" ), p_TmpInt32 );
-				}
-				else
-				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：调用用户定义的初始化函数失败。返回值：%d。" ), p_TmpInt32 );
-					goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypUserDstoy:
-			{
-				MediaMsgUserDstoy * p_MediaMsgUserDstoyPt = ( MediaMsgUserDstoy * )&p_MediaMsg;
-
-				MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 1;
-				MediaPocsThrdPt->m_UserDstoyFuncPt( MediaPocsThrdPt ); //调用用户定义的销毁函数。
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的销毁函数成功。" ) );
-				break;
-			}
-			case MediaMsgTypUserMsg:
-			{
-				MediaMsgUserMsg * p_MediaMsgUserMsgPt = ( MediaMsgUserMsg * )&p_MediaMsg;
-
-				p_TmpInt32 = MediaPocsThrdPt->m_UserMsgFuncPt( MediaPocsThrdPt, p_MediaMsgUserMsgPt->m_UserMsgArr );
-				if( p_TmpInt32 == 0 )
-				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的消息函数成功。返回值：%d。" ), p_TmpInt32 );
-				}
-				else
-				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：调用用户定义的消息函数失败。返回值：%d。" ), p_TmpInt32 );
-					goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypAdoVdoInptOtptInit:
-			{
-				if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数，就初始化音视频输入输出、音视频输入输出Avi文件写入器。
-				{
-					if( MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrdPt ) != 0 ) goto Out;
-					if( MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrdPt ) != 0 ) goto Out;
-				}
-				break;
-			}
-			case MediaMsgTypAdoVdoInptOtptDstoy:
-			{
-				MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrdPt );
-				MediaPocsThrdAdoVdoInptOtptDstoy( MediaPocsThrdPt );
-				break;
-			}
+			FileDstoy( p_StsFilePt, 1, NULL );
+			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：保存状态到Txt文件 %vs 成功。" ), p_ThrdMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
+			VstrDstoy( p_ThrdMsgSaveStsToTxtFilePt->m_FullPathVstrPt );
+			break;
 		}
+		case ThrdMsgTypRqirExit:
+		{
+			ThrdMsgRqirExit * p_ThrdMsgRqirExitPt = ( ThrdMsgRqirExit * )MsgPt;
 
-        if( p_MediaMsg.m_MediaMsgRsltPt != NULL ) *p_MediaMsg.m_MediaMsgRsltPt = 0; //设置媒体消息处理结果为成功。
-        p_Rslt = 0; //设置本函数执行成功。
+			switch( p_ThrdMsgRqirExitPt->m_ExitFlag )
+			{
+				case 1: //请求退出。
+				{
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：接收退出请求：退出。" ) );
+						
+					//执行顺序：媒体销毁，用户销毁。
+					if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数。
+					{
+						ThrdMsgAdoVdoInptOtptDstoy p_ThrdMsgAdoVdoInptOtptDstoy;
+						if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptDstoy, &p_ThrdMsgAdoVdoInptOtptDstoy, sizeof( p_ThrdMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						{
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							goto Out;
+						}
+						ThrdMsgUserDstoy p_ThrdMsgUserDstoy;
+						if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypUserDstoy, &p_ThrdMsgUserDstoy, sizeof( p_ThrdMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						{
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							goto Out;
+						}
+					}
+					else //如果上一次调用了用户定义的销毁函数，就不再进行媒体销毁，用户销毁。
+					{
+						
+					}
+					break;
+				}
+				case 2: //请求重启。
+				{
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：接收退出请求：重启。" ) );
+
+					//执行顺序：媒体销毁，用户销毁，用户初始化，媒体初始化。
+					if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数。
+					{
+						ThrdMsgAdoVdoInptOtptDstoy p_ThrdMsgAdoVdoInptOtptDstoy;
+						if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptDstoy, &p_ThrdMsgAdoVdoInptOtptDstoy, sizeof( p_ThrdMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						{
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							goto Out;
+						}
+						ThrdMsgUserDstoy p_ThrdMsgUserDstoy;
+						if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypUserDstoy, &p_ThrdMsgUserDstoy, sizeof( p_ThrdMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						{
+							if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+							goto Out;
+						}
+					}
+					else //如果上一次调用了用户定义的销毁函数，就不再进行媒体销毁，用户销毁。
+					{
+						
+					}
+					ThrdMsgUserInit p_ThrdMsgUserInit;
+					if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypUserInit, &p_ThrdMsgUserInit, sizeof( p_ThrdMsgUserInit ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						goto Out;
+					}
+					ThrdMsgAdoVdoInptOtptInit p_ThrdMsgAdoVdoInptOtptInit;
+					if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptInit, &p_ThrdMsgAdoVdoInptOtptInit, sizeof( p_ThrdMsgAdoVdoInptOtptInit ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						goto Out;
+					}
+					break;
+				}
+				case 3: //请求重启但不执行用户定义的UserInit初始化函数和UserDstoy销毁函数。
+				{
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：接收退出请求：重启但不调用用户定义的UserInit初始化函数和UserDstoy销毁函数。" ) );
+
+					//执行顺序：媒体销毁，媒体初始化。
+					ThrdMsgAdoVdoInptOtptDstoy p_ThrdMsgAdoVdoInptOtptDstoy;
+					if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptDstoy, &p_ThrdMsgAdoVdoInptOtptDstoy, sizeof( p_ThrdMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						goto Out;
+					}
+					ThrdMsgAdoVdoInptOtptInit p_ThrdMsgAdoVdoInptOtptInit;
+					if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptInit, &p_ThrdMsgAdoVdoInptOtptInit, sizeof( p_ThrdMsgAdoVdoInptOtptInit ), MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "发送线程消息失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+						goto Out;
+					}
+					break;
+				}
+			}
+			break;
+		}
+		case ThrdMsgTypUserInit:
+		{
+			ThrdMsgUserInit * p_ThrdMsgUserInitPt = ( ThrdMsgUserInit * )MsgPt;
+
+			MediaPocsThrdPt->m_ExitCode = MediaPocsThrd::ExitCodeNormal; //清空退出码。
+			MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 0; //设置上一次调用了用户定义的初始化函数。
+			p_TmpInt32 = MediaPocsThrdPt->m_UserInitFuncPt( MediaPocsThrdPt ); //调用用户定义的初始化函数。
+			if( p_TmpInt32 == 0 )
+			{
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的初始化函数成功。返回值：%d。" ), p_TmpInt32 );
+			}
+			else
+			{
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：调用用户定义的初始化函数失败。返回值：%d。" ), p_TmpInt32 );
+				goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypUserDstoy:
+		{
+			ThrdMsgUserDstoy * p_ThrdMsgUserDstoyPt = ( ThrdMsgUserDstoy * )MsgPt;
+
+			MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 1; //设置上一次调用了用户定义的销毁函数。
+			MediaPocsThrdPt->m_UserDstoyFuncPt( MediaPocsThrdPt ); //调用用户定义的销毁函数。
+			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的销毁函数成功。" ) );
+			break;
+		}
+		case ThrdMsgTypAdoVdoInptOtptInit:
+		{
+			if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数，就初始化音视频输入输出、音视频输入输出Avi文件写入器。
+			{
+				if( MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrdPt ) != 0 ) goto Out;
+				if( MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrdPt ) != 0 ) goto Out;
+			}
+			break;
+		}
+		case ThrdMsgTypAdoVdoInptOtptDstoy:
+		{
+			MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrdPt );
+			MediaPocsThrdAdoVdoInptOtptDstoy( MediaPocsThrdPt );
+			break;
+		}
+		default: //用户消息。
+		{
+			ThrdMsgUserMsg * p_ThrdMsgUserMsgPt = ( ThrdMsgUserMsg * )MsgPt;
+
+			p_TmpInt32 = MediaPocsThrdPt->m_UserMsgFuncPt( MediaPocsThrdPt, MsgTyp - ThrdMsgTypUserMsgMinVal, MsgPt, MsgLenByt );
+			if( p_TmpInt32 == 0 )
+			{
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的消息函数成功。返回值：%d。" ), p_TmpInt32 );
+			}
+			else
+			{
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：调用用户定义的消息函数失败。返回值：%d。" ), p_TmpInt32 );
+				goto Out;
+			}
+			break;
+		}
 	}
-    else
-    {
-        p_Rslt = 1; //设置本函数执行成功。
-    }
+
+    p_Rslt = 0; //设置本函数执行成功。
 	
 	Out:
 	if( p_Rslt < 0 ) //如果本函数执行失败。
 	{
-		if( p_MediaMsg.m_MediaMsgTyp == MediaMsgTypUserInit )
+		if( MsgTyp == ThrdMsgTypUserInit )
 			MediaPocsThrdPt->m_ExitCode = MediaPocsThrd::ExitCodeUserInit; //设置退出码为调用用户定义的初始化函数失败。
-		else if( p_MediaMsg.m_MediaMsgTyp == MediaMsgTypAdoVdoInptOtptInit )
+		else if( MsgTyp == ThrdMsgTypAdoVdoInptOtptInit )
 			MediaPocsThrdPt->m_ExitCode = MediaPocsThrd::ExitCodeAdoVdoInptOtptInit; //设置退出码为音视频输入输出初始化失败。
 		else
-			MediaPocsThrdPt->m_ExitCode = MediaPocsThrd::ExitCodeMediaMsgPocs; //设置退出码为媒体消息处理失败。
+			MediaPocsThrdPt->m_ExitCode = MediaPocsThrd::ExitCodeThrdMsgPocs; //设置退出码为线程消息处理失败。
 
 		if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数，就执行销毁。
 		{
-			//执行顺序：媒体销毁，用户销毁并退出。
-			MediaPocsThrdPt->m_ReadyExitCnt++;
-			MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
-			p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-			MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-			MediaMsgUserDstoy p_MediaMsgUserDstoy;
-			p_MediaMsgUserDstoy.m_MediaMsgTyp = MediaMsgTypUserDstoy;
-			MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+			//执行顺序：媒体销毁，用户销毁。
+			ThrdMsgAdoVdoInptOtptDstoy p_ThrdMsgAdoVdoInptOtptDstoy;
+			MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptDstoy, &p_ThrdMsgAdoVdoInptOtptDstoy, sizeof( p_ThrdMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+			ThrdMsgUserDstoy p_ThrdMsgUserDstoy;
+			MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypUserDstoy, &p_ThrdMsgUserDstoy, sizeof( p_ThrdMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
-
-		if( p_MediaMsg.m_MediaMsgRsltPt != NULL ) *p_MediaMsg.m_MediaMsgRsltPt = -1; //设置媒体消息处理结果为失败。
 	}
 	return p_Rslt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdAdoVdoInptOtptFrmPocs
- * 功能说明：媒体处理线程音视频输入输出帧处理。
+ * 功能说明：媒体处理线程的音视频输入输出帧处理。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -5640,9 +5350,9 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		//使用编码器。
 		switch( MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd )
 		{
-			case 0: //如果要使用PCM原始数据。
+			case 0: //如果要使用Pcm原始数据。
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用PCM原始数据。" ) );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用Pcm原始数据。" ) );
 				break;
 			}
 			case 1: //如果要使用Speex编码器。
@@ -5862,12 +5572,12 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				if( AviFileWriterAddVdoStrm( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, '462H', 50, &p_VdoOtptStrmAviFileIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //最大采样频率应该尽量被1000整除。
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：音视频输入输出Avi文件添加视频输出已编码格式原始流成功。索引：%uz32d。" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, p_VdoOtptStrmAviFileIdx );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：音视频输入输出Avi文件添加视频输出已编码格式原始流成功。索引：%uz32d。" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, p_VdoOtptStrmAviFileIdx );
 					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoOtptEncdSrcStrmIdxMapPt->insert( std::map< uint32_t, uint32_t >::value_type( MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, p_VdoOtptStrmAviFileIdx ) );
 				}
 				else
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：音视频输入输出Avi文件添加视频输出已编码格式原始流失败。原因：%vs" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：音视频输入输出Avi文件添加视频输出已编码格式原始流失败。原因：%vs" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt );
 				}
 			}
 
@@ -5875,11 +5585,11 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				if( AviFileWriterVdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, p_VdoOtptStrmAviFileIdx, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_EncdSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_EncdSrcFrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧成功。" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧成功。" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx );
 				}
 				else
 				{
-					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引 %uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt );
+					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt );
 				}
 				//{ uint64_t p_CurTimeStamp; AviFileWriterVdoStrmGetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, p_VdoOtptStrmAviFileIdx, &p_CurTimeStamp, NULL ); LOGFE( Cu8vstr( "音视频输入输出Avi文件视频输出帧时间戳：%uz64d  %uz64d  %z64d" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec, p_CurTimeStamp, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec - p_CurTimeStamp ); }
 			}
@@ -6028,7 +5738,7 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 	{
 		MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_ID = 0; //设置音频输入设备标识符为默认音频输入设备。
 		LOGFI( Cu8vstr( "媒体处理线程：音频输入设备已经关闭，切换到默认音频输入设备，并重启媒体处理线程。" ) );
-		MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL );
+		MediaPocsThrdRqirExit( MediaPocsThrdPt, 0, 3, NULL );
 	}
 
 	//如果音频输出设备已经关闭，就切换到默认音频输出设备，并重启媒体处理线程。
@@ -6036,7 +5746,7 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 	{
 		MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ID = 0; //设置音频输出设备标识符为默认音频输出设备。
 		LOGFI( Cu8vstr( "媒体处理线程：音频输出设备已经关闭，切换到默认音频输出设备，并重启媒体处理线程。" ) );
-		MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL );
+		MediaPocsThrdRqirExit( MediaPocsThrdPt, 0, 3, NULL );
 	}
 
 	//如果视频输入设备已经关闭，就切换到默认视频输入设备，并重启媒体处理线程。
@@ -6049,7 +5759,7 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		{
 			MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_ID = 0; //设置视频输入设备标识符为默认视频输入设备。
 			LOGFI( Cu8vstr( "媒体处理线程：视频输入设备已经关闭，切换到默认视频输入设备，并重启媒体处理线程。" ) );
-			MediaPocsThrdRqirExit( MediaPocsThrdPt, 3, 0, NULL );
+			MediaPocsThrdRqirExit( MediaPocsThrdPt, 0, 3, NULL );
 		}
 	}
 
@@ -6062,14 +5772,11 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 
 		if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy == 0 ) //如果上一次调用了用户定义的初始化函数，就执行销毁。
 		{
-			//执行顺序：媒体销毁，用户销毁并退出。
-			MediaPocsThrdPt->m_ReadyExitCnt++;
-			MediaMsgAdoVdoInptOtptDstoy p_MediaMsgAdoVdoInptOtptDstoy;
-			p_MediaMsgAdoVdoInptOtptDstoy.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptDstoy;
-			MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgAdoVdoInptOtptDstoy, sizeof( p_MediaMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-			MediaMsgUserDstoy p_MediaMsgUserDstoy;
-			p_MediaMsgUserDstoy.m_MediaMsgTyp = MediaMsgTypUserDstoy;
-			MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 1, 0, &p_MediaMsgUserDstoy, sizeof( p_MediaMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+			//执行顺序：媒体销毁，用户销毁。
+			ThrdMsgAdoVdoInptOtptDstoy p_ThrdMsgAdoVdoInptOtptDstoy;
+			MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypAdoVdoInptOtptDstoy, &p_ThrdMsgAdoVdoInptOtptDstoy, sizeof( p_ThrdMsgAdoVdoInptOtptDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+			ThrdMsgUserDstoy p_ThrdMsgUserDstoy;
+			MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 1, 0, ThrdMsgTypUserDstoy, &p_ThrdMsgUserDstoy, sizeof( p_ThrdMsgUserDstoy ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 	}
 	return p_Rslt;
@@ -6077,7 +5784,7 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：MediaPocsThrdRun
- * 功能说明：媒体处理线程主函数。
+ * 功能说明：媒体处理线程的主函数。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -6090,24 +5797,23 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 	uint64_t p_LastTickMsec = 0;
 
 	CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
+	MediaPocsThrdPt->m_ThrdMsgQueuePt->m_MsgPocsThrdInfoPt = MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt; //设置线程消息队列的消息处理线程信息。
 
 	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：本地代码指令集名称：%s。" ), ( sizeof( size_t ) == 4 ) ? "x86" : "x64" );
 
 	MediaPocsThrdPt->m_RunFlag = MediaPocsThrd::RunFlagRun; //设置本线程运行标记为正在运行。
 	if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：开始准备音视频输入输出帧处理。" ) );
 
-	MediaMsgUserInit p_MediaMsgUserInit;
-	p_MediaMsgUserInit.m_MediaMsgTyp = MediaMsgTypUserInit;
-	MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 0, 1, &p_MediaMsgUserInit, sizeof( p_MediaMsgUserInit ), MediaPocsThrdPt->m_ErrInfoVstrPt );
-	MediaMsgAdoVdoInptOtptInit p_MediaMsgAdoVdoInptOtptInit;
-	p_MediaMsgAdoVdoInptOtptInit.m_MediaMsgTyp = MediaMsgTypAdoVdoInptOtptInit;
-	MediaPocsThrdSendMediaMsg( MediaPocsThrdPt, 0, 1, &p_MediaMsgAdoVdoInptOtptInit, sizeof( p_MediaMsgAdoVdoInptOtptInit ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+	ThrdMsgUserInit p_ThrdMsgUserInit;
+	MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 1, ThrdMsgTypUserInit, &p_ThrdMsgUserInit, sizeof( p_ThrdMsgUserInit ), MediaPocsThrdPt->m_ErrInfoVstrPt );
+	ThrdMsgAdoVdoInptOtptInit p_ThrdMsgAdoVdoInptOtptInit;
+	MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 1, ThrdMsgTypAdoVdoInptOtptInit, &p_ThrdMsgAdoVdoInptOtptInit, sizeof( p_ThrdMsgAdoVdoInptOtptInit ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//媒体处理循环开始。
 	while( true )
 	{
-		while( MediaPocsThrdOneMediaMsgPocs( MediaPocsThrdPt ) != 1 ); //进行一条媒体消息处理，直到媒体消息容器为空。
-		if( MediaPocsThrdPt->m_ReadyExitCnt > 0 ) break; //如果媒体消息容器为空，且媒体处理线程准备退出。
+		while( MsgQueueMsgPocsThrdMsgPocs( MediaPocsThrdPt->m_ThrdMsgQueuePt, NULL ) == 0 ); //进行消息处理，直到线程消息队列为空。
+		if( MediaPocsThrdPt->m_LastCallUserInitOrDstoy != 0 ) break; //如果线程消息队列为空，且上一次调用了用户定义的销毁函数，就表示本线程需要退出。
 
 		if( MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec();
 
@@ -6149,9 +5855,9 @@ extern "C" void __cdecl MediaPocsThrdClsUserDstoy( MediaPocsThrd * MediaPocsThrd
 }
 
 //回调MediaPocsThrdCls类的用户定义的消息函数。
-extern "C" int __cdecl MediaPocsThrdClsUserMsg( MediaPocsThrd * MediaPocsThrdPt, void * UserMsgPt )
+extern "C" int __cdecl MediaPocsThrdClsUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
 {
-	return ( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserMsg( UserMsgPt );
+	return ( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserMsg( MsgTyp, MsgPt, MsgLenByt );
 }
 
 //回调MediaPocsThrdCls类的用户定义的读取音视频输入帧函数。

@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __JAVANTVINTFC_H__
-#define __JAVANTVINTFC_H__
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -57,6 +56,4 @@ __FUNC_DLLAPI__ int GetAndrdPkgName( JNIEnv * env, uint8_t * PkgNameU8strPt, siz
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

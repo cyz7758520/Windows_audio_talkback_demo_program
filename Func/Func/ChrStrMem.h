@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __CHRSTRMEM_H__
-#define __CHRSTRMEM_H__
+#include "Func.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -105,10 +104,10 @@ __FUNC_DLLAPI__ int _StrCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t DstStr
 { \
 	const Vstr * _p_SrcVstrPt = SrcVstrPt; \
 	AvstrPt = ( Vstr * )alloca( sizeof( Vstr ) ); /*设置栈动态字符串的指针。*/ \
-	AvstrPt->m_SzChr = StrCpyMaxLenByt( AvstrChrSet, _p_SrcVstrPt->m_ChrSet, _p_SrcVstrPt->m_LenChr ); /*设置栈动态字符串的大小。*/ \
-	AvstrPt->m_Pt = alloca( AvstrPt->m_SzChr ); /*设置栈动态字符串缓冲区的指针。*/ \
 	AvstrPt->m_ChrSet = AvstrChrSet; /*设置栈动态字符串的字符集。*/ \
-	StrCpy( ( uint8_t * )AvstrPt->m_Pt, AvstrChrSet, AvstrPt->m_SzChr, 1, &AvstrPt->m_LenChr, _p_SrcVstrPt->m_Pt, _p_SrcVstrPt->m_ChrSet, _p_SrcVstrPt->m_SzChr, ); /*源始动态字符串复制到栈动态字符串。*/ \
+	AvstrPt->m_SzChr = StrCpyMaxLenByt( AvstrPt->m_ChrSet, _p_SrcVstrPt->m_ChrSet, _p_SrcVstrPt->m_LenChr ); /*设置栈动态字符串的大小。*/ \
+	AvstrPt->m_Pt = alloca( AvstrPt->m_SzChr * AvstrPt->m_ChrSet ); /*设置栈动态字符串缓冲区的指针。*/ \
+	StrCpy( ( uint8_t * )AvstrPt->m_Pt, AvstrPt->m_ChrSet, AvstrPt->m_SzChr, 1, &AvstrPt->m_LenChr, _p_SrcVstrPt->m_Pt, _p_SrcVstrPt->m_ChrSet, _p_SrcVstrPt->m_SzChr, ); /*源始动态字符串复制到栈动态字符串。*/ \
 }
 
 //将变量格式化复制到字符串。
@@ -122,6 +121,17 @@ __FUNC_DLLAPI__ int _StrFmtCpy( void * DstStrPt, ChrSet DstStrChrSet, size_t Dst
     StrFmtCpy( , AstrChrSet, , IsWriteEnd, AstrLenChrPt, FmtStrPt, FmtStrChrSet, __VA_ARGS__ ); /*设置栈字符串的长度。*/ \
 	AstrPt = ( AstrPtType )alloca( ( *AstrLenChrPt + IsWriteEnd ) * AstrChrSet ); /*设置栈字符串缓冲区的指针。*/ \
 	StrFmtCpy( AstrPt, AstrChrSet, , IsWriteEnd, , FmtStrPt, FmtStrChrSet, __VA_ARGS__ ); /*设置栈字符串。*/ \
+}
+
+//将变量格式化复制并创建栈动态字符串。
+#define AvstrFmtCpy( AvstrPt, AvstrChrSet, FmtVstrPt, ... ) \
+{ \
+    const Vstr * _p_FmtVstrPt = FmtVstrPt; \
+	AvstrPt = ( Vstr * )alloca( sizeof( Vstr ) ); /*设置栈动态字符串的指针。*/ \
+    AvstrPt->m_ChrSet = AvstrChrSet; /*设置栈动态字符串的字符集。*/ \
+	StrFmtCpy( , AvstrPt->m_ChrSet, , 1, &AvstrPt->m_SzChr, _p_FmtVstrPt->m_Pt, _p_FmtVstrPt->m_ChrSet, __VA_ARGS__ ), AvstrPt->m_SzChr++; /*设置栈动态字符串的大小。*/ \
+	AvstrPt->m_Pt = alloca( AvstrPt->m_SzChr * AvstrPt->m_ChrSet ); /*设置栈动态字符串缓冲区的指针。*/ \
+	StrFmtCpy( ( uint8_t * )AvstrPt->m_Pt, AvstrPt->m_ChrSet, , 1, , _p_FmtVstrPt->m_Pt, _p_FmtVstrPt->m_ChrSet, __VA_ARGS__ ); /*设置栈字符串。*/ \
 }
 
 //将可变参数列表格式化复制到字符串。
@@ -165,6 +175,4 @@ __FUNC_DLLAPI__ int _StrLowerCase( char * SrcStrPt, char * DstStrPt, size_t MaxL
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __LIBYUV_H__
-#define __LIBYUV_H__
+#include "Func.h"
 
 //LibYUV项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_LIBYUV__ ) //如果正在编译LibYUV项目。
@@ -136,6 +135,4 @@ __LIBYUV_DLLAPI__ int LibYUVPictrDrawToWnd( const uint8_t * SrcPictrPt, int32_t 
 #endif
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __RNNOISE_H__
-#define __RNNOISE_H__
+#include "Func.h"
 
 //RNNoise项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_RNNOISE__ ) //如果正在编译RNNoise项目。
@@ -51,6 +50,4 @@ __RNNOISE_DLLAPI__ int RNNoiseDstoy( RNNoise * RNNoisePt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

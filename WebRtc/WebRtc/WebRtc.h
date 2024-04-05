@@ -1,7 +1,6 @@
-﻿#include "Func.h"
+﻿#pragma once
 
-#ifndef __WEBRTC_H__
-#define __WEBRTC_H__
+#include "Func.h"
 
 //WebRtc项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_WEBRTC__ ) //如果正在编译WebRtc项目。
@@ -83,6 +82,4 @@ __WEBRTC_DLLAPI__ int WebRtcResamplerDstoy( void * WebRtcResamplerPt );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

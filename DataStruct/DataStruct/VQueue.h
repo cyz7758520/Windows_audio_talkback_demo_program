@@ -1,7 +1,6 @@
-﻿#include "DataStruct.h"
+﻿#pragma once
 
-#ifndef __VQUEUE_H__
-#define __VQUEUE_H__
+#include "DataStruct.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -11,6 +10,7 @@ extern "C"
 typedef struct VQueue VQueue;
 	
 __DATASTRUCT_DLLAPI__ int VQueueInit( VQueue * * VQueuePtPt, size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VQueueDstoy( VQueue * VQueuePt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int VQueueLocked( VQueue * VQueuePt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int VQueueUnlock( VQueue * VQueuePt, Vstr * ErrInfoVstrPt );
@@ -31,8 +31,6 @@ __DATASTRUCT_DLLAPI__ int VQueueGetTotal( VQueue * VQueuePt, size_t * ElmTotalPt
 __DATASTRUCT_DLLAPI__ int VQueueSetSz( VQueue * VQueuePt, size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int VQueueGetSz( VQueue * VQueuePt, size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__DATASTRUCT_DLLAPI__ int VQueueDstoy( VQueue * VQueuePt, Vstr * ErrInfoVstrPt );
-
 #ifdef __cplusplus
 }
 #endif
@@ -47,6 +45,7 @@ public:
 	~VQueueCls() { Dstoy( NULL ); }
 
 	int Init( size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return VQueueInit( &m_VQueuePt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VQueueDstoy( m_VQueuePt, ErrInfoVstrPt ); m_VQueuePt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return VQueueLocked( m_VQueuePt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return VQueueUnlock( m_VQueuePt, ErrInfoVstrPt ); }
@@ -66,9 +65,5 @@ public:
 	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetTotal( m_VQueuePt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
 	int SetSz( size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueSetSz( m_VQueuePt, SzByt, IsAutoLock, ErrInfoVstrPt ); }
 	int GetSz( size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetSz( m_VQueuePt, SzBytPt, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VQueueDstoy( m_VQueuePt, ErrInfoVstrPt ); m_VQueuePt = NULL; return p_Rslt; }
 };
-#endif
-
 #endif
