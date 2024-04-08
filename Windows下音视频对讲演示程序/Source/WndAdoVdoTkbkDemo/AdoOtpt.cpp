@@ -1030,7 +1030,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 		p_DvcGlblIntfcTablePt->Release();
 	}
 	
-	while( AdoOtptPt->m_Thrd.m_ThrdIsStart == 0 ) FuncSleep( 1 ); //等待线程开始。
+	while( ( AdoOtptPt->m_Thrd.m_ThrdIsStart == 0 ) && ( AdoOtptPt->m_Thrd.m_ExitFlag == 0 ) ) FuncSleep( 1 ); //等待线程开始。这里判断退出标记是因为音频输入可能会初始化失败导致不会让线程开始。
 
 	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：开始准备音频输出。" ) );
 

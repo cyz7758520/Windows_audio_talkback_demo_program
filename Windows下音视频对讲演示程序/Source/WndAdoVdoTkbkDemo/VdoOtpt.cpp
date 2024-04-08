@@ -514,15 +514,13 @@ int VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 	}
 
 	//添加到流容器。
-	p_StrmPt = ( VdoOtpt::Strm * )malloc( sizeof( VdoOtpt::Strm ) );
+	p_StrmPt = ( VdoOtpt::Strm * )calloc( 1, sizeof( VdoOtpt::Strm ) );
 	if( p_StrmPt == NULL ) goto Out;
 	if( VdoOtptPt->m_StrmCntnr.PutTail( &p_StrmPt, NULL, 0, NULL ) != 0 )
 	{
 		goto Out;
 	}
 	p_StrmPt->m_Idx = StrmIdx;
-	p_StrmPt->m_IsUse = 0;
-	p_StrmPt->m_UseWhatDecd = 0;
 
 	p_Rslt = 0; //设置本函数执行成功。
 	
