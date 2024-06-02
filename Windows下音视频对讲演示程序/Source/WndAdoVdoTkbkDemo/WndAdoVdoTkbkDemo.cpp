@@ -1974,7 +1974,33 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 
 		for( int p_Argn = 0; p_Argn < p_Argc; p_Argn++ )
 		{
-			if( wcscmp( p_Argv[ p_Argn ], L"-SrvrUrl" ) == 0 )
+			if( wcscmp( p_Argv[ p_Argn ], L"-Title" ) == 0 )
+			{
+				if( p_Argn + 1 < p_Argc )
+				{
+					p_Argn++;
+					SetWindowText( g_MainDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SrvrStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_ClntStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_PttDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_StngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_AjbStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SaveStsToTxtFileStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SpeexAecStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_WebRtcAecmStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_WebRtcAecStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SpeexWebRtcAecStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SpeexPrpocsNsStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_WebRtcNsxStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_WebRtcNsStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SpeexPrpocsStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SpeexCodecStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_SaveAdoInptOtptToWaveFileStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_OpenH264CodecStngDlgWndHdl, p_Argv[ p_Argn ] );
+				}
+			}
+			else if( wcscmp( p_Argv[ p_Argn ], L"-SrvrUrl" ) == 0 )
 			{
 				if( p_Argn + 1 < p_Argc )
 				{
@@ -2147,6 +2173,10 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 					ListView_SetSelectionMark( g_ClntLstWndHdl, _wtoi( p_Argv[ p_Argn ] ) );
 					SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntCnctOrDstoyBtnId ), BM_CLICK, 0, 0 );
 				}
+			}
+			else if( wcscmp( p_Argv[ p_Argn ], L"-BdctInit" ) == 0 )
+			{
+				BdctInit();
 			}
 		}
 

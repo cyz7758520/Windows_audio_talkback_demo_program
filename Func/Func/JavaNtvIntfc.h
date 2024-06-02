@@ -7,7 +7,6 @@ extern "C"
 {
 #endif
 
-#if( defined __ANDROID_GCC__ )
 __FUNC_DLLAPI__ int GetJavaCls( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, jclass * ClsPt );
 
 __FUNC_DLLAPI__ int GetJavaClsMbrVarFieldID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, jfieldID * FieldIDPt );
@@ -52,7 +51,6 @@ __FUNC_DLLAPI__ int GetJavaStringClsObjU16str( JNIEnv * env, jstring StringClsOb
 __FUNC_DLLAPI__ int DstoyJavaStringClsObjU16str( JNIEnv * env, jstring StringClsObj, const uint16_t * CharArrPt );
 
 __FUNC_DLLAPI__ int GetAndrdPkgName( JNIEnv * env, uint8_t * PkgNameU8strPt, size_t PkgNameU8strSzChr, size_t * PkgNameU8strLenChrPt );
-#endif
 
 #ifdef __cplusplus
 }

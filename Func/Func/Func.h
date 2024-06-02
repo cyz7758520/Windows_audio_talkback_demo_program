@@ -399,7 +399,9 @@ typedef enum BufAutoAdjMeth
 #include "PocsThrd.h"
 #include "Toast.h"
 #include "Ado.h"
+#if( defined __ANDROID_GCC__ )
 #include "JavaNtvIntfc.h"
+#endif
 
 #ifdef __cplusplus
 extern "C"

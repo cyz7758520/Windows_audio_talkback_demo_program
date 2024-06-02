@@ -150,7 +150,7 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 
 	//初始化视频输入。
 	p_MediaPocsThrdPt->m_VdoInpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输入的媒体处理线程的指针。
-	MediaPocsThrdSetVdoInpt( p_MediaPocsThrdPt, 0, 15, 480, 640, NULL, NULL );
+	MediaPocsThrdSetVdoInpt( p_MediaPocsThrdPt, 0, 15, 480, 640, 0, 0, 0, NULL, NULL );
 	MediaPocsThrdVdoInptSetUseDvc( p_MediaPocsThrdPt, 0, 0, NULL );
 
 	//初始化视频输出。
@@ -966,6 +966,9 @@ typedef struct
 	int32_t m_MaxSmplRate;
 	int32_t m_FrmWidth;
 	int32_t m_FrmHeight;
+	int32_t m_SrcMaxSmplRate;
+	int32_t m_SrcFrmWidth;
+	int32_t m_SrcFrmHeight;
 	HWND m_PrvwWndHdl;
 } ThrdMsgSetVdoInpt;
 typedef struct
@@ -2591,8 +2594,11 @@ int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
 			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
 			 MaxSmplRate：[输入]，存放最大采样频率，取值范围为[1,60]，实际帧率以视频输入设备支持的为准。
-			 FrmWidth：[输入]，存放帧宽度，单位为像素，只能为偶数。
-			 FrmHeight：[输入]，存放帧高度，单位为像素，只能为偶数。
+			 FrmWidth：[输入]，存放帧的宽度，单位为像素，只能为偶数。
+			 FrmHeight：[输入]，存放帧的高度，单位为像素，只能为偶数。
+			 SrcMaxSmplRate：[输入]，存放原始的最大采样频率，取值范围为[1,60]，为0表示自动选择。
+			 SrcFrmWidth：[输入]，存放原始帧的宽度，单位为像素，只能为偶数，为0表示自动选择。
+			 SrcFrmHeight：[输入]，存放原始帧的高度，单位为像素，只能为偶数，为0表示自动选择。
 			 PrvwWndHdl：[输入]，存放预览窗口的句柄，可以为NULL。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
@@ -2601,7 +2607,7 @@ int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t MaxSmplRate, int32_t FrmWidth, int32_t FrmHeight, HWND PrvwWndHdl, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t MaxSmplRate, int32_t FrmWidth, int32_t FrmHeight, int32_t SrcMaxSmplRate, int32_t SrcFrmWidth, int32_t SrcFrmHeight, HWND PrvwWndHdl, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	ThrdMsgSetVdoInpt p_ThrdMsgSetVdoInpt;
@@ -2631,6 +2637,9 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 	p_ThrdMsgSetVdoInpt.m_MaxSmplRate = MaxSmplRate;
     p_ThrdMsgSetVdoInpt.m_FrmWidth = FrmWidth;
 	p_ThrdMsgSetVdoInpt.m_FrmHeight = FrmHeight;
+	p_ThrdMsgSetVdoInpt.m_SrcMaxSmplRate = SrcMaxSmplRate;
+    p_ThrdMsgSetVdoInpt.m_SrcFrmWidth = SrcFrmWidth;
+	p_ThrdMsgSetVdoInpt.m_SrcFrmHeight = SrcFrmHeight;
 	p_ThrdMsgSetVdoInpt.m_PrvwWndHdl = PrvwWndHdl;
 	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetVdoInpt, &p_ThrdMsgSetVdoInpt, sizeof( p_ThrdMsgSetVdoInpt ), ErrInfoVstrPt ) != 0 )
 	{
@@ -4590,6 +4599,9 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			MediaPocsThrdPt->m_VdoInpt.m_FrmWidth = p_ThrdMsgSetVdoInptPt->m_FrmWidth;
 			MediaPocsThrdPt->m_VdoInpt.m_FrmHeight = p_ThrdMsgSetVdoInptPt->m_FrmHeight;
 			MediaPocsThrdPt->m_VdoInpt.m_Yu12FrmLenByt = p_ThrdMsgSetVdoInptPt->m_FrmWidth * p_ThrdMsgSetVdoInptPt->m_FrmHeight * 3 / 2;
+			MediaPocsThrdPt->m_VdoInpt.m_SrcMaxSmplRate = p_ThrdMsgSetVdoInptPt->m_SrcMaxSmplRate;
+			MediaPocsThrdPt->m_VdoInpt.m_SrcFrmWidth = p_ThrdMsgSetVdoInptPt->m_SrcFrmWidth;
+			MediaPocsThrdPt->m_VdoInpt.m_SrcFrmHeight = p_ThrdMsgSetVdoInptPt->m_SrcFrmHeight;
 			MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl = p_ThrdMsgSetVdoInptPt->m_PrvwWndHdl;
 
 			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) if( VdoInptInit( &MediaPocsThrdPt->m_VdoInpt ) != 0 ) goto Out;

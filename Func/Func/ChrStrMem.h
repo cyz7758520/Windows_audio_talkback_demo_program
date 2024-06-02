@@ -36,10 +36,10 @@ __FUNC_DLLAPI__ int StrTrim( char * SrcStrPt, const char * TrimStrPt, char TrimP
 
 //__FUNC_DLLAPI__ int MemCmp( const void * Buf1Pt, const void * Buf2Pt, size_t MemSzByt );
 
-#if( ( defined __MS_VCXX__ ) || ( __CYGWIN_GCC__ ) || ( __LINUX_GCC__ ) )
+#if( ( defined __MS_VCXX__ ) || ( __CYGWIN_GCC__ ) || ( __LINUX_GCC__ ) || ( __ANDROID_GCC__ ) )
 #if( ( defined __X86__ ) || ( defined __X64__ ) )
-//__FUNC_DLLAPI__ void * __cdecl memcpy( void * DstPt, void const * SrcPt, size_t SzByt );
-//__FUNC_DLLAPI__ void * __cdecl memmove( void * DstPt, void const * SrcPt, size_t SzByt );
+//__FUNC_DLLAPI__ void * __cdecl memcpy( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
+//__FUNC_DLLAPI__ void * __cdecl memmove( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
 __FUNC_DLLAPI__ void * __cdecl MemCpy( void * DstPt, void const * SrcPt, size_t SzByt );
 __FUNC_DLLAPI__ void * __cdecl MemCpyAvx( void * DstPt, void const * SrcPt, size_t SzByt );
 __FUNC_DLLAPI__ void * __cdecl MemCpySse2( void * DstPt, void const * SrcPt, size_t SzByt );

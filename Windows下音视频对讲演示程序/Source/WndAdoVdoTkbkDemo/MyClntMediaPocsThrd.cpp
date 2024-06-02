@@ -815,6 +815,7 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 				( SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_GETCURSEL, 0, 0 ) == 1 ) ? 320 :
 					( SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_GETCURSEL, 0, 0 ) == 2 ) ? 640 :
 						( SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_GETCURSEL, 0, 0 ) == 3 ) ? 1280 : 0,
+			0, 0, 0,
 			SendVdoInptOtptWndInitMsg( Cu8vstr( "视频输入预览" ) ),
 			( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
@@ -836,6 +837,7 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 			( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate30RdBtnId ) == BST_CHECKED ) ? 30 : 0,
 			p_VdoFrmSzOtherWidth,
 			p_VdoFrmSzOtherHeight,
+			0, 0, 0,
 			SendVdoInptOtptWndInitMsg( Cu8vstr( "视频输入预览" ) ),
 			( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}

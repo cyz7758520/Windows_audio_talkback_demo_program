@@ -866,7 +866,7 @@ void __cdecl ClntMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsTh
 	ClntMediaPocsThrd * p_ClntMediaPocsThrdPt = ( ClntMediaPocsThrd * )MediaPocsThrdPt->m_UserDataPt; //存放客户端媒体处理线程的指针。
 	size_t p_ElmTotal; //存放元素总数。
 
-	if( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit != 0 )
+	if( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct )
 	{
 		TkbkClntUserReadAdoVdoInptFrm( &p_ClntMediaPocsThrdPt->m_TkbkClnt, AdoInptPcmSrcFrmPt,
 									   AdoInptPcmRsltFrmPt, AdoInptPcmFrmLenUnit, AdoInptPcmRsltFrmVoiceActSts,

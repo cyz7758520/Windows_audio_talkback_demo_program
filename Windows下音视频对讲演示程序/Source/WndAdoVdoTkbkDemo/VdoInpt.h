@@ -31,6 +31,9 @@ typedef struct VdoInpt //视频输入。
 	int32_t m_FrmWidth; //存放帧的宽度，单位为像素，只能为偶数。
 	int32_t m_FrmHeight; //存放帧的高度，单位为像素，只能为偶数。
 	size_t m_Yu12FrmLenByt; //存放Yu12格式帧的长度，单位为字节，为m_FrmWidth * m_FrmHeight * 3 / 2。
+	int32_t m_SrcMaxSmplRate; //存放原始的最大采样频率，取值范围为[1,60]，为0表示自动选择。
+    int32_t m_SrcFrmWidth; //存放原始帧的宽度，单位为像素，只能为偶数，为0表示自动选择。
+    int32_t m_SrcFrmHeight; //存放原始帧的高度，单位为像素，只能为偶数，为0表示自动选择。
 
 	int32_t m_UseWhatEncd; //存放使用什么编码器，为0表示Yu12原始数据，为1表示OpenH264编码器。
 
