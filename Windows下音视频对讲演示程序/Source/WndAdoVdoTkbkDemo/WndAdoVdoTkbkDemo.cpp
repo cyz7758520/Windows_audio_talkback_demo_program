@@ -28,8 +28,7 @@ HWND g_AdoInptDvcCbBoxWndHdl = NULL; //存放音频输入设备组合框窗口�
 HWND g_AdoOtptDvcCbBoxWndHdl = NULL; //存放音频输出设备组合框窗口的句柄。
 HWND g_VdoInptDvcCbBoxWndHdl = NULL; //存放视频输入设备组合框窗口的句柄。
 HWND g_LogLstBoxWndHdl = NULL; //存放日志列表框窗口的句柄。
-HWND g_VdoInptPrvwTxtWndHdl = NULL; //存放视频输入预览文本框窗口的句柄。
-HWND g_VdoOtptDspyTxtWndHdl = NULL; //存放视频输出显示文本框窗口的句柄。
+HWND g_VdoInptOtptTxtWndHdl = NULL; //存放视频输入输出文本框窗口的句柄。
 typedef struct VdoInptOtptWnd //视频输入输出窗口。
 {
 	HWND m_TitleTxtWndHdl; //标题文本框窗口句柄。
@@ -59,364 +58,6 @@ HWND g_SpeexPrpocsStngDlgWndHdl = NULL; //存放Speex预处理器的设置对话
 HWND g_SpeexCodecStngDlgWndHdl = NULL; //存放Speex编解码器设置对话框窗口的句柄。
 HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl = NULL; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
 HWND g_OpenH264CodecStngDlgWndHdl = NULL; //存放OpenH264编解码器设置对话框窗口的句柄。
-
-void MySrvrThrdDstoy();
-void MyClntMediaPocsThrdDstoy();
-void TkbkDstoy();
-void BdctDstoy();
-
-//我的服务端线程初始化。
-int MySrvrThrdInit()
-{
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	HWND p_SrvrUrlHdl;
-	int p_SrvrUrlLenChr;
-	Vstr * p_SrvrUrlVstrPt = NULL;
-	Vstr * p_PrtclVstrPt = NULL;
-	Vstr * p_HostnameVstrPt = NULL;
-	Vstr * p_PortVstrPt = NULL;
-	int p_CmpRslt;
-
-	if( g_MySrvrThrdPt == NULL ) //如果我的服务端线程还没有启动。
-	{
-		p_SrvrUrlHdl = GetDlgItem( g_MainDlgWndHdl, SrvrUrlCbBoxId );
-		p_SrvrUrlLenChr = GetWindowTextLength( p_SrvrUrlHdl );
-		VstrInit( &p_SrvrUrlVstrPt, Utf16, p_SrvrUrlLenChr + 1, );
-		GetDlgItemText( g_MainDlgWndHdl, SrvrUrlCbBoxId, ( LPWSTR )p_SrvrUrlVstrPt->m_Pt, p_SrvrUrlLenChr + 1 );
-		p_SrvrUrlVstrPt->m_LenChr = p_SrvrUrlLenChr;
-
-		VstrInit( &p_PrtclVstrPt, Utf16, , );
-		VstrInit( &p_HostnameVstrPt, Utf16, , );
-		VstrInit( &p_PortVstrPt, Utf16, , );
-
-		if( VstrUrlParse( p_SrvrUrlVstrPt, p_PrtclVstrPt, NULL, NULL, p_HostnameVstrPt, p_PortVstrPt, NULL, NULL, NULL, NULL, g_ErrInfoVstr.m_VstrPt ) != 0 )
-		{
-			g_ErrInfoVstr.Ins( 0, Cu8vstr( "解析服务端Url字符串失败。原因：" ) );
-			LOGE( g_ErrInfoVstr.m_VstrPt );
-			Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
-			goto Out;
-		}
-		if( ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Tcp" ), &p_CmpRslt ), p_CmpRslt != 0 ) && ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Audp" ), &p_CmpRslt ), p_CmpRslt != 0 ) )
-		{
-			g_ErrInfoVstr.Cpy( Cu8vstr( "服务端Url字符串的协议不正确。" ) );
-			LOGE( g_ErrInfoVstr.m_VstrPt );
-			Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
-			goto Out;
-		}
-		if( VstrCmp( p_PortVstrPt, Cu8vstr( "" ), &p_CmpRslt ), p_CmpRslt == 0 )
-		{
-			VstrCpy( p_PortVstrPt, Cu8vstr( "12345" ), , );
-		}
-
-		LOGI( Cu8vstr( "我的服务端线程初始化开始。" ) );
-
-		//初始化我的服务端线程的指针。
-		g_MySrvrThrdPt = new MySrvrThrdCls( g_MainDlgWndHdl );
-		if( g_MySrvrThrdPt->Init( &g_ErrInfoVstr ) != 0 )
-		{
-			LOGFE( Cu8vstr( "我的服务端线程初始化失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
-			goto Out;
-		}
-
-		//设置所有连接销毁时是否自动请求退出。
-		g_MySrvrThrdPt->m_SrvrThrdPt->m_IsAutoRqirExit = 2;
-
-		//设置是否打印Log日志、显示Toast。
-		g_MySrvrThrdPt->SetIsPrintLogShowToast( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-												( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-												NULL,
-												&g_ErrInfoVstr );
-
-		//设置是否使用阻止系统休眠。
-		g_MySrvrThrdPt->SendSetIsUsePrvntSysSleepMsg( 0,
-													  ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-													  &g_ErrInfoVstr );
-
-		//设置服务端初始化。
-		g_MySrvrThrdPt->SendSrvrInitMsg( 0,
-										 ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Tcp" ), &p_CmpRslt ), p_CmpRslt == 0 ) ? 0 : 1,
-										 ( VstrCls * )&p_HostnameVstrPt,
-										 ( VstrCls * )&p_PortVstrPt,
-										 10,
-										 2,
-										 NULL );
-
-		//启动我的服务端线程。
-		if( g_MySrvrThrdPt->Start( &g_ErrInfoVstr ) != 0 )
-		{
-			LOGFE( Cu8vstr( "启动我的服务端线程失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
-			goto Out;
-		}
-
-		LOGI( Cu8vstr( "我的服务端线程初始化结束。" ) );
-	}
-
-	p_Rslt = 0; // //设置本函数执行成功。
-
-	Out:
-	VstrDstoy( p_SrvrUrlVstrPt );
-	VstrDstoy( p_PrtclVstrPt );
-	VstrDstoy( p_HostnameVstrPt );
-	VstrDstoy( p_PortVstrPt );
-	if( p_Rslt != 0 )
-	{
-		if( g_MySrvrThrdPt != NULL )
-		{
-			MySrvrThrdDstoy();
-			delete g_MySrvrThrdPt;
-			g_MySrvrThrdPt = NULL;
-		}
-	}
-	return p_Rslt;
-}
-
-//我的服务端线程销毁。
-void MySrvrThrdDstoy()
-{
-	if( g_MySrvrThrdPt != NULL )
-	{
-		LOGI( Cu8vstr( "请求并等待我的服务端线程退出开始。" ) );
-		g_MySrvrThrdPt->SendRqirExitMsg( 1, &g_ErrInfoVstr );
-		LOGI( Cu8vstr( "请求并等待我的服务端线程退出结束。" ) );
-	}
-}
-
-//我的客户端媒体处理线程初始化。
-int MyClntMediaPocsThrdInit()
-{
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-
-	if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程还没有启动。
-	{
-		wchar_t p_TmpU16strPt[ 1024 ];
-
-		LOGI( Cu8vstr( "开始启动我的客户端媒体处理线程。" ) );
-
-		//初始化我的客户端媒体处理线程。
-		g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
-		if( g_MyClntMediaPocsThrdPt->Init( &g_ErrInfoVstr ) != 0 )
-		{
-			LOGFE( Cu8vstr( "初始化我的客户端媒体处理线程失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
-			goto Out;
-		}
-
-		//设置网络。
-		{
-			//设置传输模式。
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_XfrMode = ( IsDlgButtonChecked( g_ClntStngDlgWndHdl, UsePttRdBtnId ) == BST_CHECKED ) ? 0 : 1;
-
-			//设置最大连接次数。
-			GetWindowText( GetDlgItem( g_ClntStngDlgWndHdl, MaxCnctTimesEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_MaxCnctTimes = _wtoi( p_TmpU16strPt );
-
-			//设置要参考远端对讲模式来设置对讲模式。
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_IsReferRmtTkbkModeSetTkbkMode = ( IsDlgButtonChecked( g_ClntStngDlgWndHdl, IsReferRmtTkbkModeSetTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0;
-
-			//设置在对讲客户端的连接销毁且广播客户端销毁时自动请求退出。
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_IsAutoRqirExit = 1;
-		}
-
-		//设置是否使用容器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseCntnrRecvOtptFrmRdBtnId ) == BST_CHECKED )
-		{
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_UseWhatRecvOtptFrm = 0;
-		}
-
-		//设置是否使用自适应抖动缓冲器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseAjbRecvOtptFrmRdBtnId ) == BST_CHECKED )
-		{
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_UseWhatRecvOtptFrm = 1;
-
-			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMinNeedBufFrmCntEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_AAjbParm.m_MinNeedBufFrmCnt = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxNeedBufFrmCntEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_AAjbParm.m_MaxNeedBufFrmCnt = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbMaxCntuLostFrmCntEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_AAjbParm.m_MaxCntuLostFrmCnt = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_AAjbParm.m_AdaptSensitivity = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_VAjbParm.m_MinNeedBufFrmCnt = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_VAjbParm.m_MaxNeedBufFrmCnt = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbAdaptSensitivityEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-			g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_VAjbParm.m_AdaptSensitivity = _wtof( p_TmpU16strPt );
-		}
-
-		//设置是否打印Log日志、显示Toast。
-		g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->SetIsPrintLogShowToast(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-			( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-			NULL,
-			&g_ErrInfoVstr );
-
-		//设置是否使用阻止系统休眠。
-		g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->SetIsUsePrvntSysSleep(
-			0,
-			( IsDlgButtonChecked( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-			&g_ErrInfoVstr );
-
-		//启动我的客户端媒体处理线程。
-		if( g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->Start( &g_ErrInfoVstr ) != 0 )
-		{
-			LOGFE( Cu8vstr( "启动我的客户端媒体处理线程失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
-			goto Out;
-		}
-
-		LOGI( Cu8vstr( "启动我的客户端媒体处理线程完毕。" ) );
-
-		p_Rslt = 0; // //设置本函数执行成功。
-	}
-
-	Out:
-	if( p_Rslt != 0 )
-	{
-		if( g_MyClntMediaPocsThrdPt != NULL )
-		{
-			MyClntMediaPocsThrdDstoy();
-			delete g_MyClntMediaPocsThrdPt;
-			g_MyClntMediaPocsThrdPt = NULL;
-		}
-	}
-	return p_Rslt;
-}
-
-//我的客户端媒体处理线程销毁。
-void MyClntMediaPocsThrdDstoy()
-{
-	if( g_MyClntMediaPocsThrdPt != NULL )
-	{
-		LOGI( Cu8vstr( "请求并等待我的客户端媒体处理线程退出开始。" ) );
-		g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->RqirExit( 1, 1, &g_ErrInfoVstr );
-		LOGI( Cu8vstr( "请求并等待我的客户端媒体处理线程退出结束。" ) );
-	}
-}
-
-//对讲初始化。
-int TkbkInit()
-{
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
-	int p_Num = ListView_GetSelectionMark( g_ClntLstWndHdl );
-	int p_IsTcpOrAudpPrtcl;
-	Vstr * p_RmtNodeNameVstrPt = NULL;
-	Vstr * p_RmtNodeSrvcVstrPt = NULL;
-	wchar_t p_TmpU16strPt[ 1024 ];
-	
-	LOGI( Cu8vstr( "对讲初始化开始。" ) );
-
-	if( p_Num != -1 )
-	{
-		if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程还没有初始化。
-		{
-			if( MyClntMediaPocsThrdInit() != 0 ) //如果我的客户端媒体处理线程初始化失败。
-			{
-				goto ClntCnctBtnOut;
-			}
-		}
-
-		g_MyClntMediaPocsThrdPt->m_TkbkClntNum = p_Num;
-		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 0, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-		p_IsTcpOrAudpPrtcl = ( wcscmp( p_TmpU16strPt, L"Tcp" ) == 0 ) ? 0 : 1;
-		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 1, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-		VstrInit( &p_RmtNodeNameVstrPt, Utf16, , Cu16vstr( p_TmpU16strPt ) );
-		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-		VstrInit( &p_RmtNodeSrvcVstrPt, Utf16, , Cu16vstr( p_TmpU16strPt ) );
-		g_MyClntMediaPocsThrdPt->SendTkbkClntCnctInitMsg( 1, p_IsTcpOrAudpPrtcl, p_RmtNodeNameVstrPt, p_RmtNodeSrvcVstrPt, NULL );
-
-		//设置本端对讲模式。
-		g_MyClntMediaPocsThrdPt->SendTkbkClntLclTkbkModeMsg( 0,
-															 ( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoInptTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeAdoInpt : 0 ) +
-															 ( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoOtptTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeAdoOtpt : 0 ) +
-															 ( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoInptTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeVdoInpt : 0 ) +
-															 ( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoOtptTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeVdoOtpt : 0 ),
-															 &g_ErrInfoVstr );
-	}
-	
-	LOGI( Cu8vstr( "对讲初始化结束。" ) );
-	
-	p_Rslt = 0; // //设置本函数执行成功。
-
-	ClntCnctBtnOut:
-	VstrDstoy( p_RmtNodeNameVstrPt );
-	VstrDstoy( p_RmtNodeSrvcVstrPt );
-	if( p_Rslt != 0 ) //如果本函数执行失败。
-	{
-		TkbkDstoy();
-	}
-	return ( INT_PTR )TRUE;
-}
-
-//对讲销毁。
-void TkbkDstoy()
-{
-	if( g_MyClntMediaPocsThrdPt != NULL )
-	{
-		LOGI( Cu8vstr( "开始请求并等待对讲销毁。" ) );
-		g_MyClntMediaPocsThrdPt->SendTkbkClntCnctDstoyMsg( 1, NULL );
-		LOGI( Cu8vstr( "结束请求并等待对讲销毁。" ) );
-	}
-}
-
-//广播初始化。
-int BdctInit()
-{
-	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
-	int p_IsTcpOrAudpPrtcl;
-	Vstr * p_RmtNodeNameVstrPt = NULL;
-	Vstr * p_RmtNodeSrvcVstrPt = NULL;
-	wchar_t p_TmpU16strPt[ 1024 ];
-
-	LOGI( Cu8vstr( "广播初始化开始。" ) );
-
-	if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程还没有启动。
-	{
-		if( MyClntMediaPocsThrdInit() != 0 ) //如果我的客户端媒体处理线程初始化失败。
-		{
-			goto Out;
-		}
-	}
-
-	//发送广播客户端初始化消息。
-	g_MyClntMediaPocsThrdPt->SendBdctClntInitMsg( 0, 0, NULL );
-
-	//添加客户端列表。
-	VstrInit( &p_RmtNodeNameVstrPt, Utf16, ,  );
-	VstrInit( &p_RmtNodeSrvcVstrPt, Utf16, ,  );
-	for( int p_Num = 0, p_ClntLstTotal = ListView_GetItemCount( g_ClntLstWndHdl ); p_Num < p_ClntLstTotal; p_Num++ )
-	{
-		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 0, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-		p_IsTcpOrAudpPrtcl = ( wcscmp( p_TmpU16strPt, L"Tcp" ) == 0 ) ? 0 : 1;
-		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 1, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-		VstrCpy( p_RmtNodeNameVstrPt, Cu16vstr( p_TmpU16strPt ), ,  );
-		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-		VstrCpy( p_RmtNodeSrvcVstrPt, Cu16vstr( p_TmpU16strPt ), ,  );
-		g_MyClntMediaPocsThrdPt->SendBdctClntCnctInitMsg( 0, p_IsTcpOrAudpPrtcl, p_RmtNodeNameVstrPt, p_RmtNodeSrvcVstrPt, NULL );
-	}
-
-	LOGI( Cu8vstr( "广播初始化结束。" ) );
-
-	p_Rslt = 0; //设置本函数执行成功。
-
-	Out:
-	VstrDstoy( p_RmtNodeNameVstrPt );
-	VstrDstoy( p_RmtNodeSrvcVstrPt );
-	if( p_Rslt != 0 ) //如果本函数执行失败。
-	{
-		BdctDstoy();
-	}
-	return p_Rslt;
-}
-
-//广播销毁。
-void BdctDstoy()
-{
-	if( g_MyClntMediaPocsThrdPt != NULL )
-	{
-		LOGI( Cu8vstr( "开始请求并等待广播销毁。" ) );
-		g_MyClntMediaPocsThrdPt->SendBdctClntDstoyMsg( 1, NULL );
-		LOGI( Cu8vstr( "结束请求并等待广播销毁。" ) );
-	}
-}
 
 //刷新音视频设备。
 void RefresAdoVdohDvc()
@@ -565,7 +206,7 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 
 			p_VdoInptOtptWndWdh = RectWidth( p_MainDlgWndRect ) - g_VdoTxtWndLeftMargin - g_VdoTxtWndRightMargin;
 			p_VdoInptOtptWndHgt = RectHeight( p_MainDlgWndRect ) - g_VdoTxtWndTopMargin - g_VdoTxtWndBottomMargin;
-			SetWindowPos( g_VdoInptPrvwTxtWndHdl, HWND_BOTTOM, g_VdoTxtWndLeftMargin, g_VdoTxtWndTopMargin, p_VdoInptOtptWndWdh, p_VdoInptOtptWndHgt, 0 ); //设置视频输入预览文本框窗口的位置。
+			SetWindowPos( g_VdoInptOtptTxtWndHdl, HWND_BOTTOM, g_VdoTxtWndLeftMargin, g_VdoTxtWndTopMargin, p_VdoInptOtptWndWdh, p_VdoInptOtptWndHgt, 0 ); //设置视频输入输出文本框窗口的位置。
 			g_VdoInptOtptWndCntnr.GetTotal( &p_VdoInptOtptWndTotal, 0, NULL );
 			if( p_VdoInptOtptWndTotal > 0 ) //如果有视频输入输出窗口。
 			{
@@ -578,11 +219,11 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 					SetWindowPos( p_VdoInptOtptWndTmpPt->m_DspyTxtWndHdl, NULL, g_VdoTxtWndLeftMargin, g_VdoTxtWndTopMargin + p_XTmp, p_VdoInptOtptWndWdh, p_PerVdoInptOtptWndHgt, SWP_NOZORDER );
 					p_XTmp += p_PerVdoInptOtptWndHgt;
 				}
-				ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_HIDE );
+				ShowWindow( g_VdoInptOtptTxtWndHdl, SW_HIDE );
 			}
 			else //如果没有视频输入输出窗口。
 			{
-				ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_SHOW );
+				ShowWindow( g_VdoInptOtptTxtWndHdl, SW_SHOW );
 			}
 			break;
 		}
@@ -631,7 +272,7 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 
 			p_VdoInptOtptWndWdh = RectWidth( p_MainDlgWndRect );
 			p_VdoInptOtptWndHgt = RectHeight( p_MainDlgWndRect );
-			SetWindowPos( g_VdoInptPrvwTxtWndHdl, HWND_BOTTOM, 0, 0, p_VdoInptOtptWndWdh, p_VdoInptOtptWndHgt, 0 ); //设置视频输入预览文本框窗口的位置。
+			SetWindowPos( g_VdoInptOtptTxtWndHdl, HWND_BOTTOM, 0, 0, p_VdoInptOtptWndWdh, p_VdoInptOtptWndHgt, 0 ); //设置视频输入输出文本框窗口的位置。
 			g_VdoInptOtptWndCntnr.GetTotal( &p_VdoInptOtptWndTotal, 0, NULL );
 			if( p_VdoInptOtptWndTotal > 0 ) //如果有视频输入输出窗口。
 			{
@@ -644,11 +285,11 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 					SetWindowPos( p_VdoInptOtptWndTmpPt->m_DspyTxtWndHdl, NULL, 0, p_XTmp, p_VdoInptOtptWndWdh, p_PerVdoInptOtptWndHgt, SWP_NOZORDER );
 					p_XTmp += p_PerVdoInptOtptWndHgt;
 				}
-				ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_HIDE );
+				ShowWindow( g_VdoInptOtptTxtWndHdl, SW_HIDE );
 			}
 			else //如果没有视频输入输出窗口。
 			{
-				ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_SHOW );
+				ShowWindow( g_VdoInptOtptTxtWndHdl, SW_SHOW );
 			}
 			break;
 		}
@@ -697,7 +338,7 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 
 			p_VdoInptOtptWndWdh = RectWidth( p_MainDlgWndRect );
 			p_VdoInptOtptWndHgt = RectHeight( p_MainDlgWndRect );
-			SetWindowPos( g_VdoInptPrvwTxtWndHdl, HWND_BOTTOM, 0, 0, p_VdoInptOtptWndWdh, p_VdoInptOtptWndHgt, 0 ); //设置视频输入预览文本框窗口的位置。
+			SetWindowPos( g_VdoInptOtptTxtWndHdl, HWND_BOTTOM, 0, 0, p_VdoInptOtptWndWdh, p_VdoInptOtptWndHgt, 0 ); //设置视频输入输出文本框窗口的位置。
 			g_VdoInptOtptWndCntnr.GetTotal( &p_VdoInptOtptWndTotal, 0, NULL );
 			if( p_VdoInptOtptWndTotal > 0 ) //如果有视频输入输出窗口。
 			{
@@ -710,11 +351,11 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 					SetWindowPos( p_VdoInptOtptWndTmpPt->m_DspyTxtWndHdl, NULL, p_XTmp, p_PerTitleTxtWndHgt, p_PerVdoInptOtptWndWdh, p_PerVdoInptOtptWndHgt, SWP_NOZORDER );
 					p_XTmp += p_PerVdoInptOtptWndWdh;
 				}
-				ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_HIDE );
+				ShowWindow( g_VdoInptOtptTxtWndHdl, SW_HIDE );
 			}
 			else //如果没有视频输入输出窗口。
 			{
-				ShowWindow( g_VdoInptPrvwTxtWndHdl, SW_SHOW );
+				ShowWindow( g_VdoInptOtptTxtWndHdl, SW_SHOW );
 			}
 			break;
 		}
@@ -885,8 +526,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 		{
 			RECT p_MainDlgWndRect;
 			RECT p_LogLstBoxWndRect;
-			RECT p_VdoInptPrvwTxtWndRect;
-			RECT p_VdoOtptDspyTxtWndHdlRect;
 
 			GetClientRect( g_MainDlgWndHdl, &p_MainDlgWndRect ); //获取主对话框窗口的位置。
 
@@ -944,13 +583,18 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			{
 				case SrvrCreateOrDstoyBtnId: //服务端初始化或销毁按钮。
 				{
-					if( g_MySrvrThrdPt == NULL ) //如果我的服务端线程还没有初始化。
+					if( g_MySrvrThrdPt == NULL ) //如果我的服务端线程未初始化。
 					{
-						MySrvrThrdInit();
+						g_MySrvrThrdPt = new MySrvrThrdCls( g_MainDlgWndHdl );
+						if( g_MySrvrThrdPt->Init() != 0 )
+						{
+							delete g_MySrvrThrdPt;
+							g_MySrvrThrdPt = NULL;
+						}
 					}
 					else //如果对讲客户端端连接已初始化。
 					{
-						MySrvrThrdDstoy();
+						g_MySrvrThrdPt->Dstoy();
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -1029,13 +673,26 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				}
 				case ClntCnctOrDstoyBtnId: //客户端连接或销毁按钮。
 				{
-					if( ( g_MyClntMediaPocsThrdPt == NULL ) || ( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) ) //如果我的客户端媒体处理线程还没有初始化，或对讲客户端未初始化。
+					if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未初始化。
 					{
-						TkbkInit();
+						g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
+						if( g_MyClntMediaPocsThrdPt->Init() != 0 )
+						{
+							delete g_MyClntMediaPocsThrdPt;
+							g_MyClntMediaPocsThrdPt = NULL;
+						}
 					}
-					else //如果对讲客户端端连接已初始化。
+
+					if( g_MyClntMediaPocsThrdPt != NULL ) //如果我的客户端媒体处理线程已初始化。
 					{
-						TkbkDstoy();
+						if( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) //如果对讲客户端连接未初始化。
+						{
+							g_MyClntMediaPocsThrdPt->TkbkInit();
+						}
+						else //如果对讲客户端端连接已初始化。
+						{
+							g_MyClntMediaPocsThrdPt->TkbkDstoy();
+						}
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -1422,8 +1079,8 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					if( g_MainDlgWndHdl == hDlg ) //如果是主对话框。
 					{
 						LOGI( Cu8vstr( "用户在主对话框按下关闭按钮，本软件退出。" ) );
-						MySrvrThrdDstoy();
-						MyClntMediaPocsThrdDstoy();
+						if( g_MySrvrThrdPt != NULL ) g_MySrvrThrdPt->Dstoy();
+						if( g_MyClntMediaPocsThrdPt != NULL ) g_MyClntMediaPocsThrdPt->Dstoy();
 						PostQuitMessage( 0 ); //发送退出消息。
 					}
 					else //如果是其他对话框。
@@ -1521,7 +1178,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			if( g_MySrvrThrdPt != NULL )
 			{
-				g_MySrvrThrdPt->Dstoy( &g_ErrInfoVstr ); //销毁媒体处理线程。
+				g_MySrvrThrdPt->Dstoy(); //销毁媒体处理线程。
 				delete g_MySrvrThrdPt;
 				g_MySrvrThrdPt = NULL;
 			}
@@ -1576,7 +1233,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			if( g_MyClntMediaPocsThrdPt != NULL )
 			{
-				g_MyClntMediaPocsThrdPt->Dstoy( &g_ErrInfoVstr ); //销毁媒体处理线程。
+				g_MyClntMediaPocsThrdPt->Dstoy(); //销毁媒体处理线程。
 				delete g_MyClntMediaPocsThrdPt;
 				g_MyClntMediaPocsThrdPt = NULL;
 			}
@@ -1627,9 +1284,11 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			{
 				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 3, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt->m_Pt );
 				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 4, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt->m_Pt );
+				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt3VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 5, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt3VstrPt->m_Pt );
 				
 				VstrDstoy( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt );
 				VstrDstoy( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt );
+				VstrDstoy( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt3VstrPt );
 				free( p_MainDlgWndMsgCnctLstModifyItemPt );
 			}
 			return ( INT_PTR )TRUE;
@@ -1686,9 +1345,11 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			{
 				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 3, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt->m_Pt );
 				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 4, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt->m_Pt );
+				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 5, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt->m_Pt );
 				
 				VstrDstoy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt );
 				VstrDstoy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt );
+				VstrDstoy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt );
 				free( p_MainDlgWndMsgClntLstModifyItemPt );
 			}
 			return ( INT_PTR )TRUE;
@@ -1701,30 +1362,30 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			if( p_MainDlgWndMsgVdoInptOtptWndInitPt != NULL )
 			{
 				//标题文本框窗口初始化。
-				p_VdoInptOtptWnd.m_TitleTxtWndHdl = CreateWindowEx( GetWindowExStyle( g_VdoInptPrvwTxtWndHdl ),
-																	   L"STATIC",
-																	   ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_Pt,
-																	   GetWindowStyle( g_VdoInptPrvwTxtWndHdl ) | WS_VISIBLE,
-																	   0, 0,
-																	   0, 0,
-																	   g_MainDlgWndHdl,
-																	   ( HMENU )VdoInptOtptTxtId,
-																	   g_IstnsHdl,
-																	   NULL );
-				SendMessage( p_VdoInptOtptWnd.m_TitleTxtWndHdl, WM_SETFONT, ( WPARAM )SendMessage( g_VdoInptPrvwTxtWndHdl, WM_GETFONT, 0, 0 ), MAKELPARAM( TRUE, 0 ) );
-				
+				p_VdoInptOtptWnd.m_TitleTxtWndHdl = CreateWindowEx( GetWindowExStyle( g_VdoInptOtptTxtWndHdl ),
+																	L"STATIC",
+																	( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_Pt,
+																	GetWindowStyle( g_VdoInptOtptTxtWndHdl ) | WS_VISIBLE,
+																	0, 0,
+																	0, 0,
+																	g_MainDlgWndHdl,
+																	( HMENU )VdoInptOtptTxtId,
+																	g_IstnsHdl,
+																	NULL );
+				SendMessage( p_VdoInptOtptWnd.m_TitleTxtWndHdl, WM_SETFONT, ( WPARAM )SendMessage( g_VdoInptOtptTxtWndHdl, WM_GETFONT, 0, 0 ), MAKELPARAM( TRUE, 0 ) );
+
 				//显示文本框窗口初始化。
-				p_VdoInptOtptWnd.m_DspyTxtWndHdl = CreateWindowEx( GetWindowExStyle( g_VdoInptPrvwTxtWndHdl ),
-																			 L"STATIC",
-																			 ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_Pt,
-																			 GetWindowStyle( g_VdoInptPrvwTxtWndHdl ) | WS_VISIBLE,
-																			 0, 0,
-																			 0, 0,
-																			 g_MainDlgWndHdl,
-																			 ( HMENU )VdoInptOtptTxtId,
-																			 g_IstnsHdl,
-																			 NULL );
-				SendMessage( p_VdoInptOtptWnd.m_DspyTxtWndHdl, WM_SETFONT, ( WPARAM )SendMessage( g_VdoInptPrvwTxtWndHdl, WM_GETFONT, 0, 0 ), MAKELPARAM( TRUE, 0 ) );
+				p_VdoInptOtptWnd.m_DspyTxtWndHdl = CreateWindowEx( GetWindowExStyle( g_VdoInptOtptTxtWndHdl ),
+																   L"STATIC",
+																   ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_Pt,
+																   GetWindowStyle( g_VdoInptOtptTxtWndHdl ) | WS_VISIBLE,
+																   0, 0,
+																   0, 0,
+																   g_MainDlgWndHdl,
+																   ( HMENU )VdoInptOtptTxtId,
+																   g_IstnsHdl,
+																   NULL );
+				SendMessage( p_VdoInptOtptWnd.m_DspyTxtWndHdl, WM_SETFONT, ( WPARAM )SendMessage( g_VdoInptOtptTxtWndHdl, WM_GETFONT, 0, 0 ), MAKELPARAM( TRUE, 0 ) );
 
 				g_VdoInptOtptWndCntnr.PutTail( &p_VdoInptOtptWnd, NULL, 0, NULL ); //放入视频输入输出窗口容器。
 				SetVdoWndShowMode( g_VdoWndShowMode ); //移动视频输入输出窗口。
@@ -1819,6 +1480,79 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		WSAStartup( MAKEWORD( 2, 2 ), &p_WsaData );
 	}
 
+	{
+		Vstr * p_LmtAppNameVstrPt = NULL;
+		Vstr * p_CurAppNameVstrPt = NULL;
+		uint64_t p_LmtTimeSec;
+		uint64_t p_RmnTimeSec;
+
+		VstrInit( &p_LmtAppNameVstrPt, , , );
+		VstrInit( &p_CurAppNameVstrPt, , , );
+
+		AudpGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "本端高级UDP协议套接字限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "本端高级UDP协议套接字当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "本端高级UDP协议套接字限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "本端高级UDP协议套接字剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		SpeexAecGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "Speex声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "Speex声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "Speex声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "Speex声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		WebRtcAecGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		SpeexWebRtcAecGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		RNNoiseGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "RNNoise噪音抑制器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "RNNoise噪音抑制器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "RNNoise噪音抑制器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "RNNoise噪音抑制器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		OpenH264EncdGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "OpenH264编码器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "OpenH264编码器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "OpenH264编码器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "OpenH264编码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		OpenH264DecdGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "OpenH264解码器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "OpenH264解码器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "OpenH264解码器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "OpenH264解码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		AAjbGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "音频自适应抖动缓冲器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "音频自适应抖动缓冲器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "音频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "音频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		VAjbGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "视频自适应抖动缓冲器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "视频自适应抖动缓冲器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "视频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "视频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
+		AviFileWriterGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "Avi文件写入器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "Avi文件写入器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "Avi文件写入器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "Avi文件写入器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+
+		VstrDstoy( p_LmtAppNameVstrPt );
+		VstrDstoy( p_CurAppNameVstrPt );
+	}
+
 	//判断应用程序可执行文件的名称是否为“Windows下音视频对讲演示程序.exe”或“WndAdoVdoTkbkDemo*”。
 	{
 		HANDLE p_CurProcHdl;
@@ -1860,7 +1594,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			ListView_InsertColumn( g_ClntLstWndHdl, 0, &p_LvCol );
 
 			p_LvCol.fmt = LVCFMT_CENTER;
-			p_LvCol.cx = 143;
+			p_LvCol.cx = 146;
 			p_LvCol.pszText = L"名称";
 			ListView_InsertColumn( g_CnctLstWndHdl, 1, &p_LvCol );
 			ListView_InsertColumn( g_ClntLstWndHdl, 1, &p_LvCol );
@@ -1885,6 +1619,13 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			p_LvCol.pszText = L"广播连接状态";
 			ListView_InsertColumn( g_ClntLstWndHdl, 4, &p_LvCol );
 			
+			p_LvCol.fmt = LVCFMT_CENTER;
+			p_LvCol.cx = 43;
+			p_LvCol.pszText = L"延迟";
+			ListView_InsertColumn( g_CnctLstWndHdl, 5, &p_LvCol );
+			p_LvCol.pszText = L"延迟";
+			ListView_InsertColumn( g_ClntLstWndHdl, 5, &p_LvCol );
+			
 			//连接列表设置样式。
 			ListView_SetExtendedListViewStyleEx( g_CnctLstWndHdl, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT );
 			ListView_SetExtendedListViewStyleEx( g_ClntLstWndHdl, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT );
@@ -1894,8 +1635,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		g_AdoOtptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ); //设置音频输出设备组合框窗口的句柄。
 		g_VdoInptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ); //设置视频输入设备组合框窗口的句柄。
 		g_LogLstBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, LogLstBoxId ); //设置日志列表框窗口的句柄。
-		g_VdoInptPrvwTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoInptOtptTxtId ); //设置视频输入预览文本框窗口的句柄。
-		g_VdoOtptDspyTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoInptOtptTxtId ); //设置视频输出显示文本框窗口的句柄。
+		g_VdoInptOtptTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoInptOtptTxtId ); //设置视频输入输出文本框窗口的句柄。
 		g_VdoInptOtptWndCntnr.Init( sizeof( VdoInptOtptWnd ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, NULL ); //视频输入输出窗口容器初始化。
 		g_PttDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( PttDlgId ), g_MainDlgWndHdl, WndMsgPocsPocdr );
 		g_PttBtnWndHdl = GetDlgItem( g_PttDlgWndHdl, PttBtnId );
@@ -1928,27 +1668,20 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	{
 		RECT p_MainDlgWndRect;
 		RECT p_VdoInptPrvwTxtWndRect;
-		RECT p_VdoOtptDspyTxtWndRect;
 		
 		//GetWindowRect( g_MainDlgWndHdl, &p_MainDlgWndRect );
 		//g_MainDlgWndMinWidth = RectWidth( p_MainDlgWndRect ); //设置主对话框窗口的最小宽度，单位为像素。
 		//g_MainDlgWndMinHeight = RectHeight( p_MainDlgWndRect ); //设置主对话框窗口的最小高度，单位为像素。
-		g_MainDlgWndMinWidth = 650; //设置主对话框窗口的最小宽度，单位为像素。
-		g_MainDlgWndMinHeight = 550; //设置主对话框窗口的最小高度，单位为像素。
+		g_MainDlgWndMinWidth = 700; //设置主对话框窗口的最小宽度，单位为像素。
+		g_MainDlgWndMinHeight = 700; //设置主对话框窗口的最小高度，单位为像素。
 		
-		//GetClientRect( g_MainDlgWndHdl, &p_MainDlgWndRect );
-		//GetWindowRect( g_VdoInptPrvwTxtWndHdl, &p_VdoInptPrvwTxtWndRect );
-		//RectScrnToClnt( g_MainDlgWndHdl, p_VdoInptPrvwTxtWndRect );
-		//GetWindowRect( g_VdoOtptDspyTxtWndHdl, &p_VdoOtptDspyTxtWndRect );
-		//RectScrnToClnt( g_MainDlgWndHdl, p_VdoOtptDspyTxtWndRect );
-		//g_VdoTxtWndLeftMargin = p_VdoInptPrvwTxtWndRect.left - p_MainDlgWndRect.left; //设置视频文本框窗口的左边距，单位为像素。
-		//g_VdoTxtWndTopMargin = p_VdoInptPrvwTxtWndRect.top - p_MainDlgWndRect.top; //设置视频文本框窗口的顶边距，单位为像素。
-		//g_VdoTxtWndRightMargin = p_MainDlgWndRect.right - p_VdoOtptDspyTxtWndRect.right; //设置视频文本框窗口的右边距，单位为像素。
-		//g_VdoTxtWndBottomMargin = p_MainDlgWndRect.bottom - p_VdoOtptDspyTxtWndRect.bottom; //设置视频文本框窗口的底边距，单位为像素。
-		g_VdoTxtWndLeftMargin = 455; //设置视频文本框窗口的左边距，单位为像素。
-		g_VdoTxtWndTopMargin = 11; //设置视频文本框窗口的顶边距，单位为像素。
-		g_VdoTxtWndRightMargin = 10; //设置视频文本框窗口的右边距，单位为像素。
-		g_VdoTxtWndBottomMargin = 12; //设置视频文本框窗口的底边距，单位为像素。
+		GetClientRect( g_MainDlgWndHdl, &p_MainDlgWndRect );
+		GetWindowRect( g_VdoInptOtptTxtWndHdl, &p_VdoInptPrvwTxtWndRect );
+		RectScrnToClnt( g_MainDlgWndHdl, p_VdoInptPrvwTxtWndRect );
+		g_VdoTxtWndLeftMargin = p_VdoInptPrvwTxtWndRect.left; //设置视频文本框窗口的左边距，单位为像素。
+		g_VdoTxtWndTopMargin = p_VdoInptPrvwTxtWndRect.top; //设置视频文本框窗口的顶边距，单位为像素。
+		g_VdoTxtWndRightMargin = p_MainDlgWndRect.right - p_VdoInptPrvwTxtWndRect.right; //设置视频文本框窗口的右边距，单位为像素。
+		g_VdoTxtWndBottomMargin = p_MainDlgWndRect.bottom - p_VdoInptPrvwTxtWndRect.bottom; //设置视频文本框窗口的底边距，单位为像素。
 	}
 	
 	//打印当前进程活动目录的完整绝对路径到日志。
@@ -2176,7 +1909,20 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			}
 			else if( wcscmp( p_Argv[ p_Argn ], L"-BdctInit" ) == 0 )
 			{
-				BdctInit();
+				if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未初始化。
+				{
+					g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
+					if( g_MyClntMediaPocsThrdPt->Init() != 0 )
+					{
+						delete g_MyClntMediaPocsThrdPt;
+						g_MyClntMediaPocsThrdPt = NULL;
+					}
+				}
+
+				if( g_MyClntMediaPocsThrdPt != NULL ) //如果我的客户端媒体处理线程已初始化。
+				{
+					g_MyClntMediaPocsThrdPt->BdctInit();
+				}
 			}
 		}
 
@@ -2203,11 +1949,27 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			if( p_Msg.message == WM_LBUTTONDOWN )
 			{
-				BdctInit();
+				if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未初始化。
+				{
+					g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
+					if( g_MyClntMediaPocsThrdPt->Init() != 0 )
+					{
+						delete g_MyClntMediaPocsThrdPt;
+						g_MyClntMediaPocsThrdPt = NULL;
+					}
+				}
+
+				if( g_MyClntMediaPocsThrdPt != NULL ) //如果我的客户端媒体处理线程已初始化。
+				{
+					g_MyClntMediaPocsThrdPt->BdctInit();
+				}
 			}
 			else if( p_Msg.message == WM_LBUTTONUP )
 			{
-				BdctDstoy();
+				if( g_MyClntMediaPocsThrdPt != NULL ) //如果我的客户端媒体处理线程已初始化。
+				{
+					g_MyClntMediaPocsThrdPt->BdctDstoy();
+				}
 			}
 		}
 		

@@ -43,7 +43,10 @@ __FUNC_DLLAPI__ int StrTrim( char * SrcStrPt, const char * TrimStrPt, char TrimP
 __FUNC_DLLAPI__ void * __cdecl MemCpy( void * DstPt, void const * SrcPt, size_t SzByt );
 __FUNC_DLLAPI__ void * __cdecl MemCpyAvx( void * DstPt, void const * SrcPt, size_t SzByt );
 __FUNC_DLLAPI__ void * __cdecl MemCpySse2( void * DstPt, void const * SrcPt, size_t SzByt );
-#else
+#elif( defined __ARMAT32__ )
+//__FUNC_DLLAPI__ void * __cdecl memcpy( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
+//__FUNC_DLLAPI__ void * __cdecl memmove( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
+//__FUNC_DLLAPI__ void * __cdecl MemCpy( void * DstPt, void const * SrcPt, size_t SzByt );
 #endif
 #endif
 

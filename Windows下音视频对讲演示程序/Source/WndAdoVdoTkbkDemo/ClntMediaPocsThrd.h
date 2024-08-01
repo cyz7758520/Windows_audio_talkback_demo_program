@@ -23,6 +23,8 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 		PktTypTkbkMode, //对讲模式包。
 		PktTypAdoFrm, //音频输入输出帧包。
 		PktTypVdoFrm, //视频输入输出帧包。
+		PktTypTstNtwkDly, //测试网络延迟包。
+		PktTypTstNtwkDlyRply, //测试网络延迟应答包。
 		PktTypExit, //退出包。
 	} PktTyp;
 	
@@ -68,6 +70,7 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 	
 	typedef enum UserMsgTyp //用户消息。
 	{
+		UserMsgTypTkbkClntSetIsTstNtwkDly, //对讲客户端设置是否测试网络延迟。
 		UserMsgTypTkbkClntCnctInit, //对讲客户端的连接初始化。
 		UserMsgTypTkbkClntCnctDstoy, //对讲客户端的连接销毁。
 		UserMsgTypTkbkClntLclTkbkMode, //对讲客户端的本端对讲模式。
@@ -79,6 +82,11 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 		UserMsgTypBdctClntCnctInit, //广播客户端的连接初始化。
 		UserMsgTypBdctClntCnctDstoy, //广播客户端的连接销毁。
 	} UserMsgTyp;
+	typedef struct UserMsgTkbkClntSetIsTstNtwkDly
+	{
+		int32_t m_IsTstNtwkDly;
+		uint64_t m_SendIntvlMsec;
+	} UserMsgTkbkClntSetIsTstNtwkDly;
 	typedef struct UserMsgTkbkClntCnctInit
 	{
 		int32_t m_IsTcpOrAudpPrtcl;
@@ -173,6 +181,10 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 	typedef void( __cdecl * ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, TkbkClnt::TkbkInfo * TkbkInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode );
 	ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt m_UserTkbkClntTkbkInfoRmtTkbkModeFuncPt;
 	
+	//用户定义的对讲客户端测试网络延迟函数。
+	typedef void( __cdecl * ClntMediaPocsThrdUserTkbkClntTstNtwkDlyFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, uint64_t NtwkDlyMsec );
+	ClntMediaPocsThrdUserTkbkClntTstNtwkDlyFuncPt m_UserTkbkClntTstNtwkDlyFuncPt;
+
 	//用户定义的广播客户端初始化函数。
 	typedef void( __cdecl * ClntMediaPocsThrdUserBdctClntInitFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt );
 	ClntMediaPocsThrdUserBdctClntInitFuncPt m_UserBdctClntInitFuncPt;
@@ -199,11 +211,12 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, void * U
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserShowLogFuncPt UserShowLogFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserShowToastFuncPt UserShowToastFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdInitFuncPt UserClntMediaPocsThrdInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdDstoyFuncPt UserClntMediaPocsThrdDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctInitFuncPt UserTkbkClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctDstoyFuncPt UserTkbkClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctStsFuncPt UserTkbkClntCnctStsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntMyTkbkIdxFuncPt UserTkbkClntMyTkbkIdxFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntLclTkbkModeFuncPt UserTkbkClntLclTkbkModeFuncPt, 
-						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoInitFuncPt UserTkbkClntTkbkInfoInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoDstoyFuncPt UserTkbkClntTkbkInfoDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt UserTkbkClntTkbkInfoRmtTkbkModeFuncPt,
+						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoInitFuncPt UserTkbkClntTkbkInfoInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoDstoyFuncPt UserTkbkClntTkbkInfoDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt UserTkbkClntTkbkInfoRmtTkbkModeFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTstNtwkDlyFuncPt UserTkbkClntTstNtwkDlyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntInitFuncPt UserBdctClntInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntDstoyFuncPt UserBdctClntDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctInitFuncPt UserBdctClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctDstoyFuncPt UserBdctClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctStsFuncPt UserBdctClntCnctStsFuncPt,
 						   Vstr * ErrInfoVstrPt );
 int ClntMediaPocsThrdDstoy( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * ErrInfoVstrPt );
+int ClntMediaPocsThrdSendTkbkClntSetIsTstNtwkDlyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt );
 int ClntMediaPocsThrdSendTkbkClntCnctInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt, Vstr * ErrInfoVstrPt );
 int ClntMediaPocsThrdSendTkbkClntCnctDstoyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
 int ClntMediaPocsThrdSendTkbkClntLclTkbkModeMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t LclTkbkMode, Vstr * ErrInfoVstrPt );
@@ -289,6 +302,9 @@ public:
 	//用户定义的对讲客户端对讲信息远端对讲模式函数。
 	virtual void UserTkbkClntTkbkInfoRmtTkbkMode( TkbkClnt::TkbkInfo * TkbkInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode ) = 0;
 	
+	//用户定义的对讲客户端测试网络延迟函数。
+	virtual void UserTkbkClntTstNtwkDly( uint64_t NtwkDlyMsec ) = 0;
+
 	//用户定义的广播客户端初始化函数。
 	virtual void UserBdctClntInit() = 0;
 
@@ -306,7 +322,8 @@ public:
 	
 	int Init( VstrCls * ErrInfoVstrPt );
 	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = ClntMediaPocsThrdDstoy( m_ClntMediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_ClntMediaPocsThrdPt = NULL; m_MediaPocsThrdClsPt = NULL; return p_Rslt; }
-
+	
+	int SendTkbkClntSetIsTstNtwkDlyMsg( int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, VstrCls * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendTkbkClntSetIsTstNtwkDlyMsg( m_ClntMediaPocsThrdPt, IsBlockWait, IsTstNtwkDly, SendIntvlMsec, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SendTkbkClntCnctInitMsg( int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt, VstrCls * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendTkbkClntCnctInitMsg( m_ClntMediaPocsThrdPt, IsBlockWait, IsTcpOrAudpPrtcl, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SendTkbkClntCnctDstoyMsg( int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendTkbkClntCnctDstoyMsg( m_ClntMediaPocsThrdPt, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SendTkbkClntLclTkbkModeMsg( int IsBlockWait, int32_t LclTkbkMode, VstrCls * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendTkbkClntLclTkbkModeMsg( m_ClntMediaPocsThrdPt, IsBlockWait, LclTkbkMode, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }

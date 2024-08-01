@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "TinyXml2.h"
-
 #ifdef __cplusplus
 extern "C"
 {

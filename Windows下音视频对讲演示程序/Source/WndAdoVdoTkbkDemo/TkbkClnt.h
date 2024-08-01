@@ -16,6 +16,14 @@ typedef struct TkbkClnt //对讲客户端。
 {
 	ClntMediaPocsThrd * m_ClntMediaPocsThrdPt; //存放客户端媒体处理线程的指针。
 	
+	struct TstNtwkDly //存放测试网络延迟。
+	{
+		int32_t m_IsTstNtwkDly; //存放是否测试网络延迟。
+		uint64_t m_SendIntvlMsec; //存放发送间隔，单位为毫秒。
+		uint64_t m_LastSendTickMsec; //存放最后发送的嘀嗒钟，单位为毫秒。
+		int32_t m_IsRecvRplyPkt; //存放是否接收应答包，为0表示未接收，为1表示已接收。
+	} m_TstNtwkDly;
+
     int32_t m_XfrMode; //存放传输模式，为0表示实时半双工（一键通），为1表示实时全双工。
     int32_t m_PttBtnIsDown; //存放一键即按即通按钮是否按下，为0表示弹起，为非0表示按下。
 

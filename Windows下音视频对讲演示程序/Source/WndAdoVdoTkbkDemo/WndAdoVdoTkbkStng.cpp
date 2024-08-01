@@ -1,50 +1,7 @@
 ﻿#include "Func.h"
+#include "TinyXml2.h"
 #include "WndAdoVdoTkbkDemo.h"
 #include "WndAdoVdoTkbkStng.h"
-#include "MyClntMediaPocsThrd.h"
-
-//全局变量。
-extern HINSTANCE g_IstnsHdl; //存放当前实例的句柄。
-extern VstrCls g_ErrInfoVstr; //存放错误信息动态字符串的指针。
-extern MyClntMediaPocsThrdCls * g_MyClntMediaPocsThrdPt; //存放我的客户端媒体处理线程的指针。
-extern HWND g_MainDlgWndHdl; //存放主对话框窗口的句柄。
-extern long g_MainDlgWndMinHeight; //存放主对话框窗口的最小高度，单位为像素。
-extern long g_MainDlgWndMinWidth; //存放主对话框窗口的最小宽度，单位为像素。
-extern HWND g_SrvrStngDlgWndHdl; //存放服务端设置对话框窗口的句柄。
-extern HWND g_CnctLstWndHdl; //存放连接列表窗口的句柄。
-extern HWND g_ClntStngDlgWndHdl; //存放客户端设置对话框窗口的句柄。
-extern HWND g_ClntLstWndHdl; //存放客户端列表窗口的句柄。
-extern HWND g_AdoInptDvcCbBoxWndHdl; //存放音频输入设备组合框窗口的句柄。
-extern HWND g_AdoOtptDvcCbBoxWndHdl; //存放音频输出设备组合框窗口的句柄。
-extern HWND g_VdoInptDvcCbBoxWndHdl; //存放视频输入设备组合框窗口的句柄。
-extern HWND g_LogLstBoxWndHdl; //存放日志列表框窗口的句柄。
-extern HWND g_VdoInptPrvwTxtWndHdl; //存放视频输入预览文本框窗口的句柄。
-extern HWND g_VdoOtptDspyTxtWndHdl; //存放视频输出显示文本框窗口的句柄。
-extern long g_VdoTxtWndLeftMargin; //存放视频文本框窗口的左边距，单位为像素。
-extern long g_VdoTxtWndTopMargin; //存放视频文本框窗口的顶边距，单位为像素。
-extern long g_VdoTxtWndRightMargin; //存放视频文本框窗口的右边距，单位为像素。
-extern long g_VdoTxtWndBottomMargin; //存放视频文本框窗口的底边距，单位为像素。
-extern int g_VdoWndShowMode; //存放视频窗口的显示模式，为0表示正常，为1表示垂直最大化排列，为2表示水平最大化排列。
-extern HWND g_VdoInptPrvwWndHdl; //存放视频输入预览窗口的句柄。
-extern HWND g_VdoOtptDspyWndHdl; //存放视频输出显示窗口的句柄。
-extern HWND g_PttDlgWndHdl; //存放一键即按即通对话框窗口的句柄。
-extern HWND g_PttBtnWndHdl; //存放一键即按即通按钮窗口的句柄。
-
-extern HWND g_StngDlgWndHdl; //存放设置对话框窗口的句柄。
-extern HWND g_AjbStngDlgWndHdl; //存放自适应抖动缓冲器设置对话框窗口的句柄。
-extern HWND g_SaveStsToTxtFileStngDlgWndHdl; //存放保存状态到Txt文件设置对话框窗口的句柄。
-extern HWND g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl; //存放保存音视频输入输出到Avi文件设置对话框窗口的句柄。
-extern HWND g_SpeexAecStngDlgWndHdl; //存放Speex声学回音消除器设置对话框窗口的句柄。
-extern HWND g_WebRtcAecmStngDlgWndHdl; //存放WebRtc定点版声学回音消除器设置对话框窗口的句柄。
-extern HWND g_WebRtcAecStngDlgWndHdl; //存放WebRtc浮点版声学回音消除器设置对话框窗口的句柄。
-extern HWND g_SpeexWebRtcAecStngDlgWndHdl; //存放SpeexWebRtc三重声学回音消除器设置对话框窗口的句柄。
-extern HWND g_SpeexPrpocsNsStngDlgWndHdl; //存放Speex预处理器的噪音抑制设置对话框窗口的句柄。
-extern HWND g_WebRtcNsxStngDlgWndHdl; //存放WebRtc定点版噪音抑制器设置对话框窗口的句柄。
-extern HWND g_WebRtcNsStngDlgWndHdl; //存放WebRtc浮点版噪音抑制器设置对话框窗口的句柄。
-extern HWND g_SpeexPrpocsStngDlgWndHdl; //存放Speex预处理器的设置对话框窗口的句柄。
-extern HWND g_SpeexCodecStngDlgWndHdl; //存放Speex编解码器设置对话框窗口的句柄。
-extern HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
-extern HWND g_OpenH264CodecStngDlgWndHdl; //存放OpenH264编解码器设置对话框窗口的句柄。
 
 void RefresAdoVdohDvc(); //刷新音视频设备。
 
@@ -234,33 +191,34 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUsePrvntSysSleep" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsTstNtwkDly" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsTstNtwkDlyCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoVdoInptOtptToAviFile" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "Effect" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectLowRdBtnId ) == BST_CHECKED ) ? "Low" :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectMidRdBtnId ) == BST_CHECKED ) ? "Mid" :
-					( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectHighRdBtnId ) == BST_CHECKED ) ? "High" :
-						( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectSuperRdBtnId ) == BST_CHECKED ) ? "Super" :
-							( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectPremiumRdBtnId ) == BST_CHECKED ) ? "Premium" : "Super" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectLowRdBtnId ) == BST_CHECKED ) ? "Low" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectMidRdBtnId ) == BST_CHECKED ) ? "Mid" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectHighRdBtnId ) == BST_CHECKED ) ? "High" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectSuperRdBtnId ) == BST_CHECKED ) ? "Super" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectPremiumRdBtnId ) == BST_CHECKED ) ? "Premium" : "Super" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoSmplRate" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId ) == BST_CHECKED ) ? 8000 :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate16000RdBtnId ) == BST_CHECKED ) ? 16000 :
-					( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate32000RdBtnId ) == BST_CHECKED ) ? 32000 :
-						( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate48000RdBtnId ) == BST_CHECKED ) ? 48000 : 16000 );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId ) == BST_CHECKED ) ? 8000 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate16000RdBtnId ) == BST_CHECKED ) ? 16000 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate32000RdBtnId ) == BST_CHECKED ) ? 32000 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoSmplRate48000RdBtnId ) == BST_CHECKED ) ? 48000 : 16000 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoFrmLen" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId ) == BST_CHECKED ) ? 10 :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen20msRdBtnId ) == BST_CHECKED ) ? 20 :
-					( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 20 );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId ) == BST_CHECKED ) ? 10 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen20msRdBtnId ) == BST_CHECKED ) ? 20 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 20 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseSystemAecNsAgc" );
@@ -268,21 +226,19 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatAec" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoAecRdBtnId ) == BST_CHECKED ) ? "NoAec" :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexAecRdBtnId ) == BST_CHECKED ) ? "SpeexAec" :
-					( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecmRdBtnId ) == BST_CHECKED ) ? "WebRtcAecm" :
-						( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecRdBtnId ) == BST_CHECKED ) ? "WebRtcAec" :
-							( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexWebRtcAecRdBtnId ) == BST_CHECKED ) ? "SpeexWebRtcAec" : "SpeexWebRtcAec" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoAecRdBtnId ) == BST_CHECKED ) ? "NoAec" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexAecRdBtnId ) == BST_CHECKED ) ? "SpeexAec" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecmRdBtnId ) == BST_CHECKED ) ? "WebRtcAecm" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecRdBtnId ) == BST_CHECKED ) ? "WebRtcAec" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexWebRtcAecRdBtnId ) == BST_CHECKED ) ? "SpeexWebRtcAec" : "SpeexWebRtcAec" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatNs" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoNsRdBtnId ) == BST_CHECKED ) ? "NoNs" :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexPrpocsNsRdBtnId ) == BST_CHECKED ) ? "SpeexPrpocsNs" :
-					( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcNsxRdBtnId ) == BST_CHECKED ) ? "WebRtcNsx" :
-						( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcNsRdBtnId ) == BST_CHECKED ) ? "WebRtcNs" :
-							( IsDlgButtonChecked( g_StngDlgWndHdl, UseRNNoiseRdBtnId ) == BST_CHECKED ) ? "RNNoise" : "RNNoise" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoNsRdBtnId ) == BST_CHECKED ) ? "NoNs" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexPrpocsNsRdBtnId ) == BST_CHECKED ) ? "SpeexPrpocsNs" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcNsxRdBtnId ) == BST_CHECKED ) ? "WebRtcNsx" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcNsRdBtnId ) == BST_CHECKED ) ? "WebRtcNs" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseRNNoiseRdBtnId ) == BST_CHECKED ) ? "RNNoise" : "RNNoise" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseSpeexPrpocs" );
@@ -290,10 +246,9 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "AdoUseWhatCodec" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UsePcmRdBtnId ) == BST_CHECKED ) ? "Pcm" :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexCodecRdBtnId ) == BST_CHECKED ) ? "SpeexCodec" :
-					( IsDlgButtonChecked( g_StngDlgWndHdl, UseOpusCodecRdBtnId ) == BST_CHECKED ) ? "OpusCodec" : "SpeexCodec" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UsePcmRdBtnId ) == BST_CHECKED ) ? "Pcm" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexCodecRdBtnId ) == BST_CHECKED ) ? "SpeexCodec" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseOpusCodecRdBtnId ) == BST_CHECKED ) ? "OpusCodec" : "SpeexCodec" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsSaveAdoInptOtptToWaveFile" );
@@ -301,17 +256,15 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoSmplRate" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId ) == BST_CHECKED ) ? 12 :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate15RdBtnId ) == BST_CHECKED ) ? 15 :
-					( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate24RdBtnId ) == BST_CHECKED ) ? 24 :
-						( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate30RdBtnId ) == BST_CHECKED ) ? 30 : 24 );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate12RdBtnId ) == BST_CHECKED ) ? 12 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate15RdBtnId ) == BST_CHECKED ) ? 15 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate24RdBtnId ) == BST_CHECKED ) ? 24 :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoSmplRate30RdBtnId ) == BST_CHECKED ) ? 30 : 24 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatVdoFrmSz" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId ) == BST_CHECKED ) ? "Prset" :
-				( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzOtherRdBtnId ) == BST_CHECKED ) ? "Other" : "Prset" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzPrsetRdBtnId ) == BST_CHECKED ) ? "Prset" :
+									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseVdoFrmSzOtherRdBtnId ) == BST_CHECKED ) ? "Other" : "Prset" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		GetDlgItemText( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
@@ -333,9 +286,8 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoUseWhatCodec" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, UseYu12RdBtnId ) == BST_CHECKED ) ? "Yu12" :
-				( IsDlgButtonChecked( g_MainDlgWndHdl, UseOpenH264CodecRdBtnId ) == BST_CHECKED ) ? "OpenH264Codec" : "OpenH264Codec" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseYu12RdBtnId ) == BST_CHECKED ) ? "Yu12" :
+									 ( IsDlgButtonChecked( g_MainDlgWndHdl, UseOpenH264CodecRdBtnId ) == BST_CHECKED ) ? "OpenH264Codec" : "OpenH264Codec" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	}
 
@@ -543,10 +495,9 @@ void SaveStngToXmlFile()
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WorkMode" );
-		p_TmpXMLElement2Pt->SetText(
-			( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? "SpeexAecWebRtcAecm" :
-				( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? "WebRtcAecmWebRtcAec" :
-					( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? "SpeexAecWebRtcAecmWebRtcAec" : "SpeexAecWebRtcAecmWebRtcAec" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? "SpeexAecWebRtcAecm" :
+									 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? "WebRtcAecmWebRtcAec" :
+									 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? "SpeexAecWebRtcAecmWebRtcAec" : "SpeexAecWebRtcAecmWebRtcAec" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 	
 		GetDlgItemText( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
@@ -1157,6 +1108,17 @@ void ReadStngFromXmlFile()
 							else
 							{
 								CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsTstNtwkDly" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsTstNtwkDlyCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsTstNtwkDlyCkBoxId, BST_CHECKED );
 							}
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoVdoInptOtptToAviFile" ) == 0 )
@@ -2193,6 +2155,7 @@ void ResetStng()
 		CheckDlgButton( g_StngDlgWndHdl, IsSaveStsToTxtFileCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId, BST_CHECKED );
+		CheckDlgButton( g_StngDlgWndHdl, IsTstNtwkDlyCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_CHECKED );
 
 		//设置视频帧的大小。

@@ -44,6 +44,7 @@ extern "C"
 
 typedef struct SpeexAec SpeexAec;
 
+__SPEEXDSP_DLLAPI__ int SpeexAecGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecInit( SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecInitByMem( SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const char * MemPt, size_t MemLenByt, Vstr * ErrInfoVstrPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecInitByMemFile( SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt );

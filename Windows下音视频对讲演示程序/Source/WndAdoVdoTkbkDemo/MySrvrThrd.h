@@ -11,6 +11,9 @@ public:
 	MySrvrThrdCls( HWND MainDlgWndHdl ) { m_MainDlgWndHdl = MainDlgWndHdl; }
 	~MySrvrThrdCls() {}
 	
+	int Init();
+	void Dstoy();
+
 	//用户定义的显示日志函数。
 	void UserShowLog( VstrCls * InfoVstrPt );
 	
@@ -43,4 +46,7 @@ public:
 	
 	//用户定义的连接远端对讲模式函数。
 	void UserCnctRmtTkbkMode( SrvrThrd::CnctInfo * CnctInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode );
+	
+	//用户定义的连接测试网络延迟函数。
+	void UserCnctTstNtwkDly( SrvrThrd::CnctInfo * CnctInfoPt, uint64_t NtwkDlyMsec );
 };

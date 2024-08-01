@@ -25,7 +25,7 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, void * U
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserShowLogFuncPt UserShowLogFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserShowToastFuncPt UserShowToastFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdInitFuncPt UserClntMediaPocsThrdInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdDstoyFuncPt UserClntMediaPocsThrdDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctInitFuncPt UserTkbkClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctDstoyFuncPt UserTkbkClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctStsFuncPt UserTkbkClntCnctStsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntMyTkbkIdxFuncPt UserTkbkClntMyTkbkIdxFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntLclTkbkModeFuncPt UserTkbkClntLclTkbkModeFuncPt, 
-						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoInitFuncPt UserTkbkClntTkbkInfoInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoDstoyFuncPt UserTkbkClntTkbkInfoDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt UserTkbkClntTkbkInfoRmtTkbkModeFuncPt,
+						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoInitFuncPt UserTkbkClntTkbkInfoInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoDstoyFuncPt UserTkbkClntTkbkInfoDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt UserTkbkClntTkbkInfoRmtTkbkModeFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTstNtwkDlyFuncPt UserTkbkClntTstNtwkDlyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntInitFuncPt UserBdctClntInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntDstoyFuncPt UserBdctClntDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctInitFuncPt UserBdctClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctDstoyFuncPt UserBdctClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctStsFuncPt UserBdctClntCnctStsFuncPt,
 						   Vstr * ErrInfoVstrPt )
@@ -137,6 +137,7 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, void * U
 	p_ClntMediaPocsThrdPt->m_UserTkbkClntTkbkInfoInitFuncPt = UserTkbkClntTkbkInfoInitFuncPt; //设置用户定义的对讲客户端对讲信息初始化函数的指针。
 	p_ClntMediaPocsThrdPt->m_UserTkbkClntTkbkInfoDstoyFuncPt = UserTkbkClntTkbkInfoDstoyFuncPt; //设置用户定义的对讲客户端对讲信息销毁函数的指针。
 	p_ClntMediaPocsThrdPt->m_UserTkbkClntTkbkInfoRmtTkbkModeFuncPt = UserTkbkClntTkbkInfoRmtTkbkModeFuncPt; //设置用户定义的对讲客户端对讲信息远端对讲模式函数的指针。
+	p_ClntMediaPocsThrdPt->m_UserTkbkClntTstNtwkDlyFuncPt = UserTkbkClntTstNtwkDlyFuncPt; //设置用户定义的对讲客户端测试网络延迟函数的指针。
 
 	p_ClntMediaPocsThrdPt->m_UserBdctClntInitFuncPt = UserBdctClntInitFuncPt; //设置用户定义的广播客户端初始化函数的指针。
 	p_ClntMediaPocsThrdPt->m_UserBdctClntDstoyFuncPt = UserBdctClntDstoyFuncPt; //设置用户定义的广播客户端销毁函数的指针。
@@ -193,6 +194,37 @@ int ClntMediaPocsThrdDstoy( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * ErrI
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
 		
+	}
+	return p_Rslt;
+}
+
+//发送对讲客户端设置是否测试网络延迟消息。
+int ClntMediaPocsThrdSendTkbkClntSetIsTstNtwkDlyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	ClntMediaPocsThrd::UserMsgTkbkClntSetIsTstNtwkDly p_UserMsgTkbkClntSetIsTstNtwkDly;
+	
+	//判断各个变量是否正确。
+	if( ClntMediaPocsThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程的指针不正确。" ), , );
+		goto Out;
+	}
+
+	p_UserMsgTkbkClntSetIsTstNtwkDly.m_IsTstNtwkDly = IsTstNtwkDly;
+	p_UserMsgTkbkClntSetIsTstNtwkDly.m_SendIntvlMsec = SendIntvlMsec;
+	if( MediaPocsThrdSendUserMsg( ClntMediaPocsThrdPt->m_MediaPocsThrdPt, IsBlockWait, ClntMediaPocsThrd::UserMsgTypTkbkClntSetIsTstNtwkDly, &p_UserMsgTkbkClntSetIsTstNtwkDly, sizeof( p_UserMsgTkbkClntSetIsTstNtwkDly ), ErrInfoVstrPt ) != 0 )
+	{
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
+		goto Out;
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+
 	}
 	return p_Rslt;
 }
@@ -709,6 +741,18 @@ int __cdecl ClntMediaPocsThrdUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned 
 
 	switch( MsgTyp )
 	{
+		case ClntMediaPocsThrd::UserMsgTypTkbkClntSetIsTstNtwkDly:
+		{
+			p_ClntMediaPocsThrdPt->m_TkbkClnt.m_TstNtwkDly.m_IsTstNtwkDly = ( ( ClntMediaPocsThrd::UserMsgTkbkClntSetIsTstNtwkDly * )MsgPt )->m_IsTstNtwkDly; //设置是否测试网络延迟。
+			p_ClntMediaPocsThrdPt->m_TkbkClnt.m_TstNtwkDly.m_SendIntvlMsec = ( ( ClntMediaPocsThrd::UserMsgTkbkClntSetIsTstNtwkDly * )MsgPt )->m_SendIntvlMsec; //设置测试网络延迟包的发送间隔。
+
+			if( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_TstNtwkDly.m_IsTstNtwkDly != 0 )
+			{
+				p_ClntMediaPocsThrdPt->m_TkbkClnt.m_TstNtwkDly.m_LastSendTickMsec = 0; //设置测试网络延迟包最后发送的嘀嗒钟为0，这样可以立即开始发送。
+				p_ClntMediaPocsThrdPt->m_TkbkClnt.m_TstNtwkDly.m_IsRecvRplyPkt = 1; //设置已接收测试网络延迟应答包，这样可以立即开始发送。
+			}
+			break;
+		}
 		case ClntMediaPocsThrd::UserMsgTypTkbkClntCnctInit:
 		{
 			int32_t p_IsTcpOrAudpPrtcl = ( ( ClntMediaPocsThrd::UserMsgTkbkClntCnctInit * )MsgPt )->m_IsTcpOrAudpPrtcl;
@@ -999,6 +1043,12 @@ extern "C" void __cdecl ClntMediaPocsThrdClsUserTkbkClntTkbkInfoRmtTkbkMode( Cln
 	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserTkbkClntTkbkInfoRmtTkbkMode( TkbkInfoPt, OldRmtTkbkMode, NewRmtTkbkMode );
 }
 
+//回调ClntMediaPocsThrdCls类的用户定义的对讲客户端测试网络延迟函数。
+extern "C" void __cdecl ClntMediaPocsThrdClsUserTkbkClntTstNtwkDly( ClntMediaPocsThrd * ClntMediaPocsThrdPt, uint64_t NtwkDlyMsec )
+{
+	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserTkbkClntTstNtwkDly( NtwkDlyMsec );
+}
+
 //回调ClntMediaPocsThrdCls类的用户定义的广播客户端初始化函数。
 extern "C" void __cdecl ClntMediaPocsThrdClsUserBdctClntInit( ClntMediaPocsThrd * ClntMediaPocsThrdPt )
 {
@@ -1035,7 +1085,7 @@ int ClntMediaPocsThrdCls::Init( VstrCls * ErrInfoVstrPt )
 										ClntMediaPocsThrdClsUserShowLog, ClntMediaPocsThrdClsUserShowToast,
 										ClntMediaPocsThrdClsUserClntMediaPocsThrdInit, ClntMediaPocsThrdClsUserClntMediaPocsThrdDstoy,
 										ClntMediaPocsThrdClsUserTkbkClntCnctInit, ClntMediaPocsThrdClsUserTkbkClntCnctDstoy, ClntMediaPocsThrdClsUserTkbkClntCnctSts, ClntMediaPocsThrdClsUserTkbkClntMyTkbkIdx, ClntMediaPocsThrdClsUserTkbkClntLclTkbkMode,
-										ClntMediaPocsThrdClsUserTkbkClntTkbkInfoInit, ClntMediaPocsThrdClsUserTkbkClntTkbkInfoDstoy, ClntMediaPocsThrdClsUserTkbkClntTkbkInfoRmtTkbkMode,
+										ClntMediaPocsThrdClsUserTkbkClntTkbkInfoInit, ClntMediaPocsThrdClsUserTkbkClntTkbkInfoDstoy, ClntMediaPocsThrdClsUserTkbkClntTkbkInfoRmtTkbkMode, ClntMediaPocsThrdClsUserTkbkClntTstNtwkDly,
 										ClntMediaPocsThrdClsUserBdctClntInit, ClntMediaPocsThrdClsUserBdctClntDstoy, ClntMediaPocsThrdClsUserBdctClntCnctInit, ClntMediaPocsThrdClsUserBdctClntCnctDstoy, ClntMediaPocsThrdClsUserBdctClntCnctSts,
 										( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL );
 	if( p_Rslt == 0 )

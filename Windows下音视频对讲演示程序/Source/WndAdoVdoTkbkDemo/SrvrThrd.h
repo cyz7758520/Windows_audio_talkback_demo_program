@@ -20,6 +20,8 @@ typedef struct SrvrThrd
 		PktTypTkbkMode, //对讲模式包。
 		PktTypAdoFrm, //音频输入输出帧包。
 		PktTypVdoFrm, //视频输入输出帧包。
+		PktTypTstNtwkDly, //测试网络延迟包。
+		PktTypTstNtwkDlyRply, //测试网络延迟应答包。
 		PktTypExit, //退出包。
 	} PktTyp;
 	
@@ -52,6 +54,12 @@ typedef struct SrvrThrd
 
 	int32_t m_IsUsePrvntSysSleep; //存放是否使用阻止系统睡眠，为非0表示要使用，为0表示不使用。
 	
+	struct TstNtwkDly //存放测试网络延迟。
+	{
+		int32_t m_IsTstNtwkDly; //存放是否测试网络延迟。
+		uint64_t m_SendIntvlMsec; //存放发送间隔，单位为毫秒。
+	} m_TstNtwkDly;
+
     int32_t m_SrvrIsInit; //存放服务端是否初始化，为0表示未初始化，为1表示已初始化。
     TcpSrvrSokt * m_TcpSrvrSoktPt; //存放本端Tcp协议服务端套接字的指针。
     AudpSokt * m_AudpSrvrSoktPt; //存放本端高级Udp协议服务端套接字的指针。
@@ -74,6 +82,12 @@ typedef struct SrvrThrd
 		int32_t m_RmtTkbkMode; //存放远端对讲模式。
 
 		int32_t m_IsRecvExitPkt; //存放是否接收退出包，为0表示未接收，为1表示已接收。
+		
+		struct TstNtwkDly //存放测试网络延迟。
+		{
+			uint64_t m_LastSendTickMsec; //存放最后发送的嘀嗒钟，单位为毫秒。
+			int32_t m_IsRecvRplyPkt; //存放是否接收应答包，为0表示未接收，为1表示已接收。
+		} m_TstNtwkDly;
 	} CnctInfo;
 	CQueue * m_CnctInfoCntnrPt; //存放连接信息容器的指针。
     int32_t m_CnctInfoCurMaxNum; //存放连接信息的当前最大序号。
@@ -88,7 +102,7 @@ typedef struct SrvrThrd
 
 		int8_t * m_TmpBytePt; //存放临时数据的指针。
 		size_t m_TmpByteSz; //存放临时数据大小。
-	
+
 		ThrdInfo * m_ThrdInfoPt; //存放线程信息的指针。
 	} m_Thrd;
 	
@@ -142,6 +156,10 @@ typedef struct SrvrThrd
 	//用户定义的连接远端对讲模式函数。
 	typedef void( __cdecl * SrvrThrdUserCnctRmtTkbkModeFuncPt )( SrvrThrd * SrvrThrdPt, CnctInfo * CnctInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode );
 	SrvrThrdUserCnctRmtTkbkModeFuncPt m_UserCnctRmtTkbkModeFuncPt;
+
+	//用户定义的连接测试网络延迟函数。
+	typedef void( __cdecl * SrvrThrdUserCnctTstNtwkDlyFuncPt )( SrvrThrd * SrvrThrdPt, CnctInfo * CnctInfoPt, uint64_t NtwkDlyMsec );
+	SrvrThrdUserCnctTstNtwkDlyFuncPt m_UserCnctTstNtwkDlyFuncPt;
 } SrvrThrd;
 extern const char * const g_TkbkModeU8strArrPt[ 17 ];
 
@@ -149,12 +167,13 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
 				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrThrdInitFuncPt UserSrvrThrdInitFuncPt, SrvrThrd::SrvrThrdUserSrvrThrdDstoyFuncPt UserSrvrThrdDstoyFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
-				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt,
+				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt, SrvrThrd::SrvrThrdUserCnctTstNtwkDlyFuncPt UserCnctTstNtwkDlyFuncPt,
 				  Vstr * ErrInfoVstrPt );
 int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
 
 int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt );
 int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt );
+int SrvrThrdSendSetIsTstNtwkDlyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt );
 
 int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
 int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
@@ -208,12 +227,16 @@ public:
 	
 	//用户定义的连接远端对讲模式函数。
 	virtual void UserCnctRmtTkbkMode( SrvrThrd::CnctInfo * CnctInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode ) = 0;
+	
+	//用户定义的连接测试网络延迟函数。
+	virtual void UserCnctTstNtwkDly( SrvrThrd::CnctInfo * CnctInfoPt, uint64_t NtwkDlyMsec ) = 0;
 
 	int Init( VstrCls * ErrInfoVstrPt );
 	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = SrvrThrdDstoy( m_SrvrThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_SrvrThrdPt = NULL; return p_Rslt; }
 
 	int SetIsPrintLogShowToast( int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSetIsPrintLogShowToast( m_SrvrThrdPt, IsPrintLog, IsShowToast, ShowToastWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SendSetIsUsePrvntSysSleepMsg( int IsBlockWait, int32_t IsUsePrvntSysSleep, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSetIsUsePrvntSysSleepMsg( m_SrvrThrdPt, IsBlockWait, IsUsePrvntSysSleep, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendSetIsTstNtwkDlyMsg( int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSetIsTstNtwkDlyMsg( m_SrvrThrdPt, IsBlockWait, IsTstNtwkDly, SendIntvlMsec, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int Start( VstrCls * ErrInfoVstrPt ) { return SrvrThrdStart( m_SrvrThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SendRqirExitMsg( int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendRqirExitMsg( m_SrvrThrdPt, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }

@@ -15,7 +15,7 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
 				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrThrdInitFuncPt UserSrvrThrdInitFuncPt, SrvrThrd::SrvrThrdUserSrvrThrdDstoyFuncPt UserSrvrThrdDstoyFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
-				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt,
+				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt, SrvrThrd::SrvrThrdUserCnctTstNtwkDlyFuncPt UserCnctTstNtwkDlyFuncPt,
 				  Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
@@ -82,7 +82,12 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的连接远端对讲模式函数的指针不正确。" ), , );
 		goto Out;
 	}
-	
+	if( UserCnctTstNtwkDlyFuncPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的连接测试网络延迟函数的指针不正确。" ), , );
+		goto Out;
+	}
+
 	//创建并清空服务端线程内存块。
 	p_SrvrThrdPt = ( SrvrThrd * )calloc( 1, sizeof( SrvrThrd ) );
 	if( p_SrvrThrdPt == NULL )
@@ -172,6 +177,7 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
 	p_SrvrThrdPt->m_UserCnctDstoyFuncPt = UserCnctDstoyFuncPt; //设置用户定义的连接销毁函数的指针。
 	p_SrvrThrdPt->m_UserCnctStsFuncPt = UserCnctStsFuncPt; //设置用户定义的连接状态函数的指针。
 	p_SrvrThrdPt->m_UserCnctRmtTkbkModeFuncPt = UserCnctRmtTkbkModeFuncPt; //设置用户定义的连接远端对讲模式函数的指针。
+	p_SrvrThrdPt->m_UserCnctTstNtwkDlyFuncPt = UserCnctTstNtwkDlyFuncPt; //设置用户定义的连接测试网络延迟函数的指针。
 
 	*SrvrThrdPtPt = p_SrvrThrdPt; //设置服务端线程的指针。
 
@@ -253,12 +259,13 @@ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 typedef enum ThrdMsgTyp
 {
 	ThrdMsgTypSetIsUsePrvntSysSleep,
+	ThrdMsgTypSetIsTstNtwkDly,
 
 	ThrdMsgTypSrvrInit,
 	ThrdMsgTypSrvrDstoy,
 
 	ThrdMsgTypCnctDstoy,
-
+	
 	ThrdMsgTypRqirExit,
 
 	ThrdMsgTypUserMsgMinVal = 100, //用户消息的最小值。
@@ -282,6 +289,11 @@ typedef struct
 {
 	int32_t m_CnctNum;
 } ThrdMsgCnctDstoy;
+typedef struct
+{
+	int32_t m_IsTstNtwkDly;
+	uint64_t m_SendIntvlMsec;
+} ThrdMsgSetIsTstNtwkDly;
 typedef struct
 {
 } ThrdMsgRqirExit;
@@ -333,6 +345,37 @@ int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait
 	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetIsUsePrvntSysSleep, &p_ThrdMsgSetIsUsePrvntSysSleep, sizeof( p_ThrdMsgSetIsUsePrvntSysSleep ), ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
+		goto Out;
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+
+	}
+	return p_Rslt;
+}
+
+//发送设置是否测试网络延迟消息。
+int SrvrThrdSendSetIsTstNtwkDlyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	ThrdMsgSetIsTstNtwkDly p_ThrdMsgSetIsTstNtwkDly;
+	
+	//判断各个变量是否正确。
+	if( SrvrThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针不正确。" ), , );
+		goto Out;
+	}
+
+	p_ThrdMsgSetIsTstNtwkDly.m_IsTstNtwkDly = IsTstNtwkDly;
+	p_ThrdMsgSetIsTstNtwkDly.m_SendIntvlMsec = SendIntvlMsec;
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetIsTstNtwkDly, &p_ThrdMsgSetIsTstNtwkDly, sizeof( p_ThrdMsgSetIsTstNtwkDly ), ErrInfoVstrPt ) != 0 )
+	{
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -757,6 +800,8 @@ SrvrThrd::CnctInfo * SrvrThrdCnctInfoInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpO
 	}
 	CnctInfoFindOut:;
 	p_CnctInfoTmpPt->m_IsInit = 1; //设置连接信息已初始化。
+	p_CnctInfoTmpPt->m_TstNtwkDly.m_LastSendTickMsec = 0; //设置测试网络延迟包最后发送的嘀嗒钟为0，这样可以立即开始发送。
+	p_CnctInfoTmpPt->m_TstNtwkDly.m_IsRecvRplyPkt = 1; //设置已接收测试网络延迟应答包，这样可以立即开始发送。
 	SrvrThrdPt->m_CnctInfoCurMaxNum++; //递增连接信息的当前最大序号。
 	p_CnctInfoTmpPt->m_Num = SrvrThrdPt->m_CnctInfoCurMaxNum; //设置序号。
 
@@ -785,7 +830,7 @@ SrvrThrd::CnctInfo * SrvrThrdCnctInfoInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpO
 	//全部发送对讲索引包。
 	{
 		SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = SrvrThrd::PktTypTkbkIdx; //设置对讲索引包。
-		SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = p_CnctInfoTmpPt->m_Idx; //设置索引。
+		SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = p_CnctInfoTmpPt->m_Idx; //设置对讲索引。
 
 		for( size_t p_CnctInfoLstIdx = 0; CQueueGetByNum( SrvrThrdPt->m_CnctInfoCntnrPt, p_CnctInfoLstIdx, NULL, ( void * * )&p_CnctInfoTmp2Pt, 0, 0, NULL ) == 0; p_CnctInfoLstIdx++ )
 		{
@@ -816,7 +861,7 @@ SrvrThrd::CnctInfo * SrvrThrdCnctInfoInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpO
 		{
 			if( ( p_CnctInfoTmp2Pt->m_IsInit != 0 ) && ( p_CnctInfoTmp2Pt->m_CurCnctSts == SrvrThrd::CnctStsCnct ) && ( p_CnctInfoTmp2Pt->m_Idx != p_CnctInfoTmpPt->m_Idx ) ) //如果连接信息已初始化，且当前连接状态为已连接，且不是本次连接信息。
 			{
-				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = p_CnctInfoTmp2Pt->m_Idx; //设置索引。
+				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = p_CnctInfoTmp2Pt->m_Idx; //设置对讲索引。
 				if( ( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmpPt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 					( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmpPt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
@@ -842,7 +887,7 @@ SrvrThrd::CnctInfo * SrvrThrdCnctInfoInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpO
 		{
 			if( ( p_CnctInfoTmp2Pt->m_IsInit != 0 ) && ( p_CnctInfoTmp2Pt->m_CurCnctSts == SrvrThrd::CnctStsCnct ) && ( p_CnctInfoTmp2Pt->m_Idx != p_CnctInfoTmpPt->m_Idx ) ) //如果连接信息已初始化，且当前连接状态为已连接，且不是本次连接信息。
 			{
-				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = p_CnctInfoTmp2Pt->m_Idx; //设置索引。
+				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = p_CnctInfoTmp2Pt->m_Idx; //设置对讲索引。
 				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 2 ] = p_CnctInfoTmp2Pt->m_RmtTkbkMode; //设置对讲模式。
 				if( ( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmpPt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 3, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 					( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmpPt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 3, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
@@ -891,7 +936,7 @@ void SrvrThrdCnctInfoDstoy( SrvrThrd * SrvrThrdPt, SrvrThrd::CnctInfo * CnctInfo
 		{
 			if( ( p_CnctInfoTmpPt->m_IsInit != 0 ) && ( p_CnctInfoTmpPt->m_IsRecvExitPkt == 0 ) && ( p_CnctInfoTmpPt->m_CurCnctSts == SrvrThrd::CnctStsCnct ) ) //如果连接信息已初始化，且未接收退出包，且当前连接状态为已连接。
 			{
-				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = CnctInfoPt->m_Idx; //设置索引。
+				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = CnctInfoPt->m_Idx; //设置对讲索引。
 				if( ( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmpPt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 					( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmpPt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 				{
@@ -1183,7 +1228,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 							}
 							if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] != p_CnctInfoTmpPt->m_Idx )
 							{
-								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收对讲模式包。索引为%uz8d与发送端的索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收对讲模式包。对讲索引为%uz8d与发送端的对讲索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
 								goto RecvPktOut;
 							}
 							if( ( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 2 ] < SrvrThrd::TkbkModeNone ) || ( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 2 ] >= SrvrThrd::TkbkModeNoChg ) )
@@ -1210,7 +1255,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 										}
 										else
 										{
-											LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送对讲模式包失败。对讲索引：%uz8d。对讲模式：%z8s。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], g_TkbkModeU8strArrPt[ p_CnctInfoTmpPt->m_RmtTkbkMode ], p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
+											LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送对讲模式包失败。对讲索引：%uz8d。对讲模式：%z8s。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], g_TkbkModeU8strArrPt[ p_CnctInfoTmpPt->m_RmtTkbkMode ], p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 								}
@@ -1218,14 +1263,14 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 						}
 						else if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == SrvrThrd::PktTypAdoFrm ) //如果是音频输出帧包。
 						{
-							if( p_PktLenByt < 1 + 1 + 4 ) //如果音频输出帧包的长度小于1 + 1 + 4，表示没有索引和音频输出帧时间戳。
+							if( p_PktLenByt < 1 + 1 + 4 ) //如果音频输出帧包的长度小于1 + 1 + 4，表示没有对讲索引和音频输出帧时间戳。
 							{
-								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收一个音频输出帧包的数据长度为%uzd小于1 + 4，表示没有音频输出帧时间戳，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收一个音频输出帧包的数据长度为%uzd小于1 + 1 + 4，表示没有对讲索引和音频输出帧时间戳，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
 								goto RecvPktOut;
 							}
 							if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] != p_CnctInfoTmpPt->m_Idx )
 							{
-								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收音频输出帧包。索引为%z8d与发送端的索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收音频输出帧包。对讲索引为%z8d与发送端的对讲索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
 								goto RecvPktOut;
 							}
 
@@ -1255,7 +1300,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 										}
 										else
 										{
-											LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送音频输出帧包失败。对讲索引：%uz8d。音频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
+											LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送音频输出帧包失败。对讲索引：%uz8d。音频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 								}
@@ -1267,14 +1312,14 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 						}
 						else if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == SrvrThrd::PktTypVdoFrm ) //如果是视频输出帧包。
 						{
-							if( p_PktLenByt < 1 + 1 + 4 ) //如果视频输出帧包的长度小于1 + 1 + 4，表示没有索引和视频输出帧时间戳。
+							if( p_PktLenByt < 1 + 1 + 4 ) //如果视频输出帧包的长度小于1 + 1 + 4，表示没有对讲索引和视频输出帧时间戳。
 							{
-								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收一个视频输出帧包的数据长度为%uzd小于1 + 4，表示没有视频输出帧时间戳，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收一个视频输出帧包的数据长度为%uzd小于1 + 1 + 4，表示没有对讲索引和视频输出帧时间戳，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
 								goto RecvPktOut;
 							}
 							if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] != p_CnctInfoTmpPt->m_Idx )
 							{
-								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收视频输出帧包。索引为%z8d与发送端的索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收视频输出帧包。对讲索引为%z8d与发送端的对讲索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
 								goto RecvPktOut;
 							}
 
@@ -1304,7 +1349,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 										}
 										else
 										{
-											LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送视频输出帧包失败。对讲索引：%uz8d。视频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
+											LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送视频输出帧包失败。对讲索引：%uz8d。视频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 								}
@@ -1314,16 +1359,65 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：远端对讲模式无视频输入，不进行全部发送音频输出帧包。" ), p_CnctInfoTmpPt->m_Idx );
 							}
 						}
-						else if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == SrvrThrd::PktTypExit ) //如果是退出包。
+						else if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == SrvrThrd::PktTypTstNtwkDly ) //如果是测试网络延迟包。
 						{
-							if( p_PktLenByt < 1 + 1 ) //如果退出包的长度小于1 + 1，表示没有索引。
+							if( p_PktLenByt < 1 + 1 ) //如果测试网络延迟包的长度小于1 + 1，表示没有对讲索引。
 							{
-								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收退出包。长度为%uzd小于1 + 1，表示没有索引，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收测试网络延迟包。长度为%uzd小于1 + 1，表示没有对讲索引，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
 								goto RecvPktOut;
 							}
 							if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] != p_CnctInfoTmpPt->m_Idx )
 							{
-								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收退出包。索引为%z8d与发送端的索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收测试网络延迟包。对讲索引为%z8d与发送端的对讲索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
+								goto RecvPktOut;
+							}
+
+							if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：接收测试网络延迟包。对讲索引：%z8d。总长度：%uzd。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_PktLenByt );
+
+							SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = SrvrThrd::PktTypTstNtwkDlyRply; //设置测试网络延迟应答包。
+							if( ( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmpPt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+								( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmpPt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+							{
+								LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟应答包成功。对讲索引：%uz8d。总长度：2。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+							}
+							else
+							{
+								LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟应答包失败。对讲索引：%uz8d。总长度：2。原因：%vs" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], SrvrThrdPt->m_ErrInfoVstrPt );
+							}
+						}
+						else if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == SrvrThrd::PktTypTstNtwkDlyRply ) //如果是测试网络延迟应答包。
+						{
+							if( p_PktLenByt < 1 + 1 ) //如果测试网络延迟应答包的长度小于1 + 1，表示没有对讲索引。
+							{
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收测试网络延迟应答包。长度为%uzd小于1 + 1，表示没有对讲索引，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
+								goto RecvPktOut;
+							}
+							if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] != p_CnctInfoTmpPt->m_Idx )
+							{
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收测试网络延迟应答包。对讲索引为%z8d与发送端的对讲索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
+								goto RecvPktOut;
+							}
+
+							uint64_t p_NtwkDlyMsec = FuncGetTickAsMsec() - p_CnctInfoTmpPt->m_TstNtwkDly.m_LastSendTickMsec; //存放网络延迟，单位为毫秒。
+
+							if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：接收测试网络延迟应答包。对讲索引：%z8d。延迟：%uz64d。总长度：%uzd。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_NtwkDlyMsec, p_PktLenByt );
+
+							if( SrvrThrdPt->m_TstNtwkDly.m_IsTstNtwkDly != 0 ) //如果要测试网络延迟。
+							{
+								p_CnctInfoTmpPt->m_TstNtwkDly.m_IsRecvRplyPkt = 1; //设置已接收测试网络延迟应答包。
+								SrvrThrdPt->m_UserCnctTstNtwkDlyFuncPt( SrvrThrdPt, p_CnctInfoTmpPt, p_NtwkDlyMsec ); //调用用户定义的连接测试网络延迟函数。
+							}
+						}
+						else if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == SrvrThrd::PktTypExit ) //如果是退出包。
+						{
+							if( p_PktLenByt < 1 + 1 ) //如果退出包的长度小于1 + 1，表示没有对讲索引。
+							{
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收退出包。长度为%uzd小于1 + 1，表示没有对讲索引，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, p_PktLenByt );
+								goto RecvPktOut;
+							}
+							if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] != p_CnctInfoTmpPt->m_Idx )
+							{
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：接收退出包。对讲索引为%z8d与发送端的对讲索引%uzd不一致，无法继续接收。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_CnctInfoTmpPt->m_Idx );
 								goto RecvPktOut;
 							}
 
@@ -1351,6 +1445,30 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 				RecvPktOut:;
 			}
 
+			//用本端客户端套接字测试网络延迟。
+			if( ( SrvrThrdPt->m_TstNtwkDly.m_IsTstNtwkDly != 0 ) && ( p_CnctInfoTmpPt->m_IsRqstDstoy == 0 ) && ( p_CnctInfoTmpPt->m_CurCnctSts == SrvrThrd::CnctStsCnct ) ) //如果要测试网络延迟，且连接未请求销毁，且当前连接状态为已连接。
+			{
+				uint64_t p_CurTickMsec = FuncGetTickAsMsec(); //存放当前嘀嗒钟，单位为毫秒。
+
+				if( ( p_CnctInfoTmpPt->m_TstNtwkDly.m_IsRecvRplyPkt != 0 ) && ( p_CurTickMsec - p_CnctInfoTmpPt->m_TstNtwkDly.m_LastSendTickMsec >= SrvrThrdPt->m_TstNtwkDly.m_SendIntvlMsec ) ) //如果已接收测试网络延迟应答包，且最后发送测试网络延迟包已超过间隔时间。
+				{
+					SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = SrvrThrd::PktTypTstNtwkDly; //设置数据包类型为测试网络延迟包。
+					SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = p_CnctInfoTmpPt->m_Idx; //设置对讲索引。
+					if( ( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmpPt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
+						( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmpPt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
+					{
+						LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟包成功。对讲索引：%uz8d。总长度：2。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+						
+						p_CnctInfoTmpPt->m_TstNtwkDly.m_LastSendTickMsec = p_CurTickMsec; //设置测试网络延迟包最后发送的嘀嗒钟。
+						p_CnctInfoTmpPt->m_TstNtwkDly.m_IsRecvRplyPkt = 0; //设置未接收测试网络延迟应答包。
+					}
+					else
+					{
+						LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟包失败。对讲索引：%uz8d。总长度：2。原因：%vs" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], SrvrThrdPt->m_ErrInfoVstrPt );
+					}
+				}
+			}
+
 			//销毁连接信息。
 			if( p_CnctInfoTmpPt->m_IsRqstDstoy == 1 ) //如果该连接已请求销毁。
 			{
@@ -1374,6 +1492,7 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 {
 	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为1表示线程消息容器为空，为-1表示失败。
 	int32_t p_TmpInt32;
+	SrvrThrd::CnctInfo * p_CnctInfoTmpPt = NULL;
 
 	switch( MsgTyp )
 	{
@@ -1383,6 +1502,23 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 
 			SrvrThrdPt->m_IsUsePrvntSysSleep = p_ThrdMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep;
 			SrvrThrdPrvntSysSleepInitOrDstoy( SrvrThrdPt, SrvrThrdPt->m_IsUsePrvntSysSleep );
+			break;
+		}
+		case ThrdMsgTypSetIsTstNtwkDly:
+		{
+			ThrdMsgSetIsTstNtwkDly * p_ThrdMsgSetIsTstNtwkDlyPt = ( ThrdMsgSetIsTstNtwkDly * )MsgPt;
+
+			SrvrThrdPt->m_TstNtwkDly.m_IsTstNtwkDly = p_ThrdMsgSetIsTstNtwkDlyPt->m_IsTstNtwkDly; //设置是否测试网络延迟。
+			SrvrThrdPt->m_TstNtwkDly.m_SendIntvlMsec = p_ThrdMsgSetIsTstNtwkDlyPt->m_SendIntvlMsec; //设置测试网络延迟包的发送间隔。
+
+			for( size_t p_CnctInfoLstIdx = 0; CQueueGetByNum( SrvrThrdPt->m_CnctInfoCntnrPt, p_CnctInfoLstIdx, NULL, ( void * * )&p_CnctInfoTmpPt, 0, 0, NULL ) == 0; p_CnctInfoLstIdx++ )
+			{
+				if( p_CnctInfoTmpPt->m_IsInit != 0 )
+				{
+					p_CnctInfoTmpPt->m_TstNtwkDly.m_LastSendTickMsec = 0; //设置测试网络延迟包最后发送的嘀嗒钟为0，这样可以立即开始发送。
+					p_CnctInfoTmpPt->m_TstNtwkDly.m_IsRecvRplyPkt = 1; //设置已接收测试网络延迟应答包，这样可以立即开始发送。
+				}
+			}
 			break;
 		}
 		case ThrdMsgTypSrvrInit:
@@ -1404,7 +1540,6 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		case ThrdMsgTypCnctDstoy:
 		{
 			ThrdMsgCnctDstoy * p_ThrdMsgCnctDstoyPt = ( ThrdMsgCnctDstoy * )MsgPt;
-			SrvrThrd::CnctInfo * p_CnctInfoTmpPt = NULL;
 
 			if( ( p_ThrdMsgCnctDstoyPt->m_CnctNum > SrvrThrdPt->m_CnctInfoCurMaxNum ) || ( p_ThrdMsgCnctDstoyPt->m_CnctNum < 0 ) )
 			{
@@ -1572,12 +1707,18 @@ extern "C" void __cdecl SrvrThrdClsUserCnctRmtTkbkMode( SrvrThrd * SrvrThrdPt, S
 	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserCnctRmtTkbkMode( CnctInfoPt, OldRmtTkbkMode, NewRmtTkbkMode );
 }
 
+//回调SrvrThrdCls类的用户定义的连接测试网络延迟函数。
+extern "C" void __cdecl SrvrThrdClsUserCnctTstNtwkDly( SrvrThrd * SrvrThrdPt, SrvrThrd::CnctInfo * CnctInfoPt, uint64_t NtwkDlyMsec )
+{
+	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserCnctTstNtwkDly( CnctInfoPt, NtwkDlyMsec );
+}
+
 int SrvrThrdCls::Init( VstrCls * ErrInfoVstrPt )
 {
 	return SrvrThrdInit( &m_SrvrThrdPt, this,
 						 SrvrThrdClsUserShowLog, SrvrThrdClsUserShowToast, SrvrThrdClsUserMsg,
 						 SrvrThrdClsUserSrvrThrdInit, SrvrThrdClsUserSrvrThrdDstoy,
 						 SrvrThrdClsUserSrvrInit, SrvrThrdClsUserSrvrDstoy,
-						 SrvrThrdClsUserCnctInit, SrvrThrdClsUserCnctDstoy, SrvrThrdClsUserCnctSts, SrvrThrdClsUserCnctRmtTkbkMode,
+						 SrvrThrdClsUserCnctInit, SrvrThrdClsUserCnctDstoy, SrvrThrdClsUserCnctSts, SrvrThrdClsUserCnctRmtTkbkMode, SrvrThrdClsUserCnctTstNtwkDly,
 						 ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL );
 }

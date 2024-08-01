@@ -38,6 +38,8 @@ void BdctClntDstoy( BdctClnt * BdctClntPt )
 
 	BdctClntPt->m_IsInit = 0; //设置未初始化广播客户端。
 
+	BdctClntPt->m_CnctInfoCurMaxNum = -1; //设置连接信息的当前最大序号。
+
 	BdctClntPt->m_ClntMediaPocsThrdPt->m_UserBdctClntDstoyFuncPt( BdctClntPt->m_ClntMediaPocsThrdPt ); //调用用户定义的广播客户端销毁函数。
 
 	ClntMediaPocsThrdSetTkbkMode( BdctClntPt->m_ClntMediaPocsThrdPt, 0, 0 ); //设置对讲模式。

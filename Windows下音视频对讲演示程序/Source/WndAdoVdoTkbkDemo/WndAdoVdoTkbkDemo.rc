@@ -50,61 +50,61 @@ END
 // Dialog
 //
 
-MainDlgId DIALOGEX 0, 0, 575, 438
+MainDlgId DIALOGEX 0, 0, 603, 438
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2024年06月01日",IDC_STATIC,7,7,295,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2024年08月01日",IDC_STATIC,7,7,325,16
     LTEXT           "服务端：",IDC_STATIC,7,26,33,8
-    COMBOBOX        SrvrUrlCbBoxId,39,24,206,273,CBS_DROPDOWN | WS_TABSTOP
-    DEFPUSHBUTTON   "创建",SrvrCreateOrDstoyBtnId,247,23,28,14
-    PUSHBUTTON      "设置",SrvrStngBtnId,275,23,28,14
+    COMBOBOX        SrvrUrlCbBoxId,39,24,236,273,CBS_DROPDOWN | WS_TABSTOP
+    DEFPUSHBUTTON   "创建",SrvrCreateOrDstoyBtnId,276,23,28,14
+    PUSHBUTTON      "设置",SrvrStngBtnId,304,23,28,14
     LTEXT           "连接列表：",IDC_STATIC,7,41,41,8
-    PUSHBUTTON      "销毁",CnctDstoyBtnId,275,38,28,14,WS_DISABLED
-    CONTROL         "",CnctLstId,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,52,295,49
+    PUSHBUTTON      "销毁",CnctDstoyBtnId,304,38,28,14,WS_DISABLED
+    CONTROL         "",CnctLstId,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,52,325,49
     LTEXT           "客户端：",IDC_STATIC,7,104,33,8
-    COMBOBOX        ClntSrvrUrlCbBoxId,39,102,206,273,CBS_DROPDOWN | WS_TABSTOP
-    DEFPUSHBUTTON   "添加",ClntAddBtnId,247,100,28,14
-    PUSHBUTTON      "设置",ClntStngBtnId,275,100,28,14
+    COMBOBOX        ClntSrvrUrlCbBoxId,39,102,236,273,CBS_DROPDOWN | WS_TABSTOP
+    DEFPUSHBUTTON   "添加",ClntAddBtnId,276,100,28,14
+    PUSHBUTTON      "设置",ClntStngBtnId,304,100,28,14
     LTEXT           "客户端列表：",IDC_STATIC,7,118,49,8
-    DEFPUSHBUTTON   "连接",ClntCnctOrDstoyBtnId,247,115,28,14
-    PUSHBUTTON      "删除",ClntDelBtnId,275,115,28,14
-    CONTROL         "",ClntLstId,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,129,295,49
+    DEFPUSHBUTTON   "连接",ClntCnctOrDstoyBtnId,276,115,28,14
+    PUSHBUTTON      "删除",ClntDelBtnId,304,115,28,14
+    CONTROL         "",ClntLstId,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,129,325,49
     LTEXT           "对讲模式：",IDC_STATIC,7,180,56,8
     CONTROL         "音频输入",UseAdoInptTkbkModeCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,181,45,8
-    CONTROL         "音频输出",UseAdoOtptTkbkModeCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,128,181,45,8
-    CONTROL         "视频输入",UseVdoInptTkbkModeCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,193,181,45,8
-    CONTROL         "视频输出",UseVdoOtptTkbkModeCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,258,181,45,8
+    CONTROL         "音频输出",UseAdoOtptTkbkModeCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,136,181,45,8
+    CONTROL         "视频输入",UseVdoInptTkbkModeCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,181,45,8
+    CONTROL         "视频输出",UseVdoOtptTkbkModeCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,281,181,45,8
     LTEXT           "对讲控制：",IDC_STATIC,7,193,56,8
     CONTROL         "静音",AdoInptIsMuteCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,193,45,8
-    CONTROL         "静音",AdoOtptIsMuteCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,128,193,45,8
-    CONTROL         "黑屏",VdoInptIsBlackCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,193,193,45,8
-    CONTROL         "黑屏",VdoOtptIsBlackCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,258,193,45,8
+    CONTROL         "静音",AdoOtptIsMuteCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,136,193,45,8
+    CONTROL         "黑屏",VdoInptIsBlackCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,193,45,8
+    CONTROL         "黑屏",VdoOtptIsBlackCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,281,193,45,8
     LTEXT           "音频输入设备：",IDC_STATIC,7,205,57,8
-    COMBOBOX        UseAdoInptDvcCbBoxId,63,203,239,252,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        UseAdoInptDvcCbBoxId,64,203,268,252,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "音频输出设备：",IDC_STATIC,7,219,57,8
-    COMBOBOX        UseAdoOtptDvcCbBoxId,63,217,239,232,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        UseAdoOtptDvcCbBoxId,64,217,268,232,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "视频输入设备：",IDC_STATIC,7,233,57,8
-    COMBOBOX        UseVdoInptDvcCbBoxId,63,231,239,232,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "一键即按即广播",PtbBtnId,86,244,140,14
+    COMBOBOX        UseVdoInptDvcCbBoxId,64,231,268,232,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "一键即按即广播",PtbBtnId,98,244,140,14
     PUSHBUTTON      "设置",StngBtnId,13,258,50,14
-    PUSHBUTTON      "保存设置",SaveStngBtnId,71,258,50,14
-    PUSHBUTTON      "读取设置",ReadStngBtnId,129,258,50,14
-    PUSHBUTTON      "删除设置",DelStngBtnId,187,258,50,14
-    PUSHBUTTON      "重置设置",ResetStngBtnId,245,258,50,14
-    PUSHBUTTON      "必读说明",ReadMeBtnId,86,272,140,14
+    PUSHBUTTON      "保存设置",SaveStngBtnId,78,258,50,14
+    PUSHBUTTON      "读取设置",ReadStngBtnId,143,258,50,14
+    PUSHBUTTON      "删除设置",DelStngBtnId,208,258,50,14
+    PUSHBUTTON      "重置设置",ResetStngBtnId,273,258,50,14
+    PUSHBUTTON      "必读说明",ReadMeBtnId,98,272,140,14
     CONTROL         "",IsDrawAdoWavfmToWndCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,312,8,8
     LTEXT           "音频输入\n原始波形：",IDC_STATIC,18,289,40,16
-    CTEXT           "音频输入原始波形",AdoInptSrcWavfmTxtId,63,287,239,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
+    CTEXT           "音频输入原始波形",AdoInptSrcWavfmTxtId,63,287,268,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
     LTEXT           "音频输入\n结果波形：",IDC_STATIC,18,308,40,16
-    CTEXT           "音频输入结果波形",AdoInptRsltWavfmTxtId,63,306,239,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
+    CTEXT           "音频输入结果波形",AdoInptRsltWavfmTxtId,63,306,268,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
     LTEXT           "音频输出\n原始波形：",IDC_STATIC,18,328,40,16
-    CTEXT           "音频输出原始波形",AdoOtptSrcWavfmTxtId,63,326,239,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
+    CTEXT           "音频输出原始波形",AdoOtptSrcWavfmTxtId,63,326,268,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
     LTEXT           "日志：",IDC_STATIC,7,349,25,8
-    PUSHBUTTON      "清空日志",ClearLogBtnId,253,346,50,14
-    LISTBOX         LogLstBoxId,7,359,295,71,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
-    CTEXT           "视频输入输出",VdoInptOtptTxtId,306,7,262,424,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
+    PUSHBUTTON      "清空日志",ClearLogBtnId,283,346,50,14
+    LISTBOX         LogLstBoxId,7,359,325,71,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    CTEXT           "视频输入输出",VdoInptOtptTxtId,334,7,262,424,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
 END
 
 SrvrStngDlgId DIALOGEX 0, 0, 309, 89
@@ -143,7 +143,7 @@ BEGIN
     DEFPUSHBUTTON   "一键即按即通",PttBtnId,7,7,109,37
 END
 
-StngDlgId DIALOGEX 0, 0, 309, 432
+StngDlgId DIALOGEX 0, 0, 309, 444
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -159,75 +159,76 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,62,253,12
     CONTROL         "使用阻止系统休眠",IsUsePrvntSysSleepCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,74,253,12
     CONTROL         "保存音视频输入输出到Avi文件",IsSaveAdoVdoInptOtptToAviFileCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,86,203,12
-    PUSHBUTTON      "设置",SaveAdoVdoInptOtptToAviFileStngBtnId,252,86,50,12
-    CTEXT           "————————————    预设设置    ————————————",IDC_STATIC,7,98,295,12,SS_CENTERIMAGE | WS_TABSTOP
-    LTEXT           "效果等级：",IDC_STATIC,7,110,74,12,SS_CENTERIMAGE
-    CONTROL         "低",UseEffectLowRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,110,20,12
-    CONTROL         "中",UseEffectMidRdBtnId,"Button",BS_AUTORADIOBUTTON,144,110,20,12
-    CONTROL         "高",UseEffectHighRdBtnId,"Button",BS_AUTORADIOBUTTON,190,110,20,12
-    CONTROL         "超",UseEffectSuperRdBtnId,"Button",BS_AUTORADIOBUTTON,236,110,20,12
-    CONTROL         "特",UseEffectPremiumRdBtnId,"Button",BS_AUTORADIOBUTTON,282,110,20,12
-    CTEXT           "————————————    音频设置    ————————————",IDC_STATIC,7,122,295,12,SS_CENTERIMAGE | WS_TABSTOP
-    LTEXT           "采样频率：",IDC_STATIC,7,134,74,12
-    CONTROL         "8k",UseAdoSmplRate8000RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,134,25,12
-    CONTROL         "16k",UseAdoSmplRate16000RdBtnId,"Button",BS_AUTORADIOBUTTON,157,134,25,12
-    CONTROL         "32k",UseAdoSmplRate32000RdBtnId,"Button",BS_AUTORADIOBUTTON,216,134,25,12
-    CONTROL         "48k",UseAdoSmplRate48000RdBtnId,"Button",BS_AUTORADIOBUTTON,275,134,25,12
-    LTEXT           "帧的长度：",IDC_STATIC,7,146,74,12
-    CONTROL         "10ms",UseAdoFrmLen10msRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,146,45,12
-    CONTROL         "20ms",UseAdoFrmLen20msRdBtnId,"Button",BS_AUTORADIOBUTTON,163,146,45,12
-    CONTROL         "30ms",UseAdoFrmLen30msRdBtnId,"Button",BS_AUTORADIOBUTTON,228,146,45,12
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,97,203,12
+    PUSHBUTTON      "设置",SaveAdoVdoInptOtptToAviFileStngBtnId,252,97,50,12
+    CTEXT           "————————————    预设设置    ————————————",IDC_STATIC,7,109,295,12,SS_CENTERIMAGE | WS_TABSTOP
+    LTEXT           "效果等级：",IDC_STATIC,7,121,74,12,SS_CENTERIMAGE
+    CONTROL         "低",UseEffectLowRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,121,20,12
+    CONTROL         "中",UseEffectMidRdBtnId,"Button",BS_AUTORADIOBUTTON,144,121,20,12
+    CONTROL         "高",UseEffectHighRdBtnId,"Button",BS_AUTORADIOBUTTON,190,121,20,12
+    CONTROL         "超",UseEffectSuperRdBtnId,"Button",BS_AUTORADIOBUTTON,236,121,20,12
+    CONTROL         "特",UseEffectPremiumRdBtnId,"Button",BS_AUTORADIOBUTTON,282,121,20,12
+    CTEXT           "————————————    音频设置    ————————————",IDC_STATIC,7,133,295,12,SS_CENTERIMAGE | WS_TABSTOP
+    LTEXT           "采样频率：",IDC_STATIC,7,145,74,12
+    CONTROL         "8k",UseAdoSmplRate8000RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,145,25,12
+    CONTROL         "16k",UseAdoSmplRate16000RdBtnId,"Button",BS_AUTORADIOBUTTON,157,145,25,12
+    CONTROL         "32k",UseAdoSmplRate32000RdBtnId,"Button",BS_AUTORADIOBUTTON,216,145,25,12
+    CONTROL         "48k",UseAdoSmplRate48000RdBtnId,"Button",BS_AUTORADIOBUTTON,275,145,25,12
+    LTEXT           "帧的长度：",IDC_STATIC,7,157,74,12
+    CONTROL         "10ms",UseAdoFrmLen10msRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,157,45,12
+    CONTROL         "20ms",UseAdoFrmLen20msRdBtnId,"Button",BS_AUTORADIOBUTTON,163,157,45,12
+    CONTROL         "30ms",UseAdoFrmLen30msRdBtnId,"Button",BS_AUTORADIOBUTTON,228,157,45,12
     CONTROL         "使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器",IsUseSystemAecNsAgcCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,158,295,12
-    LTEXT           "声学回音消除器：",IDC_STATIC,7,170,74,60,SS_CENTERIMAGE
-    CONTROL         "不使用",UseNoAecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,170,137,12
-    CONTROL         "Speex声学回音消除器",UseSpeexAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,182,137,12
-    PUSHBUTTON      "设置",SpeexAecStngBtnId,252,182,50,12
-    CONTROL         "WebRtc定点版声学回音消除器",UseWebRtcAecmRdBtnId,"Button",BS_AUTORADIOBUTTON,98,194,137,12
-    PUSHBUTTON      "设置",WebRtcAecmStngBtnId,252,194,50,12
-    CONTROL         "WebRtc浮点版声学回音消除器",UseWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,206,137,12
-    PUSHBUTTON      "设置",WebRtcAecStngBtnId,252,206,50,12
-    CONTROL         "SpeexWebRtc三重声学回音消除器",UseSpeexWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,218,137,12
-    PUSHBUTTON      "设置",SpeexWebRtcAecStngBtnId,252,218,50,12
-    LTEXT           "噪音抑制器：",IDC_STATIC,7,230,74,60,SS_CENTERIMAGE
-    CONTROL         "不使用",UseNoNsRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,97,230,137,12
-    CONTROL         "Speex预处理器的噪音抑制",UseSpeexPrpocsNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,242,137,12
-    PUSHBUTTON      "设置",SpeexPrpocsNsStngBtnId,252,242,50,12
-    CONTROL         "WebRtc定点版噪音抑制器",UseWebRtcNsxRdBtnId,"Button",BS_AUTORADIOBUTTON,98,254,137,12
-    PUSHBUTTON      "设置",WebRtcNsxStngBtnId,252,254,50,12
-    CONTROL         "WebRtc浮点版噪音抑制器",UseWebRtcNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,266,137,12
-    PUSHBUTTON      "设置",WebRtcNsStngBtnId,252,266,50,12
-    CONTROL         "RNNoise噪音抑制器",UseRNNoiseRdBtnId,"Button",BS_AUTORADIOBUTTON,98,278,137,12
-    CONTROL         "使用Speex预处理器",IsUseSpeexPrpocsCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,290,203,12
-    PUSHBUTTON      "设置",SpeexPrpocsStngBtnId,252,290,50,12
-    LTEXT           "编解码器：",IDC_STATIC,7,302,74,12
-    CONTROL         "Pcm原始数据",UsePcmRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,97,302,137,12
-    CONTROL         "Speex编解码器",UseSpeexCodecRdBtnId,"Button",BS_AUTORADIOBUTTON,97,314,137,12
-    PUSHBUTTON      "设置",SpeexCodecStngBtnId,252,314,50,12
-    CONTROL         "Opus编解码器",UseOpusCodecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,97,326,137,12
-    PUSHBUTTON      "设置",OpusCodecStngBtnId,252,326,50,12,WS_DISABLED
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,169,295,12
+    LTEXT           "声学回音消除器：",IDC_STATIC,7,181,74,60,SS_CENTERIMAGE
+    CONTROL         "不使用",UseNoAecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,181,137,12
+    CONTROL         "Speex声学回音消除器",UseSpeexAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,193,137,12
+    PUSHBUTTON      "设置",SpeexAecStngBtnId,252,193,50,12
+    CONTROL         "WebRtc定点版声学回音消除器",UseWebRtcAecmRdBtnId,"Button",BS_AUTORADIOBUTTON,98,205,137,12
+    PUSHBUTTON      "设置",WebRtcAecmStngBtnId,252,205,50,12
+    CONTROL         "WebRtc浮点版声学回音消除器",UseWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,217,137,12
+    PUSHBUTTON      "设置",WebRtcAecStngBtnId,252,217,50,12
+    CONTROL         "SpeexWebRtc三重声学回音消除器",UseSpeexWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,229,137,12
+    PUSHBUTTON      "设置",SpeexWebRtcAecStngBtnId,252,229,50,12
+    LTEXT           "噪音抑制器：",IDC_STATIC,7,241,74,60,SS_CENTERIMAGE
+    CONTROL         "不使用",UseNoNsRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,241,137,12
+    CONTROL         "Speex预处理器的噪音抑制",UseSpeexPrpocsNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,253,137,12
+    PUSHBUTTON      "设置",SpeexPrpocsNsStngBtnId,252,253,50,12
+    CONTROL         "WebRtc定点版噪音抑制器",UseWebRtcNsxRdBtnId,"Button",BS_AUTORADIOBUTTON,98,265,137,12
+    PUSHBUTTON      "设置",WebRtcNsxStngBtnId,252,265,50,12
+    CONTROL         "WebRtc浮点版噪音抑制器",UseWebRtcNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,277,137,12
+    PUSHBUTTON      "设置",WebRtcNsStngBtnId,252,277,50,12
+    CONTROL         "RNNoise噪音抑制器",UseRNNoiseRdBtnId,"Button",BS_AUTORADIOBUTTON,98,289,137,12
+    CONTROL         "使用Speex预处理器",IsUseSpeexPrpocsCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,301,203,12
+    PUSHBUTTON      "设置",SpeexPrpocsStngBtnId,252,301,50,12
+    LTEXT           "编解码器：",IDC_STATIC,7,313,74,12
+    CONTROL         "Pcm原始数据",UsePcmRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,97,313,137,12
+    CONTROL         "Speex编解码器",UseSpeexCodecRdBtnId,"Button",BS_AUTORADIOBUTTON,97,325,137,12
+    PUSHBUTTON      "设置",SpeexCodecStngBtnId,252,325,50,12
+    CONTROL         "Opus编解码器",UseOpusCodecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,97,337,137,12
+    PUSHBUTTON      "设置",OpusCodecStngBtnId,252,337,50,12,WS_DISABLED
     CONTROL         "保存音频输入输出到Wave文件",IsSaveAdoInptOtptToWaveFileCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,338,203,12
-    PUSHBUTTON      "设置",SaveAdoInptOtptToWaveFileStngBtnId,252,338,50,12
-    CTEXT           "————————————    视频设置    ————————————",IDC_STATIC,7,350,295,10,SS_CENTERIMAGE | WS_TABSTOP
-    LTEXT           "采样频率：",IDC_STATIC,7,362,74,12
-    CONTROL         "12",UseVdoSmplRate12RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,362,20,12
-    CONTROL         "15",UseVdoSmplRate15RdBtnId,"Button",BS_AUTORADIOBUTTON,159,362,20,12
-    CONTROL         "24",UseVdoSmplRate24RdBtnId,"Button",BS_AUTORADIOBUTTON,220,362,20,12
-    CONTROL         "30",UseVdoSmplRate30RdBtnId,"Button",BS_AUTORADIOBUTTON,281,362,20,12
-    LTEXT           "帧的大小：",IDC_STATIC,7,374,74,14
-    CONTROL         "",UseVdoFrmSzPrsetRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,374,10,14
-    COMBOBOX        VdoFrmSzPrsetCbBoxId,109,374,68,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_TRANSPARENT
-    CONTROL         "",UseVdoFrmSzOtherRdBtnId,"Button",BS_AUTORADIOBUTTON,220,374,10,14
-    EDITTEXT        VdoFrmSzOtherWidthEdTxtId,229,374,26,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "×",IDC_STATIC,255,374,8,14,SS_CENTERIMAGE
-    EDITTEXT        VdoFrmSzOtherHeightEdTxtId,261,374,26,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "编解码器：",IDC_STATIC,7,388,74,24
-    CONTROL         "Yu12原始数据",UseYu12RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,388,137,12
-    CONTROL         "OpenH264编解码器",UseOpenH264CodecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,400,137,12
-    PUSHBUTTON      "设置",OpenH264CodecStngBtnId,252,400,50,12
-    DEFPUSHBUTTON   "确定",StngOkBtnId,7,412,295,12
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,349,203,12
+    PUSHBUTTON      "设置",SaveAdoInptOtptToWaveFileStngBtnId,252,349,50,12
+    CTEXT           "————————————    视频设置    ————————————",IDC_STATIC,7,361,295,10,SS_CENTERIMAGE | WS_TABSTOP
+    LTEXT           "采样频率：",IDC_STATIC,7,373,74,12
+    CONTROL         "12",UseVdoSmplRate12RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,373,20,12
+    CONTROL         "15",UseVdoSmplRate15RdBtnId,"Button",BS_AUTORADIOBUTTON,159,373,20,12
+    CONTROL         "24",UseVdoSmplRate24RdBtnId,"Button",BS_AUTORADIOBUTTON,220,373,20,12
+    CONTROL         "30",UseVdoSmplRate30RdBtnId,"Button",BS_AUTORADIOBUTTON,281,373,20,12
+    LTEXT           "帧的大小：",IDC_STATIC,7,385,74,14
+    CONTROL         "",UseVdoFrmSzPrsetRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,385,10,14
+    COMBOBOX        VdoFrmSzPrsetCbBoxId,109,385,68,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_TRANSPARENT
+    CONTROL         "",UseVdoFrmSzOtherRdBtnId,"Button",BS_AUTORADIOBUTTON,220,385,10,14
+    EDITTEXT        VdoFrmSzOtherWidthEdTxtId,229,385,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "×",IDC_STATIC,255,385,8,14,SS_CENTERIMAGE
+    EDITTEXT        VdoFrmSzOtherHeightEdTxtId,261,385,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "编解码器：",IDC_STATIC,7,399,74,24
+    CONTROL         "Yu12原始数据",UseYu12RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,399,137,12
+    CONTROL         "OpenH264编解码器",UseOpenH264CodecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,411,137,12
+    PUSHBUTTON      "设置",OpenH264CodecStngBtnId,252,411,50,12
+    DEFPUSHBUTTON   "确定",StngOkBtnId,7,424,295,12
+    CONTROL         "测试网络延迟",IsTstNtwkDlyCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,253,12
 END
 
 AjbStngDlgId DIALOGEX 0, 0, 309, 241
@@ -522,7 +523,7 @@ BEGIN
     MainDlgId, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 568
+        RIGHTMARGIN, 596
         TOPMARGIN, 7
         BOTTOMMARGIN, 431
     END
@@ -556,7 +557,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302
         TOPMARGIN, 7
-        BOTTOMMARGIN, 424
+        BOTTOMMARGIN, 436
     END
 
     AjbStngDlgId, DIALOG

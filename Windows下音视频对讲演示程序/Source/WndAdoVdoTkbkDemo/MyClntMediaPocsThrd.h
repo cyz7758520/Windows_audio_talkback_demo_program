@@ -15,6 +15,13 @@ public:
 	MyClntMediaPocsThrdCls( HWND MainDlgWndHdl ) { m_MainDlgWndHdl = MainDlgWndHdl; }
 	~MyClntMediaPocsThrdCls() {}
 	
+	int Init();
+	void Dstoy();
+	int TkbkInit();
+	void TkbkDstoy();
+	int BdctInit();
+	void BdctDstoy();
+
 	//用户定义的显示日志函数。
 	void UserShowLog( Vstr * InfoVstrPt );
 
@@ -51,6 +58,9 @@ public:
 	//用户定义的对讲客户端对讲信息远端对讲模式函数。
 	void UserTkbkClntTkbkInfoRmtTkbkMode( TkbkClnt::TkbkInfo * TkbkInfoPt, int32_t OldRmtTkbkMode, int32_t NewRmtTkbkMode );
 	
+	//用户定义的对讲客户端测试网络延迟函数。
+	void UserTkbkClntTstNtwkDly( uint64_t NtwkDlyMsec );
+
 	//用户定义的广播客户端初始化函数。
 	void UserBdctClntInit();
 

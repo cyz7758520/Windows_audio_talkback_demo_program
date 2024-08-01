@@ -188,9 +188,9 @@ int TkbkClntCnctSendTkbkModePkt( TkbkClnt * TkbkClntPt, int LclTkbkMode )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
-	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = ( int8_t )ClntMediaPocsThrd::PktTypTkbkMode;
-	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = ( int8_t )TkbkClntPt->m_MyTkbkIdx;
-	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 2 ] = ( int8_t )LclTkbkMode;
+	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = ( int8_t )ClntMediaPocsThrd::PktTypTkbkMode; //设置对讲模式包。
+	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = ( int8_t )TkbkClntPt->m_MyTkbkIdx; //设置对讲索引。
+	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 2 ] = ( int8_t )LclTkbkMode; //设置对讲模式。
 	if( TkbkClntCnctSendPkt( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt, 3, 1, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送对讲模式包成功。对讲索引：%z32d。对讲模式：%z8s。" ), TkbkClntPt->m_MyTkbkIdx, g_TkbkModeU8strArrPt[ LclTkbkMode ] );
@@ -703,7 +703,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 		}
 
 		//用本端客户端套接字接收远端服务端套接字发送的数据包。
-		if( ( TkbkClntPt->m_IsRqstDstoy == 0 ) && ( TkbkClntPt->m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct ) ) //如果该连接未请求销毁，且当前连接状态为已连接。
+		if( ( TkbkClntPt->m_IsRqstDstoy == 0 ) && ( TkbkClntPt->m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct ) ) //如果连接未请求销毁，且当前连接状态为已连接。
 		{
 			size_t p_PktLenByt;
 			uint32_t p_TmpUint32;
@@ -942,6 +942,52 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 							}
 						}
 					}
+					else if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == ClntMediaPocsThrd::PktTypTstNtwkDly ) //如果是测试网络延迟包。
+					{
+						if( p_PktLenByt < 1 + 1 ) //如果测试网络延迟包的长度小于1 + 1，表示没有对讲索引。
+						{
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收测试网络延迟包。长度为%uzd小于1 + 1，表示没有对讲索引，无法继续接收。" ), p_PktLenByt );
+							goto RecvPktOut;
+						}
+						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] != TkbkClntPt->m_MyTkbkIdx )
+						{
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收测试网络延迟包。索引为%z8d与我的对讲索引%z32d不一致，无法继续接收。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], TkbkClntPt->m_MyTkbkIdx );
+							goto RecvPktOut;
+						}
+
+						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收测试网络延迟包。对讲索引：%z8d。总长度：%uzd。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_PktLenByt );
+
+						TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = ( int8_t )ClntMediaPocsThrd::PktTypTstNtwkDlyRply; //设置测试网络延迟应答包。
+						if( TkbkClntCnctSendPkt( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+						{
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送测试网络延迟应答包成功。对讲索引：%z32d。总长度：2。" ), TkbkClntPt->m_MyTkbkIdx );
+						}
+						else
+						{
+							VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送测试网络延迟应答包失败。对讲索引：%z32d。总长度：2。原因：" ), TkbkClntPt->m_MyTkbkIdx );
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+							TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+							goto Out;
+						}
+					}
+					else if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == ClntMediaPocsThrd::PktTypTstNtwkDlyRply ) //如果是测试网络延迟应答包。
+					{
+						if( p_PktLenByt < 1 + 1 ) //如果退出包的长度小于1 + 1，表示没有对讲索引。
+						{
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收测试网络延迟应答包。长度为%uzd小于1 + 1，表示没有对讲索引，无法继续接收。" ), p_PktLenByt );
+							goto RecvPktOut;
+						}
+
+						uint64_t p_NtwkDlyMsec = FuncGetTickAsMsec() - TkbkClntPt->m_TstNtwkDly.m_LastSendTickMsec; //存放网络延迟，单位为毫秒。
+
+						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收测试网络延迟应答包。对讲索引：%z8d。延迟：%uz64d。总长度：%uzd。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_NtwkDlyMsec, p_PktLenByt );
+
+						if( TkbkClntPt->m_TstNtwkDly.m_IsTstNtwkDly != 0 ) //如果要测试网络延迟。
+						{
+							TkbkClntPt->m_TstNtwkDly.m_IsRecvRplyPkt = 1; //设置已接收测试网络延迟应答包。
+							TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserTkbkClntTstNtwkDlyFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, p_NtwkDlyMsec ); //调用用户定义的对讲客户端测试网络延迟函数。
+						}
+					}
 					else if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == ClntMediaPocsThrd::PktTypExit ) //如果是退出包。
 					{
 						if( p_PktLenByt < 1 + 1 ) //如果退出包的长度小于1 + 1，表示没有对讲索引。
@@ -980,6 +1026,32 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 				goto RecvPktOut;
 			}
 			RecvPktOut:;
+		}
+
+		//用本端客户端套接字测试网络延迟。
+		if( ( TkbkClntPt->m_TstNtwkDly.m_IsTstNtwkDly != 0 ) && ( TkbkClntPt->m_IsRqstDstoy == 0 ) && ( TkbkClntPt->m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct ) && ( TkbkClntPt->m_MyTkbkIdx != -1 ) ) //如果要测试网络延迟，且连接未请求销毁，且当前连接状态为已连接，且已设置我的对讲索引。
+		{
+			uint64_t p_CurTickMsec = FuncGetTickAsMsec(); //存放当前嘀嗒钟，单位为毫秒。
+
+			if( ( TkbkClntPt->m_TstNtwkDly.m_IsRecvRplyPkt != 0 ) && ( p_CurTickMsec - TkbkClntPt->m_TstNtwkDly.m_LastSendTickMsec >= TkbkClntPt->m_TstNtwkDly.m_SendIntvlMsec ) ) //如果已接收测试网络延迟应答包，且最后发送测试网络延迟包已超过间隔时间。
+			{
+				TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = ClntMediaPocsThrd::PktTypTstNtwkDly; //设置数据包类型为测试网络延迟包。
+				TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = TkbkClntPt->m_MyTkbkIdx; //设置对讲索引。
+				if( TkbkClntCnctSendPkt( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+				{
+					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送测试网络延迟包成功。对讲索引：%z32d。总长度：2。" ), TkbkClntPt->m_MyTkbkIdx );
+
+					TkbkClntPt->m_TstNtwkDly.m_LastSendTickMsec = p_CurTickMsec; //设置测试网络延迟包最后发送的嘀嗒钟。
+					TkbkClntPt->m_TstNtwkDly.m_IsRecvRplyPkt = 0; //设置未接收测试网络延迟应答包。
+				}
+				else
+				{
+					VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送测试网络延迟包失败。对讲索引：%z32d。总长度：2。原因：" ), TkbkClntPt->m_MyTkbkIdx );
+					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+					TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+					goto Out;
+				}
+			}
 		}
 
 		//连接销毁。

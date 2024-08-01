@@ -37,6 +37,8 @@
 	#endif
 #endif
 
+__SOKT_DLLAPI__ void SoktGetLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+
 #include "TcpSokt.h"
 #include "UdpSokt.h"
 #include "AudpSokt.h"
