@@ -35,6 +35,7 @@
 #define NTDDI_VERSION    0xFFFFFFFF			//设置NTDDI_VERSION宏为最高版本Windows
 #define _WIN32_IE        0xFFFF				//设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN					//设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
+#define NOMINMAX							//设置NOMINMAX宏，防止min和max被定义为宏
 #include <windows.h>						//包含整个Windows SDK支持的API
 #include <windowsx.h>						//ComboBox_AddString、ComboBox_ResetContent
 #include <commctrl.h>						//ListView_InsertItem、ListView_DeleteItem、ListView_DeleteAllItems、ListView_SetItem、ListView_GetItem

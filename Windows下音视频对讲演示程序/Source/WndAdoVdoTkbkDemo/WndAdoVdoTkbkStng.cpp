@@ -176,7 +176,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "Stng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "Effect" );
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatEffect" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectLowRdBtnId ) == BST_CHECKED ) ? "Low" :
 									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectMidRdBtnId ) == BST_CHECKED ) ? "Mid" :
 									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseEffectHighRdBtnId ) == BST_CHECKED ) ? "High" :
@@ -185,7 +185,7 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 		
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatAecTend" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseCntnrRecvOtptFrmRdBtnId ) == BST_CHECKED ) ? "EchoCncl" : "DblTalk" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAecTendEchoCnclRdBtnId ) == BST_CHECKED ) ? "EchoCncl" : "DblTalk" );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 		
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseDebugInfo" );
@@ -1087,7 +1087,7 @@ void ReadStngFromXmlFile()
 				{
 					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						if( strcmp( p_TmpXMLElement2Pt->Name(), "Effect" ) == 0 )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatEffect" ) == 0 )
 						{
 							if( strcmp( p_TmpXMLElement2Pt->GetText(), "Low" ) == 0 )
 							{
