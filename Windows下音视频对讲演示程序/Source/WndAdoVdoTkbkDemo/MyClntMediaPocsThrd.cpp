@@ -612,7 +612,6 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 			float p_EchoCntu;
 			int32_t p_EchoSupes;
 			int32_t p_EchoSupesAct;
-			int p_IsSaveMemFile;
 
 			GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 			p_FilterLenMsec = _wtoi( p_TmpU16strPt );
@@ -625,9 +624,8 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 			p_EchoSupes = _wtoi( p_TmpU16strPt );
 			GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 			p_EchoSupesAct = _wtoi( p_TmpU16strPt );
-			p_IsSaveMemFile = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsSaveMemFileCkBoxId ) == BST_CHECKED );
 
-			m_MediaPocsThrdClsPt->AdoInptSetUseSpeexAec( 0, p_FilterLenMsec, p_IsUseRec, p_EchoMultiple, p_EchoCntu, p_EchoSupes, p_EchoSupesAct, p_IsSaveMemFile, Cu8vstr( ".\\SpeexAecMem" ), ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			m_MediaPocsThrdClsPt->AdoInptSetUseSpeexAec( 0, p_FilterLenMsec, p_IsUseRec, p_EchoMultiple, p_EchoCntu, p_EchoSupes, p_EchoSupesAct, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 
 		//设置音频输入是否使用WebRtc定点版声学回音消除器。
@@ -655,7 +653,6 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 			int32_t p_IsUseExtdFilterMode;
 			int32_t p_IsUseRefinedFilterAdaptAecMode;
 			int32_t p_IsUseAdaptAdjDelay;
-			int p_IsSaveMemFile;
 
 			GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 			p_EchoMode = _wtoi( p_TmpU16strPt );
@@ -665,9 +662,19 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 			p_IsUseExtdFilterMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
 			p_IsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
 			p_IsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
-			p_IsSaveMemFile = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsSaveMemFileCkBoxId ) == BST_CHECKED );
 
-			m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec( 0, p_EchoMode, p_Delay, p_IsUseDelayAgstcMode, p_IsUseExtdFilterMode, p_IsUseRefinedFilterAdaptAecMode, p_IsUseAdaptAdjDelay, p_IsSaveMemFile, Cu8vstr( ".\\WebRtcAecMem" ), ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec( 0, p_EchoMode, p_Delay, p_IsUseDelayAgstcMode, p_IsUseExtdFilterMode, p_IsUseRefinedFilterAdaptAecMode, p_IsUseAdaptAdjDelay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		}
+		
+		//设置音频输入是否使用WebRtc第三版声学回音消除器。
+		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAec3RdBtnId ) == BST_CHECKED )
+		{
+			int32_t p_Delay;
+
+			GetWindowText( GetDlgItem( g_WebRtcAec3StngDlgWndHdl, WebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+			p_Delay = _wtoi( p_TmpU16strPt );
+
+			m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec3( 0, p_Delay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 
 		//设置音频输入是否使用SpeexWebRtc三重声学回音消除器。
@@ -689,12 +696,15 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 			int32_t p_WebRtcAecIsUseExtdFilterMode;
 			int32_t p_WebRtcAecIsUseRefinedFilterAdaptAecMode;
 			int32_t p_WebRtcAecIsUseAdaptAdjDelay;
+			int32_t p_WebRtcAec3Delay;
 			int32_t p_IsUseSameRoomAec;
 			int32_t p_SameRoomEchoMinDelay;
 
-			p_WorkMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? 1 :
-						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? 2 :
-						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? 3 : 0;
+			p_WorkMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecm :
+						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec :
+						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec :
+						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3 :
+						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3 : 0;
 			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 			p_SpeexAecFilterLenMsec = _wtoi( p_TmpU16strPt );
 			p_SpeexAecIsUseRec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
@@ -719,11 +729,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 			p_WebRtcAecIsUseExtdFilterMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
 			p_WebRtcAecIsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
 			p_WebRtcAecIsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
+			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+			p_WebRtcAec3Delay = _wtoi( p_TmpU16strPt );
 			p_IsUseSameRoomAec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId ) == BST_CHECKED );
 			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 			p_SameRoomEchoMinDelay = _wtoi( p_TmpU16strPt );
 
-			m_MediaPocsThrdClsPt->AdoInptSetUseSpeexWebRtcAec( 0, p_WorkMode, p_SpeexAecFilterLenMsec, p_SpeexAecIsUseRec, p_SpeexAecEchoMultiple, p_SpeexAecEchoCntu, p_SpeexAecEchoSupes, p_SpeexAecEchoSupesAct, p_WebRtcAecmIsUseCNGMode, p_WebRtcAecmEchoMode, p_WebRtcAecmDelay, p_WebRtcAecEchoMode, p_WebRtcAecDelay, p_WebRtcAecIsUseDelayAgstcMode, p_WebRtcAecIsUseExtdFilterMode, p_WebRtcAecIsUseRefinedFilterAdaptAecMode, p_WebRtcAecIsUseAdaptAdjDelay, p_IsUseSameRoomAec, p_SameRoomEchoMinDelay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			m_MediaPocsThrdClsPt->AdoInptSetUseSpeexWebRtcAec( 0, p_WorkMode, p_SpeexAecFilterLenMsec, p_SpeexAecIsUseRec, p_SpeexAecEchoMultiple, p_SpeexAecEchoCntu, p_SpeexAecEchoSupes, p_SpeexAecEchoSupesAct, p_WebRtcAecmIsUseCNGMode, p_WebRtcAecmEchoMode, p_WebRtcAecmDelay, p_WebRtcAecEchoMode, p_WebRtcAecDelay, p_WebRtcAecIsUseDelayAgstcMode, p_WebRtcAecIsUseExtdFilterMode, p_WebRtcAecIsUseRefinedFilterAdaptAecMode, p_WebRtcAecIsUseAdaptAdjDelay, p_WebRtcAec3Delay, p_IsUseSameRoomAec, p_SameRoomEchoMinDelay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 	}
 

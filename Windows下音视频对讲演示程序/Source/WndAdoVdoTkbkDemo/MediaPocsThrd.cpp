@@ -112,16 +112,6 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 
 	//初始化音频输入。
 	p_MediaPocsThrdPt->m_AdoInpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置音频输入的媒体处理线程的指针。
-	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt, , , ) != 0 )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入Speex声学回音消除器内存块文件完整路径动态字符串失败。" ), , );
-		goto Out;
-	}
-	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt, , , ) != 0 )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入WebRtc浮点版声学回音消除器内存块文件完整路径动态字符串失败。" ), , );
-		goto Out;
-	}
 	if( VstrInit( &p_MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt, , , ) != 0 )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "初始化音频输入原始Wave文件完整路径动态字符串失败。" ), , );
@@ -276,20 +266,6 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt = NULL;
 	}
 
-	//销毁音频输入WebRtc浮点版声学回音消除器内存块文件完整路径动态字符串。
-	if( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt != NULL )
-	{
-		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt );
-		MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt = NULL;
-	}
-
-	//销毁音频输入Speex声学回音消除器内存块文件完整路径动态字符串。
-	if( MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt != NULL )
-	{
-		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt );
-		MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt = NULL;
-	}
-	
 	//销毁线程消息容器。
 	if( MediaPocsThrdPt->m_ThrdMsgQueuePt != NULL )
 	{
@@ -727,6 +703,7 @@ typedef enum ThrdMsgTyp
 	ThrdMsgTypAdoInptSetUseSpeexAec,
 	ThrdMsgTypAdoInptSetUseWebRtcAecm,
 	ThrdMsgTypAdoInptSetUseWebRtcAec,
+	ThrdMsgTypAdoInptSetUseWebRtcAec3,
 	ThrdMsgTypAdoInptSetUseSpeexWebRtcAec,
 	ThrdMsgTypAdoInptSetUseNoNs,
 	ThrdMsgTypAdoInptSetUseSpeexPrpocsNs,
@@ -804,8 +781,6 @@ typedef struct
 	float m_EchoCntu;
 	int32_t m_EchoSupes;
 	int32_t m_EchoSupesAct;
-	int32_t m_IsSaveMemFile;
-	Vstr * m_MemFileFullPathVstrPt;
 } ThrdMsgAdoInptSetUseSpeexAec;
 typedef struct
 {
@@ -821,9 +796,11 @@ typedef struct
 	int32_t m_IsUseExtdFilterMode;
 	int32_t m_IsUseRefinedFilterAdaptAecMode;
 	int32_t m_IsUseAdaptAdjDelay;
-	int32_t m_IsSaveMemFile;
-	Vstr * m_MemFileFullPathVstrPt;
 } ThrdMsgAdoInptSetUseWebRtcAec;
+typedef struct
+{
+	int32_t m_Delay;
+} ThrdMsgAdoInptSetUseWebRtcAec3;
 typedef struct
 {
 	int32_t m_WorkMode;
@@ -842,6 +819,7 @@ typedef struct
 	int32_t m_WebRtcAecIsUseExtdFilterMode;
 	int32_t m_WebRtcAecIsUseRefinedFilterAdaptAecMode;
 	int32_t m_WebRtcAecIsUseAdaptAdjDelay;
+	int32_t m_WebRtcAec3Delay;
 	int32_t m_IsUseSameRoomAec;
 	int32_t m_SameRoomEchoMinDelay;
 } ThrdMsgAdoInptSetUseSpeexWebRtcAec;
@@ -1218,8 +1196,6 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBloc
 			 EchoCntu：[输入]，存放在残余回音消除时，残余回音持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
 			 EchoSupes：[输入]，存放在残余回音消除时，残余回音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
 			 EchoSupesAct：[输入]，存放在残余回音消除时，有近端语音活动时残余回音最大衰减分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
-			 IsSaveMemFile：[输入]，存放是否保存内存块到文件，为非0表示要保存，为0表示不保存。
-			 MemFileFullPathVstrPt：[输入]，存放内存块文件完整路径动态字符串的指针。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -1227,21 +1203,15 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBloc
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, int32_t IsSaveMemFile, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	ThrdMsgAdoInptSetUseSpeexAec p_ThrdMsgAdoInptSetUseSpeexAec;
-	p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ), , );
-		goto Out;
-	}
-	if( ( IsSaveMemFile != 0 ) && ( MemFileFullPathVstrPt == NULL ) )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "内存块文件完整路径动态字符串的指针不正确。" ), , );
 		goto Out;
 	}
 	
@@ -1251,15 +1221,6 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsB
     p_ThrdMsgAdoInptSetUseSpeexAec.m_EchoCntu = EchoCntu;
     p_ThrdMsgAdoInptSetUseSpeexAec.m_EchoSupes = EchoSupes;
     p_ThrdMsgAdoInptSetUseSpeexAec.m_EchoSupesAct = EchoSupesAct;
-	p_ThrdMsgAdoInptSetUseSpeexAec.m_IsSaveMemFile = IsSaveMemFile;
-	if( IsSaveMemFile != 0 )
-	{
-		if( VstrInit( &p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt, Utf8, , MemFileFullPathVstrPt ) != 0 )
-		{
-			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置内存块文件完整路径动态字符串失败。" ), , );
-			goto Out;
-		}
-	}
 	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseSpeexAec, &p_ThrdMsgAdoInptSetUseSpeexAec, sizeof( p_ThrdMsgAdoInptSetUseSpeexAec ), ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
@@ -1271,7 +1232,7 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsB
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgAdoInptSetUseSpeexAec.m_MemFileFullPathVstrPt );
+		
 	}
 	return p_Rslt;
 }
@@ -1333,8 +1294,6 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int I
 			 IsUseExtdFilterMode：[输入]，存放是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 			 IsUseRefinedFilterAdaptAecMode：[输入]，存放是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
 			 IsUseAdaptAdjDelay：[输入]，存放是否使用自适应调节回音延迟，为非0表示要使用，为0表示不使用。
-			 IsSaveMemFile：[输入]，存放是否保存内存块到文件，为非0表示要保存，为0表示不保存。
-			 MemFileFullPathVstrPt：[输入]，存放内存块文件完整路径动态字符串的指针。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
 			 非0：失败。
@@ -1342,21 +1301,15 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int I
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, int32_t IsSaveMemFile, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	ThrdMsgAdoInptSetUseWebRtcAec p_ThrdMsgAdoInptSetUseWebRtcAec;
-	p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt = NULL;
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ), , );
-		goto Out;
-	}
-	if( ( IsSaveMemFile != 0 ) && ( MemFileFullPathVstrPt == NULL ) )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "内存块文件完整路径动态字符串的指针不正确。" ), , );
 		goto Out;
 	}
 	
@@ -1366,15 +1319,6 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
     p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsUseExtdFilterMode = IsUseExtdFilterMode;
     p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsUseRefinedFilterAdaptAecMode = IsUseRefinedFilterAdaptAecMode;
     p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsUseAdaptAdjDelay = IsUseAdaptAdjDelay;
-	p_ThrdMsgAdoInptSetUseWebRtcAec.m_IsSaveMemFile = IsSaveMemFile;
-	if( IsSaveMemFile != 0 )
-	{
-		if( VstrInit( &p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt, Utf8, , MemFileFullPathVstrPt ) != 0 )
-		{
-			VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置内存块文件完整路径动态字符串失败。" ), , );
-			goto Out;
-		}
-	}
 	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseWebRtcAec, &p_ThrdMsgAdoInptSetUseWebRtcAec, sizeof( p_ThrdMsgAdoInptSetUseWebRtcAec ), ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
@@ -1386,7 +1330,49 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
 	Out:
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		if( p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt != NULL ) VstrDstoy( p_ThrdMsgAdoInptSetUseWebRtcAec.m_MemFileFullPathVstrPt );
+		
+	}
+	return p_Rslt;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * 函数名称：MediaPocsThrdAdoInptSetUseWebRtcAec3
+ * 功能说明：媒体处理线程的音频输入设置要使用WebRtc第三版声学回音消除器。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+			 IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
+			 Delay：[输入]，存放回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
+			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+ * 返回说明：0：成功。
+			 非0：失败。
+ * 线程安全：是 或 否
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+int MediaPocsThrdAdoInptSetUseWebRtcAec3( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t Delay, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	ThrdMsgAdoInptSetUseWebRtcAec3 p_ThrdMsgAdoInptSetUseWebRtcAec3;
+
+	//判断各个变量是否正确。
+	if( MediaPocsThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ), , );
+		goto Out;
+	}
+	
+    p_ThrdMsgAdoInptSetUseWebRtcAec3.m_Delay = Delay;
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseWebRtcAec3, &p_ThrdMsgAdoInptSetUseWebRtcAec3, sizeof( p_ThrdMsgAdoInptSetUseWebRtcAec3 ), ErrInfoVstrPt ) != 0 )
+	{
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
+		goto Out;
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+		
 	}
 	return p_Rslt;
 }
@@ -1412,6 +1398,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
 			 WebRtcAecIsUseExtdFilterMode：[输入]，存放WebRtc浮点版声学回音消除器是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 			 WebRtcAecIsUseRefinedFilterAdaptAecMode：[输入]，存放WebRtc浮点版声学回音消除器是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
 			 WebRtcAecIsUseAdaptAdjDelay：[输入]，存放WebRtc浮点版声学回音消除器是否使用自适应调节回音延迟，为非0表示要使用，为0表示不使用。
+			 WebRtcAec3Delay：[输入]，存放WebRtc第三版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 			 IsUseSameRoomAec：[输入]，存放是否使用同一房间声学回音消除，为非0表示要使用，为0表示不使用。
 			 SameRoomEchoMinDelay：[输入]，存放同一房间回音最小延迟，单位为毫秒，取值区间为[1,2147483647]。
 			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
@@ -1421,7 +1408,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t WorkMode, int32_t SpeexAecFilterLenMsec, int32_t SpeexAecIsUseRec, float SpeexAecEchoMutp, float SpeexAecEchoCntu, int32_t SpeexAecEchoSupes, int32_t SpeexAecEchoSupesAct, int32_t WebRtcAecmIsUseCNGMode, int32_t WebRtcAecmEchoMode, int32_t WebRtcAecmDelay, int32_t WebRtcAecEchoMode, int32_t WebRtcAecDelay, int32_t WebRtcAecIsUseDelayAgstcMode, int32_t WebRtcAecIsUseExtdFilterMode, int32_t WebRtcAecIsUseRefinedFilterAdaptAecMode, int32_t WebRtcAecIsUseAdaptAdjDelay, int32_t IsUseSameRoomAec, int32_t SameRoomEchoMinDelay, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t WorkMode, int32_t SpeexAecFilterLenMsec, int32_t SpeexAecIsUseRec, float SpeexAecEchoMutp, float SpeexAecEchoCntu, int32_t SpeexAecEchoSupes, int32_t SpeexAecEchoSupesAct, int32_t WebRtcAecmIsUseCNGMode, int32_t WebRtcAecmEchoMode, int32_t WebRtcAecmDelay, int32_t WebRtcAecEchoMode, int32_t WebRtcAecDelay, int32_t WebRtcAecIsUseDelayAgstcMode, int32_t WebRtcAecIsUseExtdFilterMode, int32_t WebRtcAecIsUseRefinedFilterAdaptAecMode, int32_t WebRtcAecIsUseAdaptAdjDelay, int32_t WebRtcAec3Delay, int32_t IsUseSameRoomAec, int32_t SameRoomEchoMinDelay, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	ThrdMsgAdoInptSetUseSpeexWebRtcAec p_ThrdMsgAdoInptSetUseSpeexWebRtcAec;
@@ -1449,6 +1436,7 @@ int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, i
 	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode = WebRtcAecIsUseExtdFilterMode;
 	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode = WebRtcAecIsUseRefinedFilterAdaptAecMode;
 	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay = WebRtcAecIsUseAdaptAdjDelay;
+	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_WebRtcAec3Delay = WebRtcAec3Delay;
 	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_IsUseSameRoomAec = IsUseSameRoomAec;
 	p_ThrdMsgAdoInptSetUseSpeexWebRtcAec.m_SameRoomEchoMinDelay = SameRoomEchoMinDelay;
 	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypAdoInptSetUseSpeexWebRtcAec, &p_ThrdMsgAdoInptSetUseSpeexWebRtcAec, sizeof( p_ThrdMsgAdoInptSetUseSpeexWebRtcAec ), ErrInfoVstrPt ) != 0 )
@@ -4147,12 +4135,6 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_EchoCntu;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_EchoSupes;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_EchoSupesAct;
-			MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile = p_ThrdMsgAdoInptSetUseSpeexAecPt->m_IsSaveMemFile;
-			if( p_ThrdMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt != NULL )
-			{
-				VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt, p_ThrdMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt, , );
-				VstrDstoy( p_ThrdMsgAdoInptSetUseSpeexAecPt->m_MemFileFullPathVstrPt );
-			}
 
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
@@ -4190,12 +4172,21 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsUseExtdFilterMode;
 			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsUseRefinedFilterAdaptAecMode;
 			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsUseAdaptAdjDelay;
-			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile = p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_IsSaveMemFile;
-			if( p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt != NULL )
+
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
-				VstrCpy( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt, p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt, , );
-				VstrDstoy( p_ThrdMsgAdoInptSetUseWebRtcAecPt->m_MemFileFullPathVstrPt );
+				if( AdoInptAecInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
+				AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
 			}
+			break;
+		}
+		case ThrdMsgTypAdoInptSetUseWebRtcAec3:
+		{
+			ThrdMsgAdoInptSetUseWebRtcAec3 * p_ThrdMsgAdoInptSetUseWebRtcAec3Pt = ( ThrdMsgAdoInptSetUseWebRtcAec3 * )MsgPt;
+			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
+
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 4;
+			MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Delay = p_ThrdMsgAdoInptSetUseWebRtcAec3Pt->m_Delay;
 
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
@@ -4209,7 +4200,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			ThrdMsgAdoInptSetUseSpeexWebRtcAec * p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt = ( ThrdMsgAdoInptSetUseSpeexWebRtcAec * )MsgPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
-			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 4;
+			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 5;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WorkMode;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecFilterLenMsec;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecIsUseRec = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SpeexAecIsUseRec;
@@ -4226,6 +4217,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseExtdFilterMode;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseRefinedFilterAdaptAecMode;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAecIsUseAdaptAdjDelay;
+			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAec3Delay = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_WebRtcAec3Delay;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_IsUseSameRoomAec;
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay = p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt->m_SameRoomEchoMinDelay;
 
@@ -4786,8 +4778,6 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoCntu：%f\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoCntu );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupes：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupes );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_EchoSupesAct：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_EchoSupesAct );
-			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_IsSaveMemFile );
-			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_MemFileFullPathVstrPt );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_IsUseCNGMode );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAecm.m_EchoMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_EchoMode );
@@ -4799,8 +4789,8 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseExtdFilterMode );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsUseAdaptAdjDelay );
-			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_IsSaveMemFile );
-			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt：%vs\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_MemFileFullPathVstrPt );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_WebRtcAec3.m_Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Delay );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WorkMode );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec );
@@ -4818,6 +4808,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAec3Delay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_WebRtcAec3Delay );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_IsUseSameRoomAec );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_SameRoomEchoMinDelay );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
@@ -5265,7 +5256,20 @@ int MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 					}
 					break;
 				}
-				case 4: //如果要使用SpeexWebRtc三重声学回音消除器。
+				case 4: //如果要使用WebRtc第三版声学回音消除器。
+				{
+					if( ( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt != NULL ) && ( WebRtcAec3Pocs( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 ) )
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用WebRtc第三版声学回音消除器成功。" ) );
+						SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
+					}
+					else
+					{
+						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用WebRtc第三版声学回音消除器失败。" ) );
+					}
+					break;
+				}
+				case 5: //如果要使用SpeexWebRtc三重声学回音消除器。
 				{
 					if( SpeexWebRtcAecPocs( MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 )
 					{

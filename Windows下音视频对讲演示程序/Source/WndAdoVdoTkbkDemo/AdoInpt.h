@@ -4,6 +4,7 @@
 #include "DataStruct.h"
 #include "SpeexDsp.h"
 #include "WebRtc.h"
+#include "WebRtc3.h"
 #include "SpeexWebRtcAec.h"
 #include "RNNoise.h"
 #include "Speex.h"
@@ -34,7 +35,7 @@ typedef struct AdoInpt //存放音频输入。
 	
 	int32_t m_IsUseSystemAecNsAgc; //存放是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
 
-	int32_t m_UseWhatAec; //存放使用什么声学回音消除器，为0表示不使用，为1表示Speex声学回音消除器，为2表示WebRtc定点版声学回音消除器，为2表示WebRtc浮点版声学回音消除器，为4表示SpeexWebRtc三重声学回音消除器。
+	int32_t m_UseWhatAec; //存放使用什么声学回音消除器，为0表示不使用，为1表示Speex声学回音消除器，为2表示WebRtc定点版声学回音消除器，为3表示WebRtc浮点版声学回音消除器，为4表示WebRtc第三版声学回音消除器，为5表示SpeexWebRtc三重声学回音消除器。
 	int32_t m_IsCanUseAec; //存放是否可以使用声学回音消除器，为0表示不可以，为非0表示可以。
 
 	struct //存放Speex声学回音消除器。
@@ -46,8 +47,6 @@ typedef struct AdoInpt //存放音频输入。
 		float m_EchoCntu; //存放在残余回音消除时，残余回音的持续系数，系数越大消除越强，取值区间为[0.0,0.9]。
 		int32_t m_EchoSupes; //存放在残余回音消除时，残余回音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
 		int32_t m_EchoSupesAct; //存放在残余回音消除时，有近端语音活动时残余回音最大衰减的分贝值，分贝值越小衰减越大，取值区间为[-2147483648,0]。
-		int32_t m_IsSaveMemFile; //存放是否保存内存块到文件，为非0表示要保存，为0表示不保存。
-		Vstr * m_MemFileFullPathVstrPt; //存放内存块文件完整路径动态字符串的指针。
 	} m_SpeexAec;
 
 	struct //存放WebRtc定点版声学回音消除器。
@@ -67,9 +66,13 @@ typedef struct AdoInpt //存放音频输入。
 		int32_t m_IsUseExtdFilterMode; //存放是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 		int32_t m_IsUseRefinedFilterAdaptAecMode; //存放是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
 		int32_t m_IsUseAdaptAdjDelay; //存放是否使用自适应调节回音延迟，为非0表示要使用，为0表示不使用。
-		int32_t m_IsSaveMemFile; //存放是否保存内存块到文件，为非0表示要保存，为0表示不保存。
-		Vstr * m_MemFileFullPathVstrPt; //存放内存块文件完整路径动态字符串的指针。
 	} m_WebRtcAec;
+	
+	struct //存放WebRtc第三版声学回音消除器。
+	{
+		WebRtcAec3 * m_Pt; //存放指针。
+		int32_t m_Delay; //存放回音延迟，单位为毫秒，取值区间为[0,2147483647]，为0表示自适应设置。
+	} m_WebRtcAec3;
 
 	struct //存放SpeexWebRtc三重声学回音消除器。
 	{
@@ -90,6 +93,7 @@ typedef struct AdoInpt //存放音频输入。
 		int32_t m_WebRtcAecIsUseExtdFilterMode; //存放WebRtc浮点版声学回音消除器是否使用扩展滤波器模式，为非0表示要使用，为0表示不使用。
 		int32_t m_WebRtcAecIsUseRefinedFilterAdaptAecMode; //存放WebRtc浮点版声学回音消除器是否使用精制滤波器自适应Aec模式，为非0表示要使用，为0表示不使用。
 		int32_t m_WebRtcAecIsUseAdaptAdjDelay; //存放WebRtc浮点版声学回音消除器是否使用自适应调节回音延迟，为非0表示要使用，为0表示不使用。
+		int32_t m_WebRtcAec3Delay; //存放WebRtc第三版声学回音消除器的回音延迟，单位为毫秒，取值区间为[-2147483648,2147483647]，为0表示自适应设置。
 		int32_t m_IsUseSameRoomAec; //存放是否使用同一房间声学回音消除，为非0表示要使用，为0表示不使用。
 		int32_t m_SameRoomEchoMinDelay; //存放同一房间回音最小延迟，单位为毫秒，取值区间为[1,2147483647]。
 	} m_SpeexWebRtcAec;

@@ -46,11 +46,6 @@ typedef struct SpeexAec SpeexAec;
 
 __SPEEXDSP_DLLAPI__ int SpeexAecGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecInit( SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecInitByMem( SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const char * MemPt, size_t MemLenByt, Vstr * ErrInfoVstrPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecInitByMemFile( SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecGetMemLen( SpeexAec * SpeexAecPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, size_t * MemLenBytPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecGetMem( SpeexAec * SpeexAecPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, char * MemPt, size_t MemSzByt );
-__SPEEXDSP_DLLAPI__ int SpeexAecSaveMemFile( SpeexAec * SpeexAecPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecGetIsCnvgnc( SpeexAec * SpeexAecPt, int32_t * IsCnvgncPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecPocs( SpeexAec * SpeexAecPt, int16_t * InptFrmPt, int16_t * OtptFrmPt, int16_t * RsltFrmPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecDstoy( SpeexAec * SpeexAecPt );

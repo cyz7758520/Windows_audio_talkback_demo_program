@@ -25,7 +25,7 @@
 #include <atomic>							//std::atomic
 #include <cfloat>							//FLT_MAX、DBL_MAX
 #include <typeinfo>
-using namespace std;
+//using namespace std;						//会导致std::byte冲突。
 #endif
 
 #if( defined __MS_VCXX__ )

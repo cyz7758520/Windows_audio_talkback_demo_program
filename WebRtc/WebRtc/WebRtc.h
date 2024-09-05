@@ -54,11 +54,6 @@ typedef struct WebRtcAec WebRtcAec;
 
 __WEBRTC_DLLAPI__ int WebRtcAecGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 __WEBRTC_DLLAPI__ int WebRtcAecInit( WebRtcAec * * WebRtcAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, Vstr * ErrInfoVstrPt );
-__WEBRTC_DLLAPI__ int WebRtcAecInitByMem( WebRtcAec * * WebRtcAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, char * MemPt, size_t MemLenByt, Vstr * ErrInfoVstrPt );
-__WEBRTC_DLLAPI__ int WebRtcAecInitByMemFile( WebRtcAec * * WebRtcAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt );
-__WEBRTC_DLLAPI__ int WebRtcAecGetMemLen( WebRtcAec * WebRtcAecPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, size_t * MemLenBytPt );
-__WEBRTC_DLLAPI__ int WebRtcAecGetMem( WebRtcAec * WebRtcAecPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, char * MemPt, size_t MemSzByt );
-__WEBRTC_DLLAPI__ int WebRtcAecSaveMemFile( WebRtcAec * WebRtcAecPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, const Vstr * MemFileFullPathVstrPt, Vstr * ErrInfoVstrPt );
 __WEBRTC_DLLAPI__ int WebRtcAecSetDelay( WebRtcAec * WebRtcAecPt, int32_t Delay );
 __WEBRTC_DLLAPI__ int WebRtcAecGetDelay( WebRtcAec * WebRtcAecPt, int32_t * DelayPt );
 __WEBRTC_DLLAPI__ int WebRtcAecGetIsCnvgnc( WebRtcAec * WebRtcAecPt, int32_t * IsCnvgncPt );

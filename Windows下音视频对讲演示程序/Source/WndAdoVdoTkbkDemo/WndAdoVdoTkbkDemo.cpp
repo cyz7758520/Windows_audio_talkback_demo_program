@@ -50,6 +50,7 @@ HWND g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl = NULL; //存放保存音视频�
 HWND g_SpeexAecStngDlgWndHdl = NULL; //存放Speex声学回音消除器设置对话框窗口的句柄。
 HWND g_WebRtcAecmStngDlgWndHdl = NULL; //存放WebRtc定点版声学回音消除器设置对话框窗口的句柄。
 HWND g_WebRtcAecStngDlgWndHdl = NULL; //存放WebRtc浮点版声学回音消除器设置对话框窗口的句柄。
+HWND g_WebRtcAec3StngDlgWndHdl = NULL; //存放WebRtc第三版声学回音消除器设置对话框窗口的句柄。
 HWND g_SpeexWebRtcAecStngDlgWndHdl = NULL; //存放SpeexWebRtc三重声学回音消除器设置对话框窗口的句柄。
 HWND g_SpeexPrpocsNsStngDlgWndHdl = NULL; //存放Speex预处理器的噪音抑制设置对话框窗口的句柄。
 HWND g_WebRtcNsxStngDlgWndHdl = NULL; //存放WebRtc定点版噪音抑制器设置对话框窗口的句柄。
@@ -841,6 +842,22 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					ResetStng();
 					return ( INT_PTR )TRUE;
 				}
+				case UseEffectLowRdBtnId: //效果等级：低。
+				case UseEffectMidRdBtnId: //效果等级：中。
+				case UseEffectHighRdBtnId: //效果等级：高。
+				case UseEffectSuperRdBtnId: //效果等级：超。
+				case UseEffectPremiumRdBtnId: //效果等级：特。
+				case UseAecTendEchoCnclRdBtnId: //声学回音消除倾向：消除彻底，双讲吃音。
+				case UseAecTendDblTalkRdBtnId: //声学回音消除倾向：双讲流畅，残余回音。
+				{
+					SetEffectAecTendStng();
+					return ( INT_PTR )TRUE;
+				}
+				case IsUseDebugInfoCkBoxId: //使用调试信息复选框。
+				{
+					SetDebugInfoStng();
+					return ( INT_PTR )TRUE;
+				}
 				case AjbStngBtnId: //自适应抖动缓冲器设置按钮。
 				{
 					ShowWindow( g_AjbStngDlgWndHdl, SW_SHOW ), EnableWindow( hDlg, FALSE ); //显示自适应抖动缓冲器设置对话框。
@@ -856,31 +873,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					ShowWindow( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SW_SHOW ), EnableWindow( hDlg, FALSE ); //显示自适应抖动缓冲器设置对话框。
 					return ( INT_PTR )TRUE;
 				}
-				case UseEffectLowRdBtnId: //效果等级：低。
-				{
-					EffectLow();
-					return ( INT_PTR )TRUE;
-				}
-				case UseEffectMidRdBtnId: //效果等级：中。
-				{
-					EffectMid();
-					return ( INT_PTR )TRUE;
-				}
-				case UseEffectHighRdBtnId: //效果等级：高。
-				{
-					EffectHigh();
-					return ( INT_PTR )TRUE;
-				}
-				case UseEffectSuperRdBtnId: //效果等级：超。
-				{
-					EffectSuper();
-					return ( INT_PTR )TRUE;
-				}
-				case UseEffectPremiumRdBtnId: //效果等级：特。
-				{
-					EffectPremium();
-					return ( INT_PTR )TRUE;
-				}
 				case SpeexAecStngBtnId: //Speex声学回音消除器设置按钮。
 				{
 					ShowWindow( g_SpeexAecStngDlgWndHdl, SW_SHOW ), EnableWindow( hDlg, FALSE ); //显示Speex声学回音消除器设置对话框。
@@ -894,6 +886,11 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				case WebRtcAecStngBtnId: //WebRtc浮点版声学回音消除器设置按钮。
 				{
 					ShowWindow( g_WebRtcAecStngDlgWndHdl, SW_SHOW ), EnableWindow( hDlg, FALSE ); //显示WebRtc浮点版声学回音消除器设置对话框。
+					return ( INT_PTR )TRUE;
+				}
+				case WebRtcAec3StngBtnId: //WebRtc第三版声学回音消除器设置按钮。
+				{
+					ShowWindow( g_WebRtcAec3StngDlgWndHdl, SW_SHOW ), EnableWindow( hDlg, FALSE ); //显示WebRtc第三版声学回音消除器设置对话框。
 					return ( INT_PTR )TRUE;
 				}
 				case SpeexWebRtcAecStngBtnId: //SpeexWebRtc三重声学回音消除器设置按钮。
@@ -987,22 +984,6 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					EnableWindow( GetParent( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl ), TRUE ), ShowWindow( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SW_HIDE ); //隐藏保存音视频输入输出到Avi文件设置对话框。
 					return ( INT_PTR )TRUE;
 				}
-				case SpeexAecDelMemFileBtnId: //Speex声学回音消除器的删除内存块文件按钮。
-				{
-					if( DeleteFile( L".\\SpeexAecMem" ) != 0 )
-					{
-						MessageBox( hDlg, L"删除Speex声学回音消除器的内存块文件 SpeexAecMem 成功。", L"Windows下音视频对讲演示程序", MB_OK | MB_ICONINFORMATION );
-					}
-					else
-					{
-						uint16_t * p_TmpU16strPt;
-						size_t p_TmpU16strLenChr;
-						GetWinLastErrInfo( , g_ErrInfoVstr.m_VstrPt ), g_ErrInfoVstr.FmtIns( 0, Cu8vstr( "删除Speex声学回音消除器的内存块文件 SpeexAecMem 失败。原因：" ) );
-						AstrCpy( uint16_t *, p_TmpU16strPt, Utf16, 1, &p_TmpU16strLenChr, g_ErrInfoVstr.m_VstrPt->m_Pt, g_ErrInfoVstr.m_VstrPt->m_ChrSet, , );
-						MessageBox( hDlg, ( wchar_t * )p_TmpU16strPt, L"Windows下音视频对讲演示程序", MB_OK | MB_ICONERROR );
-					}
-					return ( INT_PTR )TRUE;
-				}
 				case SpeexAecStngOkBtnId: //Speex声学回音消除器设置对话框的确定按钮。
 				{
 					EnableWindow( GetParent( g_SpeexAecStngDlgWndHdl ), TRUE ), ShowWindow( g_SpeexAecStngDlgWndHdl, SW_HIDE ); //隐藏Speex声学回音消除器设置对话框。
@@ -1013,25 +994,14 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					EnableWindow( GetParent( g_WebRtcAecmStngDlgWndHdl ), TRUE ), ShowWindow( g_WebRtcAecmStngDlgWndHdl, SW_HIDE ); //隐藏WebRtc定点版声学回音消除器设置对话框。
 					return ( INT_PTR )TRUE;
 				}
-				case WebRtcAecDelMemFileBtnId: //WebRtc浮点版声学回音消除器的删除内存块文件按钮。
-				{
-					if( DeleteFile( L".\\WebRtcAecMem" ) != 0 )
-					{
-						MessageBox( hDlg, L"删除WebRtc浮点版声学回音消除器的内存块文件 WebRtcAecMem 成功。", L"Windows下音视频对讲演示程序", MB_OK | MB_ICONINFORMATION );
-					}
-					else
-					{
-						uint16_t * p_TmpU16strPt;
-						size_t p_TmpU16strLenChr;
-						GetWinLastErrInfo( , g_ErrInfoVstr.m_VstrPt ), g_ErrInfoVstr.FmtIns( 0, Cu8vstr( "删除WebRtc浮点版声学回音消除器的内存块文件 WebRtcAecMem 失败。原因：" ) );
-						AstrCpy( uint16_t *, p_TmpU16strPt, Utf16, 1, &p_TmpU16strLenChr, g_ErrInfoVstr.m_VstrPt->m_Pt, g_ErrInfoVstr.m_VstrPt->m_ChrSet, , );
-						MessageBox( hDlg, ( wchar_t * )p_TmpU16strPt, L"Windows下音视频对讲演示程序", MB_OK | MB_ICONERROR );
-					}
-					return ( INT_PTR )TRUE;
-				}
 				case WebRtcAecStngOkBtnId: //WebRtc浮点版声学回音消除器设置对话框的确定按钮。
 				{
 					EnableWindow( GetParent( g_WebRtcAecStngDlgWndHdl ), TRUE ), ShowWindow( g_WebRtcAecStngDlgWndHdl, SW_HIDE ); //隐藏WebRtc浮点版声学回音消除器设置对话框。
+					return ( INT_PTR )TRUE;
+				}
+				case WebRtcAec3StngOkBtnId: //WebRtc第三版声学回音消除器设置对话框的确定按钮。
+				{
+					EnableWindow( GetParent( g_WebRtcAec3StngDlgWndHdl ), TRUE ), ShowWindow( g_WebRtcAec3StngDlgWndHdl, SW_HIDE ); //隐藏WebRtc第三版声学回音消除器设置对话框。
 					return ( INT_PTR )TRUE;
 				}
 				case SpeexWebRtcAecStngOkBtnId: //SpeexWebRtc三重声学回音消除器设置对话框的确定按钮。
@@ -1507,6 +1477,12 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
 		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
 		
+		WebRtcAec3GetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
+		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
+		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
+		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		
 		SpeexWebRtcAecGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
 		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
 		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
@@ -1647,6 +1623,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		g_SpeexAecStngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( SpeexAecStngDlgId ), g_StngDlgWndHdl, WndMsgPocsPocdr );
 		g_WebRtcAecmStngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( WebRtcAecmStngDlgId ), g_StngDlgWndHdl, WndMsgPocsPocdr );
 		g_WebRtcAecStngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( WebRtcAecStngDlgId ), g_StngDlgWndHdl, WndMsgPocsPocdr );
+		g_WebRtcAec3StngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( WebRtcAec3StngDlgId ), g_StngDlgWndHdl, WndMsgPocsPocdr );
 		g_SpeexWebRtcAecStngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( SpeexWebRtcAecStngDlgId ), g_StngDlgWndHdl, WndMsgPocsPocdr );
 		g_SpeexPrpocsNsStngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( SpeexPrpocsNsStngDlgId ), g_StngDlgWndHdl, WndMsgPocsPocdr );
 		g_WebRtcNsxStngDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( WebRtcNsxStngDlgId ), g_StngDlgWndHdl, WndMsgPocsPocdr );
@@ -1723,6 +1700,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 					SetWindowText( g_SpeexAecStngDlgWndHdl, p_Argv[ p_Argn ] );
 					SetWindowText( g_WebRtcAecmStngDlgWndHdl, p_Argv[ p_Argn ] );
 					SetWindowText( g_WebRtcAecStngDlgWndHdl, p_Argv[ p_Argn ] );
+					SetWindowText( g_WebRtcAec3StngDlgWndHdl, p_Argv[ p_Argn ] );
 					SetWindowText( g_SpeexWebRtcAecStngDlgWndHdl, p_Argv[ p_Argn ] );
 					SetWindowText( g_SpeexPrpocsNsStngDlgWndHdl, p_Argv[ p_Argn ] );
 					SetWindowText( g_WebRtcNsxStngDlgWndHdl, p_Argv[ p_Argn ] );

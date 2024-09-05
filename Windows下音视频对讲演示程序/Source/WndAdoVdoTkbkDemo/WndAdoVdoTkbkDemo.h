@@ -111,6 +111,7 @@ extern HWND g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl; //存放保存音视频�
 extern HWND g_SpeexAecStngDlgWndHdl; //存放Speex声学回音消除器设置对话框窗口的句柄。
 extern HWND g_WebRtcAecmStngDlgWndHdl; //存放WebRtc定点版声学回音消除器设置对话框窗口的句柄。
 extern HWND g_WebRtcAecStngDlgWndHdl; //存放WebRtc浮点版声学回音消除器设置对话框窗口的句柄。
+extern HWND g_WebRtcAec3StngDlgWndHdl; //存放WebRtc第三版声学回音消除器设置对话框窗口的句柄。
 extern HWND g_SpeexWebRtcAecStngDlgWndHdl; //存放SpeexWebRtc三重声学回音消除器设置对话框窗口的句柄。
 extern HWND g_SpeexPrpocsNsStngDlgWndHdl; //存放Speex预处理器的噪音抑制设置对话框窗口的句柄。
 extern HWND g_WebRtcNsxStngDlgWndHdl; //存放WebRtc定点版噪音抑制器设置对话框窗口的句柄。
