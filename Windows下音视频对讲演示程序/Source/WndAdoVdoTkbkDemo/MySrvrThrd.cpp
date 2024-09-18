@@ -2,7 +2,7 @@
 #include "WndAdoVdoTkbkDemo.h"
 
 //我的服务端线程初始化。
-int MySrvrThrdCls::Init()
+int MySrvrThrdCls::Init( const void * LicnCodePt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	HWND p_SrvrUrlHdl;
@@ -47,7 +47,7 @@ int MySrvrThrdCls::Init()
 		LOGI( Cu8vstr( "我的服务端线程初始化开始。" ) );
 		
 		//初始化我的服务端线程的指针。
-		if( SrvrThrdCls::Init( &g_ErrInfoVstr ) != 0 )
+		if( SrvrThrdCls::Init( LicnCodePt, &g_ErrInfoVstr ) != 0 )
 		{
 			LOGFE( Cu8vstr( "我的服务端线程初始化失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
 			goto Out;

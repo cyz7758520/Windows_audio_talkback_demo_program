@@ -52,8 +52,8 @@ __WEBRTC_DLLAPI__ int WebRtcAecmDstoy( WebRtcAecm * WebRtcAecmPt );
 
 typedef struct WebRtcAec WebRtcAec;
 
-__WEBRTC_DLLAPI__ int WebRtcAecGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
-__WEBRTC_DLLAPI__ int WebRtcAecInit( WebRtcAec * * WebRtcAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, Vstr * ErrInfoVstrPt );
+__WEBRTC_DLLAPI__ int WebRtcAecGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+__WEBRTC_DLLAPI__ int WebRtcAecInit( const void * LicnCodePt, WebRtcAec * * WebRtcAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, Vstr * ErrInfoVstrPt );
 __WEBRTC_DLLAPI__ int WebRtcAecSetDelay( WebRtcAec * WebRtcAecPt, int32_t Delay );
 __WEBRTC_DLLAPI__ int WebRtcAecGetDelay( WebRtcAec * WebRtcAecPt, int32_t * DelayPt );
 __WEBRTC_DLLAPI__ int WebRtcAecGetIsCnvgnc( WebRtcAec * WebRtcAecPt, int32_t * IsCnvgncPt );

@@ -21,7 +21,7 @@ const char * const g_TkbkModeU8strArrPt[ 17 ] = {
 };
 
 //客户端媒体处理线程初始化。
-int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, void * UserDataPt,
+int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const void * LicnCodePt, void * UserDataPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserShowLogFuncPt UserShowLogFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserShowToastFuncPt UserShowToastFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdInitFuncPt UserClntMediaPocsThrdInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdDstoyFuncPt UserClntMediaPocsThrdDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctInitFuncPt UserTkbkClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctDstoyFuncPt UserTkbkClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctStsFuncPt UserTkbkClntCnctStsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntMyTkbkIdxFuncPt UserTkbkClntMyTkbkIdxFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntLclTkbkModeFuncPt UserTkbkClntLclTkbkModeFuncPt, 
@@ -49,7 +49,7 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, void * U
 	}
 	
 	//初始化媒体处理线程。
-	if( MediaPocsThrdInit( &p_ClntMediaPocsThrdPt->m_MediaPocsThrdPt, p_ClntMediaPocsThrdPt,
+	if( MediaPocsThrdInit( &p_ClntMediaPocsThrdPt->m_MediaPocsThrdPt, LicnCodePt, p_ClntMediaPocsThrdPt,
 						   ClntMediaPocsThrdUserInit, ClntMediaPocsThrdUserPocs, ClntMediaPocsThrdUserDstoy, ClntMediaPocsThrdUserMsg,
 						   ClntMediaPocsThrdUserReadAdoVdoInptFrm,
 						   ClntMediaPocsThrdUserWriteAdoOtptFrm, ClntMediaPocsThrdUserGetAdoOtptFrm,
@@ -1079,9 +1079,9 @@ extern "C" void __cdecl ClntMediaPocsThrdClsUserBdctClntCnctSts( ClntMediaPocsTh
 	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserBdctClntCnctSts( CnctInfoPt, CurCnctSts );
 }
 
-int ClntMediaPocsThrdCls::Init( VstrCls * ErrInfoVstrPt )
+int ClntMediaPocsThrdCls::Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt )
 {
-	int p_Rslt = ClntMediaPocsThrdInit( &m_ClntMediaPocsThrdPt, this,
+	int p_Rslt = ClntMediaPocsThrdInit( &m_ClntMediaPocsThrdPt, LicnCodePt, this,
 										ClntMediaPocsThrdClsUserShowLog, ClntMediaPocsThrdClsUserShowToast,
 										ClntMediaPocsThrdClsUserClntMediaPocsThrdInit, ClntMediaPocsThrdClsUserClntMediaPocsThrdDstoy,
 										ClntMediaPocsThrdClsUserTkbkClntCnctInit, ClntMediaPocsThrdClsUserTkbkClntCnctDstoy, ClntMediaPocsThrdClsUserTkbkClntCnctSts, ClntMediaPocsThrdClsUserTkbkClntMyTkbkIdx, ClntMediaPocsThrdClsUserTkbkClntLclTkbkMode,

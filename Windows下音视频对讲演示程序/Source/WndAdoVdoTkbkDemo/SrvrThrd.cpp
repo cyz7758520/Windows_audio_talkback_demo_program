@@ -11,7 +11,7 @@ extern "C" int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt
 extern "C" DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt );
 
 //服务端线程初始化。
-int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
+int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * UserDataPt,
 				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrThrdInitFuncPt UserSrvrThrdInitFuncPt, SrvrThrd::SrvrThrdUserSrvrThrdDstoyFuncPt UserSrvrThrdDstoyFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
@@ -107,6 +107,14 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化线程消息队列失败。原因：" ) );
 		goto Out;
+	}
+	
+	//初始化授权码。
+	if( LicnCodePt != NULL )
+	{
+		uint64_t p_LicnCodeLenByt = 8 + *( uint64_t * )LicnCodePt * ( 256 + 8 + 256 ) * 4;
+		p_SrvrThrdPt->m_LicnCodePt = ( const void * )malloc( p_LicnCodeLenByt );
+		memcpy( ( void * )p_SrvrThrdPt->m_LicnCodePt, LicnCodePt, p_LicnCodeLenByt );
 	}
 
 	if( CQueueInit( &p_SrvrThrdPt->m_CnctInfoCntnrPt, sizeof( SrvrThrd::CnctInfo ), 10, BufAutoAdjMethFreeNumber, 10, SIZE_MAX, ErrInfoVstrPt ) != 0 )
@@ -232,6 +240,13 @@ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 	if( SrvrThrdPt->m_CnctInfoCntnrPt != NULL )
 	{
 		CQueueDstoy( SrvrThrdPt->m_CnctInfoCntnrPt, NULL );
+	}
+	
+	//销毁授权码。
+	if( SrvrThrdPt->m_LicnCodePt != NULL )
+	{
+		free( ( void * )SrvrThrdPt->m_LicnCodePt );
+		SrvrThrdPt->m_LicnCodePt = NULL;
 	}
 
 	//销毁线程消息容器。
@@ -650,7 +665,7 @@ int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * Lc
 	}
 	else //如果要使用高级Udp协议。
 	{
-		if( AudpInit( &SrvrThrdPt->m_AudpSrvrSoktPt, p_RmtNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ( short )1, ( short )5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议服务端套接字成功。
+		if( AudpInit( SrvrThrdPt->m_LicnCodePt, &SrvrThrdPt->m_AudpSrvrSoktPt, p_RmtNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ( short )1, ( short )5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议服务端套接字成功。
 		{
 			if( AudpSetSendBufSz( SrvrThrdPt->m_AudpSrvrSoktPt, 1024 * 1024, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的发送缓冲区大小失败。
 			{
@@ -1713,9 +1728,9 @@ extern "C" void __cdecl SrvrThrdClsUserCnctTstNtwkDly( SrvrThrd * SrvrThrdPt, Sr
 	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserCnctTstNtwkDly( CnctInfoPt, NtwkDlyMsec );
 }
 
-int SrvrThrdCls::Init( VstrCls * ErrInfoVstrPt )
+int SrvrThrdCls::Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt )
 {
-	return SrvrThrdInit( &m_SrvrThrdPt, this,
+	return SrvrThrdInit( &m_SrvrThrdPt, LicnCodePt, this,
 						 SrvrThrdClsUserShowLog, SrvrThrdClsUserShowToast, SrvrThrdClsUserMsg,
 						 SrvrThrdClsUserSrvrThrdInit, SrvrThrdClsUserSrvrThrdDstoy,
 						 SrvrThrdClsUserSrvrInit, SrvrThrdClsUserSrvrDstoy,

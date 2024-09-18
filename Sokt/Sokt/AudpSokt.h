@@ -16,9 +16,9 @@ enum AudpCnctSts
 	AudpCnctStsDsct  //连接状态：已断开。本端或远端正常断开。
 };
 
-__SOKT_DLLAPI__ int AudpGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int AudpGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int AudpInit( AudpSokt * * AudpSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int AudpInit( const void * LicnCodePt, AudpSokt * * AudpSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int AudpAcpt( AudpSokt * AudpSoktPt, size_t * CnctIdxPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
 
@@ -54,9 +54,9 @@ public:
 	AudpSoktCls() { m_AudpSoktPt = NULL; }
 	~AudpSoktCls() { Dstoy( NULL ); }
 
-	static int GetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt ) { return AudpGetAppLmtInfo( LmtAppNameVstrPt, CurAppNameVstrPt, LmtTimeSecPt, RmnTimeSecPt, ErrInfoVstrPt ); }
+	static int GetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt ) { return AudpGetAppLmtInfo( LicnCodePt, LmtTimeSecPt, RmnTimeSecPt, ErrInfoVstrPt ); }
 
-	int Init( const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpInit( &m_AudpSoktPt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, NewCnctMaxWaitCnt, TmotMsec, ErrInfoVstrPt ); }
+	int Init( const void * LicnCodePt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpInit( LicnCodePt, &m_AudpSoktPt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, NewCnctMaxWaitCnt, TmotMsec, ErrInfoVstrPt ); }
 
 	int Acpt( size_t * CnctIdxPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpAcpt( m_AudpSoktPt, CnctIdxPt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, TmotMsec, ErrInfoVstrPt ); }
 	

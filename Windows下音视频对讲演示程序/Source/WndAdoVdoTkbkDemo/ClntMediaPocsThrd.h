@@ -207,7 +207,7 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 } ClntMediaPocsThrd;
 extern const char * const g_TkbkModeU8strArrPt[ 17 ];
 
-int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, void * UserDataPt,
+int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const void * LicnCodePt, void * UserDataPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserShowLogFuncPt UserShowLogFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserShowToastFuncPt UserShowToastFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdInitFuncPt UserClntMediaPocsThrdInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserClntMediaPocsThrdDstoyFuncPt UserClntMediaPocsThrdDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctInitFuncPt UserTkbkClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctDstoyFuncPt UserTkbkClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctStsFuncPt UserTkbkClntCnctStsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntMyTkbkIdxFuncPt UserTkbkClntMyTkbkIdxFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntLclTkbkModeFuncPt UserTkbkClntLclTkbkModeFuncPt, 
@@ -320,7 +320,7 @@ public:
 	//用户定义的广播客户端连接状态函数。
 	virtual void UserBdctClntCnctSts( BdctClnt::CnctInfo * CnctInfoPt, int32_t CurCnctSts ) = 0;
 	
-	int Init( VstrCls * ErrInfoVstrPt );
+	int Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt );
 	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = ClntMediaPocsThrdDstoy( m_ClntMediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_ClntMediaPocsThrdPt = NULL; m_MediaPocsThrdClsPt = NULL; return p_Rslt; }
 	
 	int SendTkbkClntSetIsTstNtwkDlyMsg( int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, VstrCls * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendTkbkClntSetIsTstNtwkDlyMsg( m_ClntMediaPocsThrdPt, IsBlockWait, IsTstNtwkDly, SendIntvlMsec, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }

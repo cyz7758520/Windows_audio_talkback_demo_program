@@ -101,6 +101,9 @@
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\SrvrThrd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\LicnCode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.rc">

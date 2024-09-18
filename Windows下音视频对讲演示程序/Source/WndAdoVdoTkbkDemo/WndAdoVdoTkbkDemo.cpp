@@ -60,6 +60,8 @@ HWND g_SpeexCodecStngDlgWndHdl = NULL; //存放Speex编解码器设置对话框�
 HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl = NULL; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
 HWND g_OpenH264CodecStngDlgWndHdl = NULL; //存放OpenH264编解码器设置对话框窗口的句柄。
 
+extern const uint8_t g_LicnCodePt[];
+
 //刷新音视频设备。
 void RefresAdoVdohDvc()
 {
@@ -587,7 +589,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					if( g_MySrvrThrdPt == NULL ) //如果我的服务端线程未初始化。
 					{
 						g_MySrvrThrdPt = new MySrvrThrdCls( g_MainDlgWndHdl );
-						if( g_MySrvrThrdPt->Init() != 0 )
+						if( g_MySrvrThrdPt->Init( g_LicnCodePt ) != 0 )
 						{
 							delete g_MySrvrThrdPt;
 							g_MySrvrThrdPt = NULL;
@@ -677,7 +679,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未初始化。
 					{
 						g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
-						if( g_MyClntMediaPocsThrdPt->Init() != 0 )
+						if( g_MyClntMediaPocsThrdPt->Init( g_LicnCodePt ) != 0 )
 						{
 							delete g_MyClntMediaPocsThrdPt;
 							g_MyClntMediaPocsThrdPt = NULL;
@@ -688,7 +690,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					{
 						if( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) //如果对讲客户端连接未初始化。
 						{
-							g_MyClntMediaPocsThrdPt->TkbkInit();
+							g_MyClntMediaPocsThrdPt->TkbkInit( g_LicnCodePt );
 						}
 						else //如果对讲客户端端连接已初始化。
 						{
@@ -1459,71 +1461,115 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		VstrInit( &p_LmtAppNameVstrPt, , , );
 		VstrInit( &p_CurAppNameVstrPt, , , );
 
-		AudpGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "本端高级UDP协议套接字限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "本端高级UDP协议套接字当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "本端高级UDP协议套接字限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "本端高级UDP协议套接字剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( AudpGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "本端高级UDP协议套接字限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "本端高级UDP协议套接字剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取本端高级UDP协议套接字的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		SpeexAecGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "Speex声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "Speex声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "Speex声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "Speex声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( SpeexAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "Speex声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "Speex声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取Speex声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		WebRtcAecGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( WebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取WebRtc浮点版声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		WebRtcAec3GetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( WebRtcAec3GetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取WebRtc第三版声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		SpeexWebRtcAecGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( SpeexWebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取SpeexWebRtc三重声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		RNNoiseGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "RNNoise噪音抑制器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "RNNoise噪音抑制器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "RNNoise噪音抑制器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "RNNoise噪音抑制器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( RNNoiseGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "RNNoise噪音抑制器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "RNNoise噪音抑制器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取RNNoise噪音抑制器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		OpenH264EncdGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "OpenH264编码器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "OpenH264编码器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "OpenH264编码器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "OpenH264编码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( OpenH264EncdGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "OpenH264编码器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "OpenH264编码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取OpenH264编码器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		OpenH264DecdGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "OpenH264解码器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "OpenH264解码器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "OpenH264解码器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "OpenH264解码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( OpenH264DecdGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "OpenH264解码器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "OpenH264解码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取OpenH264解码器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		AAjbGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "音频自适应抖动缓冲器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "音频自适应抖动缓冲器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "音频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "音频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( AAjbGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "音频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "音频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取音频自适应抖动缓冲器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		VAjbGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "视频自适应抖动缓冲器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "视频自适应抖动缓冲器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "视频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "视频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( VAjbGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		{
+			LOGFD( Cu8vstr( "视频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "视频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取视频自适应抖动缓冲器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 		
-		AviFileWriterGetAppLmtInfo( p_LmtAppNameVstrPt, p_CurAppNameVstrPt, &p_LmtTimeSec, &p_RmnTimeSec, NULL );
-		LOGFD( Cu8vstr( "Avi文件写入器限制应用程序的名称：%vs。" ), p_LmtAppNameVstrPt );
-		LOGFD( Cu8vstr( "Avi文件写入器当前应用程序的名称：%vs。" ), p_CurAppNameVstrPt );
-		LOGFD( Cu8vstr( "Avi文件写入器限制时间：%uz64d。" ), p_LmtTimeSec );
-		LOGFD( Cu8vstr( "Avi文件写入器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		if( AviFileWriterGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, NULL ) == 0 )
+		{
+			LOGFD( Cu8vstr( "Avi文件写入器限制时间：%uz64d。" ), p_LmtTimeSec );
+			LOGFD( Cu8vstr( "Avi文件写入器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
+		}
+		else
+		{
+			LOGFD( Cu8vstr( "获取Avi文件写入器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
+		}
 
 		VstrDstoy( p_LmtAppNameVstrPt );
 		VstrDstoy( p_CurAppNameVstrPt );
@@ -1890,7 +1936,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 				if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未初始化。
 				{
 					g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
-					if( g_MyClntMediaPocsThrdPt->Init() != 0 )
+					if( g_MyClntMediaPocsThrdPt->Init( g_LicnCodePt ) != 0 )
 					{
 						delete g_MyClntMediaPocsThrdPt;
 						g_MyClntMediaPocsThrdPt = NULL;
@@ -1899,7 +1945,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 
 				if( g_MyClntMediaPocsThrdPt != NULL ) //如果我的客户端媒体处理线程已初始化。
 				{
-					g_MyClntMediaPocsThrdPt->BdctInit();
+					g_MyClntMediaPocsThrdPt->BdctInit( g_LicnCodePt );
 				}
 			}
 		}
@@ -1930,7 +1976,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 				if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未初始化。
 				{
 					g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
-					if( g_MyClntMediaPocsThrdPt->Init() != 0 )
+					if( g_MyClntMediaPocsThrdPt->Init( g_LicnCodePt ) != 0 )
 					{
 						delete g_MyClntMediaPocsThrdPt;
 						g_MyClntMediaPocsThrdPt = NULL;
@@ -1939,7 +1985,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 
 				if( g_MyClntMediaPocsThrdPt != NULL ) //如果我的客户端媒体处理线程已初始化。
 				{
-					g_MyClntMediaPocsThrdPt->BdctInit();
+					g_MyClntMediaPocsThrdPt->BdctInit( g_LicnCodePt );
 				}
 			}
 			else if( p_Msg.message == WM_LBUTTONUP )

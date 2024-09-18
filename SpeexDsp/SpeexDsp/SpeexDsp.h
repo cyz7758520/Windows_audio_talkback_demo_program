@@ -44,8 +44,8 @@ extern "C"
 
 typedef struct SpeexAec SpeexAec;
 
-__SPEEXDSP_DLLAPI__ int SpeexAecGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecInit( SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt );
+__SPEEXDSP_DLLAPI__ int SpeexAecGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+__SPEEXDSP_DLLAPI__ int SpeexAecInit( const void * LicnCodePt, SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecGetIsCnvgnc( SpeexAec * SpeexAecPt, int32_t * IsCnvgncPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecPocs( SpeexAec * SpeexAecPt, int16_t * InptFrmPt, int16_t * OtptFrmPt, int16_t * RsltFrmPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecDstoy( SpeexAec * SpeexAecPt );

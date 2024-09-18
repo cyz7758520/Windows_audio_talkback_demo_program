@@ -8,7 +8,8 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt );
  * 函数名称：MediaPocsThrdInit
  * 功能说明：媒体处理线程初始化。
  * 参数说明：MediaPocsThrdPtPt：[输出]，存放媒体处理线程的指针的指针，不能为NULL。
-			 UserDataPt：[输入]，存放用户数据的指针，可以为NULL。
+			 LicnCodePt：[输入]，存放授权码的指针，可以为NULL。
+             UserDataPt：[输入]，存放用户数据的指针，可以为NULL。
 			 UserInitFuncPt：[输入]，存放用户定义的初始化函数的指针，不能为NULL。
 			 UserPocsFuncPt：[输入]，存放用户定义的处理函数的指针，不能为NULL。
 			 UserDstoyFuncPt：[输入]，存放用户定义的销毁函数的指针，不能为NULL。
@@ -25,7 +26,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt );
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
+int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, const void * LicnCodePt, void * UserDataPt,
 					   MediaPocsThrd::MediaPocsThrdUserInitFuncPt UserInitFuncPt, MediaPocsThrd::MediaPocsThrdUserPocsFuncPt UserPocsFuncPt, MediaPocsThrd::MediaPocsThrdUserDstoyFuncPt UserDstoyFuncPt, MediaPocsThrd::MediaPocsThrdUserMsgFuncPt UserMsgFuncPt,
 					   MediaPocsThrd::MediaPocsThrdUserReadAdoVdoInptFrmFuncPt UserReadAdoVdoInptFrmFuncPt,
 					   MediaPocsThrd::MediaPocsThrdUserWriteAdoOtptFrmFuncPt UserWriteAdoOtptFrmFuncPt, MediaPocsThrd::MediaPocsThrdUserGetAdoOtptFrmFuncPt UserGetAdoOtptFrmFuncPt,
@@ -108,6 +109,14 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, void * UserDataPt,
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化线程消息队列失败。原因：" ) );
 		goto Out;
+	}
+
+	//初始化授权码。
+	if( LicnCodePt != NULL )
+	{
+		uint64_t p_LicnCodeLenByt = 8 + *( uint64_t * )LicnCodePt * ( 256 + 8 + 256 ) * 4;
+		p_MediaPocsThrdPt->m_LicnCodePt = ( const void * )malloc( p_LicnCodeLenByt );
+		memcpy( ( void * )p_MediaPocsThrdPt->m_LicnCodePt, LicnCodePt, p_LicnCodeLenByt );
 	}
 
 	//初始化音频输入。
@@ -264,6 +273,13 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 	{
 		VstrDstoy( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt );
 		MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcFullPathVstrPt = NULL;
+	}
+
+	//销毁授权码。
+	if( MediaPocsThrdPt->m_LicnCodePt != NULL )
+	{
+		free( ( void * )MediaPocsThrdPt->m_LicnCodePt );
+		MediaPocsThrdPt->m_LicnCodePt = NULL;
 	}
 
 	//销毁线程消息容器。
@@ -3546,7 +3562,7 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 	{
 		if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt == NULL )
 		{
-			if( AviFileWriterInit( &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt, 5, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( AviFileWriterInit( MediaPocsThrdPt->m_LicnCodePt, &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt, 5, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件 %vs Avi文件写入器成功。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
 			}
@@ -5929,9 +5945,9 @@ extern "C" void MediaPocsThrdClsUserGetVdoOtptFrm( MediaPocsThrd * MediaPocsThrd
 																				VdoOtptEncdSrcFrmPt, VdoOtptEncdSrcFrmLenByt );
 }
 
-int MediaPocsThrdCls::Init( VstrCls * ErrInfoVstrPt )
+int MediaPocsThrdCls::Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt )
 {
-	return MediaPocsThrdInit( &m_MediaPocsThrdPt, this,
+	return MediaPocsThrdInit( &m_MediaPocsThrdPt, LicnCodePt, this,
 							  MediaPocsThrdClsUserInit, MediaPocsThrdClsUserPocs, MediaPocsThrdClsUserDstoy, MediaPocsThrdClsUserMsg,
 							  MediaPocsThrdClsUserReadAdoVdoInptFrm,
 							  MediaPocsThrdClsUserWriteAdoOtptFrm, MediaPocsThrdClsUserGetAdoOtptFrm,

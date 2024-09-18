@@ -11,7 +11,7 @@ public:
 	MySrvrThrdCls( HWND MainDlgWndHdl ) { m_MainDlgWndHdl = MainDlgWndHdl; }
 	~MySrvrThrdCls() {}
 	
-	int Init();
+	int Init( const void * LicnCodePt );
 	void Dstoy();
 
 	//用户定义的显示日志函数。

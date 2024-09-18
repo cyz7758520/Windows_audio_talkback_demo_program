@@ -36,7 +36,7 @@ int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 		}
 		case 1: //如果要使用OpenH264解码器。
 		{
-			if( OpenH264DecdInit( &StrmPt->m_OpenH264Decd.m_Pt, StrmPt->m_OpenH264Decd.m_DecdThrdNum, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( OpenH264DecdInit( VdoOtptPt->m_MediaPocsThrdPt->m_LicnCodePt, &StrmPt->m_OpenH264Decd.m_Pt, StrmPt->m_OpenH264Decd.m_DecdThrdNum, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：初始化OpenH264解码器成功。" ), StrmPt->m_Idx );
 			}

@@ -7,6 +7,12 @@ extern "C"
 {
 #endif
 
+#ifdef g_JvmPt
+extern JavaVM * g_JvmPt;
+#else
+#error undefinition g_JvmPt
+#endif
+
 __FUNC_DLLAPI__ int GetJavaCls( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, jclass * ClsPt );
 
 __FUNC_DLLAPI__ int GetJavaClsMbrVarFieldID( JNIEnv * env, jclass Cls, int32_t IsStatic, const char * MbrVarNameStrPt, const char * MbrVarDataTypeSignStrPt, jfieldID * FieldIDPt );

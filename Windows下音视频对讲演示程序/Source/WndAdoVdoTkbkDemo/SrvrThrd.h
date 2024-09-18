@@ -47,6 +47,8 @@ typedef struct SrvrThrd
 	} CnctSts;
 	
     int32_t m_IsRqirExit; //存放是否请求退出，为0表示未请求退出，为1表示已请求退出。
+	
+	const void * m_LicnCodePt; //存放授权码的指针。
 
 	int32_t m_IsPrintLog; //存放是否打印Log日志，为非0表示要打印，为0表示不打印。
 	int32_t m_IsShowToast; //存放是否显示Toast，为非0表示要显示，为0表示不显示。
@@ -163,7 +165,7 @@ typedef struct SrvrThrd
 } SrvrThrd;
 extern const char * const g_TkbkModeU8strArrPt[ 17 ];
 
-int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, void * UserDataPt,
+int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * UserDataPt,
 				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrThrdInitFuncPt UserSrvrThrdInitFuncPt, SrvrThrd::SrvrThrdUserSrvrThrdDstoyFuncPt UserSrvrThrdDstoyFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
@@ -231,7 +233,7 @@ public:
 	//用户定义的连接测试网络延迟函数。
 	virtual void UserCnctTstNtwkDly( SrvrThrd::CnctInfo * CnctInfoPt, uint64_t NtwkDlyMsec ) = 0;
 
-	int Init( VstrCls * ErrInfoVstrPt );
+	int Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt );
 	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = SrvrThrdDstoy( m_SrvrThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_SrvrThrdPt = NULL; return p_Rslt; }
 
 	int SetIsPrintLogShowToast( int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSetIsPrintLogShowToast( m_SrvrThrdPt, IsPrintLog, IsShowToast, ShowToastWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }

@@ -9,9 +9,9 @@ extern "C"
 
 typedef struct AviFileWriter AviFileWriter;
 
-__MEDIAFILE_DLLAPI__ int AviFileWriterGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+__MEDIAFILE_DLLAPI__ int AviFileWriterGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 
-__MEDIAFILE_DLLAPI__ int AviFileWriterInit( AviFileWriter * * AviFileWriterPtPt, const Vstr * AviFileFullPathVstrPt, size_t AviFileWrBufSzByt, uint32_t MaxStrmNum, Vstr * ErrInfoVstrPt );
+__MEDIAFILE_DLLAPI__ int AviFileWriterInit( const void * LicnCodePt, AviFileWriter * * AviFileWriterPtPt, const Vstr * AviFileFullPathVstrPt, size_t AviFileWrBufSzByt, uint32_t MaxStrmNum, Vstr * ErrInfoVstrPt );
 
 __MEDIAFILE_DLLAPI__ int AviFileWriterSetStartTimeStamp( AviFileWriter * AviFileWriterPt, uint64_t StartTimeStampMsec, Vstr * ErrInfoVstrPt );
 __MEDIAFILE_DLLAPI__ int AviFileWriterGetStartTimeStamp( AviFileWriter * AviFileWriterPt, uint64_t * StartTimeStampMsecPt, Vstr * ErrInfoVstrPt );

@@ -41,8 +41,8 @@ extern "C"
 
 typedef struct WebRtcAec3 WebRtcAec3;
 
-__WEBRTC3_DLLAPI__ int WebRtcAec3GetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
-__WEBRTC3_DLLAPI__ int WebRtcAec3Init( WebRtcAec3 * * WebRtcAec3PtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t Delay, Vstr * ErrInfoVstrPt );
+__WEBRTC3_DLLAPI__ int WebRtcAec3GetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+__WEBRTC3_DLLAPI__ int WebRtcAec3Init( const void * LicnCodePt, WebRtcAec3 * * WebRtcAec3PtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t Delay, Vstr * ErrInfoVstrPt );
 __WEBRTC3_DLLAPI__ int WebRtcAec3SetDelay( WebRtcAec3 * WebRtcAec3Pt, int32_t Delay );
 __WEBRTC3_DLLAPI__ int WebRtcAec3GetDelay( WebRtcAec3 * WebRtcAec3Pt, int32_t * DelayPt );
 __WEBRTC3_DLLAPI__ int WebRtcAec3GetIsCnvgnc( WebRtcAec3 * WebRtcAec3Pt, int32_t * IsCnvgncPt );

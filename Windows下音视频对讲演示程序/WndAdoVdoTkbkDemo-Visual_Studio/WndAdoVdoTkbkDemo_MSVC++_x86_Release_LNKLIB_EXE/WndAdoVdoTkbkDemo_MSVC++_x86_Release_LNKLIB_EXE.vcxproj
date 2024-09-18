@@ -83,6 +83,7 @@
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\AdoOtpt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\BdctClnt.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\ClntMediaPocsThrd.cpp" />
+    <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\LicnCode.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MediaPocsThrd.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MyClntMediaPocsThrd.cpp" />
     <ClCompile Include="..\..\Source\WndAdoVdoTkbkDemo\MySrvrThrd.cpp" />

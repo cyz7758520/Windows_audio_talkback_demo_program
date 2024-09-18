@@ -2,7 +2,7 @@
 #include "WndAdoVdoTkbkDemo.h"
 
 //我的客户端媒体处理线程初始化。
-int MyClntMediaPocsThrdCls::Init()
+int MyClntMediaPocsThrdCls::Init( const void * LicnCodePt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
@@ -13,7 +13,7 @@ int MyClntMediaPocsThrdCls::Init()
 		LOGI( Cu8vstr( "开始启动我的客户端媒体处理线程。" ) );
 
 		//初始化我的客户端媒体处理线程。
-		if( ClntMediaPocsThrdCls::Init( &g_ErrInfoVstr ) != 0 )
+		if( ClntMediaPocsThrdCls::Init( LicnCodePt, &g_ErrInfoVstr ) != 0 )
 		{
 			LOGFE( Cu8vstr( "初始化我的客户端媒体处理线程失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
 			goto Out;
@@ -104,7 +104,7 @@ void MyClntMediaPocsThrdCls::Dstoy()
 }
 
 //对讲初始化。
-int MyClntMediaPocsThrdCls::TkbkInit()
+int MyClntMediaPocsThrdCls::TkbkInit( const void * LicnCodePt )
 {
 	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	int p_Num = ListView_GetSelectionMark( g_ClntLstWndHdl );
@@ -119,7 +119,7 @@ int MyClntMediaPocsThrdCls::TkbkInit()
 	{
 		if( m_ClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未启动。
 		{
-			if( Init() != 0 ) //如果我的客户端媒体处理线程初始化失败。
+			if( Init( LicnCodePt ) != 0 ) //如果我的客户端媒体处理线程初始化失败。
 			{
 				goto Out;
 			}
@@ -173,7 +173,7 @@ void MyClntMediaPocsThrdCls::TkbkDstoy()
 }
 
 //广播初始化。
-int MyClntMediaPocsThrdCls::BdctInit()
+int MyClntMediaPocsThrdCls::BdctInit( const void * LicnCodePt )
 {
 	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	int p_IsTcpOrAudpPrtcl;
@@ -185,7 +185,7 @@ int MyClntMediaPocsThrdCls::BdctInit()
 
 	if( m_ClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未启动。
 	{
-		if( Init() != 0 ) //如果我的客户端媒体处理线程初始化失败。
+		if( Init( LicnCodePt ) != 0 ) //如果我的客户端媒体处理线程初始化失败。
 		{
 			goto Out;
 		}

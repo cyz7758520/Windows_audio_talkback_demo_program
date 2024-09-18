@@ -893,7 +893,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		}
 		case 1: //如果要使用OpenH264编码器。
 		{
-			if( OpenH264EncdInit( &VdoInptPt->m_OpenH264Encd.m_Pt, VdoInptPt->m_FrmWidth, VdoInptPt->m_FrmHeight, VdoInptPt->m_OpenH264Encd.m_VdoType, VdoInptPt->m_OpenH264Encd.m_EncdBitrate, VdoInptPt->m_OpenH264Encd.m_BitrateCtrlMode, VdoInptPt->m_MaxSmplRate, VdoInptPt->m_OpenH264Encd.m_IDRFrmIntvl, VdoInptPt->m_OpenH264Encd.m_Cmplxt, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( OpenH264EncdInit( VdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &VdoInptPt->m_OpenH264Encd.m_Pt, VdoInptPt->m_FrmWidth, VdoInptPt->m_FrmHeight, VdoInptPt->m_OpenH264Encd.m_VdoType, VdoInptPt->m_OpenH264Encd.m_EncdBitrate, VdoInptPt->m_OpenH264Encd.m_BitrateCtrlMode, VdoInptPt->m_MaxSmplRate, VdoInptPt->m_OpenH264Encd.m_IDRFrmIntvl, VdoInptPt->m_OpenH264Encd.m_Cmplxt, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：初始化OpenH264编码器成功。" ) );
 			}

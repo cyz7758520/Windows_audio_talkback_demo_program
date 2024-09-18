@@ -274,7 +274,7 @@ TkbkClnt::TkbkInfo * TkbkClntTkbkInfoInit( TkbkClnt * TkbkClntPt, int32_t TkbkId
 		case 1: //如果要使用自适应抖动缓冲器。
 		{
 			//初始化音频自适应抖动缓冲器。
-			if( AAjbInit( &p_TkbkInfoTmpPt->m_AAjbPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit, 1, 1, 0, TkbkClntPt->m_AAjbParm.m_MinNeedBufFrmCnt, TkbkClntPt->m_AAjbParm.m_MaxNeedBufFrmCnt, TkbkClntPt->m_AAjbParm.m_MaxCntuLostFrmCnt, TkbkClntPt->m_AAjbParm.m_AdaptSensitivity, ( TkbkClntPt->m_XfrMode == 0 ) ? 0 : 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( AAjbInit( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_LicnCodePt, &p_TkbkInfoTmpPt->m_AAjbPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit, 1, 1, 0, TkbkClntPt->m_AAjbParm.m_MinNeedBufFrmCnt, TkbkClntPt->m_AAjbParm.m_MaxNeedBufFrmCnt, TkbkClntPt->m_AAjbParm.m_MaxCntuLostFrmCnt, TkbkClntPt->m_AAjbParm.m_AdaptSensitivity, ( TkbkClntPt->m_XfrMode == 0 ) ? 0 : 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "初始化音频自适应抖动缓冲器成功。" ) );
 			}
@@ -287,7 +287,7 @@ TkbkClnt::TkbkInfo * TkbkClntTkbkInfoInit( TkbkClnt * TkbkClntPt, int32_t TkbkId
 			}
 
 			//初始化视频自适应抖动缓冲器。
-			if( VAjbInit( &p_TkbkInfoTmpPt->m_VAjbPt, 1, TkbkClntPt->m_VAjbParm.m_MinNeedBufFrmCnt, TkbkClntPt->m_VAjbParm.m_MaxNeedBufFrmCnt, TkbkClntPt->m_VAjbParm.m_AdaptSensitivity, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( VAjbInit( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_LicnCodePt, &p_TkbkInfoTmpPt->m_VAjbPt, 1, TkbkClntPt->m_VAjbParm.m_MinNeedBufFrmCnt, TkbkClntPt->m_VAjbParm.m_MaxNeedBufFrmCnt, TkbkClntPt->m_VAjbParm.m_AdaptSensitivity, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "初始化视频自适应抖动缓冲器成功。" ) );
 			}
@@ -557,6 +557,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						}
 
 						TkbkClntPt->m_CurCnctSts = ClntMediaPocsThrd::CnctStsCnct; //设置当前连接状态为已连接。
+						TkbkClntPt->m_TstNtwkDly.m_IsRecvRplyPkt = 1; //设置已接收测试网络延迟应答包，这样可以立即开始发送。
 						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserTkbkClntCnctStsFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_CurCnctSts ); //调用用户定义的对讲客户端连接状态函数。
 						
 						VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化本端Tcp协议客户端套接字[%vs:%vs]，并连接远端Tcp协议服务端套接字[%vs:%vs]成功。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_LclNodeAddrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_LclNodePortPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodeAddrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodePortPt );
@@ -598,7 +599,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt == NULL ) //如果未初始化本端高级Udp协议客户端套接字。
 				{
-					if( AudpInit( &TkbkClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, p_RmtNodeAddrFamly, NULL, NULL, 0, 5000, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议客户端套接字成功。
+					if( AudpInit( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_LicnCodePt, &TkbkClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, p_RmtNodeAddrFamly, NULL, NULL, 0, 5000, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议客户端套接字成功。
 					{
 						if( AudpGetLclAddr( TkbkClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, NULL, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_LclNodeAddrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_LclNodePortPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取本端高级Udp协议套接字绑定的本地节点地址和端口失败。
 						{
@@ -666,6 +667,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						}
 
 						TkbkClntPt->m_CurCnctSts = ClntMediaPocsThrd::CnctStsCnct; //设置当前连接状态为已连接。
+						TkbkClntPt->m_TstNtwkDly.m_IsRecvRplyPkt = 1; //设置已接收测试网络延迟应答包，这样可以立即开始发送。
 						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserTkbkClntCnctStsFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_CurCnctSts ); //调用用户定义的对讲客户端连接状态函数。
 						
 						VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：用本端高级Udp协议客户端套接字连接远端高级Udp协议服务端套接字[%vs:%vs]成功。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodeAddrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodePortPt );

@@ -44,8 +44,8 @@ extern "C"
 
 typedef struct OpenH264Encd OpenH264Encd;
 
-__OPENH264_DLLAPI__ int OpenH264EncdGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
-__OPENH264_DLLAPI__ int OpenH264EncdInit( OpenH264Encd * * OpenH264EncdPtPt, int32_t EncdPictrWidth, int32_t EncdPictrHeight, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t MaxFrmRate, int32_t IDRFrmIntvlFrmCnt, int32_t Cmplxt, Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264EncdGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264EncdInit( const void * LicnCodePt, OpenH264Encd * * OpenH264EncdPtPt, int32_t EncdPictrWidth, int32_t EncdPictrHeight, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t MaxFrmRate, int32_t IDRFrmIntvlFrmCnt, int32_t Cmplxt, Vstr * ErrInfoVstrPt );
 __OPENH264_DLLAPI__ int OpenH264EncdSetEncdBitrate( OpenH264Encd * OpenH264EncdPt, int32_t EncdBitrate, Vstr * ErrInfoVstrPt );
 __OPENH264_DLLAPI__ int OpenH264EncdGetEncdBitrate( OpenH264Encd * OpenH264EncdPt, int32_t * EncdBitratePt, Vstr * ErrInfoVstrPt );
 __OPENH264_DLLAPI__ int OpenH264EncdPocs( OpenH264Encd * OpenH264EncdPt,
@@ -56,8 +56,8 @@ __OPENH264_DLLAPI__ int OpenH264EncdDstoy( OpenH264Encd * OpenH264EncdPt, Vstr *
 
 typedef struct OpenH264Decd OpenH264Decd;
 
-__OPENH264_DLLAPI__ int OpenH264DecdGetAppLmtInfo( Vstr * LmtAppNameVstrPt, Vstr * CurAppNameVstrPt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
-__OPENH264_DLLAPI__ int OpenH264DecdInit( OpenH264Decd * * OpenH264DecdPtPt, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264DecdGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+__OPENH264_DLLAPI__ int OpenH264DecdInit( const void * LicnCodePt, OpenH264Decd * * OpenH264DecdPtPt, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt );
 __OPENH264_DLLAPI__ int OpenH264DecdPocs( OpenH264Decd * OpenH264DecdPt,
 										  uint8_t * H264FrmPt, size_t H264FrmLenByt,
 										  uint8_t * Yu12FrmPt, size_t Yu12FrmSzByt, int32_t * Yu12FrmWidthPt, int32_t * Yu12FrmHeightPt,

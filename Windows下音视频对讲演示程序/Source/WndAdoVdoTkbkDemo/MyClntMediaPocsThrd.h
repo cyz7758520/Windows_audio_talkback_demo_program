@@ -15,11 +15,11 @@ public:
 	MyClntMediaPocsThrdCls( HWND MainDlgWndHdl ) { m_MainDlgWndHdl = MainDlgWndHdl; }
 	~MyClntMediaPocsThrdCls() {}
 	
-	int Init();
+	int Init( const void * LicnCodePt );
 	void Dstoy();
-	int TkbkInit();
+	int TkbkInit( const void * LicnCodePt );
 	void TkbkDstoy();
-	int BdctInit();
+	int BdctInit( const void * LicnCodePt );
 	void BdctDstoy();
 
 	//用户定义的显示日志函数。

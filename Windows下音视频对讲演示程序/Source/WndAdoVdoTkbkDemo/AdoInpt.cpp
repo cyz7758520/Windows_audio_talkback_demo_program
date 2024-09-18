@@ -30,7 +30,7 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 1: //如果要使用Speex声学回音消除器。
 		{
-			if( SpeexAecInit( &AdoInptPt->m_SpeexAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_SpeexAec.m_FilterLenMsec, AdoInptPt->m_SpeexAec.m_IsUseRec, AdoInptPt->m_SpeexAec.m_EchoMutp, AdoInptPt->m_SpeexAec.m_EchoCntu, AdoInptPt->m_SpeexAec.m_EchoSupes, AdoInptPt->m_SpeexAec.m_EchoSupesAct, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( SpeexAecInit( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_SpeexAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_SpeexAec.m_FilterLenMsec, AdoInptPt->m_SpeexAec.m_IsUseRec, AdoInptPt->m_SpeexAec.m_EchoMutp, AdoInptPt->m_SpeexAec.m_EchoCntu, AdoInptPt->m_SpeexAec.m_EchoSupes, AdoInptPt->m_SpeexAec.m_EchoSupesAct, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Speex声学回音消除器成功。" ) );
 			}
@@ -56,7 +56,7 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 3: //如果要使用WebRtc浮点版声学回音消除器。
 		{
-			if( WebRtcAecInit( &AdoInptPt->m_WebRtcAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcAec.m_EchoMode, AdoInptPt->m_WebRtcAec.m_Delay, AdoInptPt->m_WebRtcAec.m_IsUseDelayAgstcMode, AdoInptPt->m_WebRtcAec.m_IsUseExtdFilterMode, AdoInptPt->m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode, AdoInptPt->m_WebRtcAec.m_IsUseAdaptAdjDelay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( WebRtcAecInit( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_WebRtcAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcAec.m_EchoMode, AdoInptPt->m_WebRtcAec.m_Delay, AdoInptPt->m_WebRtcAec.m_IsUseDelayAgstcMode, AdoInptPt->m_WebRtcAec.m_IsUseExtdFilterMode, AdoInptPt->m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode, AdoInptPt->m_WebRtcAec.m_IsUseAdaptAdjDelay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc浮点版声学回音消除器成功。" ) );
 			}
@@ -69,7 +69,7 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 4: //如果要使用WebRtc第三版声学回音消除器。
 		{
-			if( WebRtcAec3Init( &AdoInptPt->m_WebRtcAec3.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcAec3.m_Delay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( WebRtcAec3Init( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_WebRtcAec3.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcAec3.m_Delay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc第三版声学回音消除器成功。" ) );
 			}
@@ -82,7 +82,7 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 5: //如果要使用SpeexWebRtc三重声学回音消除器。
 		{
-			if( SpeexWebRtcAecInit( &AdoInptPt->m_SpeexWebRtcAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_SpeexWebRtcAec.m_WorkMode, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecIsUseRec, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoMutp, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoCntu, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoSupes, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmEchoMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecEchoMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAec3Delay, AdoInptPt->m_SpeexWebRtcAec.m_IsUseSameRoomAec, AdoInptPt->m_SpeexWebRtcAec.m_SameRoomEchoMinDelay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( SpeexWebRtcAecInit( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_SpeexWebRtcAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_SpeexWebRtcAec.m_WorkMode, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecIsUseRec, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoMutp, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoCntu, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoSupes, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmEchoMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecEchoMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAec3Delay, AdoInptPt->m_SpeexWebRtcAec.m_IsUseSameRoomAec, AdoInptPt->m_SpeexWebRtcAec.m_SameRoomEchoMinDelay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化SpeexWebRtc三重声学回音消除器成功。" ) );
 			}
@@ -319,7 +319,7 @@ int AdoInptNsInit( AdoInpt * AdoInptPt )
 		}
 		case 4: //如果要使用RNNoise噪音抑制器。
 		{
-			if( RNNoiseInit( &AdoInptPt->m_RNNoise.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( RNNoiseInit( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_RNNoise.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化RNNoise噪音抑制器成功。" ) );
 			}
