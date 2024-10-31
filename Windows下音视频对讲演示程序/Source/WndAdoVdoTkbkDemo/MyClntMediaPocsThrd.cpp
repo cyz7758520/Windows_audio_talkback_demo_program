@@ -393,14 +393,18 @@ void MyClntMediaPocsThrdCls::UserTkbkClntLclTkbkMode( int32_t OldLclTkbkMode, in
 		wchar_t p_FullPathU16strPt[ 1024 ];
 		wchar_t p_TmpU16strPt[ 1024 ];
 		size_t p_WrBufSzByt;
+		int32_t p_MaxStrmNum;
 
 		GetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId ), p_FullPathU16strPt, SzOfArr( p_FullPathU16strPt ) );
 		GetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_WrBufSzByt = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileMaxStrmNumEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
+		p_MaxStrmNum = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->SetIsSaveAdoVdoInptOtptToAviFile( 0,
 																Cu16vstr( p_FullPathU16strPt ),
 																p_WrBufSzByt,
+																p_MaxStrmNum,
 																( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 																( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 																( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
@@ -570,6 +574,28 @@ void MyClntMediaPocsThrdCls::UserBdctClntCnctSts( BdctClnt::CnctInfo * CnctInfoP
 	}
 	p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt = NULL;
 	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypClntLstModifyItem, ( WPARAM )p_MainDlgWndMsgClntLstModifyItemPt, 0 );
+}
+
+//用户定义的设备改变函数。
+void MyClntMediaPocsThrdCls::UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt )
+{
+	Vstr * p_DvcNameVstrPt;
+
+	if( AdoInptDvcNameVstrPt != NULL )
+	{
+		VstrInit( &p_DvcNameVstrPt, Utf16, , AdoInptDvcNameVstrPt );
+		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypAdoInptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
+	}
+	else if( AdoOtptDvcNameVstrPt != NULL )
+	{
+		VstrInit( &p_DvcNameVstrPt, Utf16, , AdoOtptDvcNameVstrPt );
+		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypAdoOtptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
+	}
+	else if( VdoInptDvcNameVstrPt != NULL )
+	{
+		VstrInit( &p_DvcNameVstrPt, Utf16, , VdoInptDvcNameVstrPt );
+		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypVdoInptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
+	}
 }
 
 //设置要使用音频输入。
@@ -877,9 +903,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 	}
 
 	//设置音频输入使用的设备。
-	m_MediaPocsThrdClsPt->AdoInptSetUseDvc( 0,
-											SendMessage( GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ),
-											( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	{
+		wchar_t * p_CurAdoInptDvcNameU16strPt = NULL;
+		CbBoxGetCurSelTxt( g_AdoInptDvcCbBoxWndHdl, p_CurAdoInptDvcNameU16strPt ); //获取当前选择的音频输入设备的名称。
+		m_MediaPocsThrdClsPt->AdoInptSetUseDvc( 0,
+												Cu16vstr( p_CurAdoInptDvcNameU16strPt ),
+												( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	}
 
 	//设置音频输入是否静音。
 	m_MediaPocsThrdClsPt->AdoInptSetIsMute( 0,
@@ -935,9 +965,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoOtpt()
 														 ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输出使用的设备。
-	m_MediaPocsThrdClsPt->AdoOtptSetUseDvc( 0,
-											SendMessage( GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ),
-											( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	{
+		wchar_t * p_CurAdoOtptDvcNameU16strPt = NULL;
+		CbBoxGetCurSelTxt( g_AdoOtptDvcCbBoxWndHdl, p_CurAdoOtptDvcNameU16strPt ); //获取当前选择的音频输出设备的名称。
+		m_MediaPocsThrdClsPt->AdoOtptSetUseDvc( 0,
+												Cu16vstr( p_CurAdoOtptDvcNameU16strPt ),
+												( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	}
 
 	//设置音频输出是否静音。
 	m_MediaPocsThrdClsPt->AdoOtptSetIsMute( 0,
@@ -1092,9 +1126,13 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 	}
 
 	//设置视频输入使用的设备。
-	m_MediaPocsThrdClsPt->VdoInptSetUseDvc( 0,
-											SendMessage( GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ),
-											( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	{
+		wchar_t * p_CurVdoInptDvcNameU16strPt = NULL;
+		CbBoxGetCurSelTxt( g_VdoInptDvcCbBoxWndHdl, p_CurVdoInptDvcNameU16strPt ); //获取当前选择的视频输入设备的名称。
+		m_MediaPocsThrdClsPt->VdoInptSetUseDvc( 0,
+												Cu16vstr( p_CurVdoInptDvcNameU16strPt ),
+												( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	}
 
 	//设置视频输入是否黑屏。
 	m_MediaPocsThrdClsPt->VdoInptSetIsBlack( 0,

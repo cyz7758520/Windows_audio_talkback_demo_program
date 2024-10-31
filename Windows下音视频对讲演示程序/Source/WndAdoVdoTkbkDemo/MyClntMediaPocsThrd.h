@@ -75,6 +75,9 @@ public:
 	
 	//用户定义的广播客户端连接状态函数。
 	void UserBdctClntCnctSts( BdctClnt::CnctInfo * CnctInfoPt, int32_t CurCnctSts );
+	
+	//用户定义的设备改变函数。
+	void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
 
 	void SetToUseAdoInpt();
 	void SetNotUseAdoInpt();

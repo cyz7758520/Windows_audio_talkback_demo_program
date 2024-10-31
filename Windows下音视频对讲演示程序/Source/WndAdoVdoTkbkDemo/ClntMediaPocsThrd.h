@@ -204,6 +204,10 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 	//用户定义的广播客户端连接状态函数。
 	typedef void( __cdecl * ClntMediaPocsThrdUserBdctClntCnctStsFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, BdctClnt::CnctInfo * CnctInfoPt, int32_t CurCnctSts );
 	ClntMediaPocsThrdUserBdctClntCnctStsFuncPt m_UserBdctClntCnctStsFuncPt;
+	
+	//用户定义的设备改变函数。
+	typedef void( __cdecl * ClntMediaPocsThrdUserDvcChgFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
+	ClntMediaPocsThrdUserDvcChgFuncPt m_UserDvcChgFuncPt;
 } ClntMediaPocsThrd;
 extern const char * const g_TkbkModeU8strArrPt[ 17 ];
 
@@ -214,6 +218,7 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const vo
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoInitFuncPt UserTkbkClntTkbkInfoInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoDstoyFuncPt UserTkbkClntTkbkInfoDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt UserTkbkClntTkbkInfoRmtTkbkModeFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTstNtwkDlyFuncPt UserTkbkClntTstNtwkDlyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntInitFuncPt UserBdctClntInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntDstoyFuncPt UserBdctClntDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctInitFuncPt UserBdctClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctDstoyFuncPt UserBdctClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserBdctClntCnctStsFuncPt UserBdctClntCnctStsFuncPt,
+						   ClntMediaPocsThrd::ClntMediaPocsThrdUserDvcChgFuncPt UserDvcChgFuncPt,
 						   Vstr * ErrInfoVstrPt );
 int ClntMediaPocsThrdDstoy( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * ErrInfoVstrPt );
 int ClntMediaPocsThrdSendTkbkClntSetIsTstNtwkDlyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt );
@@ -233,6 +238,7 @@ int ClntMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt );
 int ClntMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt );
 void ClntMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt );
 int ClntMediaPocsThrdUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+void ClntMediaPocsThrdUserDvcChg( MediaPocsThrd * MediaPocsThrdPt, Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
 void ClntMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsThrdPt,
 											 int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
 											 uint8_t * AdoInptEncdRsltFrmPt, size_t AdoInptEncdRsltFrmLenByt, int32_t AdoInptEncdRsltFrmIsNeedTrans,
@@ -320,6 +326,9 @@ public:
 	//用户定义的广播客户端连接状态函数。
 	virtual void UserBdctClntCnctSts( BdctClnt::CnctInfo * CnctInfoPt, int32_t CurCnctSts ) = 0;
 	
+	//用户定义的设备改变函数。
+	virtual void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt ) = 0;
+
 	int Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt );
 	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = ClntMediaPocsThrdDstoy( m_ClntMediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_ClntMediaPocsThrdPt = NULL; m_MediaPocsThrdClsPt = NULL; return p_Rslt; }
 	

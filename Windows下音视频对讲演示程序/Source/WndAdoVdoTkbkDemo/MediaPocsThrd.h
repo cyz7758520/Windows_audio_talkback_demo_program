@@ -52,7 +52,382 @@ typedef struct MediaPocsThrd
 	ExitCode m_ExitCode; //存放退出码。
 	
 	int32_t m_LastCallUserInitOrDstoy; //存放上一次调用了用户定义的初始化函数或销毁函数，为0表示初始化函数，为1表示销毁函数。
-	
+
+	typedef enum ThrdMsgTyp
+	{
+		ThrdMsgTypSetAdoInpt,
+		ThrdMsgTypAdoInptSetIsUseSystemAecNsAgc,
+		ThrdMsgTypAdoInptSetUseNoAec,
+		ThrdMsgTypAdoInptSetUseSpeexAec,
+		ThrdMsgTypAdoInptSetUseWebRtcAecm,
+		ThrdMsgTypAdoInptSetUseWebRtcAec,
+		ThrdMsgTypAdoInptSetUseWebRtcAec3,
+		ThrdMsgTypAdoInptSetUseSpeexWebRtcAec,
+		ThrdMsgTypAdoInptSetUseNoNs,
+		ThrdMsgTypAdoInptSetUseSpeexPrpocsNs,
+		ThrdMsgTypAdoInptSetUseWebRtcNsx,
+		ThrdMsgTypAdoInptSetUseWebRtcNs,
+		ThrdMsgTypAdoInptSetUseRNNoise,
+		ThrdMsgTypAdoInptSetIsUseSpeexPrpocs,
+		ThrdMsgTypAdoInptSetUsePcm,
+		ThrdMsgTypAdoInptSetUseSpeexEncd,
+		ThrdMsgTypAdoInptSetUseOpusEncd,
+		ThrdMsgTypAdoInptSetIsSaveAdoToWaveFile,
+		ThrdMsgTypAdoInptSetIsDrawAdoWavfmToWnd,
+		ThrdMsgTypAdoInptSetUseDvc,
+		ThrdMsgTypAdoInptSetIsMute,
+
+		ThrdMsgTypSetAdoOtpt,
+		ThrdMsgTypAdoOtptAddStrm,
+		ThrdMsgTypAdoOtptDelStrm,
+		ThrdMsgTypAdoOtptSetStrmUsePcm,
+		ThrdMsgTypAdoOtptSetStrmUseSpeexDecd,
+		ThrdMsgTypAdoOtptSetStrmUseOpusDecd,
+		ThrdMsgTypAdoOtptSetStrmIsUse,
+		ThrdMsgTypAdoOtptSetIsSaveAdoToWaveFile,
+		ThrdMsgTypAdoOtptSetIsDrawAdoWavfmToWnd,
+		ThrdMsgTypAdoOtptSetUseDvc,
+		ThrdMsgTypAdoOtptSetIsMute,
+
+		ThrdMsgTypSetVdoInpt,
+		ThrdMsgTypVdoInptSetUseYu12,
+		ThrdMsgTypVdoInptSetUseOpenH264Encd,
+		ThrdMsgTypVdoInptSetUseDvc,
+		ThrdMsgTypVdoInptSetIsBlack,
+
+		ThrdMsgTypVdoOtptAddStrm,
+		ThrdMsgTypVdoOtptDelStrm,
+		ThrdMsgTypVdoOtptSetStrm,
+		ThrdMsgTypVdoOtptSetStrmUseYu12,
+		ThrdMsgTypVdoOtptSetStrmUseOpenH264Decd,
+		ThrdMsgTypVdoOtptSetStrmIsBlack,
+		ThrdMsgTypVdoOtptSetStrmIsUse,
+
+		ThrdMsgTypSetIsUseAdoVdoInptOtpt,
+
+		ThrdMsgTypSetIsUsePrvntSysSleep,
+		ThrdMsgTypSetIsSaveAdoVdoInptOtptToAviFile,
+		ThrdMsgTypSaveStsToTxtFile,
+
+		ThrdMsgTypRqirExit,
+
+		ThrdMsgTypUserInit,
+		ThrdMsgTypUserDstoy,
+
+		ThrdMsgTypAdoVdoInptOtptInit,
+		ThrdMsgTypAdoVdoInptOtptDstoy,
+
+		ThrdMsgTypAdoInptDvcChg,
+		ThrdMsgTypAdoInptDvcClos,
+		ThrdMsgTypAdoOtptDvcChg,
+		ThrdMsgTypAdoOtptDvcClos,
+		ThrdMsgTypVdoInptDvcChg,
+		ThrdMsgTypVdoInptDvcClos,
+
+		ThrdMsgTypUserMsgMinVal = 100, //用户消息的最小值。
+	} ThrdMsgTyp;
+	typedef struct
+	{
+		int32_t m_SmplRate;
+		size_t m_FrmLenMsec;
+	} ThrdMsgSetAdoInpt;
+	typedef struct
+	{
+		int32_t m_IsUseSystemAecNsAgc;
+	} ThrdMsgAdoInptSetIsUseSystemAecNsAgc;
+	typedef struct
+	{
+	} ThrdMsgAdoInptSetUseNoAec;
+	typedef struct
+	{
+		int32_t m_FilterLenMsec;
+		int32_t m_IsUseRec;
+		float m_EchoMutp;
+		float m_EchoCntu;
+		int32_t m_EchoSupes;
+		int32_t m_EchoSupesAct;
+	} ThrdMsgAdoInptSetUseSpeexAec;
+	typedef struct
+	{
+		int32_t m_IsUseCNGMode;
+		int32_t m_EchoMode;
+		int32_t m_Delay;
+	} ThrdMsgAdoInptSetUseWebRtcAecm;
+	typedef struct
+	{
+		int32_t m_EchoMode;
+		int32_t m_Delay;
+		int32_t m_IsUseDelayAgstcMode;
+		int32_t m_IsUseExtdFilterMode;
+		int32_t m_IsUseRefinedFilterAdaptAecMode;
+		int32_t m_IsUseAdaptAdjDelay;
+	} ThrdMsgAdoInptSetUseWebRtcAec;
+	typedef struct
+	{
+		int32_t m_Delay;
+	} ThrdMsgAdoInptSetUseWebRtcAec3;
+	typedef struct
+	{
+		int32_t m_WorkMode;
+		int32_t m_SpeexAecFilterLenMsec;
+		int32_t m_SpeexAecIsUseRec;
+		float m_SpeexAecEchoMutp;
+		float m_SpeexAecEchoCntu;
+		int32_t m_SpeexAecEchoSupes;
+		int32_t m_SpeexAecEchoSupesAct;
+		int32_t m_WebRtcAecmIsUseCNGMode;
+		int32_t m_WebRtcAecmEchoMode;
+		int32_t m_WebRtcAecmDelay;
+		int32_t m_WebRtcAecEchoMode;
+		int32_t m_WebRtcAecDelay;
+		int32_t m_WebRtcAecIsUseDelayAgstcMode;
+		int32_t m_WebRtcAecIsUseExtdFilterMode;
+		int32_t m_WebRtcAecIsUseRefinedFilterAdaptAecMode;
+		int32_t m_WebRtcAecIsUseAdaptAdjDelay;
+		int32_t m_WebRtcAec3Delay;
+		int32_t m_IsUseSameRoomAec;
+		int32_t m_SameRoomEchoMinDelay;
+	} ThrdMsgAdoInptSetUseSpeexWebRtcAec;
+	typedef struct
+	{
+	} ThrdMsgAdoInptSetUseNoNs;
+	typedef struct
+	{
+		int32_t m_IsUseNs;
+		int32_t m_NoiseSupes;
+		int32_t m_IsUseDereverb;
+	} ThrdMsgAdoInptSetUseSpeexPrpocsNs;
+	typedef struct
+	{
+		int32_t m_PolicyMode;
+	} ThrdMsgAdoInptSetUseWebRtcNsx;
+	typedef struct
+	{
+		int32_t m_PolicyMode;
+	} ThrdMsgAdoInptSetUseWebRtcNs;
+	typedef struct
+	{
+	} ThrdMsgAdoInptSetUseRNNoise;
+	typedef struct
+	{
+		int32_t m_IsUseSpeexPrpocs;
+		int32_t m_IsUseVad;
+		int32_t m_VadProbStart;
+		int32_t m_VadProbCntu;
+		int32_t m_IsUseAgc;
+		int32_t m_AgcLevel;
+		int32_t m_AgcIncrement;
+		int32_t m_AgcDecrement;
+		int32_t m_AgcMaxGain;
+	} ThrdMsgAdoInptSetIsUseSpeexPrpocs;
+	typedef struct
+	{
+	} ThrdMsgAdoInptSetUsePcm;
+	typedef struct
+	{
+		int32_t m_UseCbrOrVbr;
+		int32_t m_Qualt;
+		int32_t m_Cmplxt;
+		int32_t m_PlcExptLossRate;
+	} ThrdMsgAdoInptSetUseSpeexEncd;
+	typedef struct
+	{
+	} ThrdMsgAdoInptSetUseOpusEncd;
+	typedef struct
+	{
+		int32_t m_IsSave;
+		Vstr * m_SrcFullPathVstrPt;
+		Vstr * m_RsltFullPathVstrPt;
+		size_t m_WrBufSzByt;
+	} ThrdMsgAdoInptSetIsSaveAdoToWaveFile;
+	typedef struct
+	{
+		int32_t m_IsDraw;
+		HWND m_SrcWndHdl;
+		HWND m_RsltWndHdl;
+	} ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd;
+	typedef struct
+	{
+		Vstr * m_NameVstrPt;
+	} ThrdMsgAdoInptSetUseDvc;
+	typedef struct
+	{
+		int32_t m_IsMute;
+	} ThrdMsgAdoInptSetIsMute;
+	typedef struct
+	{
+		int32_t m_SmplRate;
+		size_t m_FrmLenMsec;
+	} ThrdMsgSetAdoOtpt;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+	} ThrdMsgAdoOtptAddStrm;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+	} ThrdMsgAdoOtptDelStrm;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+	} ThrdMsgAdoOtptSetStrmUsePcm;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+		int32_t m_IsUsePrcplEnhsmt;
+	} ThrdMsgAdoOtptSetStrmUseSpeexDecd;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+	} ThrdMsgAdoOtptSetStrmUseOpusDecd;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+		int32_t m_IsUse;
+	} ThrdMsgAdoOtptSetStrmIsUse;
+	typedef struct
+	{
+		int32_t m_IsSave;
+		Vstr * m_SrcFullPathVstrPt;
+		size_t m_WrBufSzByt;
+	} ThrdMsgAdoOtptSetIsSaveAdoToWaveFile;
+	typedef struct
+	{
+		int32_t m_IsDraw;
+		HWND m_SrcWndHdl;
+	} ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd;
+	typedef struct
+	{
+		Vstr * m_NameVstrPt;
+	} ThrdMsgAdoOtptSetUseDvc;
+	typedef struct
+	{
+		int32_t m_IsMute;
+	} ThrdMsgAdoOtptSetIsMute;
+	typedef struct
+	{
+		int32_t m_MaxSmplRate;
+		int32_t m_FrmWidth;
+		int32_t m_FrmHeight;
+		int32_t m_SrcMaxSmplRate;
+		int32_t m_SrcFrmWidth;
+		int32_t m_SrcFrmHeight;
+		HWND m_PrvwWndHdl;
+	} ThrdMsgSetVdoInpt;
+	typedef struct
+	{
+	} ThrdMsgVdoInptSetUseYu12;
+	typedef struct
+	{
+		int32_t m_VdoType;
+		int32_t m_EncdBitrate;
+		int32_t m_BitrateCtrlMode;
+		int32_t m_IDRFrmIntvl;
+		int32_t m_Cmplxt;
+	} ThrdMsgVdoInptSetUseOpenH264Encd;
+	typedef struct
+	{
+		Vstr * m_NameVstrPt;
+	} ThrdMsgVdoInptSetUseDvc;
+	typedef struct
+	{
+		int32_t m_IsBlack;
+	} ThrdMsgSetVdoInptIsBlack;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+	} ThrdMsgAddVdoOtptStrm;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+	} ThrdMsgDelVdoOtptStrm;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+		HWND m_DspyWndHdl;
+	} ThrdMsgSetVdoOtptStrm;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+	} ThrdMsgSetVdoOtptStrmUseYu12;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+		int32_t m_DecdThrdNum;
+	} ThrdMsgSetVdoOtptStrmUseOpenH264Decd;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+		int32_t m_IsBlack;
+	} ThrdMsgSetVdoOtptStrmIsBlack;
+	typedef struct
+	{
+		int32_t m_StrmIdx;
+		int32_t m_IsUse;
+	} ThrdMsgSetVdoOtptStrmIsUse;
+	typedef struct
+	{
+		int32_t m_IsUsePrvntSysSleep;
+	} ThrdMsgSetIsUsePrvntSysSleep;
+	typedef struct
+	{
+		Vstr * m_FullPathVstrPt;
+		size_t m_WrBufSzByt;
+		int32_t m_MaxStrmNum;
+		int32_t m_IsSaveAdoInpt;
+		int32_t m_IsSaveAdoOtpt;
+		int32_t m_IsSaveVdoInpt;
+		int32_t m_IsSaveVdoOtpt;
+	} ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile;
+	typedef struct
+	{
+		Vstr * m_FullPathVstrPt;
+	} ThrdMsgSaveStsToTxtFile;
+	typedef struct
+	{
+		int32_t m_IsUseAdoInpt;
+		int32_t m_IsUseAdoOtpt;
+		int32_t m_IsUseVdoInpt;
+		int32_t m_IsUseVdoOtpt;
+	} ThrdMsgSetIsUseAdoVdoInptOtpt;
+	typedef struct
+	{
+		int32_t m_ExitFlag;
+	} ThrdMsgRqirExit;
+	typedef struct
+	{
+	} ThrdMsgUserInit;
+	typedef struct
+	{
+	} ThrdMsgUserDstoy;
+	typedef struct
+	{
+		uint8_t m_UserMsgArr[];
+	} ThrdMsgUserMsg;
+	typedef struct
+	{
+	} ThrdMsgAdoVdoInptOtptInit;
+	typedef struct
+	{
+	} ThrdMsgAdoVdoInptOtptDstoy;
+	typedef struct
+	{
+	} ThrdMsgAdoInptDvcChg;
+	typedef struct
+	{
+	} ThrdMsgAdoInptDvcClos;
+	typedef struct
+	{
+	} ThrdMsgAdoOtptDvcChg;
+	typedef struct
+	{
+	} ThrdMsgAdoOtptDvcClos;
+	typedef struct
+	{
+	} ThrdMsgVdoInptDvcChg;
+	typedef struct
+	{
+	} ThrdMsgVdoInptDvcClos;
 	MsgQueue * m_ThrdMsgQueuePt; //存放线程消息队列的指针。
 
 	const void * m_LicnCodePt; //存放授权码的指针。
@@ -68,6 +443,7 @@ typedef struct MediaPocsThrd
 		AviFileWriter * m_WriterPt; //存放写入器的指针。
 		Vstr * m_FullPathVstrPt; //存放完整路径动态字符串的指针。
 		size_t m_WrBufSzByt; //存放写入缓冲区大小，单位为字节。
+		int32_t m_MaxStrmNum; //存放最大流数量，取值区间为[1,100]。
 		int32_t m_IsSaveAdoInpt; //存放是否保存音频输入，为非0表示要保存，为0表示不保存。
 		int32_t m_IsSaveAdoOtpt; //存放是否保存音频输出，为非0表示要保存，为0表示不保存。
 		int32_t m_IsSaveVdoInpt; //存放是否保存视频输入，为非0表示要保存，为0表示不保存。
@@ -125,6 +501,10 @@ typedef struct MediaPocsThrd
 	//用户定义的消息函数。
 	typedef int( __cdecl * MediaPocsThrdUserMsgFuncPt )( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
 	MediaPocsThrdUserMsgFuncPt m_UserMsgFuncPt;
+	
+	//用户定义的设备改变函数。
+	typedef void( __cdecl * MediaPocsThrdUserDvcChgFuncPt )( MediaPocsThrd * MediaPocsThrdPt, Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
+	MediaPocsThrdUserDvcChgFuncPt m_UserDvcChgFuncPt;
 
 	//用户定义的读取音视频输入帧函数。
 	typedef void( __cdecl * MediaPocsThrdUserReadAdoVdoInptFrmFuncPt )( MediaPocsThrd * MediaPocsThrdPt,
@@ -161,7 +541,8 @@ typedef struct MediaPocsThrd
 } MediaPocsThrd;
 
 int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, const void * LicnCodePt, void * UserDataPt,
-					   MediaPocsThrd::MediaPocsThrdUserInitFuncPt UserInitFuncPt, MediaPocsThrd::MediaPocsThrdUserPocsFuncPt UserPocsFuncPt, MediaPocsThrd::MediaPocsThrdUserDstoyFuncPt UserDstoyFuncPt, MediaPocsThrd::MediaPocsThrdUserMsgFuncPt UserMsgFuncPt,
+					   MediaPocsThrd::MediaPocsThrdUserInitFuncPt UserInitFuncPt, MediaPocsThrd::MediaPocsThrdUserPocsFuncPt UserPocsFuncPt, MediaPocsThrd::MediaPocsThrdUserDstoyFuncPt UserDstoyFuncPt,
+					   MediaPocsThrd::MediaPocsThrdUserMsgFuncPt UserMsgFuncPt, MediaPocsThrd::MediaPocsThrdUserDvcChgFuncPt UserDvcChgFuncPt,
 					   MediaPocsThrd::MediaPocsThrdUserReadAdoVdoInptFrmFuncPt UserReadAdoVdoInptFrmFuncPt,
 					   MediaPocsThrd::MediaPocsThrdUserWriteAdoOtptFrmFuncPt UserWriteAdoOtptFrmFuncPt, MediaPocsThrd::MediaPocsThrdUserGetAdoOtptFrmFuncPt UserGetAdoOtptFrmFuncPt,
 					   MediaPocsThrd::MediaPocsThrdUserWriteVdoOtptFrmFuncPt UserWriteVdoOtptFrmFuncPt, MediaPocsThrd::MediaPocsThrdUserGetVdoOtptFrmFuncPt UserGetVdoOtptFrmFuncPt,
@@ -172,6 +553,9 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameArrPtPtPt, UINT * A
 int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameArrPtPtPt, UINT * AdoOtptDvcTotalPt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameArrPtPtPt, UINT * VdoInptDvcTotalPt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdDstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdGetAdoInptDvcId( Vstr * AdoInptDvcNameVstrPt, UINT * AdoInptDvcIdPt, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdGetAdoOtptDvcId( Vstr * AdoOtptDvcNameVstrPt, UINT * AdoOtptDvcIdPt, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdGetVdoInptDvcId( Vstr * VdoInptDvcNameVstrPt, UINT * VdoInptDvcIdPt, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt );
 
@@ -199,7 +583,7 @@ int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, int IsB
 int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, const Vstr * RsltFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsDrawAdoWavfmToWnd, HWND SrcWndHdl, HWND RsltWndHdl, Vstr * ErrInfoVstrPt );
 
-int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, UINT AdoInptDvcID, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * NameVstrPt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsMute, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt );
@@ -214,7 +598,7 @@ int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsDrawAdoWavfmToWnd, HWND SrcWndHdl, Vstr * ErrInfoVstrPt );
 
-int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, UINT AdoOtptDvcID, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * NameVstrPt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsMute, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t MaxSmplRate, int32_t FrmWidth, int32_t FrmHeight, int32_t SrcMaxSmplRate, int32_t SrcFrmWidth, int32_t SrcFrmHeight, HWND PrvwWndHdl, Vstr * ErrInfoVstrPt );
@@ -222,7 +606,7 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t IDRFrmIntvl, int32_t Cmplxt, Vstr * ErrInfoVstrPt );
 
-int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, UINT VdoInptDvcID, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * NameVstrPt, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int IsBlack, Vstr * ErrInfoVstrPt );
 
@@ -238,7 +622,7 @@ int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 int MediaPocsThrdSetIsPrintLogShowToast( MediaPocsThrd * MediaPocsThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt );
-int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, size_t WrBufSzByt, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, Vstr * ErrInfoVstrPt );
+int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, size_t WrBufSzByt, int32_t MaxStrmNum, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, Vstr * ErrInfoVstrPt );
 int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt );
 
 int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt );
@@ -269,6 +653,9 @@ public:
 	
 	//用户定义的消息函数。
 	virtual int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt ) = 0;
+	
+	//用户定义的设备改变函数。
+	virtual void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt ) = 0;
 
 	//用户定义的读取音视频输入帧函数。
 	virtual void UserReadAdoVdoInptFrm( int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
@@ -331,7 +718,7 @@ public:
 	int AdoInptSetIsSaveAdoToWaveFile( int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, const Vstr * RsltFullPathVstrPt, size_t WrBufSzByt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( m_MediaPocsThrdPt, IsBlockWait, IsSave, SrcFullPathVstrPt, RsltFullPathVstrPt, WrBufSzByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoInptSetIsDrawAdoWavfmToWnd( int IsBlockWait, int32_t IsDraw, HWND SrcWndHdl, HWND RsltWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( m_MediaPocsThrdPt, IsBlockWait, IsDraw, SrcWndHdl, RsltWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
-	int AdoInptSetUseDvc( int IsBlockWait, UINT AdoInptDvcID, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetUseDvc( m_MediaPocsThrdPt, IsBlockWait, AdoInptDvcID, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int AdoInptSetUseDvc( int IsBlockWait, Vstr * NameVstrPt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetUseDvc( m_MediaPocsThrdPt, IsBlockWait, NameVstrPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoInptSetIsMute( int IsBlockWait, int32_t IsMute, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsMute( m_MediaPocsThrdPt, IsBlockWait, IsMute, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int SetAdoOtpt( int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoOtpt( m_MediaPocsThrdPt, IsBlockWait, SmplRate, FrmLenMsec, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
@@ -346,7 +733,7 @@ public:
 	int AdoOtptSetIsSaveAdoToWaveFile( int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, size_t WrBufSzByt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( m_MediaPocsThrdPt, IsBlockWait, IsSave, SrcFullPathVstrPt, WrBufSzByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoOtptSetIsDrawAdoWavfmToWnd( int IsBlockWait, int32_t IsDraw, HWND SrcWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( m_MediaPocsThrdPt, IsBlockWait, IsDraw, SrcWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
-	int AdoOtptSetUseDvc( int IsBlockWait, UINT AdoOtptDvcID, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetUseDvc( m_MediaPocsThrdPt, IsBlockWait, AdoOtptDvcID, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int AdoOtptSetUseDvc( int IsBlockWait, Vstr * NameVstrPt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetUseDvc( m_MediaPocsThrdPt, IsBlockWait, NameVstrPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int AdoOtptSetIsMute( int IsBlockWait, int32_t IsMute, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdAdoOtptSetIsMute( m_MediaPocsThrdPt, IsBlockWait, IsMute, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int SetVdoInpt( int IsBlockWait, int32_t MaxSmplRate, int32_t FrmWidth, int32_t FrmHeight, int32_t SrcMaxSmplRate, int32_t SrcFrmWidth, int32_t SrcFrmHeight, HWND PrvwWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetVdoInpt( m_MediaPocsThrdPt, IsBlockWait, MaxSmplRate, FrmWidth, FrmHeight, SrcMaxSmplRate, SrcFrmWidth, SrcFrmHeight, PrvwWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
@@ -354,7 +741,7 @@ public:
 	int VdoInptSetUseYu12( int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoInptSetUseYu12( m_MediaPocsThrdPt, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int VdoInptSetUseOpenH264Encd( int IsBlockWait, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t IDRFrmIntvl, int32_t Cmplxt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoInptSetUseOpenH264Encd( m_MediaPocsThrdPt, IsBlockWait, VdoType, EncdBitrate, BitrateCtrlMode, IDRFrmIntvl, Cmplxt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
-	int VdoInptSetUseDvc( int IsBlockWait, UINT VdoInptDvcID, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoInptSetUseDvc( m_MediaPocsThrdPt, IsBlockWait, VdoInptDvcID, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int VdoInptSetUseDvc( int IsBlockWait, Vstr * NameVstrPt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoInptSetUseDvc( m_MediaPocsThrdPt, IsBlockWait, NameVstrPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
 	int VdoInptSetIsBlack( int IsBlockWait, int IsBlack, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdVdoInptSetIsBlack( m_MediaPocsThrdPt, IsBlockWait, IsBlack, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 
@@ -370,7 +757,7 @@ public:
 
 	int SetIsPrintLogShowToast( int IsPrintLog, int IsShowToast, HWND ShowToastWndHdl, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetIsPrintLogShowToast( m_MediaPocsThrdPt, IsPrintLog, IsShowToast, ShowToastWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SetIsUsePrvntSysSleep( int IsBlockWait, int32_t IsUsePrvntSysSleep, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetIsUsePrvntSysSleep( m_MediaPocsThrdPt, IsBlockWait, IsUsePrvntSysSleep, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SetIsSaveAdoVdoInptOtptToAviFile( int IsBlockWait, const Vstr * FullPathVstrPt, size_t WrBufSzByt, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( m_MediaPocsThrdPt, IsBlockWait, FullPathVstrPt, WrBufSzByt, IsSaveAdoInpt, IsSaveAdoOtpt, IsSaveVdoInpt, IsSaveVdoOtpt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SetIsSaveAdoVdoInptOtptToAviFile( int IsBlockWait, const Vstr * FullPathVstrPt, size_t WrBufSzByt, int32_t MaxStrmNum, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( m_MediaPocsThrdPt, IsBlockWait, FullPathVstrPt, WrBufSzByt, MaxStrmNum, IsSaveAdoInpt, IsSaveAdoOtpt, IsSaveVdoInpt, IsSaveVdoOtpt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	int SaveStsToTxtFile( int IsBlockWait, const Vstr * FullPathVstrPt, VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdSaveStsToTxtFile( m_MediaPocsThrdPt, IsBlockWait, FullPathVstrPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
 	
 	int Start( VstrCls * ErrInfoVstrPt ) { return MediaPocsThrdStart( m_MediaPocsThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }

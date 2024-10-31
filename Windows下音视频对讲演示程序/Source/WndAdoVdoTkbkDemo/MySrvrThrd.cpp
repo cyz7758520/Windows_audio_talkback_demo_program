@@ -32,14 +32,14 @@ int MySrvrThrdCls::Init( const void * LicnCodePt )
 			Toast( m_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
 			goto Out;
 		}
-		if( ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Tcp" ), &p_CmpRslt ), p_CmpRslt != 0 ) && ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Audp" ), &p_CmpRslt ), p_CmpRslt != 0 ) )
+		if( ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Tcp" ), , &p_CmpRslt ), p_CmpRslt != 0 ) && ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Audp" ), , &p_CmpRslt ), p_CmpRslt != 0 ) )
 		{
 			g_ErrInfoVstr.Cpy( Cu8vstr( "服务端Url字符串的协议不正确。" ) );
 			LOGE( g_ErrInfoVstr.m_VstrPt );
 			Toast( m_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
 			goto Out;
 		}
-		if( VstrCmp( p_PortVstrPt, Cu8vstr( "" ), &p_CmpRslt ), p_CmpRslt == 0 )
+		if( VstrCmp( p_PortVstrPt, , , Cu8vstr( "" ), , &p_CmpRslt ), p_CmpRslt == 0 )
 		{
 			VstrCpy( p_PortVstrPt, Cu8vstr( "12345" ), , );
 		}
@@ -75,7 +75,7 @@ int MySrvrThrdCls::Init( const void * LicnCodePt )
 
 		//设置服务端初始化。
 		SendSrvrInitMsg( 0,
-						 ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Tcp" ), &p_CmpRslt ), p_CmpRslt == 0 ) ? 0 : 1,
+						 ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Tcp" ), , &p_CmpRslt ), p_CmpRslt == 0 ) ? 0 : 1,
 						 ( VstrCls * )&p_HostnameVstrPt,
 						 ( VstrCls * )&p_PortVstrPt,
 						 10,

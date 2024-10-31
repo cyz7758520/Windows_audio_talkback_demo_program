@@ -169,6 +169,14 @@ ___
 &emsp;&emsp;&emsp;&emsp;&emsp;MsgArgPt：\[输入\]，存放消息参数的指针。如果没有消息参数，则本参数为NULL。  
 返回说明：无。  
 ___
+函数名称：UserDvcChg  
+功能说明：用户定义的设备改变函数，在音频输入设备、音频输出设备、视频输入设备改变时回调一次。  
+参数说明：MediaPocsThrdPt：\[输入\]，存放媒体处理线程的指针。  
+&emsp;&emsp;&emsp;&emsp;&emsp;AdoInptDvcNameVstrPt：\[输入\]，存放音频输入设备名称动态字符串的指针。如果音频输入设备没有改变，则本参数为NULL。  
+&emsp;&emsp;&emsp;&emsp;&emsp;AdoOtptDvcNameVstrPt：\[输入\]，存放音频输出设备名称动态字符串的指针。如果音频输出设备没有改变，则本参数为NULL。  
+&emsp;&emsp;&emsp;&emsp;&emsp;VdoInptDvcNameVstrPt：\[输入\]，存放视频输入设备名称动态字符串的指针。如果视频输入设备没有改变，则本参数为NULL。  
+返回说明：无。  
+___
 函数名称：UserReadAdoVdoInptFrm  
 功能说明：用户定义的读取音视频输入帧函数，在读取到一个音频输入帧或视频输入帧并处理完后回调一次。如果不使用音频输入和视频输入，则本函数不会被回调。  
 参数说明：MediaPocsThrdPt：\[输入\]，存放媒体处理线程的指针。  
@@ -323,5 +331,8 @@ ___
 ___
 函数名称：UserBdctClntCnctSts  
 功能说明：用户定义的广播客户端连接状态函数。  
+___
+函数名称：UserDvcChg  
+功能说明：用户定义的设备改变函数。  
 ___
 

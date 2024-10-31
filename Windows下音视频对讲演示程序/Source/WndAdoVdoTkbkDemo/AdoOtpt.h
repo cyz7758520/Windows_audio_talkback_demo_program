@@ -66,8 +66,9 @@ typedef struct AdoOtpt //音频输出。
 	
 	struct //存放设备。
 	{
-		UINT m_ID; //存放标识符，取值范围为从1到音频输出设备的总数，为0表示使用默认设备。
+		Vstr * m_NameVstrPt; //存放名称动态字符串的指针。
 		IMMDeviceEnumerator * m_EnumPt; //存放枚举器的指针。
+		IMMNotificationClient * m_NotificationClientPt; //存放默认设备改变消息客户端的指针。
 		IMMDeviceCollection * m_ClctPt; //存放收集器的指针。
 		IMMDevice * m_Pt; //存放指针。
 		IAudioClient * m_ClntPt; //存放客户端的指针。
@@ -81,7 +82,6 @@ typedef struct AdoOtpt //音频输出。
 		size_t m_PcmBufFrmLenByt; //存放Pcm格式缓冲区帧的长度，单位为字节。
 		SpeexResamplerState * m_PcmBufFrmSpeexResamplerPt; //存放Pcm格式缓冲区帧Speex重采样器的指针。
 		int32_t m_IsMute; //存放是否静音，为0表示有声音，为非0表示静音。
-		int32_t m_IsClos; //存放是否关闭，为0表示正常，为非0表示关闭。
 	} m_Dvc;
 
 	CQueueCls m_PcmSrcFrmCntnr; //存放Pcm格式原始帧容器。

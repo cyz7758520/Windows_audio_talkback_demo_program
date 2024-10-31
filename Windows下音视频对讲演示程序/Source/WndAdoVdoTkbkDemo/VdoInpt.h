@@ -49,7 +49,7 @@ typedef struct VdoInpt //视频输入。
 
 	struct //存放设备。
 	{
-		UINT m_ID; //存放标识符，取值范围为从0到视频输入设备的总数减一。
+		Vstr * m_NameVstrPt; //存放名称动态字符串的指针。
 		IGraphBuilder * m_FilterGraphManagerPt; //存放过滤器图管理器的指针。
 		IMediaEventEx * m_FilterGraphMediaEventPt; //存放过滤器图媒体事件器的指针。
 		IMediaControl * m_FilterGraphMediaCtrlPt; //存放过滤器图媒体控制器的指针。

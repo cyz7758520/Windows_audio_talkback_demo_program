@@ -60,10 +60,12 @@ HWND g_SpeexCodecStngDlgWndHdl = NULL; //存放Speex编解码器设置对话框�
 HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl = NULL; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
 HWND g_OpenH264CodecStngDlgWndHdl = NULL; //存放OpenH264编解码器设置对话框窗口的句柄。
 
-extern const uint8_t g_LicnCodePt[];
+IMMNotificationClient * g_NotificationClntPt = NULL; //存放音频输入输出设备改变消息客户端的指针。
 
-//刷新音视频设备。
-void RefresAdoVdohDvc()
+extern const uint8_t g_LicnCodePt[]; //存放授权码的指针。
+
+//刷新音视频输入输出设备。
+void RefreshAdoVdoInptOtptDvc( int IsRefresAdoInptDvc, int IsRefresAdoOtptDvc, int IsRefresVdoInptDvc )
 {
 	Vstr * * p_AdoInptDvcNameVstrArrPt = NULL;
 	UINT p_AdoInptDvcTotal = 0;
@@ -71,80 +73,111 @@ void RefresAdoVdohDvc()
 	UINT p_AdoOtptDvcTotal = 0;
 	Vstr * * p_VdoInptDvcNameVstrArrPt = NULL;
 	UINT p_VdoInptDvcTotal = 0;
+	wchar_t * p_CurAdoInptDvcNameU16strPt = NULL;
+	wchar_t * p_CurAdoOtptDvcNameU16strPt = NULL;
+	wchar_t * p_CurVdoInptDvcNameU16strPt = NULL;
 	long p_TmpInt;
 
 	//获取音频输入设备、音频输出设备、视频输入设备的名称。
-	if( MediaPocsThrdGetAdoInptDvcName( &p_AdoInptDvcNameVstrArrPt, &p_AdoInptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+	if( IsRefresAdoInptDvc != 0 )
 	{
-		g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取音频输入设备名称失败。原因：" ) );
-		LOGE( g_ErrInfoVstr.m_VstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-		goto RefresAdoVdohDvc;
+		if( MediaPocsThrdGetAdoInptDvcName( &p_AdoInptDvcNameVstrArrPt, &p_AdoInptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+		{
+			g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取音频输入设备名称失败。原因：" ) );
+			LOGE( g_ErrInfoVstr.m_VstrPt );
+			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+			goto RefresAdoVdohDvc;
+		}
 	}
-	if( MediaPocsThrdGetAdoOtptDvcName( &p_AdoOtptDvcNameVstrArrPt, &p_AdoOtptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+	if( IsRefresAdoOtptDvc != 0 )
 	{
-		g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取音频输出设备名称失败。原因：" ) );
-		LOGE( g_ErrInfoVstr.m_VstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-		goto RefresAdoVdohDvc;
+		if( MediaPocsThrdGetAdoOtptDvcName( &p_AdoOtptDvcNameVstrArrPt, &p_AdoOtptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+		{
+			g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取音频输出设备名称失败。原因：" ) );
+			LOGE( g_ErrInfoVstr.m_VstrPt );
+			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+			goto RefresAdoVdohDvc;
+		}
 	}
-	if( MediaPocsThrdGetVdoInptDvcName( &p_VdoInptDvcNameVstrArrPt, &p_VdoInptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+	if( IsRefresVdoInptDvc != 0 )
 	{
-		g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取视频输入设备名称失败。原因：" ) );
-		LOGE( g_ErrInfoVstr.m_VstrPt );
-		{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
-		goto RefresAdoVdohDvc;
+		if( MediaPocsThrdGetVdoInptDvcName( &p_VdoInptDvcNameVstrArrPt, &p_VdoInptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+		{
+			g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取视频输入设备名称失败。原因：" ) );
+			LOGE( g_ErrInfoVstr.m_VstrPt );
+			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+			goto RefresAdoVdohDvc;
+		}
 	}
+	
+	//获取当前选择的音频输入设备、音频输出设备、视频输入设备的名称。
+	if( IsRefresAdoInptDvc != 0 ) CbBoxGetCurSelTxt( g_AdoInptDvcCbBoxWndHdl, p_CurAdoInptDvcNameU16strPt );
+	if( IsRefresAdoOtptDvc != 0 ) CbBoxGetCurSelTxt( g_AdoOtptDvcCbBoxWndHdl, p_CurAdoOtptDvcNameU16strPt );
+	if( IsRefresVdoInptDvc != 0 ) CbBoxGetCurSelTxt( g_VdoInptDvcCbBoxWndHdl, p_CurVdoInptDvcNameU16strPt );
 
 	//清空音频输入设备、音频输出设备、视频输入设备的组合框。
-	SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_RESETCONTENT, 0, 0 );
-	SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_RESETCONTENT, 0, 0 );
-	SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_RESETCONTENT, 0, 0 );
+	if( IsRefresAdoInptDvc != 0 ) SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_RESETCONTENT, 0, 0 );
+	if( IsRefresAdoOtptDvc != 0 ) SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_RESETCONTENT, 0, 0 );
+	if( IsRefresVdoInptDvc != 0 ) SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_RESETCONTENT, 0, 0 );
 
 	//添加音频输入设备、音频输出设备、视频输入设备到组合框。
-	if( p_AdoInptDvcTotal > 0 )
+	if( IsRefresAdoInptDvc != 0 )
 	{
-		for( p_TmpInt = 0; p_TmpInt < p_AdoInptDvcTotal; p_TmpInt++ )
+		if( p_AdoInptDvcTotal > 0 )
 		{
-			SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+			for( p_TmpInt = 0; p_TmpInt < p_AdoInptDvcTotal; p_TmpInt++ )
+			{
+				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+			}
+		}
+		else
+		{
+			SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"无" );
 		}
 	}
-	else
+	if( IsRefresAdoOtptDvc != 0 )
 	{
-		SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"无" );
-	}
-	if( p_AdoOtptDvcTotal > 0 )
-	{
-		for( p_TmpInt = 0; p_TmpInt < p_AdoOtptDvcTotal; p_TmpInt++ )
+		if( p_AdoOtptDvcTotal > 0 )
 		{
-			SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoOtptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+			for( p_TmpInt = 0; p_TmpInt < p_AdoOtptDvcTotal; p_TmpInt++ )
+			{
+				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoOtptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+			}
+		}
+		else
+		{
+			SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"无" );
 		}
 	}
-	else
+	if( IsRefresVdoInptDvc != 0 )
 	{
-		SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"无" );
-	}
-	if( p_VdoInptDvcTotal > 0 )
-	{
-		for( p_TmpInt = 0; p_TmpInt < p_VdoInptDvcTotal; p_TmpInt++ )
+		if( p_VdoInptDvcTotal > 0 )
 		{
-			SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_VdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+			for( p_TmpInt = 0; p_TmpInt < p_VdoInptDvcTotal; p_TmpInt++ )
+			{
+				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_VdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+			}
 		}
-	}
-	else
-	{
-		SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"无" );
+		else
+		{
+			SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )L"无" );
+		}
 	}
 
-	//默认选择第一个设备。
-	SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SETCURSEL, ( WPARAM )0, ( LPARAM )NULL );
-	SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SETCURSEL, ( WPARAM )0, ( LPARAM )NULL );
-	SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SETCURSEL, ( WPARAM )0, ( LPARAM )NULL );
+	//默认选择第一个音频输入设备、音频输出设备、视频输入设备。这步必须要执行，因为重新选择之前选择的有可能失败。
+	if( IsRefresAdoInptDvc != 0 ) SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SETCURSEL, ( WPARAM )0, ( LPARAM )NULL ); 
+	if( IsRefresAdoOtptDvc != 0 ) SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SETCURSEL, ( WPARAM )0, ( LPARAM )NULL );
+	if( IsRefresVdoInptDvc != 0 ) SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SETCURSEL, ( WPARAM )0, ( LPARAM )NULL );
+
+	//重新选择之前选择的音频输入设备、音频输出设备、视频输入设备。
+	if( p_CurAdoInptDvcNameU16strPt != NULL ) SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_CurAdoInptDvcNameU16strPt );
+	if( p_CurAdoOtptDvcNameU16strPt != NULL ) SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_CurAdoOtptDvcNameU16strPt );
+	if( p_CurVdoInptDvcNameU16strPt != NULL ) SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_CurVdoInptDvcNameU16strPt );
 
 	RefresAdoVdohDvc:
-	MediaPocsThrdDstoyDvcName( p_AdoInptDvcNameVstrArrPt, p_AdoInptDvcTotal, NULL );
-	MediaPocsThrdDstoyDvcName( p_AdoOtptDvcNameVstrArrPt, p_AdoOtptDvcTotal, NULL );
-	MediaPocsThrdDstoyDvcName( p_VdoInptDvcNameVstrArrPt, p_VdoInptDvcTotal, NULL );
+	if( IsRefresAdoInptDvc != 0 ) MediaPocsThrdDstoyDvcName( p_AdoInptDvcNameVstrArrPt, p_AdoInptDvcTotal, NULL );
+	if( IsRefresAdoOtptDvc != 0 ) MediaPocsThrdDstoyDvcName( p_AdoOtptDvcNameVstrArrPt, p_AdoOtptDvcTotal, NULL );
+	if( IsRefresVdoInptDvc != 0 ) MediaPocsThrdDstoyDvcName( p_VdoInptDvcNameVstrArrPt, p_VdoInptDvcTotal, NULL );
 }
 
 //设置视频窗口的显示模式。
@@ -367,10 +400,10 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 }
 
 //发送视频输入输出窗口初始化消息。
-HWND SendVdoInptOtptWndInitMsg( Vstr * TitleStrPt )
+HWND SendVdoInptOtptWndInitMsg( Vstr * TitleVstrPt )
 {
 	MainDlgWndMsgVdoInptOtptWndInit * p_MainDlgWndMsgVdoInptOtptWndInitPt = ( MainDlgWndMsgVdoInptOtptWndInit * )malloc( sizeof( MainDlgWndMsgVdoInptOtptWndInit ) );
-	VstrInit( &p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt, Utf16, , TitleStrPt );
+	VstrInit( &p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt, Utf16, , TitleVstrPt );
 	SendMessage( g_MainDlgWndHdl, MainDlgWndMsgTypVdoInptOtptWndInit, ( WPARAM )p_MainDlgWndMsgVdoInptOtptWndInitPt, 0 );
 	HWND p_DspyTxtWndHdl = p_MainDlgWndMsgVdoInptOtptWndInitPt->m_DspyTxtWndHdl;
 	VstrDstoy( p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt );
@@ -387,11 +420,11 @@ void SendVdoInptOtptWndDstoyMsg( HWND DspyTxtWndHdl )
 }
 
 //发送视频输入输出窗口设置标题消息。
-void SendVdoInptOtptWndSetTitleMsg( HWND DspyTxtWndHdl, Vstr * TitleStrPt )
+void SendVdoInptOtptWndSetTitleMsg( HWND DspyTxtWndHdl, Vstr * TitleVstrPt )
 {
 	MainDlgWndMsgVdoInptOtptWndSetTitle * p_MainDlgWndMsgVdoInptOtptWndSetTitlePt = ( MainDlgWndMsgVdoInptOtptWndSetTitle * )malloc( sizeof( MainDlgWndMsgVdoInptOtptWndSetTitle ) );
 	p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_DspyTxtWndHdl = DspyTxtWndHdl;
-	VstrInit( &p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_TitleVstrPt, Utf16, , TitleStrPt );
+	VstrInit( &p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_TitleVstrPt, Utf16, , TitleVstrPt );
 	PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypVdoInptOtptWndSetTitle, ( WPARAM )p_MainDlgWndMsgVdoInptOtptWndSetTitlePt, 0 );
 }
 
@@ -543,41 +576,22 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			return ( INT_PTR )TRUE;
 		}
-		case WM_DEVICECHANGE: //系统硬件设备改变消息。
+		case WM_DEVICECHANGE: //系统设备改变消息。
 		{
-			wchar_t * p_CurAdoInptDvcNameStrPt = NULL;
-			wchar_t * p_CurAdoOtptDvcNameStrPt = NULL;
-			wchar_t * p_CurVdoInptDvcNameStrPt = NULL;
-			long p_TmpInt;
-
-			//获取当前选择的音频输入设备、音频输出设备、视频输入设备。
-			p_TmpInt = SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_GETCURSEL, 0, 0 );
-			if( p_TmpInt != CB_ERR )
+			if( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE ) //如果是有设备添加或删除。
 			{
-				p_CurAdoInptDvcNameStrPt = ( wchar_t * )alloca( ( SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_GETLBTEXTLEN, p_TmpInt, NULL ) + 1 ) * 2 );
-				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_GETLBTEXT, p_TmpInt, ( LPARAM )p_CurAdoInptDvcNameStrPt );
-			}
-			p_TmpInt = SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_GETCURSEL, 0, 0 );
-			if( p_TmpInt != CB_ERR )
-			{
-				p_CurAdoOtptDvcNameStrPt = ( wchar_t * )alloca( ( SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_GETLBTEXTLEN, p_TmpInt, NULL ) + 1 ) * 2 );
-				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_GETLBTEXT, p_TmpInt, ( LPARAM )p_CurAdoOtptDvcNameStrPt );
-			}
-			p_TmpInt = SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_GETCURSEL, 0, 0 );
-			if( p_TmpInt != CB_ERR )
-			{
-				p_CurVdoInptDvcNameStrPt = ( wchar_t * )alloca( ( SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_GETLBTEXTLEN, p_TmpInt, NULL ) + 1 ) * 2 );
-				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_GETLBTEXT, p_TmpInt, ( LPARAM )p_CurVdoInptDvcNameStrPt );
-			}
+				PDEV_BROADCAST_HDR pHdr = ( PDEV_BROADCAST_HDR )lParam;
+				if( ( pHdr != NULL ) && ( pHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE ) )
+				{
+					PDEV_BROADCAST_DEVICEINTERFACE pDevInterface = ( PDEV_BROADCAST_DEVICEINTERFACE )pHdr;
 
-			//刷新音视频设备。
-			RefresAdoVdohDvc();
-
-			//重新选择之前选择的音频输入设备、音频输出设备、视频输入设备。
-			if( p_CurAdoInptDvcNameStrPt != NULL ) SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_CurAdoInptDvcNameStrPt );
-			if( p_CurAdoOtptDvcNameStrPt != NULL ) SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_CurAdoOtptDvcNameStrPt );
-			if( p_CurVdoInptDvcNameStrPt != NULL ) SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_CurVdoInptDvcNameStrPt );
-			
+					if( IsEqualGUID( pDevInterface->dbcc_classguid, KSCATEGORY_CAPTURE ) ) //如果是视频输入设备。
+					{
+						LOGI( Cu8vstr( "接收到视频输入设备改变消息。" ) );
+						PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypVdoInptDvcChg, 0, 0 );
+					}
+				}
+			}
 			return ( INT_PTR )TRUE;
 		}
 		case WM_COMMAND: //命令消息。
@@ -652,14 +666,14 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
 						goto ClntAddOut;
 					}
-					if( ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Tcp" ), &p_CmpRslt ),p_CmpRslt != 0 ) && ( VstrCmp( p_PrtclVstrPt, Cu8vstr( "Audp" ), &p_CmpRslt ),p_CmpRslt != 0 ) )
+					if( ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Tcp" ), , &p_CmpRslt ),p_CmpRslt != 0 ) && ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Audp" ), , &p_CmpRslt ),p_CmpRslt != 0 ) )
 					{
 						g_ErrInfoVstr.Cpy( Cu8vstr( "客户端的服务端Url字符串的协议不正确。" ) );
 						LOGE( g_ErrInfoVstr.m_VstrPt );
 						Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
 						goto ClntAddOut;
 					}
-					if( VstrCmp( p_PortVstrPt, Cu8vstr( "" ), &p_CmpRslt ), p_CmpRslt == 0 )
+					if( VstrCmp( p_PortVstrPt, , , Cu8vstr( "" ), , &p_CmpRslt ), p_CmpRslt == 0 )
 					{
 						VstrCpy( p_PortVstrPt, Cu8vstr( "12345" ), ,  );
 					}
@@ -729,7 +743,11 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							if( g_MyClntMediaPocsThrdPt != NULL )
 							{
 								//设置音频输入使用的设备。
-								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoInptSetUseDvc( 1, SendMessage( GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ), &g_ErrInfoVstr );
+								wchar_t * p_CurAdoInptDvcNameU16strPt = NULL;
+								CbBoxGetCurSelTxt( g_AdoInptDvcCbBoxWndHdl, p_CurAdoInptDvcNameU16strPt ); //获取当前选择的音频输入设备的名称。
+								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoInptSetUseDvc( 0,
+																								 Cu16vstr( p_CurAdoInptDvcNameU16strPt ),
+																								 &g_ErrInfoVstr );
 							}
 							break;
 						}
@@ -745,7 +763,11 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 							if( g_MyClntMediaPocsThrdPt != NULL )
 							{
 								//设置音频输出使用的设备。
-								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoOtptSetUseDvc( 1, SendMessage( GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ), &g_ErrInfoVstr );
+								wchar_t * p_CurAdoOtptDvcNameU16strPt = NULL;
+								CbBoxGetCurSelTxt( g_AdoOtptDvcCbBoxWndHdl, p_CurAdoOtptDvcNameU16strPt ); //获取当前选择的音频输出设备的名称。
+								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoOtptSetUseDvc( 0,
+																								 Cu16vstr( p_CurAdoOtptDvcNameU16strPt ),
+																								 &g_ErrInfoVstr );
 							}
 							break;
 						}
@@ -760,8 +782,12 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 						{
 							if( g_MyClntMediaPocsThrdPt != NULL )
 							{
-								//设置视频输入使用的设备。
-								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->VdoInptSetUseDvc( 1, SendMessage( GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ), CB_GETCURSEL, 0, 0 ), &g_ErrInfoVstr );
+								//设置音频输入使用的设备。
+								wchar_t * p_CurVdoInptDvcNameU16strPt = NULL;
+								CbBoxGetCurSelTxt( g_VdoInptDvcCbBoxWndHdl, p_CurVdoInptDvcNameU16strPt ); //获取当前选择的音频输入设备的名称。
+								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->VdoInptSetUseDvc( 0,
+																								 Cu16vstr( p_CurVdoInptDvcNameU16strPt ),
+																								 &g_ErrInfoVstr );
 							}
 							break;
 						}
@@ -1070,7 +1096,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			{
 				case 
 			}*/
-			return ( INT_PTR )FALSE;
+			break;
 		}
 		case WM_DESTROY: //窗口销毁消息。
 		{
@@ -1414,6 +1440,48 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			}
 			return ( INT_PTR )TRUE;
 		}
+		case MainDlgWndMsgTypAdoInptDvcChg:
+		{
+			Vstr * p_AdoInptDvcNameVstrPt = ( Vstr * )wParam;
+
+			RefreshAdoVdoInptOtptDvc( 1, 0, 0 ); //刷新音频输入设备。
+
+			if( p_AdoInptDvcNameVstrPt != NULL )
+			{
+				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_AdoInptDvcNameVstrPt->m_Pt ); //选择当前使用的音频输入设备。
+
+				VstrDstoy( p_AdoInptDvcNameVstrPt );
+			}
+			return ( INT_PTR )TRUE;
+		}
+		case MainDlgWndMsgTypAdoOtptDvcChg:
+		{
+			Vstr * p_AdoOtptDvcNameVstrPt = ( Vstr * )wParam;
+
+			RefreshAdoVdoInptOtptDvc( 0, 1, 0 ); //刷新音频输出设备。
+
+			if( p_AdoOtptDvcNameVstrPt != NULL )
+			{
+				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_AdoOtptDvcNameVstrPt->m_Pt ); //选择当前使用的音频输出设备。
+
+				VstrDstoy( p_AdoOtptDvcNameVstrPt );
+			}
+			return ( INT_PTR )TRUE;
+		}
+		case MainDlgWndMsgTypVdoInptDvcChg:
+		{
+			Vstr * p_VdoInptDvcNameVstrPt = ( Vstr * )wParam;
+
+			RefreshAdoVdoInptOtptDvc( 0, 0, 1 ); //刷新视频输入设备。
+
+			if( p_VdoInptDvcNameVstrPt != NULL )
+			{
+				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_VdoInptDvcNameVstrPt->m_Pt ); //选择当前使用的视频输入设备。
+
+				VstrDstoy( p_VdoInptDvcNameVstrPt );
+			}
+			return ( INT_PTR )TRUE;
+		}
 	}
 	return ( INT_PTR )FALSE;
 }
@@ -1430,8 +1498,10 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	// TODO: 在此处放置代码。
 	#ifdef __DEBUG__
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF );
-	//_CrtSetBreakAlloc( 227 );
+	//_CrtSetBreakAlloc( 2829 );
 	#endif
+
+	CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
 
 	g_IstnsHdl = hInstance; //设置当前实例的句柄。
 	
@@ -1707,6 +1777,150 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		g_VdoTxtWndBottomMargin = p_MainDlgWndRect.bottom - p_VdoInptPrvwTxtWndRect.bottom; //设置视频文本框窗口的底边距，单位为像素。
 	}
 	
+	//注册音频输入输出设备改变消息。
+	{
+		class MyMMNotificationClient : public IMMNotificationClient
+		{
+		public:
+			IMMDeviceEnumerator * m_AdoDvcEnumPt; //存放音频设备枚举器的指针。
+			ULONG m_RefCnt;
+
+			MyMMNotificationClient( IMMDeviceEnumerator * AdoDvcEnumPt )
+			{
+				m_AdoDvcEnumPt = AdoDvcEnumPt;
+				m_RefCnt = 0;
+				AddRef();
+			}
+
+			~MyMMNotificationClient()
+			{
+
+			}
+			
+			HRESULT STDMETHODCALLTYPE QueryInterface( REFIID riid, _COM_Outptr_ void __RPC_FAR *__RPC_FAR * ppvObject )
+			{
+				if( riid == __uuidof( IUnknown ) || riid == __uuidof( IMMNotificationClient ) )
+				{
+					*ppvObject = ( IMMNotificationClient * )this;
+					AddRef();
+					return S_OK;
+				}
+				else
+				{
+					*ppvObject = NULL;
+					return E_NOINTERFACE;
+				}
+			}
+
+			ULONG STDMETHODCALLTYPE AddRef()
+			{
+				return InterlockedIncrement( &m_RefCnt );
+			}
+
+			ULONG STDMETHODCALLTYPE Release()
+			{
+				ULONG p_RefCnt = InterlockedDecrement( &m_RefCnt );
+				if( 0 == p_RefCnt )
+				{
+					m_AdoDvcEnumPt->UnregisterEndpointNotificationCallback( this );
+					m_AdoDvcEnumPt->Release();
+					delete this;
+				}
+				return p_RefCnt;
+			}
+
+			HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged( EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId ) //默认的音频输入输出设备改变回调。
+			{
+				if( ( flow == eCapture ) && ( role == eConsole ) )
+				{
+					LOGI( Cu8vstr( "接收到默认的音频输入设备改变消息。" ) );
+					PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypAdoInptDvcChg, 0, 0 );
+				}
+				else if( ( flow == eRender ) && ( role == eConsole ) )
+				{
+					LOGI( Cu8vstr( "接收到默认的音频输出设备改变消息。" ) );
+					PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypAdoOtptDvcChg, 0, 0 );
+				}
+				return S_OK;
+			}
+
+			HRESULT STDMETHODCALLTYPE OnDeviceAdded( LPCWSTR pwstrDeviceId ) //音频输入输出设备增加回调。
+			{
+				IMMDevice * p_DvcPt = NULL;
+				IMMEndpoint * p_EndpointPt = NULL;
+				EDataFlow p_DataFlow;
+				HRESULT p_HRslt;
+
+				p_HRslt = m_AdoDvcEnumPt->GetDevice( pwstrDeviceId, &p_DvcPt );
+				if( p_HRslt != S_OK )
+				{
+					goto Out;
+				}
+
+				p_HRslt = p_DvcPt->QueryInterface( __uuidof( IMMEndpoint ), ( void * * )&p_EndpointPt );
+				if( p_HRslt != S_OK )
+				{
+					goto Out;
+				}
+
+				p_HRslt = p_EndpointPt->GetDataFlow( &p_DataFlow );
+				if( p_HRslt != S_OK )
+				{
+					goto Out;
+				}
+
+				if( p_DataFlow == eCapture )
+				{
+					LOGI( Cu8vstr( "接收到音频输入设备改变消息。" ) );
+					PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypAdoInptDvcChg, 0, 0 );
+				}
+				else if( p_DataFlow == eRender )
+				{
+					LOGI( Cu8vstr( "接收到音频输出设备改变消息。" ) );
+					PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypAdoOtptDvcChg, 0, 0 );
+				}
+
+				Out:
+				if( p_EndpointPt != NULL ) p_EndpointPt->Release();
+				if( p_DvcPt != NULL ) p_DvcPt->Release();
+				return S_OK;
+			}
+
+			HRESULT STDMETHODCALLTYPE OnDeviceRemoved( LPCWSTR pwstrDeviceId ) //音频输入输出设备删除回调。
+			{
+				return OnDeviceAdded( pwstrDeviceId );
+			}
+
+			HRESULT STDMETHODCALLTYPE OnDeviceStateChanged( LPCWSTR pwstrDeviceId, DWORD dwNewState ) //音频输入输出设备状态改变回调。
+			{
+				return OnDeviceAdded( pwstrDeviceId );
+			}
+
+			HRESULT STDMETHODCALLTYPE OnPropertyValueChanged( LPCWSTR pwstrDeviceId, const PROPERTYKEY key ) //音频输入输出设备属性改变回调。
+			{
+				return S_OK;
+			}
+		};
+
+		IMMDeviceEnumerator * p_AdoDvcEnumPt = NULL;
+		HRESULT p_HRslt = CoCreateInstance( __uuidof( MMDeviceEnumerator ), NULL, CLSCTX_ALL, __uuidof( IMMDeviceEnumerator ), ( void * * )&p_AdoDvcEnumPt );
+		if( p_HRslt == S_OK )
+		{
+			g_NotificationClntPt = new MyMMNotificationClient( p_AdoDvcEnumPt );
+			p_AdoDvcEnumPt->RegisterEndpointNotificationCallback( g_NotificationClntPt );
+		}
+	}
+	
+	//注册视频输入设备改变消息。
+	{
+		DEV_BROADCAST_DEVICEINTERFACE NotificationFilter;
+		ZeroMemory( &NotificationFilter, sizeof( NotificationFilter ) );
+		NotificationFilter.dbcc_size = sizeof( DEV_BROADCAST_DEVICEINTERFACE );
+		NotificationFilter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+		NotificationFilter.dbcc_classguid = KSCATEGORY_CAPTURE;
+		RegisterDeviceNotification( g_MainDlgWndHdl, &NotificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE );
+	}
+
 	//打印当前进程活动目录的完整绝对路径到日志。
 	FuncGetCurActPath( g_ErrInfoVstr.m_VstrPt, g_ErrInfoVstr.m_VstrPt );
 	g_ErrInfoVstr.Ins( 0, Cu8vstr( "当前进程活动目录的完整绝对路径：" ) );
@@ -1897,7 +2111,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 					StrToInt( p_Argv[ p_Argn ], Utf16, , , , , &p_MainDlgWndWdith, sizeof( p_MainDlgWndWdith ) );
 					p_Argn++;
 					StrToInt( p_Argv[ p_Argn ], Utf16, , , , , &p_MainDlgWndHeight, sizeof( p_MainDlgWndHeight ) );
-					
+
 					SetWindowPos( g_MainDlgWndHdl, NULL, 0, 0, p_MainDlgWndWdith, p_MainDlgWndHeight, SWP_NOZORDER | SWP_NOMOVE ); //设置主对话框窗口的位置。
 					FuncSetWndCenter( g_MainDlgWndHdl, NULL, NULL );
 				}
@@ -2005,12 +2219,15 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		}
 	}
 
+	if( g_NotificationClntPt != NULL ) g_NotificationClntPt->Release(); //销毁音频输入输出设备改变消息客户端。
 	g_VdoInptOtptWndCntnr.Dstoy( NULL ); //视频输入输出窗口容器销毁。
 	LogDstoy(); //销毁日志。
 	g_ErrInfoVstr.Dstoy(); //销毁错误信息动态字符串。
-	
+	CoUninitialize(); //销毁COM库。
+
 	#ifdef __DEBUG__
 	_ASSERTE( _CrtCheckMemory() ); //检查堆和栈是否被破坏。
+	//_CrtDumpMemoryLeaks(); //打印内存泄漏信息到输出窗口。可以不用手动调用，退出时会再自动调用一次。
 	#endif
 	return (int) p_Msg.wParam;
 }

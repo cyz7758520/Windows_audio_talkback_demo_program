@@ -584,19 +584,128 @@ void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt )
 int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	HRESULT p_HRslt;
+	int p_CmpRslt;
+	UINT p_AdoOtptDvcId; //存放音频输出设备的标识符，取值范围为从1到音频输入设备的总数，为0表示使用默认设备。
 
 	//初始化设备。
 	{
-		HRESULT p_HRslt;
-
-		p_HRslt = CoCreateInstance( CLSID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER, IID_IMMDeviceEnumerator, ( void * * )&AdoOtptPt->m_Dvc.m_EnumPt ); //初始化设备枚举器。
-		if( p_HRslt != S_OK )
+		//初始化设备枚举器。要在初始化默认设备改变消息客户端和初始化音频输入设备前执行。
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化设备枚举器失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			p_HRslt = CoCreateInstance( CLSID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER, IID_IMMDeviceEnumerator, ( void * * )&AdoOtptPt->m_Dvc.m_EnumPt );
+			if( p_HRslt != S_OK )
+			{
+				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化设备枚举器失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+				goto Out;
+			}
+		}
+		
+		//初始化默认设备改变消息客户端。
+		if( VstrCmp( AdoOtptPt->m_Dvc.m_NameVstrPt, 0, Cu8vstr( "默认：" )->m_LenChr, Cu8vstr( "默认：" ), 0, &p_CmpRslt ), p_CmpRslt == 0 ) //如果当前使用默认的音频输入设备。
+		{
+			class MyMMNotificationClient : public IMMNotificationClient
+			{
+			public:
+				ULONG m_RefCnt;
+				AdoOtpt * m_AdoOtptPt;
+
+				MyMMNotificationClient( AdoOtpt * AdoOtptPt )
+				{
+					m_AdoOtptPt = AdoOtptPt;
+					m_RefCnt = 0;
+					AddRef();
+				}
+
+				~MyMMNotificationClient()
+				{
+					
+				}
+				
+				HRESULT STDMETHODCALLTYPE QueryInterface( REFIID riid, _COM_Outptr_ void __RPC_FAR *__RPC_FAR * ppvObject )
+				{
+					if( riid == __uuidof( IUnknown ) || riid == __uuidof( IMMNotificationClient ) )
+					{
+						*ppvObject = ( IMMNotificationClient * )this;
+						AddRef();
+						return S_OK;
+					}
+					else
+					{
+						*ppvObject = NULL;
+						return E_NOINTERFACE;
+					}
+				}
+
+				ULONG STDMETHODCALLTYPE AddRef()
+				{
+					return InterlockedIncrement( &m_RefCnt );
+				}
+
+				ULONG STDMETHODCALLTYPE Release()
+				{
+					ULONG p_RefCnt = InterlockedDecrement( &m_RefCnt );
+					if( p_RefCnt == 0 )
+					{
+						delete this;
+					}
+					return p_RefCnt;
+				}
+
+				HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged( EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId ) //默认的音频输入输出设备改变回调。
+				{
+					if( ( flow == eRender ) && ( role == eConsole ) ) //如果默认音频输入设备改变，且当前使用默认的音频输入设备。
+					{
+						if( m_AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：接收到默认音频输出设备改变消息，且当前使用默认的音频输出设备，准备切换到新的设备。" ) );
+						MediaPocsThrd::ThrdMsgAdoOtptDvcClos p_ThrdMsgAdoOtptDvcClos;
+						if( MsgQueueSendMsg( m_AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcClos, &p_ThrdMsgAdoOtptDvcClos, sizeof( p_ThrdMsgAdoOtptDvcClos ), m_AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+						{
+							if( m_AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：发送音频输入设备关闭线程消息失败。原因：%vs" ), m_AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+						}
+					}
+					return S_OK;
+				}
+
+				HRESULT STDMETHODCALLTYPE OnDeviceAdded( LPCWSTR pwstrDeviceId ) //音频输入输出设备增加回调。
+				{
+					return S_OK;
+				}
+
+				HRESULT STDMETHODCALLTYPE OnDeviceRemoved( LPCWSTR pwstrDeviceId ) //音频输入输出设备删除回调。
+				{
+					return S_OK;
+				}
+
+				HRESULT STDMETHODCALLTYPE OnDeviceStateChanged( LPCWSTR pwstrDeviceId, DWORD dwNewState ) //音频输入输出设备状态改变回调。
+				{
+					return S_OK;
+				}
+
+				HRESULT STDMETHODCALLTYPE OnPropertyValueChanged( LPCWSTR pwstrDeviceId, const PROPERTYKEY key ) //音频输入输出设备属性改变回调。
+				{
+					return S_OK;
+				}
+			};
+			AdoOtptPt->m_Dvc.m_NotificationClientPt = new MyMMNotificationClient( AdoOtptPt );
+			AdoOtptPt->m_Dvc.m_EnumPt->RegisterEndpointNotificationCallback( AdoOtptPt->m_Dvc.m_NotificationClientPt );
+		}
+
+		//设置音频输出设备标识符。
+		if( MediaPocsThrdGetAdoOtptDvcId( AdoOtptPt->m_Dvc.m_NameVstrPt, &p_AdoOtptDvcId, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+		{
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取音频输出设备名称[%vs]的标识符失败。原因：%vs" ), AdoOtptPt->m_Dvc.m_NameVstrPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			{
+				MediaPocsThrd::ThrdMsgAdoOtptDvcClos p_ThrdMsgAdoOtptDvcClos;
+				if( MsgQueueSendMsg( AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcClos, &p_ThrdMsgAdoOtptDvcClos, sizeof( p_ThrdMsgAdoOtptDvcClos ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+				{
+					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：发送音频输出设备关闭线程消息失败。原因：%vs" ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+					goto Out;
+				}
+			}
+			p_Rslt = 0; //这里返回成功是为了防止媒体处理线程报错退出。
 			goto Out;
 		}
 
-		if( AdoOtptPt->m_Dvc.m_ID == 0 ) //如果要使用默认的设备。
+		if( p_AdoOtptDvcId == 0 ) //如果要使用默认的设备。
 		{
 			p_HRslt = AdoOtptPt->m_Dvc.m_EnumPt->GetDefaultAudioEndpoint( eRender, eConsole, &AdoOtptPt->m_Dvc.m_Pt ); //初始化设备。
 			if( p_HRslt != S_OK )
@@ -615,7 +724,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 				goto Out;
 			}
 
-			p_HRslt = AdoOtptPt->m_Dvc.m_ClctPt->Item( AdoOtptPt->m_Dvc.m_ID - 1, &AdoOtptPt->m_Dvc.m_Pt ); //初始化设备。
+			p_HRslt = AdoOtptPt->m_Dvc.m_ClctPt->Item( p_AdoOtptDvcId - 1, &AdoOtptPt->m_Dvc.m_Pt ); //初始化设备。
 			if( p_HRslt != S_OK )
 			{
 				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
@@ -696,8 +805,18 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 
 		if( SpeexResamplerInit( &AdoOtptPt->m_Dvc.m_PcmBufFrmSpeexResamplerPt, AdoOtptPt->m_SmplRate, AdoOtptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec, 3, NULL ) != 0 )
 		{
-			LOGE( Cu8vstr( "媒体处理线程：音频输出：初始化Pcm格式缓冲区帧Speex重采样器失败。" ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "媒体处理线程：音频输出：初始化Pcm格式缓冲区帧Speex重采样器失败。" ) );
 			goto Out;
+		}
+		
+		//发送音频输出设备改变线程消息。
+		{
+			MediaPocsThrd::ThrdMsgAdoOtptDvcChg p_ThrdMsgAdoOtptDvcChg;
+			if( MsgQueueSendMsg( AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcChg, &p_ThrdMsgAdoOtptDvcChg, sizeof( p_ThrdMsgAdoOtptDvcChg ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+			{
+				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：发送音频输出设备改变线程消息失败。原因：%vs" ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+				goto Out;
+			}
 		}
 
 		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化设备成功。采样频率：%z32d, 声道数：%z16d，缓冲区大小：%uz32d。" ), AdoOtptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec, AdoOtptPt->m_Dvc.m_WaveFmtExPt->nChannels, AdoOtptPt->m_Dvc.m_BufSzUnit );
@@ -907,12 +1026,17 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 			AdoOtptPt->m_Dvc.m_ClctPt->Release();
 			AdoOtptPt->m_Dvc.m_ClctPt = NULL;
 		}
+		if( AdoOtptPt->m_Dvc.m_NotificationClientPt != NULL ) //销毁默认设备改变消息客户端。
+		{
+			AdoOtptPt->m_Dvc.m_EnumPt->UnregisterEndpointNotificationCallback( AdoOtptPt->m_Dvc.m_NotificationClientPt );
+			AdoOtptPt->m_Dvc.m_NotificationClientPt->Release();
+			AdoOtptPt->m_Dvc.m_NotificationClientPt = NULL;
+		}
 		if( AdoOtptPt->m_Dvc.m_EnumPt != NULL ) //销毁设备枚举器。
 		{
 			AdoOtptPt->m_Dvc.m_EnumPt->Release();
 			AdoOtptPt->m_Dvc.m_EnumPt = NULL;
 		}
-		AdoOtptPt->m_Dvc.m_IsClos = 0;
 		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁设备成功。" ) );
 	}
 }
@@ -1009,7 +1133,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 	size_t p_TmpSz;
 	HRESULT p_HRslt;
 
-	CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
+	CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
 
 	/*FILE * AdoOtptFile1Pt = NULL;
 	FILE * AdoOtptFile2Pt = NULL;
@@ -1049,11 +1173,15 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 				{
 					if( p_HRslt == AUDCLNT_E_DEVICE_INVALIDATED ) //如果设备已经关闭。
 					{
-						if( AdoOtptPt->m_Dvc.m_IsClos == 0 )
+						if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：接收设备关闭消息。" ) );
 						{
-							AdoOtptPt->m_Dvc.m_IsClos = 1; //设置设备已经关闭。
-							if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：接收设备关闭消息。" ) );
+							MediaPocsThrd::ThrdMsgAdoOtptDvcClos p_ThrdMsgAdoOtptDvcClos;
+							if( MsgQueueSendMsg( AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcClos, &p_ThrdMsgAdoOtptDvcClos, sizeof( p_ThrdMsgAdoOtptDvcClos ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+							{
+								if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：发送音频输出设备关闭线程消息失败。原因：%vs" ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+							}
 						}
+						break; //这里要退出线程，防止多次发送线程消息。
 					}
 					else if( p_HRslt == AUDCLNT_E_BUFFER_ERROR )
 					{

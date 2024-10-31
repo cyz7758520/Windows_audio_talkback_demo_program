@@ -372,6 +372,8 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 	//初始化设备。
 	{
 		int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+		UINT p_VdoInptDvcId; //存放视频输入设备的标识符，取值范围为从0到视频输入设备的总数减一。
+
 		ICreateDevEnum * p_CreateDevEnumPt = NULL;
 		IEnumMoniker * p_EnumMonikerPt = NULL;
 		IMoniker * p_MonikerPt = NULL;
@@ -396,6 +398,22 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		AM_MEDIA_TYPE p_TmpAmMediaType = { 0 };
 
 		int p_TmpInt;
+		
+		//设置视频输入设备标识符。
+		if( MediaPocsThrdGetVdoInptDvcId( VdoInptPt->m_Dvc.m_NameVstrPt, &p_VdoInptDvcId, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+		{
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：获取视频输入设备名称[%vs]的标识符失败。原因：%vs" ), VdoInptPt->m_Dvc.m_NameVstrPt, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			{
+				MediaPocsThrd::ThrdMsgVdoInptDvcClos p_ThrdMsgVdoInptDvcClos;
+				if( MsgQueueSendMsg( VdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypVdoInptDvcClos, &p_ThrdMsgVdoInptDvcClos, sizeof( p_ThrdMsgVdoInptDvcClos ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+				{
+					if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：发送视频输入设备关闭线程消息失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+					goto OutInitVdoInptDvc;
+				}
+			}
+			p_Rslt = 0; //这里返回成功是为了防止媒体处理线程报错退出。
+			goto OutInitVdoInptDvc;
+		}
 
 		//创建过滤器图管理器。
 		if( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, ( void * * )&VdoInptPt->m_Dvc.m_FilterGraphManagerPt ) != S_OK )
@@ -430,7 +448,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		{
 			for( p_TmpInt = 0; p_EnumMonikerPt->Next( 1, &p_MonikerPt, NULL ) == S_OK; p_TmpInt++ )
 			{
-				if( p_TmpInt == VdoInptPt->m_Dvc.m_ID )
+				if( p_TmpInt == p_VdoInptDvcId )
 				{
 					if( p_MonikerPt->BindToObject( NULL, NULL, IID_IBaseFilter, ( void * * )&p_DvcFilterPt ) == S_OK )
 					{
@@ -788,7 +806,17 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：设置过滤器图管理器开始运行失败。" ) );
 			goto OutInitVdoInptDvc;
 		}
-
+		
+		//发送视频输入设备改变线程消息。
+		{
+			MediaPocsThrd::ThrdMsgVdoInptDvcChg p_ThrdMsgVdoInptDvcChg;
+			if( MsgQueueSendMsg( VdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypVdoInptDvcChg, &p_ThrdMsgVdoInptDvcChg, sizeof( p_ThrdMsgVdoInptDvcChg ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+			{
+				if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：发送视频输入设备改变线程消息失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+				goto Out;
+			}
+		}
+		
 		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化设备成功。" ) );
 
 		p_Rslt = 0; //设置本函数执行成功。

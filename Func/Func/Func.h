@@ -49,9 +49,6 @@
 #include <pdhmsg.h>							//PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
 #include <Ws2tcpip.h>						//Windows套接字相关
 #include <conio.h>							//getch、getche
-#include <Dshow.h>							//waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
-#include <mmsystem.h>						//MMRESULT
-#include <mmdeviceapi.h>					//IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、PROPVARIANT、
 #include <endpointvolume.h>
 #include <Propkey.h>
 #include <wmcodecdsp.h>						//CLSID_CWMAudioAEC
@@ -67,6 +64,12 @@
 #include <sys/stat.h>						//struct stat、fstat、_stat64、_wstat64
 #include <sys/types.h>						//ino_t、dev_t、off_t
 #include <fcntl.h>							//O_RDONLY、O_WRONLY、O_Rd_Wr、O_APPEND、O_CREAT、O_TRUNC、O_EXCL、O_TEXT、O_BINARY、O_RAW、O_TEMPORARY、O_NOINHERIT、O_SEQUENTIAL、O_RANDOM
+#include <dbt.h>							//DEV_BROADCAST_DEVICEINTERFACE
+#include <Dshow.h>							//waveInGetNumDevs、waveInGetDevCaps、waveInOpen、waveInPrepareHeader、waveInAddBuffer、waveInStart、waveInUnprepareHeader、waveInReset、waveInClose、WIM_OPEN、WIM_DATA、WIM_CLOSE、waveOutGetNumDevs、waveOutGetDevCaps、waveOutOpen、waveOutPrepareHeader、waveOutAddBuffer、waveOutStart、waveOutUnprepareHeader、waveOutReset、waveOutClose、WOM_OPEN、WOM_DATA、WOM_CLOSE
+#include <mmsystem.h>						//MMRESULT
+#include <initguid.h>						//必须放在mmdeviceapi.h前面，其他的后面。
+#include <mmdeviceapi.h>					//IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、IMMNotificationClient、PROPVARIANT、
+
 
 #undef StrCpy
 #undef StrTrim

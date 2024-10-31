@@ -3,8 +3,6 @@
 #include "WndAdoVdoTkbkDemo.h"
 #include "WndAdoVdoTkbkStng.h"
 
-void RefresAdoVdohDvc(); //刷新音视频设备。
-
 //保存设置到Xml文件。
 void SaveStngToXmlFile()
 {
@@ -374,6 +372,12 @@ void SaveStngToXmlFile()
 		GetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "WrBufSzByt" );
+		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		GetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileMaxStrmNumEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_Pt, p_U16TxtVstrPt->m_SzChr );
+		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "MaxStrmNum" );
 		p_TmpXMLElement2Pt->SetText( ( const char * )p_U8TxtVstrPt->m_Pt );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
@@ -1468,6 +1472,11 @@ void ReadStngFromXmlFile()
 							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
 						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "MaxStrmNum" ) == 0 )
+						{
+							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
+							SetDlgItemText( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileMaxStrmNumEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_Pt );
+						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsSaveAdoInpt" ) == 0 )
 						{
 							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
@@ -2193,7 +2202,7 @@ void ResetStng()
 	CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_UNCHECKED );
 	
 	//设置音频输入设备、音频输出设备。
-	RefresAdoVdohDvc();
+	RefreshAdoVdoInptOtptDvc( 1, 1, 1 );
 
 	//设置是否绘制音频波形到窗口。
 	CheckDlgButton( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
@@ -2228,6 +2237,7 @@ void ResetStng()
 		//设置保存音视频输入输出到Avi文件。
 		SetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileFullPathEdTxtId ), L"AdoVdoInptOtpt.avi" );
 		SetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId ), L"8192" );
+		SetWindowText( GetDlgItem( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileMaxStrmNumEdTxtId ), L"10" );
 		CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId, BST_CHECKED );
 		CheckDlgButton( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId, BST_CHECKED );

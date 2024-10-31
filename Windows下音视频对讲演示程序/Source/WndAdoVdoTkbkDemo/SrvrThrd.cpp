@@ -312,10 +312,6 @@ typedef struct
 typedef struct
 {
 } ThrdMsgRqirExit;
-typedef struct
-{
-	uint8_t m_MsgArgArr[ sizeof( ThrdMsgSrvrInit ) ];
-} ThrdMsg;
 
 //设置是否打印Log日志、显示Toast。
 int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt )
@@ -1266,11 +1262,11 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 										if( ( ( p_CnctInfoTmp2Pt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmp2Pt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 											( ( p_CnctInfoTmp2Pt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmp2Pt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 										{
-											LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送对讲模式包成功。对讲索引：%uz8d。对讲模式：%z8s。总长度：%uzd。" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], g_TkbkModeU8strArrPt[ p_CnctInfoTmpPt->m_RmtTkbkMode ], p_PktLenByt );
+											if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送对讲模式包成功。对讲索引：%uz8d。对讲模式：%z8s。总长度：%uzd。" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], g_TkbkModeU8strArrPt[ p_CnctInfoTmpPt->m_RmtTkbkMode ], p_PktLenByt );
 										}
 										else
 										{
-											LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送对讲模式包失败。对讲索引：%uz8d。对讲模式：%z8s。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], g_TkbkModeU8strArrPt[ p_CnctInfoTmpPt->m_RmtTkbkMode ], p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
+											if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送对讲模式包失败。对讲索引：%uz8d。对讲模式：%z8s。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], g_TkbkModeU8strArrPt[ p_CnctInfoTmpPt->m_RmtTkbkMode ], p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 								}
@@ -1311,11 +1307,11 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 										if( ( ( p_CnctInfoTmp2Pt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmp2Pt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 											( ( p_CnctInfoTmp2Pt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmp2Pt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 										{
-											LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送音频输出帧包成功。对讲索引：%uz8d。音频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt );
+											if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送音频输出帧包成功。对讲索引：%uz8d。音频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt );
 										}
 										else
 										{
-											LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送音频输出帧包失败。对讲索引：%uz8d。音频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
+											if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送音频输出帧包失败。对讲索引：%uz8d。音频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 								}
@@ -1360,11 +1356,11 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 										if( ( ( p_CnctInfoTmp2Pt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmp2Pt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 											( ( p_CnctInfoTmp2Pt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmp2Pt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 										{
-											LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送视频输出帧包成功。对讲索引：%uz8d。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt );
+											if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送视频输出帧包成功。对讲索引：%uz8d。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt );
 										}
 										else
 										{
-											LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送视频输出帧包失败。对讲索引：%uz8d。视频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
+											if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送视频输出帧包失败。对讲索引：%uz8d。视频输出帧时间戳：%uz32d。总长度：%uzd。原因：%vs" ), p_CnctInfoTmp2Pt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], p_TmpUint32, p_PktLenByt, SrvrThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 								}
@@ -1393,11 +1389,11 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 							if( ( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmpPt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 								( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmpPt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 							{
-								LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟应答包成功。对讲索引：%uz8d。总长度：2。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟应答包成功。对讲索引：%uz8d。总长度：2。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
 							}
 							else
 							{
-								LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟应答包失败。对讲索引：%uz8d。总长度：2。原因：%vs" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], SrvrThrdPt->m_ErrInfoVstrPt );
+								if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟应答包失败。对讲索引：%uz8d。总长度：2。原因：%vs" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], SrvrThrdPt->m_ErrInfoVstrPt );
 							}
 						}
 						else if( SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == SrvrThrd::PktTypTstNtwkDlyRply ) //如果是测试网络延迟应答包。
@@ -1472,14 +1468,14 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 					if( ( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) && ( TcpClntSendApkt( p_CnctInfoTmpPt->m_TcpClntSoktPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 0, 1, 0, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) ||
 						( ( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 1 ) && ( AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_CnctInfoTmpPt->m_AudpClntCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) ) )
 					{
-						LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟包成功。对讲索引：%uz8d。总长度：2。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+						if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟包成功。对讲索引：%uz8d。总长度：2。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
 						
 						p_CnctInfoTmpPt->m_TstNtwkDly.m_LastSendTickMsec = p_CurTickMsec; //设置测试网络延迟包最后发送的嘀嗒钟。
 						p_CnctInfoTmpPt->m_TstNtwkDly.m_IsRecvRplyPkt = 0; //设置未接收测试网络延迟应答包。
 					}
 					else
 					{
-						LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟包失败。对讲索引：%uz8d。总长度：2。原因：%vs" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], SrvrThrdPt->m_ErrInfoVstrPt );
+						if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接%uzd：发送测试网络延迟包失败。对讲索引：%uz8d。总长度：2。原因：%vs" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ], SrvrThrdPt->m_ErrInfoVstrPt );
 					}
 				}
 			}
@@ -1642,7 +1638,7 @@ DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt )
 
 		SrvrThrdCnctPocs( SrvrThrdPt ); //连接处理。
 
-		//if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接处理全部完毕，耗时 %uz64d 毫秒。" ), FuncGetTickAsMsec() - p_LastTickMsec );
+		if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接处理全部完毕，耗时 %uz64d 毫秒。" ), FuncGetTickAsMsec() - p_LastTickMsec );
 
 		FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
 	} //媒体处理循环结束。

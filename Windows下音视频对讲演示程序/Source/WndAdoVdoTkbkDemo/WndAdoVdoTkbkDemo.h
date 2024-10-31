@@ -31,6 +31,10 @@ typedef enum MainDlgWndMsgTyp //主对话框窗口消息。
 	MainDlgWndMsgTypVdoInptOtptWndInit, //视频输入输出窗口初始化。
 	MainDlgWndMsgTypVdoInptOtptWndDstoy, //视频输入输出窗口销毁。
 	MainDlgWndMsgTypVdoInptOtptWndSetTitle, //视频输入输出窗口设置标题。
+
+	MainDlgWndMsgTypAdoInptDvcChg, //音频输入设备改变。
+	MainDlgWndMsgTypAdoOtptDvcChg, //音频输出设备改变。
+	MainDlgWndMsgTypVdoInptDvcChg, //视频输入设备改变。
 } MainDlgWndMsgTyp;
 typedef struct MainDlgWndMsgCnctLstAddItem
 {
@@ -73,9 +77,11 @@ typedef struct MainDlgWndMsgVdoInptOtptWndSetTitle
 	Vstr * m_TitleVstrPt;
 } MainDlgWndMsgVdoInptOtptWndSetTitle;
 
-HWND SendVdoInptOtptWndInitMsg( Vstr * TitleStrPt );
+void RefreshAdoVdoInptOtptDvc( int IsRefresAdoInptDvc, int IsRefresAdoOtptDvc, int IsRefresVdoInptDvc );
+
+HWND SendVdoInptOtptWndInitMsg( Vstr * TitleVstrPt );
 void SendVdoInptOtptWndDstoyMsg( HWND DspyTxtWndHdl );
-void SendVdoInptOtptWndSetTitleMsg( HWND DspyTxtWndHdl, Vstr * TitleStrPt );
+void SendVdoInptOtptWndSetTitleMsg( HWND DspyTxtWndHdl, Vstr * TitleVstrPt );
 
 //全局变量。
 extern HINSTANCE g_IstnsHdl; //存放当前实例的句柄。
@@ -120,3 +126,14 @@ extern HWND g_SpeexPrpocsStngDlgWndHdl; //存放Speex预处理器的设置对话
 extern HWND g_SpeexCodecStngDlgWndHdl; //存放Speex编解码器设置对话框窗口的句柄。
 extern HWND g_SaveAdoInptOtptToWaveFileStngDlgWndHdl; //存放保存音频输入输出到Wave文件设置对话框窗口的句柄。
 extern HWND g_OpenH264CodecStngDlgWndHdl; //存放OpenH264编解码器设置对话框窗口的句柄。
+
+#define CbBoxGetCurSelTxt( CbBoxWndHdl, TxtU16strPt ) \
+{ \
+	long p_CurSelIdx; \
+	p_CurSelIdx = SendMessage( CbBoxWndHdl, CB_GETCURSEL, 0, 0 ); \
+	if( p_CurSelIdx != CB_ERR ) \
+	{ \
+		TxtU16strPt = ( wchar_t * )alloca( ( SendMessage( CbBoxWndHdl, CB_GETLBTEXTLEN, p_CurSelIdx, NULL ) + 1 ) * 2 ); \
+		SendMessage( CbBoxWndHdl, CB_GETLBTEXT, p_CurSelIdx, ( LPARAM )TxtU16strPt ); \
+	} \
+}

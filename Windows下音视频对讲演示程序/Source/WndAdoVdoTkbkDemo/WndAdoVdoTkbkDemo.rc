@@ -55,7 +55,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2024年09月18日",IDC_STATIC,7,7,325,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2024年10月31日",IDC_STATIC,7,7,325,16
     LTEXT           "服务端：",IDC_STATIC,7,26,33,8
     COMBOBOX        SrvrUrlCbBoxId,39,24,236,273,CBS_DROPDOWN | WS_TABSTOP
     DEFPUSHBUTTON   "创建",SrvrCreateOrDstoyBtnId,276,23,28,14
@@ -99,8 +99,8 @@ BEGIN
     CTEXT           "音频输入原始波形",AdoInptSrcWavfmTxtId,63,287,268,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
     LTEXT           "音频输入\n结果波形：",IDC_STATIC,18,308,40,16
     CTEXT           "音频输入结果波形",AdoInptRsltWavfmTxtId,63,306,268,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
-    LTEXT           "音频输出\n原始波形：",IDC_STATIC,18,328,40,16
-    CTEXT           "音频输出原始波形",AdoOtptSrcWavfmTxtId,63,326,268,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
+    LTEXT           "音频输出\n原始波形：",IDC_STATIC,18,327,40,16
+    CTEXT           "音频输出原始波形",AdoOtptSrcWavfmTxtId,63,325,268,21,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_STATICEDGE
     LTEXT           "日志：",IDC_STATIC,7,349,25,8
     PUSHBUTTON      "清空日志",ClearLogBtnId,283,346,50,14
     LISTBOX         LogLstBoxId,7,359,325,71,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
@@ -272,7 +272,7 @@ BEGIN
     DEFPUSHBUTTON   "确定",SaveStsToTxtFileStngOkBtnId,7,50,295,14
 END
 
-SaveAdoVdoInptOtptToAviFileStngDlgId DIALOGEX 0, 0, 309, 146
+SaveAdoVdoInptOtptToAviFileStngDlgId DIALOGEX 0, 0, 309, 159
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -283,14 +283,16 @@ BEGIN
     LTEXT           "写入缓冲区大小，单位为字节：",IDC_STATIC,7,50,213,9
     EDITTEXT        SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId,231,48,71,14,ES_AUTOHSCROLL
     CONTROL         "保存音频输入",SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,67,295,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,83,295,10
     CONTROL         "保存音频输出",SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,81,295,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,97,295,10
     CONTROL         "保存视频输入",SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,96,295,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,112,295,10
     CONTROL         "保存视频输出",SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,110,295,10
-    DEFPUSHBUTTON   "确定",SaveAdoVdoInptOtptToAviFileStngOkBtnId,7,125,295,14
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,126,295,10
+    DEFPUSHBUTTON   "确定",SaveAdoVdoInptOtptToAviFileStngOkBtnId,7,138,295,14
+    LTEXT           "最大流数量，取值区间为[1,100]：",IDC_STATIC,7,67,213,9
+    EDITTEXT        SaveAdoVdoInptOtptToAviFileMaxStrmNumEdTxtId,231,65,71,14,ES_AUTOHSCROLL
 END
 
 SpeexAecStngDlgId DIALOGEX 0, 0, 309, 185
@@ -599,7 +601,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302
         TOPMARGIN, 7
-        BOTTOMMARGIN, 139
+        BOTTOMMARGIN, 152
     END
 
     SpeexAecStngDlgId, DIALOG

@@ -55,7 +55,9 @@ __FUNC_DLLAPI__ int VstrSetSz( Vstr * VstrPt, size_t VstrSzChr );
 __FUNC_DLLAPI__ int VstrGetSz( Vstr * VstrPt, size_t * VstrSzChrPt );
 
 
-__FUNC_DLLAPI__ int VstrCmp( const Vstr * VstrPt, const Vstr * CmpVstrPt, int * CmpRsltPt );
+__FUNC_DLLAPI__ int _VstrCmp( const Vstr * VstrPt, size_t PosChr, size_t MaxCmpLenChr, const Vstr * CmpVstrPt, size_t CmpPosChr, int * CmpRsltPt );
+#define VstrCmp( VstrPt, PosChr, MaxCmpLenChr, CmpVstrPt, CmpPosChr, CmpRsltPt ) \
+       _VstrCmp( VstrPt, DEFARG( size_t, PosChr, 0 ), DEFARG( size_t, MaxCmpLenChr, SIZE_MAX ), CmpVstrPt, DEFARG( size_t, CmpPosChr, 0 ), CmpRsltPt ) 
 
 
 __FUNC_DLLAPI__ int VstrFindChr( const Vstr * VstrPt, size_t PosChr, const Vstr * FindChrVstrPt, size_t * FindPosChrPt );
@@ -102,7 +104,7 @@ public:
 	int SetSz( size_t VstrSzChr ) { return VstrSetSz( m_VstrPt, VstrSzChr ); }
 	int GetSz( size_t * VstrSzChrPt ) { return VstrGetSz( m_VstrPt, VstrSzChrPt ); }
 
-	int Cmp( const Vstr * CmpVstrPt, int * CmpRsltPt ) { return VstrCmp( m_VstrPt, CmpVstrPt, CmpRsltPt ); }
+	int Cmp( size_t PosChr, size_t MaxCmpLenChr, const Vstr * CmpVstrPt, size_t CmpPosChr, int * CmpRsltPt ) { return VstrCmp( m_VstrPt, PosChr, MaxCmpLenChr, CmpVstrPt, CmpPosChr, CmpRsltPt ); }
 
 	int FindChr( size_t PosChr, const Vstr * FindChrVstrPt, size_t * FindPosChrPt ) { return VstrFindChr( m_VstrPt, PosChr, FindChrVstrPt, FindPosChrPt ); }
 	int IsBelongChr( size_t PosChr, const Vstr * FindChrVstrPt, int IsBelong, size_t * LenChrPt ) { return VstrIsBelongChr( m_VstrPt, PosChr, FindChrVstrPt, IsBelong, LenChrPt ); }
