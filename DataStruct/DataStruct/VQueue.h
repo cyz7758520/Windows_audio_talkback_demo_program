@@ -39,31 +39,31 @@ __DATASTRUCT_DLLAPI__ int VQueueGetSz( VQueue * VQueuePt, size_t * SzBytPt, int3
 class VQueueCls
 {
 public:
-	VQueue * m_VQueuePt;
+	VQueue * m_Pt;
 
-	VQueueCls() { m_VQueuePt = NULL; }
+	VQueueCls() { m_Pt = NULL; }
 	~VQueueCls() { Dstoy( NULL ); }
 
-	int Init( size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return VQueueInit( &m_VQueuePt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VQueueDstoy( m_VQueuePt, ErrInfoVstrPt ); m_VQueuePt = NULL; return p_Rslt; }
+	int Init( size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return VQueueInit( &m_Pt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VQueueDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 	
-	int Locked( Vstr * ErrInfoVstrPt ) { return VQueueLocked( m_VQueuePt, ErrInfoVstrPt ); }
-	int Unlock( Vstr * ErrInfoVstrPt ) { return VQueueUnlock( m_VQueuePt, ErrInfoVstrPt ); }
+	int Locked( Vstr * ErrInfoVstrPt ) { return VQueueLocked( m_Pt, ErrInfoVstrPt ); }
+	int Unlock( Vstr * ErrInfoVstrPt ) { return VQueueUnlock( m_Pt, ErrInfoVstrPt ); }
 
-	int PutHead( const void * NewHeadElmDataPt, size_t NewHeadElmDataLenByt, void * * NewHeadElmDataPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueuePutHead( m_VQueuePt, NewHeadElmDataPt, NewHeadElmDataLenByt, NewHeadElmDataPtPt, IsAutoLock, ErrInfoVstrPt ); }
-	int PutTail( const void * NewTailElmDataPt, size_t NewTailElmDataLenByt, void * * NewTailElmDataPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueuePutTail( m_VQueuePt, NewTailElmDataPt, NewTailElmDataLenByt, NewTailElmDataPtPt, IsAutoLock, ErrInfoVstrPt ); }
+	int PutHead( const void * NewHeadElmDataPt, size_t NewHeadElmDataLenByt, void * * NewHeadElmDataPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueuePutHead( m_Pt, NewHeadElmDataPt, NewHeadElmDataLenByt, NewHeadElmDataPtPt, IsAutoLock, ErrInfoVstrPt ); }
+	int PutTail( const void * NewTailElmDataPt, size_t NewTailElmDataLenByt, void * * NewTailElmDataPtPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueuePutTail( m_Pt, NewTailElmDataPt, NewTailElmDataLenByt, NewTailElmDataPtPt, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int GetHead( void * HeadElmDataPt, size_t HeadElmDataSzByt, void * * HeadElmDataPtPt, size_t * HeadElmDataLenBytPt, int32_t IsDelHeadElm, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetHead( m_VQueuePt, HeadElmDataPt, HeadElmDataSzByt, HeadElmDataPtPt, HeadElmDataLenBytPt, IsDelHeadElm, IsAutoLock, ErrInfoVstrPt ); }
-	int GetTail( void * TailElmDataPt, size_t TailElmDataSzByt, void * * TailElmDataPtPt, size_t * TailElmDataLenBytPt, int32_t IsDelTailElm, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetTail( m_VQueuePt, TailElmDataPt, TailElmDataSzByt, TailElmDataPtPt, TailElmDataLenBytPt, IsDelTailElm, IsAutoLock, ErrInfoVstrPt ); }
-	int GetByNum( size_t SpecElmNum, void * SpecElmDataPt, size_t SpecElmDataSzByt, void * * SpecElmDataPtPt, size_t * SpecElmDataLenBytPt, int32_t IsDelSpecElm, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetByNum( m_VQueuePt, SpecElmNum, SpecElmDataPt, SpecElmDataSzByt, SpecElmDataPtPt, SpecElmDataLenBytPt, IsDelSpecElm, IsAutoLock, ErrInfoVstrPt ); }
+	int GetHead( void * HeadElmDataPt, size_t HeadElmDataSzByt, void * * HeadElmDataPtPt, size_t * HeadElmDataLenBytPt, int32_t IsDelHeadElm, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetHead( m_Pt, HeadElmDataPt, HeadElmDataSzByt, HeadElmDataPtPt, HeadElmDataLenBytPt, IsDelHeadElm, IsAutoLock, ErrInfoVstrPt ); }
+	int GetTail( void * TailElmDataPt, size_t TailElmDataSzByt, void * * TailElmDataPtPt, size_t * TailElmDataLenBytPt, int32_t IsDelTailElm, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetTail( m_Pt, TailElmDataPt, TailElmDataSzByt, TailElmDataPtPt, TailElmDataLenBytPt, IsDelTailElm, IsAutoLock, ErrInfoVstrPt ); }
+	int GetByNum( size_t SpecElmNum, void * SpecElmDataPt, size_t SpecElmDataSzByt, void * * SpecElmDataPtPt, size_t * SpecElmDataLenBytPt, int32_t IsDelSpecElm, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetByNum( m_Pt, SpecElmNum, SpecElmDataPt, SpecElmDataSzByt, SpecElmDataPtPt, SpecElmDataLenBytPt, IsDelSpecElm, IsAutoLock, ErrInfoVstrPt ); }
 
-	int DelHead( void * * NewHeadElmDataPtPt, size_t * NewHeadElmDataLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelHead( m_VQueuePt, NewHeadElmDataPtPt, NewHeadElmDataLenBytPt, IsAutoLock, ErrInfoVstrPt ); }
-	int DelTail( void * * NewTailElmDataPtPt, size_t * NewTailElmDataLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelTail( m_VQueuePt, NewTailElmDataPtPt, NewTailElmDataLenBytPt, IsAutoLock, ErrInfoVstrPt ); }
-	int DelByNum( size_t SpecElmNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelByNum( m_VQueuePt, SpecElmNum, IsAutoLock, ErrInfoVstrPt ); }
-	int DelAll( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelAll( m_VQueuePt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelHead( void * * NewHeadElmDataPtPt, size_t * NewHeadElmDataLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelHead( m_Pt, NewHeadElmDataPtPt, NewHeadElmDataLenBytPt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelTail( void * * NewTailElmDataPtPt, size_t * NewTailElmDataLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelTail( m_Pt, NewTailElmDataPtPt, NewTailElmDataLenBytPt, IsAutoLock, ErrInfoVstrPt ); }
+	int DelByNum( size_t SpecElmNum, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelByNum( m_Pt, SpecElmNum, IsAutoLock, ErrInfoVstrPt ); }
+	int DelAll( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueDelAll( m_Pt, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetTotal( m_VQueuePt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
-	int SetSz( size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueSetSz( m_VQueuePt, SzByt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetSz( size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetSz( m_VQueuePt, SzBytPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetTotal( size_t * ElmTotalPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetTotal( m_Pt, ElmTotalPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetSz( size_t SzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueSetSz( m_Pt, SzByt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetSz( size_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VQueueGetSz( m_Pt, SzBytPt, IsAutoLock, ErrInfoVstrPt ); }
 };
 #endif

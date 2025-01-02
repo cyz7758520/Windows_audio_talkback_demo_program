@@ -3,15 +3,60 @@
 #include "Func.h"
 #include "DataStruct.h"
 #include "Sokt.h"
+#include "WndAdoVdoTkbk.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-//服务端线程。
-typedef struct SrvrThrd
+typedef struct SrvrThrd //服务端线程。
 {
+	typedef enum ThrdMsgTyp //线程消息。
+	{
+		ThrdMsgTypSetIsUsePrvntSysSleep,
+		ThrdMsgTypSetIsTstNtwkDly,
+
+		ThrdMsgTypSrvrInit,
+		ThrdMsgTypSrvrDstoy,
+
+		ThrdMsgTypCnctDstoy,
+
+		ThrdMsgTypRqirExit,
+
+		ThrdMsgTypUserMsgMinVal = 100, //用户消息的最小值。
+	} ThrdMsgTyp;
+	typedef struct
+	{
+		int32_t m_IsUsePrvntSysSleep;
+	} ThrdMsgSetIsUsePrvntSysSleep;
+	typedef struct
+	{
+		int32_t m_IsTcpOrAudpPrtcl;
+		Vstr * m_LclNodeNameVstrPt;
+		Vstr * m_LclNodeSrvcVstrPt;
+		int32_t m_MaxCnctNum;
+		int32_t m_IsAutoRqirExit;
+	} ThrdMsgSrvrInit;
+	typedef struct
+	{
+	} ThrdMsgSrvrDstoy;
+	typedef struct
+	{
+		int32_t m_CnctNum;
+	} ThrdMsgCnctDstoy;
+	typedef struct
+	{
+		int32_t m_IsTstNtwkDly;
+		uint64_t m_SendIntvlMsec;
+	} ThrdMsgSetIsTstNtwkDly;
+	typedef struct
+	{
+	} ThrdMsgRqirExit;
+	typedef struct
+	{
+		uint8_t m_UserMsgArr[];
+	} ThrdMsgUserMsg;
 	MsgQueue * m_ThrdMsgQueuePt; //存放线程消息队列的指针。
 	
 	typedef enum PktTyp //数据包类型。
@@ -46,7 +91,7 @@ typedef struct SrvrThrd
 		CnctStsDsct, //已断开。
 	} CnctSts;
 	
-    int32_t m_IsRqirExit; //存放是否请求退出，为0表示未请求退出，为1表示已请求退出。
+	int32_t m_IsRqirExit; //存放是否请求退出，为0表示未请求退出，为1表示已请求退出。
 	
 	const void * m_LicnCodePt; //存放授权码的指针。
 
@@ -62,16 +107,16 @@ typedef struct SrvrThrd
 		uint64_t m_SendIntvlMsec; //存放发送间隔，单位为毫秒。
 	} m_TstNtwkDly;
 
-    int32_t m_SrvrIsInit; //存放服务端是否初始化，为0表示未初始化，为1表示已初始化。
-    TcpSrvrSokt * m_TcpSrvrSoktPt; //存放本端Tcp协议服务端套接字的指针。
-    AudpSokt * m_AudpSrvrSoktPt; //存放本端高级Udp协议服务端套接字的指针。
-    int32_t m_IsAutoRqirExit; //存放是否自动请求退出，为0表示手动，为1表示在所有连接销毁时自动请求退出，为2表示在所有连接和服务端都销毁时自动请求退出。
-	
+	int32_t m_SrvrIsInit; //存放服务端是否初始化，为0表示未初始化，为1表示已初始化。
+	TcpSrvrSokt * m_TcpSrvrSoktPt; //存放本端Tcp协议服务端套接字的指针。
+	AudpSokt * m_AudpSrvrSoktPt; //存放本端高级Udp协议服务端套接字的指针。
+	int32_t m_IsAutoRqirExit; //存放是否自动请求退出，为0表示手动，为1表示在所有连接销毁时自动请求退出，为2表示在所有连接和服务端都销毁时自动请求退出。
+
 	typedef struct CnctInfo //连接信息。
 	{
-        size_t m_Idx; //存放索引，从0开始，连接信息容器的唯一索引，连接中途不会改变。
-        int32_t m_IsInit; //存放连接信息是否初始化，为0表示未初始化，为非0表示已初始化。
-        int32_t m_Num; //存放序号，从0开始，随着前面的连接销毁而递减。
+		size_t m_Idx; //存放索引，从0开始，连接信息容器的唯一索引，连接中途不会改变。
+		int32_t m_IsInit; //存放连接信息是否初始化，为0表示未初始化，为非0表示已初始化。
+		int32_t m_Num; //存放序号，从0开始，随着前面的连接销毁而递减。
 
 		int32_t m_IsTcpOrAudpPrtcl; //存放是否是Tcp或Udp协议，为0表示Tcp协议，为1表示高级Udp协议。
 		Vstr * m_RmtNodeNameVstrPt; //存放远端套接字绑定的远端节点名称动态字符串的指针。
@@ -92,7 +137,7 @@ typedef struct SrvrThrd
 		} m_TstNtwkDly;
 	} CnctInfo;
 	CQueue * m_CnctInfoCntnrPt; //存放连接信息容器的指针。
-    int32_t m_CnctInfoCurMaxNum; //存放连接信息的当前最大序号。
+	int32_t m_CnctInfoCurMaxNum; //存放连接信息的当前最大序号。
 	int32_t m_MaxCnctNum; //存放最大连接数。
 	
 	struct //存放线程。
@@ -115,6 +160,22 @@ typedef struct SrvrThrd
 	//存放用户数据的指针。注意：在C++的SrvrThrdCls类中，本变量存放this指针，请勿修改。
 	void * m_UserDataPt;
 	
+	//用户定义的初始化函数。
+	typedef void( __cdecl * SrvrThrdUserInitFuncPt )( SrvrThrd * SrvrThrdPt );
+	SrvrThrdUserInitFuncPt m_UserInitFuncPt;
+
+	//用户定义的销毁函数。
+	typedef void( __cdecl * SrvrThrdUserDstoyFuncPt )( SrvrThrd * SrvrThrdPt );
+	SrvrThrdUserDstoyFuncPt m_UserDstoyFuncPt;
+	
+	//用户定义的处理函数。
+	typedef void( __cdecl * SrvrThrdUserPocsFuncPt )( SrvrThrd * SrvrThrdPt );
+	SrvrThrdUserPocsFuncPt m_UserPocsFuncPt;
+	
+	//用户定义的消息函数。
+	typedef int( __cdecl * SrvrThrdUserMsgFuncPt )( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+	SrvrThrdUserMsgFuncPt m_UserMsgFuncPt;
+	
 	//用户定义的显示日志函数。
 	typedef void( __cdecl * SrvrThrdUserShowLogFuncPt )( SrvrThrd * SrvrThrdPt, Vstr * InfoVstrPt );
 	SrvrThrdUserShowLogFuncPt m_UserShowLogFuncPt;
@@ -122,18 +183,6 @@ typedef struct SrvrThrd
 	//用户定义的显示Toast函数。
 	typedef void( __cdecl * SrvrThrdUserShowToastFuncPt )( SrvrThrd * SrvrThrdPt, Vstr * InfoVstrPt );
 	SrvrThrdUserShowToastFuncPt m_UserShowToastFuncPt;
-	
-	//用户定义的消息函数。
-	typedef int( __cdecl * SrvrThrdUserMsgFuncPt )( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
-	SrvrThrdUserMsgFuncPt m_UserMsgFuncPt;
-	
-	//用户定义的服务端线程初始化函数。
-	typedef void( __cdecl * SrvrThrdUserSrvrThrdInitFuncPt )( SrvrThrd * SrvrThrdPt );
-	SrvrThrdUserSrvrThrdInitFuncPt m_UserSrvrThrdInitFuncPt;
-
-	//用户定义的服务端线程销毁函数。
-	typedef void( __cdecl * SrvrThrdUserSrvrThrdDstoyFuncPt )( SrvrThrd * SrvrThrdPt );
-	SrvrThrdUserSrvrThrdDstoyFuncPt m_UserSrvrThrdDstoyFuncPt;
 	
 	//用户定义的服务端初始化函数。
 	typedef void( __cdecl * SrvrThrdUserSrvrInitFuncPt )( SrvrThrd * SrvrThrdPt );
@@ -165,31 +214,33 @@ typedef struct SrvrThrd
 } SrvrThrd;
 extern const char * const g_TkbkModeU8strArrPt[ 17 ];
 
-int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * UserDataPt,
-				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
-				  SrvrThrd::SrvrThrdUserSrvrThrdInitFuncPt UserSrvrThrdInitFuncPt, SrvrThrd::SrvrThrdUserSrvrThrdDstoyFuncPt UserSrvrThrdDstoyFuncPt,
-				  SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
-				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt, SrvrThrd::SrvrThrdUserCnctTstNtwkDlyFuncPt UserCnctTstNtwkDlyFuncPt,
-				  Vstr * ErrInfoVstrPt );
-int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * UserDataPt,
+										   SrvrThrd::SrvrThrdUserInitFuncPt UserInitFuncPt, SrvrThrd::SrvrThrdUserDstoyFuncPt UserDstoyFuncPt,
+										   SrvrThrd::SrvrThrdUserPocsFuncPt UserPocsFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
+										   SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt,
+										   SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
+										   SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt, SrvrThrd::SrvrThrdUserCnctTstNtwkDlyFuncPt UserCnctTstNtwkDlyFuncPt,
+										   Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
 
-int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt );
-int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt );
-int SrvrThrdSendSetIsTstNtwkDlyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendSetIsTstNtwkDlyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt );
 
-int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
-int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
-int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt );
-int SrvrThrdSendSrvrInitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, Vstr * ErrInfoVstrPt );
-int SrvrThrdSendSrvrDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
-int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendSrvrInitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendSrvrDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt );
+
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
 #endif
 
 #ifdef __cplusplus
-class SrvrThrdCls
+__WNDADOVDOTKBK_DLLAPI__ class SrvrThrdCls
 {
 public:
 	SrvrThrd * m_SrvrThrdPt;
@@ -197,20 +248,23 @@ public:
 	SrvrThrdCls() { m_SrvrThrdPt = NULL; }
 	~SrvrThrdCls() { Dstoy( NULL ); }
 	
-	//用户定义的显示日志函数。
-	virtual void UserShowLog( VstrCls * InfoVstrPt ) = 0;
+	//用户定义的初始化函数。
+	virtual void UserInit() = 0;
+
+	//用户定义的销毁函数。
+	virtual void UserDstoy() = 0;
 	
-	//用户定义的显示Toast函数。
-	virtual void UserShowToast( VstrCls * InfoVstrPt ) = 0;
-	
+	//用户定义的处理函数。
+	virtual void UserPocs() = 0;
+
 	//用户定义的消息函数。
 	virtual int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt ) = 0;
 	
-	//用户定义的服务端线程初始化函数。
-	virtual void UserSrvrThrdInit() = 0;
-
-	//用户定义的服务端线程销毁函数。
-	virtual void UserSrvrThrdDstoy() = 0;
+	//用户定义的显示日志函数。
+	virtual void UserShowLog( Vstr * InfoVstrPt ) = 0;
+	
+	//用户定义的显示Toast函数。
+	virtual void UserShowToast( Vstr * InfoVstrPt ) = 0;
 	
 	//用户定义的服务端初始化函数。
 	virtual void UserSrvrInit() = 0;
@@ -233,19 +287,19 @@ public:
 	//用户定义的连接测试网络延迟函数。
 	virtual void UserCnctTstNtwkDly( SrvrThrd::CnctInfo * CnctInfoPt, uint64_t NtwkDlyMsec ) = 0;
 
-	int Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt );
-	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = SrvrThrdDstoy( m_SrvrThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_SrvrThrdPt = NULL; return p_Rslt; }
+	int Init( const void * LicnCodePt, Vstr * ErrInfoVstrPt );
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = SrvrThrdDstoy( m_SrvrThrdPt, ErrInfoVstrPt ); m_SrvrThrdPt = NULL; return p_Rslt; }
 
-	int SetIsPrintLogShowToast( int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSetIsPrintLogShowToast( m_SrvrThrdPt, IsPrintLog, IsShowToast, ShowToastWndHdl, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendSetIsUsePrvntSysSleepMsg( int IsBlockWait, int32_t IsUsePrvntSysSleep, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSetIsUsePrvntSysSleepMsg( m_SrvrThrdPt, IsBlockWait, IsUsePrvntSysSleep, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendSetIsTstNtwkDlyMsg( int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSetIsTstNtwkDlyMsg( m_SrvrThrdPt, IsBlockWait, IsTstNtwkDly, SendIntvlMsec, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SetIsPrintLogShowToast( int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt ) { return SrvrThrdSetIsPrintLogShowToast( m_SrvrThrdPt, IsPrintLog, IsShowToast, ShowToastWndHdl, ErrInfoVstrPt ); }
+	int SendSetIsUsePrvntSysSleepMsg( int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendSetIsUsePrvntSysSleepMsg( m_SrvrThrdPt, IsBlockWait, IsUsePrvntSysSleep, ErrInfoVstrPt ); }
+	int SendSetIsTstNtwkDlyMsg( int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendSetIsTstNtwkDlyMsg( m_SrvrThrdPt, IsBlockWait, IsTstNtwkDly, SendIntvlMsec, ErrInfoVstrPt ); }
 
-	int Start( VstrCls * ErrInfoVstrPt ) { return SrvrThrdStart( m_SrvrThrdPt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendRqirExitMsg( int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendRqirExitMsg( m_SrvrThrdPt, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendUserMsg( m_SrvrThrdPt, IsBlockWait, MsgTyp, MsgPt, MsgLenByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int SendSrvrInitMsg( int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendSrvrInitMsg( m_SrvrThrdPt, IsBlockWait, IsTcpOrAudpPrtcl, LclNodeNameVstrPt, LclNodeSrvcVstrPt, MaxCnctNum, IsAutoRqirExit, ErrInfoVstrPt ); }
+	int SendSrvrDstoyMsg( int IsBlockWait, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendSrvrDstoyMsg( m_SrvrThrdPt, IsBlockWait, ErrInfoVstrPt ); }
+	int SendCnctDstoyMsg( int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendCnctDstoyMsg( m_SrvrThrdPt, IsBlockWait, CnctNum, ErrInfoVstrPt ); }
 
-	int SendSrvrInitMsg( int IsBlockWait, int32_t IsTcpOrAudpPrtcl, VstrCls * LclNodeNameVstrPt, VstrCls * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSrvrInitMsg( m_SrvrThrdPt, IsBlockWait, IsTcpOrAudpPrtcl, ( LclNodeNameVstrPt != NULL ) ? LclNodeNameVstrPt->m_VstrPt : NULL, ( LclNodeSrvcVstrPt != NULL ) ? LclNodeSrvcVstrPt->m_VstrPt : NULL, MaxCnctNum, IsAutoRqirExit, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendSrvrDstoyMsg( int IsBlockWait, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendSrvrDstoyMsg( m_SrvrThrdPt, IsBlockWait, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendCnctDstoyMsg( int IsBlockWait, int32_t CnctNum, VstrCls * ErrInfoVstrPt ) { return SrvrThrdSendCnctDstoyMsg( m_SrvrThrdPt, IsBlockWait, CnctNum, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int Start( Vstr * ErrInfoVstrPt ) { return SrvrThrdStart( m_SrvrThrdPt, ErrInfoVstrPt ); }
+	int SendRqirExitMsg( int IsBlockWait, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendRqirExitMsg( m_SrvrThrdPt, IsBlockWait, ErrInfoVstrPt ); }
+	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendUserMsg( m_SrvrThrdPt, IsBlockWait, MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ); }
 };
 #endif

@@ -32,8 +32,8 @@ typedef struct VdoInpt //视频输入。
 	int32_t m_FrmHeight; //存放帧的高度，单位为像素，只能为偶数。
 	size_t m_Yu12FrmLenByt; //存放Yu12格式帧的长度，单位为字节，为m_FrmWidth * m_FrmHeight * 3 / 2。
 	int32_t m_SrcMaxSmplRate; //存放原始的最大采样频率，取值范围为[1,60]，为0表示自动选择。
-    int32_t m_SrcFrmWidth; //存放原始帧的宽度，单位为像素，只能为偶数，为0表示自动选择。
-    int32_t m_SrcFrmHeight; //存放原始帧的高度，单位为像素，只能为偶数，为0表示自动选择。
+	int32_t m_SrcFrmWidth; //存放原始帧的宽度，单位为像素，只能为偶数，为0表示自动选择。
+	int32_t m_SrcFrmHeight; //存放原始帧的高度，单位为像素，只能为偶数，为0表示自动选择。
 
 	int32_t m_UseWhatEncd; //存放使用什么编码器，为0表示Yu12原始数据，为1表示OpenH264编码器。
 
@@ -64,7 +64,7 @@ typedef struct VdoInpt //视频输入。
 		int32_t m_BgraSrcFrmIsScale; //存放Bgra8888格式原始帧是否缩放，为0表示不缩放，为非0表示要缩放。
 		int32_t m_BgraSrcFrmScaleWidth; //存放Bgra8888格式原始帧缩放后的宽度，单位为像素，为m_FrmWidth。
 		int32_t m_BgraSrcFrmScaleHeight; //存放Bgra8888格式原始帧缩放后的高度，单位为像素，为m_FrmHeight。
-        size_t m_BgraSrcFrmScaleLenByt; //存放Bgra8888格式原始帧缩放后的长度，单位为字节，为m_BgraSrcFrmScaleWidth * m_BgraSrcFrmScaleHeight * 4。
+		size_t m_BgraSrcFrmScaleLenByt; //存放Bgra8888格式原始帧缩放后的长度，单位为字节，为m_BgraSrcFrmScaleWidth * m_BgraSrcFrmScaleHeight * 4。
 		HWND m_PrvwWndHdl; //存放预览窗口的句柄。
 		int32_t m_IsBlack; //存放是否黑屏，为0表示有图像，为非0表示黑屏。
 	} m_Dvc;

@@ -13,21 +13,24 @@ public:
 	
 	int Init( const void * LicnCodePt );
 	void Dstoy();
-
-	//用户定义的显示日志函数。
-	void UserShowLog( VstrCls * InfoVstrPt );
 	
-	//用户定义的显示Toast函数。
-	void UserShowToast( VstrCls * InfoVstrPt );
+	//用户定义的初始化函数。
+	void UserInit();
+
+	//用户定义的销毁函数。
+	void UserDstoy();
+	
+	//用户定义的处理函数。
+	void UserPocs();
 	
 	//用户定义的消息函数。
 	int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
 	
-	//用户定义的服务端线程初始化函数。
-	void UserSrvrThrdInit();
-
-	//用户定义的服务端线程销毁函数。
-	void UserSrvrThrdDstoy();
+	//用户定义的显示日志函数。
+	void UserShowLog( Vstr * InfoVstrPt );
+	
+	//用户定义的显示Toast函数。
+	void UserShowToast( Vstr * InfoVstrPt );
 	
 	//用户定义的服务端初始化函数。
 	void UserSrvrInit();

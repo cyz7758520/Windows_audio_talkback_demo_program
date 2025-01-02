@@ -24,14 +24,14 @@ typedef struct TkbkClnt //对讲客户端。
 		int32_t m_IsRecvRplyPkt; //存放是否接收应答包，为0表示未接收，为1表示已接收。
 	} m_TstNtwkDly;
 
-    int32_t m_XfrMode; //存放传输模式，为0表示实时半双工（一键通），为1表示实时全双工。
-    int32_t m_PttBtnIsDown; //存放一键即按即通按钮是否按下，为0表示弹起，为非0表示按下。
+	int32_t m_XfrMode; //存放传输模式，为0表示实时半双工（一键通），为1表示实时全双工。
+	int32_t m_PttBtnIsDown; //存放一键即按即通按钮是否按下，为0表示弹起，为非0表示按下。
 
 	typedef struct TkbkInfo //对讲信息。
 	{
-        size_t m_TkbkIdx; //存放对讲索引，从0开始，对讲信息容器的唯一索引，连接中途不会改变。
-        int32_t m_IsInit; //存放对讲信息是否初始化，为0表示未初始化，为非0表示已初始化。
-        int32_t m_Num; //存放序号，从0开始，随着前面的连接销毁而递减。
+		int32_t m_TkbkIdx; //存放对讲索引，从0开始，对讲信息容器的唯一索引，连接中途不会改变。
+		int32_t m_IsInit; //存放对讲信息是否初始化，为0表示未初始化，为非0表示已初始化。
+		int32_t m_Num; //存放序号，从0开始，随着前面的连接销毁而递减。
 		
 		int32_t m_RmtTkbkMode; //存放远端对讲模式。
 
@@ -54,9 +54,9 @@ typedef struct TkbkClnt //对讲客户端。
 		} m_VdoOtptTmpVar;
 	} TkbkInfo;
 	CQueue * m_TkbkInfoCntnrPt; //存放对讲信息容器的指针。
-    int32_t m_TkbkInfoCurMaxNum; //存放对讲信息的当前最大序号。
+	int32_t m_TkbkInfoCurMaxNum; //存放对讲信息的当前最大序号。
 	
-    int32_t m_UseWhatRecvOtptFrm; //存放使用什么接收输出帧，为0表示容器，为1表示自适应抖动缓冲器。
+	int32_t m_UseWhatRecvOtptFrm; //存放使用什么接收输出帧，为0表示容器，为1表示自适应抖动缓冲器。
 	
 	struct AAjbParm //存放音频自适应抖动缓冲器的参数。
 	{
@@ -79,7 +79,7 @@ typedef struct TkbkClnt //对讲客户端。
 	TcpClntSokt * m_TcpClntSoktPt; //存放本端Tcp协议客户端套接字的指针。
 	size_t m_AudpClntCnctIdx; //存放本端高级Udp协议客户端连接索引。
 	int32_t m_CurCnctSts; //存放当前连接状态，为[-m_MaxCnctTimes,0]表示等待远端接受连接。
-    int32_t m_IsRqstDstoy; //存放是否请求销毁，为0表示未请求，为1表示已请求。
+	int32_t m_IsRqstDstoy; //存放是否请求销毁，为0表示未请求，为1表示已请求。
 
 	int32_t m_MyTkbkIdx; //存放我的对讲索引。
 	int32_t m_LclTkbkMode; //存放本端对讲模式。

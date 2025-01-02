@@ -12,8 +12,9 @@ extern "C" DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt );
 
 //服务端线程初始化。
 int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * UserDataPt,
-				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
-				  SrvrThrd::SrvrThrdUserSrvrThrdInitFuncPt UserSrvrThrdInitFuncPt, SrvrThrd::SrvrThrdUserSrvrThrdDstoyFuncPt UserSrvrThrdDstoyFuncPt,
+				  SrvrThrd::SrvrThrdUserInitFuncPt UserInitFuncPt, SrvrThrd::SrvrThrdUserDstoyFuncPt UserDstoyFuncPt,
+				  SrvrThrd::SrvrThrdUserPocsFuncPt UserPocsFuncPt, SrvrThrd::SrvrThrdUserMsgFuncPt UserMsgFuncPt,
+				  SrvrThrd::SrvrThrdUserShowLogFuncPt UserShowLogFuncPt, SrvrThrd::SrvrThrdUserShowToastFuncPt UserShowToastFuncPt,
 				  SrvrThrd::SrvrThrdUserSrvrInitFuncPt UserSrvrInitFuncPt, SrvrThrd::SrvrThrdUserSrvrDstoyFuncPt UserSrvrDstoyFuncPt,
 				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt, SrvrThrd::SrvrThrdUserCnctTstNtwkDlyFuncPt UserCnctTstNtwkDlyFuncPt,
 				  Vstr * ErrInfoVstrPt )
@@ -27,6 +28,26 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * Use
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针的指针不正确。" ), , );
 		goto Out;
 	}
+	if( UserInitFuncPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的初始化函数的指针不正确。" ), , );
+		goto Out;
+	}
+	if( UserDstoyFuncPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的销毁函数的指针不正确。" ), , );
+		goto Out;
+	}
+	if( UserPocsFuncPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的处理函数的指针不正确。" ), , );
+		goto Out;
+	}
+	if( UserMsgFuncPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的消息函数的指针不正确。" ), , );
+		goto Out;
+	}
 	if( UserShowLogFuncPt == NULL )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的显示日志函数的指针不正确。" ), , );
@@ -35,21 +56,6 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * Use
 	if( UserShowToastFuncPt == NULL )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的显示Toast函数的指针不正确。" ), , );
-		goto Out;
-	}
-	if( UserMsgFuncPt == NULL )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的消息函数的指针不正确。" ), , );
-		goto Out;
-	}
-	if( UserSrvrThrdInitFuncPt == NULL )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的服务端线程初始化函数的指针不正确。" ), , );
-		goto Out;
-	}
-	if( UserSrvrThrdDstoyFuncPt == NULL )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "用户定义的服务端线程销毁函数的指针不正确。" ), , );
 		goto Out;
 	}
 	if( UserSrvrInitFuncPt == NULL )
@@ -174,13 +180,19 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * Use
 	}
 
 	p_SrvrThrdPt->m_UserDataPt = UserDataPt; //设置用户数据的指针。
+	
+	p_SrvrThrdPt->m_UserInitFuncPt = UserInitFuncPt; //设置用户定义的初始化函数的指针。
+	p_SrvrThrdPt->m_UserDstoyFuncPt = UserDstoyFuncPt; //设置用户定义的销毁函数的指针。
+	
+	p_SrvrThrdPt->m_UserPocsFuncPt = UserPocsFuncPt; //设置用户定义的处理函数的指针。
+	p_SrvrThrdPt->m_UserMsgFuncPt = UserMsgFuncPt; //设置用户定义的消息函数的指针。
+
 	p_SrvrThrdPt->m_UserShowLogFuncPt = UserShowLogFuncPt; //设置用户定义的显示日志函数的指针。
 	p_SrvrThrdPt->m_UserShowToastFuncPt = UserShowToastFuncPt; //设置用户定义的显示Toast函数的指针。
-	p_SrvrThrdPt->m_UserMsgFuncPt = UserMsgFuncPt; //设置用户定义的消息函数的指针。
-	p_SrvrThrdPt->m_UserSrvrThrdInitFuncPt = UserSrvrThrdInitFuncPt; //设置用户定义的服务端线程初始化函数的指针。
-	p_SrvrThrdPt->m_UserSrvrThrdDstoyFuncPt = UserSrvrThrdDstoyFuncPt; //设置用户定义的服务端线程销毁函数的指针。
+
 	p_SrvrThrdPt->m_UserSrvrInitFuncPt = UserSrvrInitFuncPt; //设置用户定义的服务端初始化函数的指针。
 	p_SrvrThrdPt->m_UserSrvrDstoyFuncPt = UserSrvrDstoyFuncPt; //设置用户定义的服务端销毁函数的指针。
+
 	p_SrvrThrdPt->m_UserCnctInitFuncPt = UserCnctInitFuncPt; //设置用户定义的连接初始化函数的指针。
 	p_SrvrThrdPt->m_UserCnctDstoyFuncPt = UserCnctDstoyFuncPt; //设置用户定义的连接销毁函数的指针。
 	p_SrvrThrdPt->m_UserCnctStsFuncPt = UserCnctStsFuncPt; //设置用户定义的连接状态函数的指针。
@@ -271,48 +283,6 @@ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 	return p_Rslt;
 }
 
-typedef enum ThrdMsgTyp
-{
-	ThrdMsgTypSetIsUsePrvntSysSleep,
-	ThrdMsgTypSetIsTstNtwkDly,
-
-	ThrdMsgTypSrvrInit,
-	ThrdMsgTypSrvrDstoy,
-
-	ThrdMsgTypCnctDstoy,
-	
-	ThrdMsgTypRqirExit,
-
-	ThrdMsgTypUserMsgMinVal = 100, //用户消息的最小值。
-} ThrdMsgTyp;
-typedef struct
-{
-	int32_t m_IsUsePrvntSysSleep;
-} ThrdMsgSetIsUsePrvntSysSleep;
-typedef struct
-{
-	int32_t m_IsTcpOrAudpPrtcl;
-	Vstr * m_LclNodeNameVstrPt;
-	Vstr * m_LclNodeSrvcVstrPt;
-	int32_t m_MaxCnctNum;
-	int32_t m_IsAutoRqirExit;
-} ThrdMsgSrvrInit;
-typedef struct
-{
-} ThrdMsgSrvrDstoy;
-typedef struct
-{
-	int32_t m_CnctNum;
-} ThrdMsgCnctDstoy;
-typedef struct
-{
-	int32_t m_IsTstNtwkDly;
-	uint64_t m_SendIntvlMsec;
-} ThrdMsgSetIsTstNtwkDly;
-typedef struct
-{
-} ThrdMsgRqirExit;
-
 //设置是否打印Log日志、显示Toast。
 int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt )
 {
@@ -343,7 +313,7 @@ int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, i
 int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	ThrdMsgSetIsUsePrvntSysSleep p_ThrdMsgSetIsUsePrvntSysSleep;
+	SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep p_ThrdMsgSetIsUsePrvntSysSleep;
 
 	//判断各个变量是否正确。
 	if( SrvrThrdPt == NULL )
@@ -353,7 +323,7 @@ int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait
 	}
 
 	p_ThrdMsgSetIsUsePrvntSysSleep.m_IsUsePrvntSysSleep = IsUsePrvntSysSleep;
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetIsUsePrvntSysSleep, &p_ThrdMsgSetIsUsePrvntSysSleep, sizeof( p_ThrdMsgSetIsUsePrvntSysSleep ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypSetIsUsePrvntSysSleep, &p_ThrdMsgSetIsUsePrvntSysSleep, sizeof( p_ThrdMsgSetIsUsePrvntSysSleep ), ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
@@ -373,7 +343,7 @@ int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait
 int SrvrThrdSendSetIsTstNtwkDlyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	ThrdMsgSetIsTstNtwkDly p_ThrdMsgSetIsTstNtwkDly;
+	SrvrThrd::ThrdMsgSetIsTstNtwkDly p_ThrdMsgSetIsTstNtwkDly;
 	
 	//判断各个变量是否正确。
 	if( SrvrThrdPt == NULL )
@@ -384,7 +354,7 @@ int SrvrThrdSendSetIsTstNtwkDlyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int3
 
 	p_ThrdMsgSetIsTstNtwkDly.m_IsTstNtwkDly = IsTstNtwkDly;
 	p_ThrdMsgSetIsTstNtwkDly.m_SendIntvlMsec = SendIntvlMsec;
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSetIsTstNtwkDly, &p_ThrdMsgSetIsTstNtwkDly, sizeof( p_ThrdMsgSetIsTstNtwkDly ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypSetIsTstNtwkDly, &p_ThrdMsgSetIsTstNtwkDly, sizeof( p_ThrdMsgSetIsTstNtwkDly ), ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
 		goto Out;
@@ -413,6 +383,107 @@ void SrvrThrdPrvntSysSleepInitOrDstoy( SrvrThrd * SrvrThrdPt, int32_t IsInitPrvn
 		SetThreadExecutionState( ES_CONTINUOUS );
 		if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "服务端线程：销毁阻止系统睡眠成功。" ) );
 	}
+}
+
+//发送服务端初始化消息。
+int SrvrThrdSendSrvrInitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	SrvrThrd::ThrdMsgSrvrInit p_ThrdMsgSrvrInit;
+	
+	//判断各个变量是否正确。
+	if( SrvrThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针不正确。" ), , );
+		goto Out;
+	}
+
+	p_ThrdMsgSrvrInit.m_IsTcpOrAudpPrtcl = IsTcpOrAudpPrtcl;
+	if( VstrInit( &p_ThrdMsgSrvrInit.m_LclNodeNameVstrPt, Utf8, , LclNodeNameVstrPt ) != 0 )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置本端套接字绑定的名称动态字符串失败。" ), , );
+		goto Out;
+	}
+	if( VstrInit( &p_ThrdMsgSrvrInit.m_LclNodeSrvcVstrPt, Utf8, , LclNodeSrvcVstrPt ) != 0 )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置本端套接字绑定的服务动态字符串失败。" ), , );
+		goto Out;
+	}
+	p_ThrdMsgSrvrInit.m_MaxCnctNum = MaxCnctNum;
+	p_ThrdMsgSrvrInit.m_IsAutoRqirExit = IsAutoRqirExit;
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypSrvrInit, &p_ThrdMsgSrvrInit, sizeof( p_ThrdMsgSrvrInit ), ErrInfoVstrPt ) != 0 )
+	{
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
+		goto Out;
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+
+	}
+	return p_Rslt;
+}
+
+//发送服务端销毁消息。
+int SrvrThrdSendSrvrDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	SrvrThrd::ThrdMsgSrvrDstoy p_ThrdMsgSrvrDstoy;
+	
+	//判断各个变量是否正确。
+	if( SrvrThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针不正确。" ), , );
+		goto Out;
+	}
+
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypSrvrDstoy, &p_ThrdMsgSrvrDstoy, sizeof( p_ThrdMsgSrvrDstoy ), ErrInfoVstrPt ) != 0 )
+	{
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
+		goto Out;
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+
+	}
+	return p_Rslt;
+}
+
+//发送连接销毁消息。
+int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt )
+{
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	SrvrThrd::ThrdMsgCnctDstoy p_ThrdMsgCnctDstoy;
+	
+	//判断各个变量是否正确。
+	if( SrvrThrdPt == NULL )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针不正确。" ), , );
+		goto Out;
+	}
+
+	p_ThrdMsgCnctDstoy.m_CnctNum = CnctNum;
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypCnctDstoy, &p_ThrdMsgCnctDstoy, sizeof( p_ThrdMsgCnctDstoy ), ErrInfoVstrPt ) != 0 )
+	{
+		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
+		goto Out;
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+
+	}
+	return p_Rslt;
 }
 
 //服务端线程启动。
@@ -453,7 +524,7 @@ int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	ThrdMsgRqirExit p_ThrdMsgRqirExit;
+	SrvrThrd::ThrdMsgRqirExit p_ThrdMsgRqirExit;
 
 	//判断各个变量是否正确。
 	if( SrvrThrdPt == NULL )
@@ -462,7 +533,7 @@ int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrI
 		goto Out;
 	}
 	
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypRqirExit, &p_ThrdMsgRqirExit, sizeof( p_ThrdMsgRqirExit ), ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypRqirExit, &p_ThrdMsgRqirExit, sizeof( p_ThrdMsgRqirExit ), ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
@@ -490,110 +561,9 @@ int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int Ms
 		goto Out;
 	}
 	
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypUserMsgMinVal + MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypUserMsgMinVal + MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
-		goto Out;
-	}
-
-	p_Rslt = 0; //设置本函数执行成功。
-
-	Out:
-	if( p_Rslt != 0 ) //如果本函数执行失败。
-	{
-
-	}
-	return p_Rslt;
-}
-
-//发送服务端初始化消息。
-int SrvrThrdSendSrvrInitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, Vstr * ErrInfoVstrPt )
-{
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	ThrdMsgSrvrInit p_ThrdMsgSrvrInit;
-	
-	//判断各个变量是否正确。
-	if( SrvrThrdPt == NULL )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针不正确。" ), , );
-		goto Out;
-	}
-
-	p_ThrdMsgSrvrInit.m_IsTcpOrAudpPrtcl = IsTcpOrAudpPrtcl;
-	if( VstrInit( &p_ThrdMsgSrvrInit.m_LclNodeNameVstrPt, Utf8, , LclNodeNameVstrPt ) != 0 )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置本端套接字绑定的名称动态字符串失败。" ), , );
-		goto Out;
-	}
-	if( VstrInit( &p_ThrdMsgSrvrInit.m_LclNodeSrvcVstrPt, Utf8, , LclNodeSrvcVstrPt ) != 0 )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置本端套接字绑定的服务动态字符串失败。" ), , );
-		goto Out;
-	}
-	p_ThrdMsgSrvrInit.m_MaxCnctNum = MaxCnctNum;
-	p_ThrdMsgSrvrInit.m_IsAutoRqirExit = IsAutoRqirExit;
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSrvrInit, &p_ThrdMsgSrvrInit, sizeof( p_ThrdMsgSrvrInit ), ErrInfoVstrPt ) != 0 )
-	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
-		goto Out;
-	}
-
-	p_Rslt = 0; //设置本函数执行成功。
-
-	Out:
-	if( p_Rslt != 0 ) //如果本函数执行失败。
-	{
-
-	}
-	return p_Rslt;
-}
-
-//发送服务端销毁消息。
-int SrvrThrdSendSrvrDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
-{
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	ThrdMsgSrvrDstoy p_ThrdMsgSrvrDstoy;
-	
-	//判断各个变量是否正确。
-	if( SrvrThrdPt == NULL )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针不正确。" ), , );
-		goto Out;
-	}
-
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypSrvrDstoy, &p_ThrdMsgSrvrDstoy, sizeof( p_ThrdMsgSrvrDstoy ), ErrInfoVstrPt ) != 0 )
-	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
-		goto Out;
-	}
-
-	p_Rslt = 0; //设置本函数执行成功。
-
-	Out:
-	if( p_Rslt != 0 ) //如果本函数执行失败。
-	{
-
-	}
-	return p_Rslt;
-}
-
-//发送连接销毁消息。
-int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt )
-{
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	ThrdMsgCnctDstoy p_ThrdMsgCnctDstoy;
-	
-	//判断各个变量是否正确。
-	if( SrvrThrdPt == NULL )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "服务端线程的指针不正确。" ), , );
-		goto Out;
-	}
-
-	p_ThrdMsgCnctDstoy.m_CnctNum = CnctNum;
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, ThrdMsgTypCnctDstoy, &p_ThrdMsgCnctDstoy, sizeof( p_ThrdMsgCnctDstoy ), ErrInfoVstrPt ) != 0 )
-	{
-		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送用户消息失败。原因：" ) );
 		goto Out;
 	}
 
@@ -627,7 +597,7 @@ int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * Lc
 
 	{ //设置远端节点的地址族。
 		ADDRINFOW * p_AddrInfoListPt;
-		if( GetAddrInfo( ( PCWSTR )LclNodeNameVstrPt->m_Pt, NULL, NULL, &p_AddrInfoListPt ) == 0 )
+		if( GetAddrInfo( ( PCWSTR )LclNodeNameVstrPt->m_StrPt, NULL, NULL, &p_AddrInfoListPt ) == 0 )
 		{
 			p_RmtNodeAddrFamly = ( p_AddrInfoListPt->ai_family == AF_INET ) ? 4 : ( p_AddrInfoListPt->ai_family == AF_INET6 ) ? 6 : 0;
 			FreeAddrInfo( p_AddrInfoListPt );
@@ -1076,11 +1046,17 @@ void SrvrThrdIsAutoRqirExit( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 //连接处理，包括接受连接、接收发送数据包、删除连接。
 void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 {
-    int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-    SrvrThrd::CnctInfo * p_CnctInfoTmpPt;
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	SrvrThrd::CnctInfo * p_CnctInfoTmpPt;
 	SrvrThrd::CnctInfo * p_CnctInfoTmp2Pt;
 	size_t p_PktLenByt;
 	uint32_t p_TmpUint32;
+	
+	//调用用户定义的处理函数。
+	{
+		SrvrThrdPt->m_UserPocsFuncPt( SrvrThrdPt );
+		//if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "服务端线程：调用用户定义的处理函数成功。" ) );
+	}
 
 	//用本端Tcp协议服务端套接字接受远端Tcp协议客户端套接字的连接。
 	if( SrvrThrdPt->m_TcpSrvrSoktPt != NULL )
@@ -1131,7 +1107,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 					SrvrThrdPt->m_UserCnctRmtTkbkModeFuncPt( SrvrThrdPt, p_CnctInfoTmpPt, p_CnctInfoTmpPt->m_RmtTkbkMode, p_CnctInfoTmpPt->m_RmtTkbkMode ); //调用用户定义的连接远端对讲模式函数。
 					
 					VstrFmtCpy( SrvrThrdPt->m_ErrInfoVstrPt, Cu8vstr( "服务端线程：连接%uzd：用本端Tcp协议服务端套接字接受远端Tcp协议客户端套接字[%vs:%vs]的连接成功。" ), p_CnctInfoTmpPt->m_Idx, SrvrThrdPt->m_Thrd.m_RmtNodeAddrPt, SrvrThrdPt->m_Thrd.m_RmtNodePortPt );
-					if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGE( SrvrThrdPt->m_ErrInfoVstrPt );
+					if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGI( SrvrThrdPt->m_ErrInfoVstrPt );
 					SrvrThrdPt->m_UserShowLogFuncPt( SrvrThrdPt, SrvrThrdPt->m_ErrInfoVstrPt );
 					break;
 				}
@@ -1212,9 +1188,9 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 		}
 	}
 
-    //遍历连接信息容器。
-    for( size_t p_CnctInfoLstIdx = 0; CQueueGetByNum( SrvrThrdPt->m_CnctInfoCntnrPt, p_CnctInfoLstIdx, NULL, ( void * * )&p_CnctInfoTmpPt, 0, 0, NULL ) == 0; p_CnctInfoLstIdx++ )
-    {
+	//遍历连接信息容器。
+	for( size_t p_CnctInfoLstIdx = 0; CQueueGetByNum( SrvrThrdPt->m_CnctInfoCntnrPt, p_CnctInfoLstIdx, NULL, ( void * * )&p_CnctInfoTmpPt, 0, 0, NULL ) == 0; p_CnctInfoLstIdx++ )
+	{
 		if( p_CnctInfoTmpPt->m_IsInit != 0 )
 		{
 			//用本端套接字接收连接的远端套接字发送的数据包。
@@ -1507,17 +1483,17 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 
 	switch( MsgTyp )
 	{
-		case ThrdMsgTypSetIsUsePrvntSysSleep:
+		case SrvrThrd::ThrdMsgTypSetIsUsePrvntSysSleep:
 		{
-			ThrdMsgSetIsUsePrvntSysSleep * p_ThrdMsgSetIsUsePrvntSysSleepPt = ( ThrdMsgSetIsUsePrvntSysSleep * )MsgPt;
+			SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep * p_ThrdMsgSetIsUsePrvntSysSleepPt = ( SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep * )MsgPt;
 
 			SrvrThrdPt->m_IsUsePrvntSysSleep = p_ThrdMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep;
 			SrvrThrdPrvntSysSleepInitOrDstoy( SrvrThrdPt, SrvrThrdPt->m_IsUsePrvntSysSleep );
 			break;
 		}
-		case ThrdMsgTypSetIsTstNtwkDly:
+		case SrvrThrd::ThrdMsgTypSetIsTstNtwkDly:
 		{
-			ThrdMsgSetIsTstNtwkDly * p_ThrdMsgSetIsTstNtwkDlyPt = ( ThrdMsgSetIsTstNtwkDly * )MsgPt;
+			SrvrThrd::ThrdMsgSetIsTstNtwkDly * p_ThrdMsgSetIsTstNtwkDlyPt = ( SrvrThrd::ThrdMsgSetIsTstNtwkDly * )MsgPt;
 
 			SrvrThrdPt->m_TstNtwkDly.m_IsTstNtwkDly = p_ThrdMsgSetIsTstNtwkDlyPt->m_IsTstNtwkDly; //设置是否测试网络延迟。
 			SrvrThrdPt->m_TstNtwkDly.m_SendIntvlMsec = p_ThrdMsgSetIsTstNtwkDlyPt->m_SendIntvlMsec; //设置测试网络延迟包的发送间隔。
@@ -1532,25 +1508,25 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 			}
 			break;
 		}
-		case ThrdMsgTypSrvrInit:
+		case SrvrThrd::ThrdMsgTypSrvrInit:
 		{
-			ThrdMsgSrvrInit * p_ThrdMsgSrvrInitPt = ( ThrdMsgSrvrInit * )MsgPt;
+			SrvrThrd::ThrdMsgSrvrInit * p_ThrdMsgSrvrInitPt = ( SrvrThrd::ThrdMsgSrvrInit * )MsgPt;
 			
 			p_Rslt = SrvrThrdSrvrInit( SrvrThrdPt, p_ThrdMsgSrvrInitPt->m_IsTcpOrAudpPrtcl, p_ThrdMsgSrvrInitPt->m_LclNodeNameVstrPt, p_ThrdMsgSrvrInitPt->m_LclNodeSrvcVstrPt, p_ThrdMsgSrvrInitPt->m_MaxCnctNum, p_ThrdMsgSrvrInitPt->m_IsAutoRqirExit );
 			VstrDstoy( p_ThrdMsgSrvrInitPt->m_LclNodeNameVstrPt );
 			VstrDstoy( p_ThrdMsgSrvrInitPt->m_LclNodeSrvcVstrPt );
 			goto Out;
 		}
-		case ThrdMsgTypSrvrDstoy:
+		case SrvrThrd::ThrdMsgTypSrvrDstoy:
 		{
-			ThrdMsgSrvrDstoy * p_ThrdMsgSrvrDstoyPt = ( ThrdMsgSrvrDstoy * )MsgPt;
+			SrvrThrd::ThrdMsgSrvrDstoy * p_ThrdMsgSrvrDstoyPt = ( SrvrThrd::ThrdMsgSrvrDstoy * )MsgPt;
 			
 			SrvrThrdSrvrDstoy( SrvrThrdPt );
 			break;
 		}
-		case ThrdMsgTypCnctDstoy:
+		case SrvrThrd::ThrdMsgTypCnctDstoy:
 		{
-			ThrdMsgCnctDstoy * p_ThrdMsgCnctDstoyPt = ( ThrdMsgCnctDstoy * )MsgPt;
+			SrvrThrd::ThrdMsgCnctDstoy * p_ThrdMsgCnctDstoyPt = ( SrvrThrd::ThrdMsgCnctDstoy * )MsgPt;
 
 			if( ( p_ThrdMsgCnctDstoyPt->m_CnctNum > SrvrThrdPt->m_CnctInfoCurMaxNum ) || ( p_ThrdMsgCnctDstoyPt->m_CnctNum < 0 ) )
 			{
@@ -1582,9 +1558,9 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 			}
 			break;
 		}
-		case ThrdMsgTypRqirExit:
+		case SrvrThrd::ThrdMsgTypRqirExit:
 		{
-			ThrdMsgRqirExit * p_ThrdMsgRqirExitPt = ( ThrdMsgRqirExit * )MsgPt;
+			SrvrThrd::ThrdMsgRqirExit * p_ThrdMsgRqirExitPt = ( SrvrThrd::ThrdMsgRqirExit * )MsgPt;
 			
 			if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "服务端线程：接收退出请求。" ) );
 			SrvrThrdPt->m_IsRqirExit = 1; //设置已请求退出。
@@ -1593,7 +1569,9 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		}
 		default: //用户消息。
 		{
-			p_TmpInt32 = SrvrThrdPt->m_UserMsgFuncPt( SrvrThrdPt, MsgTyp - ThrdMsgTypUserMsgMinVal, MsgPt, MsgLenByt );
+			SrvrThrd::ThrdMsgUserMsg * p_ThrdMsgUserMsgPt = ( SrvrThrd::ThrdMsgUserMsg * )MsgPt;
+
+			p_TmpInt32 = SrvrThrdPt->m_UserMsgFuncPt( SrvrThrdPt, MsgTyp - SrvrThrd::ThrdMsgTypUserMsgMinVal, MsgPt, MsgLenByt );
 			if( p_TmpInt32 == 0 )
 			{
 				if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：调用用户定义的消息函数成功。返回值：%d。" ), p_TmpInt32 );
@@ -1607,7 +1585,7 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		}
 	}
 
-    p_Rslt = 0; //设置本函数执行成功。
+	p_Rslt = 0; //设置本函数执行成功。
 	
 	Out:
 	if( p_Rslt < 0 ) //如果本函数执行失败。
@@ -1626,7 +1604,7 @@ DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt )
 
 	if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：本地代码指令集名称：%s。" ), ( sizeof( size_t ) == 4 ) ? "x86" : "x64" );
 
-	SrvrThrdPt->m_UserSrvrThrdInitFuncPt( SrvrThrdPt ); //调用用户定义的服务端线程初始化函数。
+	SrvrThrdPt->m_UserInitFuncPt( SrvrThrdPt ); //调用用户定义的初始化函数。
 
 	//媒体处理循环开始。
 	while( true )
@@ -1638,12 +1616,12 @@ DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt )
 
 		SrvrThrdCnctPocs( SrvrThrdPt ); //连接处理。
 
-		if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接处理全部完毕，耗时 %uz64d 毫秒。" ), FuncGetTickAsMsec() - p_LastTickMsec );
+		//if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接处理全部完毕，耗时 %uz64d 毫秒。" ), FuncGetTickAsMsec() - p_LastTickMsec );
 
 		FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
 	} //媒体处理循环结束。
 	
-	SrvrThrdPt->m_UserSrvrThrdDstoyFuncPt( SrvrThrdPt ); //调用用户定义的服务端线程销毁函数。
+	SrvrThrdPt->m_UserDstoyFuncPt( SrvrThrdPt ); //调用用户定义的销毁函数。
 	
 	SrvrThrdPrvntSysSleepInitOrDstoy( SrvrThrdPt, 0 ); //销毁阻止系统睡眠。
 
@@ -1653,33 +1631,39 @@ DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt )
 }
 
 //回调SrvrThrdCls类的用户定义的初始化函数。
+extern "C" void __cdecl SrvrThrdClsUserSrvrThrdInit( SrvrThrd * SrvrThrdPt )
+{
+	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserInit();
+}
+
+//回调SrvrThrdCls类的用户定义的销毁函数。
+extern "C" void __cdecl SrvrThrdClsUserSrvrThrdDstoy( SrvrThrd * SrvrThrdPt )
+{
+	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserDstoy();
+}
+
+//回调SrvrThrdCls类的用户定义的处理函数。
+extern "C" void __cdecl SrvrThrdClsUserSrvrThrdPocs( SrvrThrd * SrvrThrdPt )
+{
+	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserPocs();
+}
+
+//回调SrvrThrdCls类的用户定义的初始化函数。
 extern "C" void __cdecl SrvrThrdClsUserShowLog( SrvrThrd * SrvrThrdPt, Vstr * InfoVstrPt )
 {
-	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserShowLog( ( InfoVstrPt != NULL ) ? ( VstrCls * )&InfoVstrPt : NULL );
+	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserShowLog( InfoVstrPt );
 }
 
 //回调SrvrThrdCls类的用户定义的处理函数。
 extern "C" void __cdecl SrvrThrdClsUserShowToast( SrvrThrd * SrvrThrdPt, Vstr * InfoVstrPt )
 {
-	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserShowToast( ( InfoVstrPt != NULL ) ? ( VstrCls * )&InfoVstrPt : NULL );
+	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserShowToast( InfoVstrPt );
 }
 
 //回调SrvrThrdCls类的用户定义的销毁函数。
 extern "C" int __cdecl SrvrThrdClsUserMsg( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
 {
 	return ( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserMsg( MsgTyp, MsgPt, MsgLenByt );
-}
-
-//回调SrvrThrdCls类的用户定义的服务端线程初始化函数。
-extern "C" void __cdecl SrvrThrdClsUserSrvrThrdInit( SrvrThrd * SrvrThrdPt )
-{
-	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserSrvrThrdInit();
-}
-
-//回调SrvrThrdCls类的用户定义的服务端线程销毁函数。
-extern "C" void __cdecl SrvrThrdClsUserSrvrThrdDstoy( SrvrThrd * SrvrThrdPt )
-{
-	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserSrvrThrdDstoy();
 }
 
 //回调SrvrThrdCls类的用户定义的服务端初始化函数。
@@ -1724,12 +1708,13 @@ extern "C" void __cdecl SrvrThrdClsUserCnctTstNtwkDly( SrvrThrd * SrvrThrdPt, Sr
 	( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserCnctTstNtwkDly( CnctInfoPt, NtwkDlyMsec );
 }
 
-int SrvrThrdCls::Init( const void * LicnCodePt, VstrCls * ErrInfoVstrPt )
+int SrvrThrdCls::Init( const void * LicnCodePt, Vstr * ErrInfoVstrPt )
 {
 	return SrvrThrdInit( &m_SrvrThrdPt, LicnCodePt, this,
-						 SrvrThrdClsUserShowLog, SrvrThrdClsUserShowToast, SrvrThrdClsUserMsg,
 						 SrvrThrdClsUserSrvrThrdInit, SrvrThrdClsUserSrvrThrdDstoy,
+						 SrvrThrdClsUserSrvrThrdPocs, SrvrThrdClsUserMsg,
+						 SrvrThrdClsUserShowLog, SrvrThrdClsUserShowToast,
 						 SrvrThrdClsUserSrvrInit, SrvrThrdClsUserSrvrDstoy,
 						 SrvrThrdClsUserCnctInit, SrvrThrdClsUserCnctDstoy, SrvrThrdClsUserCnctSts, SrvrThrdClsUserCnctRmtTkbkMode, SrvrThrdClsUserCnctTstNtwkDly,
-						 ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL );
+			             ErrInfoVstrPt );
 }

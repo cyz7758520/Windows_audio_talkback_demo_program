@@ -10,12 +10,12 @@ int MyClntMediaPocsThrdCls::Init( const void * LicnCodePt )
 	{
 		wchar_t p_TmpU16strPt[ 1024 ];
 
-		LOGI( Cu8vstr( "开始启动我的客户端媒体处理线程。" ) );
+		LOGI( Cu8vstr( "我的客户端媒体处理线程初始化开始。" ) );
 
-		//初始化我的客户端媒体处理线程。
-		if( ClntMediaPocsThrdCls::Init( LicnCodePt, &g_ErrInfoVstr ) != 0 )
+		//客户端媒体处理线程初始化。
+		if( ClntMediaPocsThrdCls::Init( LicnCodePt, g_ErrInfoVstr.m_Pt ) != 0 )
 		{
-			LOGFE( Cu8vstr( "初始化我的客户端媒体处理线程失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
+			LOGFE( Cu8vstr( "客户端媒体处理线程初始化失败。原因：%vs" ), g_ErrInfoVstr.m_Pt );
 			goto Out;
 		}
 
@@ -54,6 +54,7 @@ int MyClntMediaPocsThrdCls::Init( const void * LicnCodePt )
 			m_ClntMediaPocsThrdPt->m_TkbkClnt.m_AAjbParm.m_MaxCntuLostFrmCnt = _wtoi( p_TmpU16strPt );
 			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, AAjbAdaptSensitivityEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 			m_ClntMediaPocsThrdPt->m_TkbkClnt.m_AAjbParm.m_AdaptSensitivity = _wtoi( p_TmpU16strPt );
+
 			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMinNeedBufFrmCntEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 			m_ClntMediaPocsThrdPt->m_TkbkClnt.m_VAjbParm.m_MinNeedBufFrmCnt = _wtoi( p_TmpU16strPt );
 			GetWindowText( GetDlgItem( g_AjbStngDlgWndHdl, VAjbMaxNeedBufFrmCntEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
@@ -63,26 +64,24 @@ int MyClntMediaPocsThrdCls::Init( const void * LicnCodePt )
 		}
 
 		//设置是否打印Log日志、显示Toast。
-		m_MediaPocsThrdClsPt->SetIsPrintLogShowToast(
-			( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-			( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-			NULL,
-			&g_ErrInfoVstr );
+		m_MediaPocsThrdClsPt->SetIsPrintLogShowToast( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+													  ( IsDlgButtonChecked( g_StngDlgWndHdl, IsPrintLogShowToastCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+													  NULL,
+													  g_ErrInfoVstr.m_Pt );
 
 		//设置是否使用阻止系统休眠。
-		m_MediaPocsThrdClsPt->SetIsUsePrvntSysSleep(
-			0,
-			( IsDlgButtonChecked( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-			&g_ErrInfoVstr );
+		m_MediaPocsThrdClsPt->SetIsUsePrvntSysSleep( 0,
+													 ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUsePrvntSysSleepCkBoxId ) == BST_CHECKED ) ? 1 : 0,
+													 g_ErrInfoVstr.m_Pt );
 
-		//启动我的客户端媒体处理线程。
-		if( m_MediaPocsThrdClsPt->Start( &g_ErrInfoVstr ) != 0 )
+		//我的客户端媒体处理线程启动。
+		if( m_MediaPocsThrdClsPt->Start( g_ErrInfoVstr.m_Pt ) != 0 )
 		{
-			LOGFE( Cu8vstr( "启动我的客户端媒体处理线程失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
+			LOGFE( Cu8vstr( "我的客户端媒体处理线程启动失败。原因：%vs" ), g_ErrInfoVstr.m_Pt );
 			goto Out;
 		}
 
-		LOGI( Cu8vstr( "启动我的客户端媒体处理线程完毕。" ) );
+		LOGI( Cu8vstr( "我的客户端媒体处理线程初始化结束。" ) );
 
 		p_Rslt = 0; //设置本函数执行成功。
 	}
@@ -99,7 +98,7 @@ int MyClntMediaPocsThrdCls::Init( const void * LicnCodePt )
 void MyClntMediaPocsThrdCls::Dstoy()
 {
 	LOGI( Cu8vstr( "请求并等待我的客户端媒体处理线程退出开始。" ) );
-	m_MediaPocsThrdClsPt->RqirExit( 1, 1, &g_ErrInfoVstr );
+	m_MediaPocsThrdClsPt->RqirExit( 1, 1, g_ErrInfoVstr.m_Pt );
 	LOGI( Cu8vstr( "请求并等待我的客户端媒体处理线程退出结束。" ) );
 }
 
@@ -129,7 +128,7 @@ int MyClntMediaPocsThrdCls::TkbkInit( const void * LicnCodePt )
 		SendTkbkClntSetIsTstNtwkDlyMsg( 0,
 										( IsDlgButtonChecked( g_StngDlgWndHdl, IsTstNtwkDlyCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 										1000,
-										&g_ErrInfoVstr );
+										g_ErrInfoVstr.m_Pt );
 
 		//发送对讲客户端的连接初始化消息。
 		m_TkbkClntNum = p_Num;
@@ -139,7 +138,7 @@ int MyClntMediaPocsThrdCls::TkbkInit( const void * LicnCodePt )
 		VstrInit( &p_RmtNodeNameVstrPt, Utf16, , Cu16vstr( p_TmpU16strPt ) );
 		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		VstrInit( &p_RmtNodeSrvcVstrPt, Utf16, , Cu16vstr( p_TmpU16strPt ) );
-		SendTkbkClntCnctInitMsg( 1, p_IsTcpOrAudpPrtcl, p_RmtNodeNameVstrPt, p_RmtNodeSrvcVstrPt, NULL );
+		SendTkbkClntCnctInitMsg( 1, p_IsTcpOrAudpPrtcl, p_RmtNodeNameVstrPt, p_RmtNodeSrvcVstrPt, g_ErrInfoVstr.m_Pt );
 
 		//发送对讲客户端的本端对讲模式消息。
 		SendTkbkClntLclTkbkModeMsg( 0,
@@ -147,7 +146,7 @@ int MyClntMediaPocsThrdCls::TkbkInit( const void * LicnCodePt )
 									( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoOtptTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeAdoOtpt : 0 ) +
 									( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoInptTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeVdoInpt : 0 ) +
 									( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoOtptTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeVdoOtpt : 0 ),
-									&g_ErrInfoVstr );
+									g_ErrInfoVstr.m_Pt );
 	}
 	
 	LOGI( Cu8vstr( "对讲初始化结束。" ) );
@@ -161,14 +160,14 @@ int MyClntMediaPocsThrdCls::TkbkInit( const void * LicnCodePt )
 	{
 		TkbkDstoy();
 	}
-	return ( INT_PTR )TRUE;
+	return p_Rslt;
 }
 
 //对讲销毁。
 void MyClntMediaPocsThrdCls::TkbkDstoy()
 {
 	LOGI( Cu8vstr( "开始请求并等待对讲销毁。" ) );
-	SendTkbkClntCnctDstoyMsg( 1, NULL );
+	SendTkbkClntCnctDstoyMsg( 1, g_ErrInfoVstr.m_Pt );
 	LOGI( Cu8vstr( "结束请求并等待对讲销毁。" ) );
 }
 
@@ -192,7 +191,7 @@ int MyClntMediaPocsThrdCls::BdctInit( const void * LicnCodePt )
 	}
 
 	//发送广播客户端初始化消息。
-	SendBdctClntInitMsg( 0, 0, NULL );
+	SendBdctClntInitMsg( 0, 0, g_ErrInfoVstr.m_Pt );
 
 	//添加客户端列表。
 	VstrInit( &p_RmtNodeNameVstrPt, Utf16, ,  );
@@ -205,7 +204,7 @@ int MyClntMediaPocsThrdCls::BdctInit( const void * LicnCodePt )
 		VstrCpy( p_RmtNodeNameVstrPt, Cu16vstr( p_TmpU16strPt ), ,  );
 		ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		VstrCpy( p_RmtNodeSrvcVstrPt, Cu16vstr( p_TmpU16strPt ), ,  );
-		SendBdctClntCnctInitMsg( 0, p_IsTcpOrAudpPrtcl, p_RmtNodeNameVstrPt, p_RmtNodeSrvcVstrPt, NULL );
+		SendBdctClntCnctInitMsg( 0, p_IsTcpOrAudpPrtcl, p_RmtNodeNameVstrPt, p_RmtNodeSrvcVstrPt, g_ErrInfoVstr.m_Pt );
 	}
 
 	LOGI( Cu8vstr( "广播初始化结束。" ) );
@@ -226,8 +225,32 @@ int MyClntMediaPocsThrdCls::BdctInit( const void * LicnCodePt )
 void MyClntMediaPocsThrdCls::BdctDstoy()
 {
 	LOGI( Cu8vstr( "开始请求并等待广播销毁。" ) );
-	SendBdctClntDstoyMsg( 1, NULL );
+	SendBdctClntDstoyMsg( 1, g_ErrInfoVstr.m_Pt );
 	LOGI( Cu8vstr( "结束请求并等待广播销毁。" ) );
+}
+
+//用户定义的初始化函数。
+void MyClntMediaPocsThrdCls::UserInit()
+{
+	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypMyClntMediaPocsThrdInit, 0, 0 );
+}
+
+//用户定义的销毁函数。
+void MyClntMediaPocsThrdCls::UserDstoy()
+{
+	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypMyClntMediaPocsThrdDstoy, 0, 0 );
+}
+
+//用户定义的处理函数。
+void MyClntMediaPocsThrdCls::UserPocs()
+{
+	
+}
+
+//用户定义的消息函数。
+int MyClntMediaPocsThrdCls::UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
+{
+	return 0;
 }
 
 //用户定义的显示日志函数。
@@ -246,18 +269,6 @@ void MyClntMediaPocsThrdCls::UserShowToast( Vstr * InfoVstrPt )
 
 	VstrInit( &p_InfoVstrPt, Utf16, , InfoVstrPt );
 	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypShowToast, ( WPARAM )p_InfoVstrPt, 0 );
-}
-
-//用户定义的客户端媒体处理线程初始化函数。
-void MyClntMediaPocsThrdCls::UserClntMediaPocsThrdInit()
-{
-	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypMyClntMediaPocsThrdInit, 0, 0 );
-}
-
-//用户定义的客户端媒体处理线程销毁函数。
-void MyClntMediaPocsThrdCls::UserClntMediaPocsThrdDstoy()
-{
-	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypMyClntMediaPocsThrdDstoy, 0, 0 );
 }
 
 //用户定义的对讲客户端连接初始化函数。
@@ -409,7 +420,7 @@ void MyClntMediaPocsThrdCls::UserTkbkClntLclTkbkMode( int32_t OldLclTkbkMode, in
 																( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveAdoOtptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 																( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoInptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 																( IsDlgButtonChecked( g_SaveAdoVdoInptOtptToAviFileStngDlgWndHdl, SaveAdoVdoInptOtptToAviFileIsSaveVdoOtptCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-																( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+																m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置是否保存状态到Txt文件。
@@ -421,7 +432,7 @@ void MyClntMediaPocsThrdCls::UserTkbkClntLclTkbkMode( int32_t OldLclTkbkMode, in
 
 		m_MediaPocsThrdClsPt->SaveStsToTxtFile( 0,
 												Cu16vstr( p_FullPathU16strPt ),
-												( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+												m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 }
 
@@ -434,20 +445,8 @@ void MyClntMediaPocsThrdCls::UserTkbkClntTkbkInfoInit( TkbkClnt::TkbkInfo * Tkbk
 //用户定义的对讲客户端对讲信息销毁函数。
 void MyClntMediaPocsThrdCls::UserTkbkClntTkbkInfoDstoy( TkbkClnt::TkbkInfo * TkbkInfoPt )
 {
-	size_t p_StrmNum = 0;
-	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
-
-	m_MediaPocsThrdClsPt->AdoOtptDelStrm( 1, 0, TkbkInfoPt->m_TkbkIdx, NULL ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。
-
-	for( ; m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.GetByNum( p_StrmNum, &p_StrmPt, NULL, 0, 0, NULL ) == 0; p_StrmNum++ )
-	{
-		if( p_StrmPt->m_Idx == TkbkInfoPt->m_TkbkIdx )
-		{
-			SendVdoInptOtptWndDstoyMsg( p_StrmPt->m_Dvc.m_DspyWndHdl );
-			break;
-		}
-	}
-	m_MediaPocsThrdClsPt->VdoOtptDelStrm( 1, 0, TkbkInfoPt->m_TkbkIdx, NULL ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。
+	SetNotUseAdoOtptStrm( TkbkInfoPt->m_TkbkIdx ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。
+	SetNotUseVdoOtptStrm( TkbkInfoPt->m_TkbkIdx ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。
 }
 
 //用户定义的对讲客户端对讲信息远端对讲模式函数。
@@ -514,7 +513,7 @@ void MyClntMediaPocsThrdCls::UserTkbkClntTstNtwkDly( uint64_t NtwkDlyMsec )
 //用户定义的广播客户端初始化函数。
 void MyClntMediaPocsThrdCls::UserBdctClntInit()
 {
-    if( m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoInpt.m_IsInit == 0 ) //如果音频输入未初始化。
+	if( m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoInpt.m_IsInit == 0 ) //如果音频输入未初始化。
 	{
 		SetToUseAdoInpt(); //设置要使用音频输入。
 	}
@@ -612,163 +611,156 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 									  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId ) == BST_CHECKED ) ? 10 :
 									  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen20msRdBtnId ) == BST_CHECKED ) ? 20 :
 									  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 0,
-									  ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+									  m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输入是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
-	m_MediaPocsThrdClsPt->AdoInptSetIsUseSystemAecNsAgc( 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	m_MediaPocsThrdClsPt->AdoInptSetIsUseSystemAecNsAgc( 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
-	if( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_XfrMode == 0 ) //如果传输模式为实时半双工（一键通）。
+	//设置音频输入是否不使用声学回音消除器。
+	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoAecRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->AdoInptSetUseNoAec( 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseNoAec( 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
-	else //如果传输模式为实时全双工。
+
+	//设置音频输入是否使用Speex声学回音消除器。
+	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexAecRdBtnId ) == BST_CHECKED )
 	{
-		//设置音频输入是否不使用声学回音消除器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoAecRdBtnId ) == BST_CHECKED )
-		{
-			m_MediaPocsThrdClsPt->AdoInptSetUseNoAec( 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-		}
+		int32_t p_FilterLenMsec;
+		int32_t p_IsUseRec;
+		float p_EchoMultiple;
+		float p_EchoCntu;
+		int32_t p_EchoSupes;
+		int32_t p_EchoSupesAct;
 
-		//设置音频输入是否使用Speex声学回音消除器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexAecRdBtnId ) == BST_CHECKED )
-		{
-			int32_t p_FilterLenMsec;
-			int32_t p_IsUseRec;
-			float p_EchoMultiple;
-			float p_EchoCntu;
-			int32_t p_EchoSupes;
-			int32_t p_EchoSupesAct;
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_FilterLenMsec = _wtoi( p_TmpU16strPt );
+		p_IsUseRec = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_EchoMultiple = _wtof( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_EchoCntu = _wtof( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_EchoSupes = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_EchoSupesAct = _wtoi( p_TmpU16strPt );
 
-			GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_FilterLenMsec = _wtoi( p_TmpU16strPt );
-			p_IsUseRec = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
-			GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_EchoMultiple = _wtof( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_EchoCntu = _wtof( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_EchoSupes = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_EchoSupesAct = _wtoi( p_TmpU16strPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexAec( 0, p_FilterLenMsec, p_IsUseRec, p_EchoMultiple, p_EchoCntu, p_EchoSupes, p_EchoSupesAct, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	}
 
-			m_MediaPocsThrdClsPt->AdoInptSetUseSpeexAec( 0, p_FilterLenMsec, p_IsUseRec, p_EchoMultiple, p_EchoCntu, p_EchoSupes, p_EchoSupesAct, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-		}
+	//设置音频输入是否使用WebRtc定点版声学回音消除器。
+	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecmRdBtnId ) == BST_CHECKED )
+	{
+		int32_t p_IsUseCNGMode;
+		int32_t p_EchoMode;
+		int32_t p_Delay;
 
-		//设置音频输入是否使用WebRtc定点版声学回音消除器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecmRdBtnId ) == BST_CHECKED )
-		{
-			int32_t p_IsUseCNGMode;
-			int32_t p_EchoMode;
-			int32_t p_Delay;
+		p_IsUseCNGMode = ( IsDlgButtonChecked( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
+		GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_EchoMode = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_Delay = _wtoi( p_TmpU16strPt );
 
-			p_IsUseCNGMode = ( IsDlgButtonChecked( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
-			GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_EchoMode = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_Delay = _wtoi( p_TmpU16strPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAecm( 0, p_IsUseCNGMode, p_EchoMode, p_Delay, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	}
 
-			m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAecm( 0, p_IsUseCNGMode, p_EchoMode, p_Delay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-		}
+	//设置音频输入是否使用WebRtc浮点版声学回音消除器。
+	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecRdBtnId ) == BST_CHECKED )
+	{
+		int32_t p_EchoMode;
+		int32_t p_Delay;
+		int32_t p_IsUseDelayAgstcMode;
+		int32_t p_IsUseExtdFilterMode;
+		int32_t p_IsUseRefinedFilterAdaptAecMode;
+		int32_t p_IsUseAdaptAdjDelay;
 
-		//设置音频输入是否使用WebRtc浮点版声学回音消除器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAecRdBtnId ) == BST_CHECKED )
-		{
-			int32_t p_EchoMode;
-			int32_t p_Delay;
-			int32_t p_IsUseDelayAgstcMode;
-			int32_t p_IsUseExtdFilterMode;
-			int32_t p_IsUseRefinedFilterAdaptAecMode;
-			int32_t p_IsUseAdaptAdjDelay;
+		GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_EchoMode = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_Delay = _wtoi( p_TmpU16strPt );
+		p_IsUseDelayAgstcMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
+		p_IsUseExtdFilterMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
+		p_IsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
+		p_IsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
 
-			GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_EchoMode = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_Delay = _wtoi( p_TmpU16strPt );
-			p_IsUseDelayAgstcMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
-			p_IsUseExtdFilterMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
-			p_IsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
-			p_IsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
-
-			m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec( 0, p_EchoMode, p_Delay, p_IsUseDelayAgstcMode, p_IsUseExtdFilterMode, p_IsUseRefinedFilterAdaptAecMode, p_IsUseAdaptAdjDelay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-		}
+		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec( 0, p_EchoMode, p_Delay, p_IsUseDelayAgstcMode, p_IsUseExtdFilterMode, p_IsUseRefinedFilterAdaptAecMode, p_IsUseAdaptAdjDelay, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	}
 		
-		//设置音频输入是否使用WebRtc第三版声学回音消除器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAec3RdBtnId ) == BST_CHECKED )
-		{
-			int32_t p_Delay;
+	//设置音频输入是否使用WebRtc第三版声学回音消除器。
+	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseWebRtcAec3RdBtnId ) == BST_CHECKED )
+	{
+		int32_t p_Delay;
 
-			GetWindowText( GetDlgItem( g_WebRtcAec3StngDlgWndHdl, WebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_Delay = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_WebRtcAec3StngDlgWndHdl, WebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_Delay = _wtoi( p_TmpU16strPt );
 
-			m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec3( 0, p_Delay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-		}
+		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec3( 0, p_Delay, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	}
 
-		//设置音频输入是否使用SpeexWebRtc三重声学回音消除器。
-		if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexWebRtcAecRdBtnId ) == BST_CHECKED )
-		{
-			int32_t p_WorkMode;
-			int32_t p_SpeexAecFilterLenMsec;
-			int32_t p_SpeexAecIsUseRec;
-			float p_SpeexAecEchoMultiple;
-			float p_SpeexAecEchoCntu;
-			int32_t p_SpeexAecEchoSupes;
-			int32_t p_SpeexAecEchoSupesAct;
-			int32_t p_WebRtcAecmIsUseCNGMode;
-			int32_t p_WebRtcAecmEchoMode;
-			int32_t p_WebRtcAecmDelay;
-			int32_t p_WebRtcAecEchoMode;
-			int32_t p_WebRtcAecDelay;
-			int32_t p_WebRtcAecIsUseDelayAgstcMode;
-			int32_t p_WebRtcAecIsUseExtdFilterMode;
-			int32_t p_WebRtcAecIsUseRefinedFilterAdaptAecMode;
-			int32_t p_WebRtcAecIsUseAdaptAdjDelay;
-			int32_t p_WebRtcAec3Delay;
-			int32_t p_IsUseSameRoomAec;
-			int32_t p_SameRoomEchoMinDelay;
+	//设置音频输入是否使用SpeexWebRtc三重声学回音消除器。
+	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseSpeexWebRtcAecRdBtnId ) == BST_CHECKED )
+	{
+		int32_t p_WorkMode;
+		int32_t p_SpeexAecFilterLenMsec;
+		int32_t p_SpeexAecIsUseRec;
+		float p_SpeexAecEchoMultiple;
+		float p_SpeexAecEchoCntu;
+		int32_t p_SpeexAecEchoSupes;
+		int32_t p_SpeexAecEchoSupesAct;
+		int32_t p_WebRtcAecmIsUseCNGMode;
+		int32_t p_WebRtcAecmEchoMode;
+		int32_t p_WebRtcAecmDelay;
+		int32_t p_WebRtcAecEchoMode;
+		int32_t p_WebRtcAecDelay;
+		int32_t p_WebRtcAecIsUseDelayAgstcMode;
+		int32_t p_WebRtcAecIsUseExtdFilterMode;
+		int32_t p_WebRtcAecIsUseRefinedFilterAdaptAecMode;
+		int32_t p_WebRtcAecIsUseAdaptAdjDelay;
+		int32_t p_WebRtcAec3Delay;
+		int32_t p_IsUseSameRoomAec;
+		int32_t p_SameRoomEchoMinDelay;
 
-			p_WorkMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecm :
-						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec :
-						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec :
-						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3 :
-						 ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3 : 0;
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_SpeexAecFilterLenMsec = _wtoi( p_TmpU16strPt );
-			p_SpeexAecIsUseRec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_SpeexAecEchoMultiple = _wtof( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_SpeexAecEchoCntu = _wtof( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_SpeexAecEchoSupes = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_SpeexAecEchoSupesAct = _wtoi( p_TmpU16strPt );
-			p_WebRtcAecmIsUseCNGMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_WebRtcAecmEchoMode = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_WebRtcAecmDelay = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_WebRtcAecEchoMode = _wtoi( p_TmpU16strPt );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_WebRtcAecDelay = _wtoi( p_TmpU16strPt );
-			p_WebRtcAecIsUseDelayAgstcMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
-			p_WebRtcAecIsUseExtdFilterMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
-			p_WebRtcAecIsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
-			p_WebRtcAecIsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_WebRtcAec3Delay = _wtoi( p_TmpU16strPt );
-			p_IsUseSameRoomAec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId ) == BST_CHECKED );
-			GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
-			p_SameRoomEchoMinDelay = _wtoi( p_TmpU16strPt );
+		p_WorkMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecm :
+						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec :
+						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec :
+						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3 :
+						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3 : 0;
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_SpeexAecFilterLenMsec = _wtoi( p_TmpU16strPt );
+		p_SpeexAecIsUseRec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_SpeexAecEchoMultiple = _wtof( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_SpeexAecEchoCntu = _wtof( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_SpeexAecEchoSupes = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_SpeexAecEchoSupesAct = _wtoi( p_TmpU16strPt );
+		p_WebRtcAecmIsUseCNGMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_WebRtcAecmEchoMode = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_WebRtcAecmDelay = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_WebRtcAecEchoMode = _wtoi( p_TmpU16strPt );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_WebRtcAecDelay = _wtoi( p_TmpU16strPt );
+		p_WebRtcAecIsUseDelayAgstcMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
+		p_WebRtcAecIsUseExtdFilterMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
+		p_WebRtcAecIsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
+		p_WebRtcAecIsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_WebRtcAec3Delay = _wtoi( p_TmpU16strPt );
+		p_IsUseSameRoomAec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId ) == BST_CHECKED );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		p_SameRoomEchoMinDelay = _wtoi( p_TmpU16strPt );
 
-			m_MediaPocsThrdClsPt->AdoInptSetUseSpeexWebRtcAec( 0, p_WorkMode, p_SpeexAecFilterLenMsec, p_SpeexAecIsUseRec, p_SpeexAecEchoMultiple, p_SpeexAecEchoCntu, p_SpeexAecEchoSupes, p_SpeexAecEchoSupesAct, p_WebRtcAecmIsUseCNGMode, p_WebRtcAecmEchoMode, p_WebRtcAecmDelay, p_WebRtcAecEchoMode, p_WebRtcAecDelay, p_WebRtcAecIsUseDelayAgstcMode, p_WebRtcAecIsUseExtdFilterMode, p_WebRtcAecIsUseRefinedFilterAdaptAecMode, p_WebRtcAecIsUseAdaptAdjDelay, p_WebRtcAec3Delay, p_IsUseSameRoomAec, p_SameRoomEchoMinDelay, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-		}
+		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexWebRtcAec( 0, p_WorkMode, p_SpeexAecFilterLenMsec, p_SpeexAecIsUseRec, p_SpeexAecEchoMultiple, p_SpeexAecEchoCntu, p_SpeexAecEchoSupes, p_SpeexAecEchoSupesAct, p_WebRtcAecmIsUseCNGMode, p_WebRtcAecmEchoMode, p_WebRtcAecmDelay, p_WebRtcAecEchoMode, p_WebRtcAecDelay, p_WebRtcAecIsUseDelayAgstcMode, p_WebRtcAecIsUseExtdFilterMode, p_WebRtcAecIsUseRefinedFilterAdaptAecMode, p_WebRtcAecIsUseAdaptAdjDelay, p_WebRtcAec3Delay, p_IsUseSameRoomAec, p_SameRoomEchoMinDelay, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否不使用噪音抑制器。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoNsRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->AdoInptSetUseNoNs( 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseNoNs( 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用Speex预处理器的噪音抑制。
@@ -783,7 +775,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		p_NoiseSupes = _wtoi( p_TmpU16strPt );
 		p_IsUseDereverb = ( IsDlgButtonChecked( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseDereverbCkBoxId ) == BST_CHECKED );
 
-		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexPrpocsNs( 0, p_IsUseNs, p_NoiseSupes, p_IsUseDereverb, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexPrpocsNs( 0, p_IsUseNs, p_NoiseSupes, p_IsUseDereverb, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用WebRtc定点版噪音抑制器。
@@ -794,7 +786,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		GetWindowText( GetDlgItem( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 		p_PolicyMode = _wtoi( p_TmpU16strPt );
 
-		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcNsx( 0, p_PolicyMode, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcNsx( 0, p_PolicyMode, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用WebRtc浮点版噪音抑制器。
@@ -805,13 +797,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		GetWindowText( GetDlgItem( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 		p_PolicyMode = _wtoi( p_TmpU16strPt );
 
-		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcNs( 0, p_PolicyMode, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcNs( 0, p_PolicyMode, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用RNNoise噪音抑制器。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseRNNoiseRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->AdoInptSetUseRNNoise( 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseRNNoise( 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用Speex预处理器。
@@ -840,13 +832,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 		p_AgcMaxGain = _wtoi( p_TmpU16strPt );
 
-		m_MediaPocsThrdClsPt->AdoInptSetIsUseSpeexPrpocs( 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId ) == BST_CHECKED ) ? 1 : 0, p_IsUseVad, p_VadProbStart, p_VadProbCont, p_IsUseAgc, p_AgcLevel, p_AgcIncrement, p_AgcDecrement, p_AgcMaxGain, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetIsUseSpeexPrpocs( 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId ) == BST_CHECKED ) ? 1 : 0, p_IsUseVad, p_VadProbStart, p_VadProbCont, p_IsUseAgc, p_AgcLevel, p_AgcIncrement, p_AgcDecrement, p_AgcMaxGain, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用Pcm原始数据。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UsePcmRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->AdoInptSetUsePcm( 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUsePcm( 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用Speex编码器。
@@ -865,13 +857,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		GetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 		p_EncdPlcExptLossRate = _wtoi( p_TmpU16strPt );
 
-		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexEncd( 0, p_EncdUseCbrOrVbr, p_EncdQualt, p_EncdCmplxt, p_EncdPlcExptLossRate, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexEncd( 0, p_EncdUseCbrOrVbr, p_EncdQualt, p_EncdCmplxt, p_EncdPlcExptLossRate, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否使用Opus编码器。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseOpusCodecRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->AdoInptSetUseOpusEncd( 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoInptSetUseOpusEncd( 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否绘制音频波形到窗口。
@@ -879,7 +871,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 														 ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 														 GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ),
 														 GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ),
-														 ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+														 m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输入是否保存音频到Wave文件。
 	if( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) &&
@@ -899,7 +891,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 															 Cu16vstr( p_AdoInptSrcFullPathU16strPt ),
 															 Cu16vstr( p_AdoInptRsltFullPathU16strPt ),
 															 p_WrBufSzByt,
-															 & g_ErrInfoVstr );
+															 g_ErrInfoVstr.m_Pt );
 	}
 
 	//设置音频输入使用的设备。
@@ -908,13 +900,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		CbBoxGetCurSelTxt( g_AdoInptDvcCbBoxWndHdl, p_CurAdoInptDvcNameU16strPt ); //获取当前选择的音频输入设备的名称。
 		m_MediaPocsThrdClsPt->AdoInptSetUseDvc( 0,
 												Cu16vstr( p_CurAdoInptDvcNameU16strPt ),
-												( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+												m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输入是否静音。
 	m_MediaPocsThrdClsPt->AdoInptSetIsMute( 0,
 											( IsDlgButtonChecked( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-											& g_ErrInfoVstr );
+											g_ErrInfoVstr.m_Pt );
 }
 
 //设置不使用音频输入。
@@ -938,7 +930,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoOtpt()
 									  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId ) == BST_CHECKED ) ? 10 :
 									  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen20msRdBtnId ) == BST_CHECKED ) ? 20 :
 									  ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 0,
-									  ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+									  m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输出是否保存音频到Wave文件。
 	if( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) &&
@@ -955,14 +947,14 @@ void MyClntMediaPocsThrdCls::SetToUseAdoOtpt()
 															 ( IsDlgButtonChecked( g_StngDlgWndHdl, IsSaveAdoInptOtptToWaveFileCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 															 Cu16vstr( p_AdoOtptSrcFullPathU16strPt ),
 															 p_WrBufSzByt,
-															 ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+															 m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输出是否绘制音频波形到窗口。
 	m_MediaPocsThrdClsPt->AdoOtptSetIsDrawAdoWavfmToWnd( 0,
 														 ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 														 GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ),
-														 ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+														 m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输出使用的设备。
 	{
@@ -970,13 +962,13 @@ void MyClntMediaPocsThrdCls::SetToUseAdoOtpt()
 		CbBoxGetCurSelTxt( g_AdoOtptDvcCbBoxWndHdl, p_CurAdoOtptDvcNameU16strPt ); //获取当前选择的音频输出设备的名称。
 		m_MediaPocsThrdClsPt->AdoOtptSetUseDvc( 0,
 												Cu16vstr( p_CurAdoOtptDvcNameU16strPt ),
-												( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+												m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输出是否静音。
 	m_MediaPocsThrdClsPt->AdoOtptSetIsMute( 0,
 											( IsDlgButtonChecked( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-											( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+											m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	
 	for( size_t p_TkbkInfoIdx = 0; CQueueGetByNum( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_TkbkInfoCntnrPt, p_TkbkInfoIdx, NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) == 0; p_TkbkInfoIdx++ )
 	{
@@ -1007,12 +999,12 @@ void MyClntMediaPocsThrdCls::SetNotUseAdoOtpt()
 void MyClntMediaPocsThrdCls::SetToUseAdoOtptStrm( int TkbkIdx )
 {
 	//音频输出添加流。
-    m_MediaPocsThrdClsPt->AdoOtptAddStrm( 0, TkbkIdx, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	m_MediaPocsThrdClsPt->AdoOtptAddStrm( 0, TkbkIdx, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输出是否使用Pcm原始数据。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UsePcmRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->AdoOtptSetStrmUsePcm( 0, TkbkIdx, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoOtptSetStrmUsePcm( 0, TkbkIdx, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输出是否使用Speex解码器。
@@ -1022,23 +1014,23 @@ void MyClntMediaPocsThrdCls::SetToUseAdoOtptStrm( int TkbkIdx )
 
 		p_DecdIsUsePrcplEnhsmt = ( IsDlgButtonChecked( g_SpeexCodecStngDlgWndHdl, SpeexDecdIsUsePrcplEnhsmtCkBoxId ) == BST_CHECKED );
 
-		m_MediaPocsThrdClsPt->AdoOtptSetStrmUseSpeexDecd( 0, TkbkIdx, p_DecdIsUsePrcplEnhsmt, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoOtptSetStrmUseSpeexDecd( 0, TkbkIdx, p_DecdIsUsePrcplEnhsmt, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输出是否使用Opus解码器。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseOpusCodecRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->AdoOtptSetStrmUseOpusDecd( 0, TkbkIdx, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->AdoOtptSetStrmUseOpusDecd( 0, TkbkIdx, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置音频输出流是否使用。
-	m_MediaPocsThrdClsPt->AdoOtptSetStrmIsUse( 0, TkbkIdx, 1, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	m_MediaPocsThrdClsPt->AdoOtptSetStrmIsUse( 0, TkbkIdx, 1, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 }
 
 //设置不使用音频输出流。
 void MyClntMediaPocsThrdCls::SetNotUseAdoOtptStrm( int TkbkIdx )
 {
-    m_MediaPocsThrdClsPt->AdoOtptDelStrm( 1, 0, TkbkIdx, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。
+	m_MediaPocsThrdClsPt->AdoOtptDelStrm( 1, 0, TkbkIdx, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。
 }
 
 //设置要使用视频输入。
@@ -1066,7 +1058,7 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 										  ( SendMessage( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzPrsetCbBoxId ), CB_GETCURSEL, 0, 0 ) == 3 ) ? 1280 : 0,
 										  0, 0, 0,
 										  SendVdoInptOtptWndInitMsg( p_TitleVstrPt ),
-										  ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+										  m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 	else //如果要使用其他的帧的大小。
 	{
@@ -1087,13 +1079,13 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 										  p_VdoFrmSzOtherHeight,
 										  0, 0, 0,
 										  SendVdoInptOtptWndInitMsg( p_TitleVstrPt ),
-										  ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+										  m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置视频输入是否使用Yu12原始数据。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseYu12RdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->VdoInptSetUseYu12( 0, ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+		m_MediaPocsThrdClsPt->VdoInptSetUseYu12( 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置视频输入是否使用OpenH264编码器。
@@ -1122,7 +1114,7 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 														 p_OpenH264EncdBitrateCtrlMode,
 														 p_OpenH264EncdIDRFrmIntvl,
 														 p_OpenH264EncdCmplxt,
-														 ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+														 m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置视频输入使用的设备。
@@ -1131,13 +1123,13 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 		CbBoxGetCurSelTxt( g_VdoInptDvcCbBoxWndHdl, p_CurVdoInptDvcNameU16strPt ); //获取当前选择的视频输入设备的名称。
 		m_MediaPocsThrdClsPt->VdoInptSetUseDvc( 0,
 												Cu16vstr( p_CurVdoInptDvcNameU16strPt ),
-												( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+												m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 	}
 
 	//设置视频输入是否黑屏。
 	m_MediaPocsThrdClsPt->VdoInptSetIsBlack( 0,
 											 ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-											 ( VstrCls * )&m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+											 m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 }
 
 //设置不使用视频输入。
@@ -1187,28 +1179,28 @@ void MyClntMediaPocsThrdCls::SetToUseVdoOtptStrm( int TkbkIdx )
 	m_MediaPocsThrdClsPt->VdoOtptSetStrm( 0,
 										  TkbkIdx,
 										  SendVdoInptOtptWndInitMsg( p_TitleVstrPt ),
-										  &g_ErrInfoVstr );
+										  g_ErrInfoVstr.m_Pt );
 
 	//设置视频输出是否使用Yu12原始数据。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseYu12RdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->VdoOtptSetStrmUseYu12( 0, TkbkIdx, &g_ErrInfoVstr );
+		m_MediaPocsThrdClsPt->VdoOtptSetStrmUseYu12( 0, TkbkIdx, g_ErrInfoVstr.m_Pt );
 	}
 
 	//设置视频输出是否使用OpenH264解码器。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseOpenH264CodecRdBtnId ) == BST_CHECKED )
 	{
-		m_MediaPocsThrdClsPt->VdoOtptSetStrmUseOpenH264Decd( 0, TkbkIdx, 0, &g_ErrInfoVstr );
+		m_MediaPocsThrdClsPt->VdoOtptSetStrmUseOpenH264Decd( 0, TkbkIdx, 0, g_ErrInfoVstr.m_Pt );
 	}
 
 	//设置视频输出是否黑屏。
 	m_MediaPocsThrdClsPt->VdoOtptSetStrmIsBlack( 0,
 												 TkbkIdx,
 												 ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0,
-												 &g_ErrInfoVstr );
+												 g_ErrInfoVstr.m_Pt );
 
 	//设置视频输出流是否使用。
-	m_MediaPocsThrdClsPt->VdoOtptSetStrmIsUse( 0, TkbkIdx, 1, &g_ErrInfoVstr );
+	m_MediaPocsThrdClsPt->VdoOtptSetStrmIsUse( 0, TkbkIdx, 1, g_ErrInfoVstr.m_Pt );
 }
 
 //设置不使用视频输出流。
@@ -1221,7 +1213,7 @@ void MyClntMediaPocsThrdCls::SetNotUseVdoOtptStrm( int TkbkIdx )
 		if( p_StrmPt->m_Idx == TkbkIdx )
 		{
 			SendVdoInptOtptWndDstoyMsg( p_StrmPt->m_Dvc.m_DspyWndHdl );
-            break;
+			break;
 		}
 	}
 	m_MediaPocsThrdClsPt->VdoOtptDelStrm( 1, 0, TkbkIdx, NULL ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。

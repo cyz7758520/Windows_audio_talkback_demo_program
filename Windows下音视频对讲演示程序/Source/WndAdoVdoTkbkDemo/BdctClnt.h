@@ -22,8 +22,8 @@ typedef struct BdctClnt //广播客户端。
 	typedef struct CnctInfo //连接信息。
 	{
 		size_t m_Idx; //存放索引，从0开始，连接信息容器的唯一索引，连接中途不会改变。
-        int32_t m_IsInit; //存放连接信息是否初始化，为0表示未初始化，为非0表示已初始化。
-        int32_t m_Num; //存放序号，从0开始，随着前面的连接销毁而递减。
+		int32_t m_IsInit; //存放连接信息是否初始化，为0表示未初始化，为非0表示已初始化。
+		int32_t m_Num; //存放序号，从0开始，随着前面的连接销毁而递减。
 
 		int32_t m_IsTcpOrAudpPrtcl; //存放是否是Tcp或Udp协议，为0表示Tcp协议，为1表示高级Udp协议。
 		Vstr * m_RmtNodeNameVstrPt; //存放远端套接字绑定的远端节点名称动态字符串的指针。
@@ -37,7 +37,7 @@ typedef struct BdctClnt //广播客户端。
 		int32_t m_IsRecvExitPkt; //存放是否接收退出包，为0表示未接收，为1表示已接收。
 	} CnctInfo;
 	CQueue * m_CnctInfoCntnrPt; //存放连接信息容器的指针。
-    int m_CnctInfoCurMaxNum; //存放连接信息的当前最大序号。
+	int m_CnctInfoCurMaxNum; //存放连接信息的当前最大序号。
 
 	int m_LastSendAdoInptFrmIsAct; //存放最后发送的音频输入帧有无语音活动，为1表示有语音活动，为0表示无语音活动。
 	uint32_t m_LastSendAdoInptFrmTimeStamp; //存放最后发送音频输入帧的时间戳。

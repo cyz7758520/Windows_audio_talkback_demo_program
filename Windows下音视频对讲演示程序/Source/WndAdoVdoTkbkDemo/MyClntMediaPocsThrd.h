@@ -21,18 +21,24 @@ public:
 	void TkbkDstoy();
 	int BdctInit( const void * LicnCodePt );
 	void BdctDstoy();
+	
+	//用户定义的初始化函数。
+	void UserInit();
+	
+	//用户定义的销毁函数。
+	void UserDstoy();
+	
+	//用户定义的处理函数。
+	void UserPocs();
 
+	//用户定义的消息函数。
+	int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+	
 	//用户定义的显示日志函数。
 	void UserShowLog( Vstr * InfoVstrPt );
 
 	//用户定义的显示Toast函数。
 	void UserShowToast( Vstr * InfoVstrPt );
-	
-	//用户定义的客户端媒体处理线程初始化函数。
-	void UserClntMediaPocsThrdInit();
-
-	//用户定义的客户端媒体处理线程销毁函数。
-	void UserClntMediaPocsThrdDstoy();
 	
 	//用户定义的对讲客户端连接初始化函数。
 	void UserTkbkClntCnctInit( int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt );

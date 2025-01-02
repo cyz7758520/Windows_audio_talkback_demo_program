@@ -110,7 +110,7 @@
 #include <lmerr.h>							//NERR_BASE、MAX_NERR
 #include <wininet.h>						//INTERNET_ERROR_BASE、INTERNET_ERROR_LAST
 #include <pdhmsg.h>							//PDH_CSTATUS_NO_MACHINE、PDH_QUERY_PERF_DATA_TIMEOUT
-//#include <Ws2tcpip.h>						//不包含该头文件，因为会与Linux套接字相关声明相冲突。
+//#include <Ws2tcpip.h>						//不包含该头文件，因为会与Linux套接字相关声明冲突。
 //#include <conio.h>						//不包含该头文件，因为Cygwin下没有。
 //#include <Dshow.h>						//不包含该头文件，因为会编译报错。
 #include <mmsystem.h>						//MMRESULT
@@ -239,7 +239,7 @@ typedef int64_t ssize_t;
 #define ALIGNUP( Val, ByteAlign ) ( ( ( ( Val ) & ~( ( ByteAlign ) - 1 ) ) != ( ~( ( ByteAlign ) - 1 ) ) ) ? ( ( ( Val ) + ( ByteAlign ) - 1 ) & ( ~( ( ByteAlign ) - 1 ) ) ) : ( ~( ( ByteAlign ) - 1 ) ) ) //向上字节对齐。
 #define ALIGNDOWN( Val, ByteAlign ) ( ( Val ) & ~( ( ByteAlign ) - 1 ) ) //向下字节对齐。
 
-//设置结束指针。
+//设置结束指针，指向最后一个元素的后面一个元素。
 #define SetEndPt( StartTyp, StartPt, SzTyp, EndTyp, EndPt ) \
 { \
 	if( ( ( SIZE_MAX - ( size_t )( StartPt ) ) / sizeof( StartTyp ) ) > ( SzTyp ) ) EndPt = ( EndTyp * )( ( StartTyp * )( StartPt )+( SzTyp ) ); /*不会溢出。*/\

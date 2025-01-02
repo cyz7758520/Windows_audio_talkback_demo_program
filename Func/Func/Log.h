@@ -46,6 +46,7 @@ extern "C"
 #endif
 
 __FUNC_DLLAPI__ int LogInit();
+__FUNC_DLLAPI__ void LogDstoy();
 
 __FUNC_DLLAPI__ int LogOpenFile( const Vstr * LogFilePathVstrPt, size_t * FileNumPt, int IsSetDfltFile, Vstr * ErrInfoVstrPt );
 __FUNC_DLLAPI__ int LogSetDfltFile( size_t FileNum, Vstr * ErrInfoVstrPt );
@@ -111,9 +112,6 @@ __FUNC_DLLAPI__ void LogHexWrite( size_t FileNum, int Lvl, const uint8_t * SrcFi
 #define LOGHNFD( FileNum, LineLenByt, FmtVstrPt, ... ) LogHexFmtWrite( FileNum, LOG_LVL_DEBUG, ( const uint8_t * )__FILE__, __LINE__, ( const uint8_t * )__FUNCTION__, LineLenByt, FmtVstrPt, __VA_ARGS__ )
 
 __FUNC_DLLAPI__ void LogHexFmtWrite( size_t FileNum, int Lvl, const uint8_t * SrcFileNameStrPt, uint64_t SrcFileLine, const uint8_t * FuncNameStrPt, size_t LineLenByt, const Vstr * FmtVstrPt, ... );
-
-
-__FUNC_DLLAPI__ void LogDstoy();
 
 #ifdef __cplusplus
 }

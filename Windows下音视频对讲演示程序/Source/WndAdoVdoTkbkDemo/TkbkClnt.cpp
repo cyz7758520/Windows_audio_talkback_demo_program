@@ -365,36 +365,36 @@ void TkbkClntTkbkInfoDstoy( TkbkClnt * TkbkClntPt, int32_t TkbkIdx )
 		}
 
 		//销毁接收音频输出帧容器。
-        if( p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt != NULL )
-        {
+		if( p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt != NULL )
+		{
 			VQueueDstoy( p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt, NULL );
-            p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt = NULL;
-            if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁接收音频输出帧容器成功。" ) );
-        }
+			p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt = NULL;
+			if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁接收音频输出帧容器成功。" ) );
+		}
 
-        //销毁接收视频输出帧容器。
-        if( p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt != NULL )
-        {
+		//销毁接收视频输出帧容器。
+		if( p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt != NULL )
+		{
 			VQueueDstoy( p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt, NULL );
-            p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt = NULL;
-            if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁接收视频输出帧容器成功。" ) );
-        }
+			p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt = NULL;
+			if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁接收视频输出帧容器成功。" ) );
+		}
 
-        //销毁音频自适应抖动缓冲器。
-        if( p_TkbkInfoTmpPt->m_AAjbPt != NULL )
-        {
+		//销毁音频自适应抖动缓冲器。
+		if( p_TkbkInfoTmpPt->m_AAjbPt != NULL )
+		{
 			AAjbDstoy( p_TkbkInfoTmpPt->m_AAjbPt, NULL );
-            p_TkbkInfoTmpPt->m_AAjbPt = NULL;
-            if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁音频自适应抖动缓冲器成功。" ) );
-        }
+			p_TkbkInfoTmpPt->m_AAjbPt = NULL;
+			if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁音频自适应抖动缓冲器成功。" ) );
+		}
 
-        //销毁视频自适应抖动缓冲器。
-        if( p_TkbkInfoTmpPt->m_VAjbPt != NULL )
-        {
-            VAjbDstoy( p_TkbkInfoTmpPt->m_VAjbPt, NULL );
-            p_TkbkInfoTmpPt->m_VAjbPt = NULL;
-            if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁视频自适应抖动缓冲器成功。" ) );
-        }
+		//销毁视频自适应抖动缓冲器。
+		if( p_TkbkInfoTmpPt->m_VAjbPt != NULL )
+		{
+			VAjbDstoy( p_TkbkInfoTmpPt->m_VAjbPt, NULL );
+			p_TkbkInfoTmpPt->m_VAjbPt = NULL;
+			if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁视频自适应抖动缓冲器成功。" ) );
+		}
 
 		//递减后面对讲信息的序号。
 		for( size_t p_TkbkInfoIdx = 0; CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, p_TkbkInfoIdx, NULL, ( void * * )&p_TkbkInfoTmp2Pt, 0, 0, NULL ) == 0; p_TkbkInfoIdx++ )
@@ -423,7 +423,7 @@ void TkbkClntTkbkInfoDstoy( TkbkClnt * TkbkClntPt, int32_t TkbkIdx )
 //对讲信息全部销毁。
 void TkbkClntTkbkInfoAllDstoy( TkbkClnt * TkbkClntPt )
 {
-    int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 	TkbkClnt::TkbkInfo * p_TkbkInfoTmpPt;
 
 	for( size_t p_TkbkInfoIdx = 0; CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, p_TkbkInfoIdx, NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) == 0; p_TkbkInfoIdx++ )
@@ -437,18 +437,18 @@ void TkbkClntTkbkInfoAllDstoy( TkbkClnt * TkbkClntPt )
 	p_Rslt = 0; //设置本函数执行成功。
 
 	Out:
-    if( p_Rslt != 0 ) //如果本函数执行失败。
-    {
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
 
-    }
+	}
 	return;
 }
 
 //连接处理，包括连接服务端、接收数据包。
 void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 {
-    int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-    TkbkClnt::TkbkInfo * p_TkbkInfoTmpPt;
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	TkbkClnt::TkbkInfo * p_TkbkInfoTmpPt;
 
 	if( TkbkClntPt->m_CnctIsInit != 0 )
 	{
@@ -459,7 +459,8 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 
 			{ //设置远端节点的地址族。
 				ADDRINFOW * p_AddrInfoListPt;
-				if( GetAddrInfo( ( PCWSTR )TkbkClntPt->m_RmtNodeNameVstrPt->m_Pt, NULL, NULL, &p_AddrInfoListPt ) == 0 )
+				{ WSADATA p_WsaData; WSAStartup( MAKEWORD( 2, 2 ), &p_WsaData ); } //初始化套接字库。
+				if( GetAddrInfo( ( PCWSTR )TkbkClntPt->m_RmtNodeNameVstrPt->m_StrPt, NULL, NULL, &p_AddrInfoListPt ) == 0 )
 				{
 					p_RmtNodeAddrFamly = ( p_AddrInfoListPt->ai_family == AF_INET ) ? 4 : ( p_AddrInfoListPt->ai_family == AF_INET6 ) ? 6 : 0;
 					FreeAddrInfo( p_AddrInfoListPt );
@@ -566,7 +567,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 					}
 					else //如果连接失败。
 					{
-						VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化本端Tcp协议客户端套接字，并连接远端Tcp协议服务端套接字[%vs:%vs]失败。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodeAddrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodePortPt );
+						VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化本端Tcp协议客户端套接字，并连接远端Tcp协议服务端套接字[%vs:%vs]失败。" ), TkbkClntPt->m_RmtNodeNameVstrPt, TkbkClntPt->m_RmtNodeSrvcVstrPt );
 						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto TcpClntSoktCnctOut;
@@ -574,14 +575,14 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 				}
 				else //如果等待本端Tcp协议客户端套接字连接远端Tcp协议服务端套接字失败。
 				{
-					VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化本端Tcp协议客户端套接字，并连接远端Tcp协议服务端套接字[%vs:%vs]失败。原因：等待本端Tcp协议客户端套接字连接远端Tcp协议服务端套接字失败。原因：" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodeAddrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodePortPt );
+					VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化本端Tcp协议客户端套接字，并连接远端Tcp协议服务端套接字[%vs:%vs]失败。原因：等待本端Tcp协议客户端套接字连接远端Tcp协议服务端套接字失败。原因：" ), TkbkClntPt->m_RmtNodeNameVstrPt, TkbkClntPt->m_RmtNodeSrvcVstrPt );
 					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 					TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 					goto TcpClntSoktCnctOut;
 				}
 
 				p_PocsRslt = 0; //设置本处理段执行成功。
-                
+				
 				TcpClntSoktCnctOut:
 				if( p_PocsRslt != 0 ) //如果本处理段执行失败。
 				{
@@ -731,7 +732,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 
 						if( TkbkClntPt->m_MyTkbkIdx == -1 ) //如果未设置我的对讲索引。
 						{
-							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收我的对讲索引包。对讲索引：%uz8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收我的对讲索引包。对讲索引：%z8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
 
 							TkbkClntPt->m_MyTkbkIdx = TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ]; //设置我的对讲索引。
 							TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserTkbkClntMyTkbkIdxFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_MyTkbkIdx ); //调用用户定义的对讲客户端我的对讲索引函数。
@@ -740,7 +741,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						}
 						else
 						{
-							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收其他对讲索引包。对讲索引：%uz8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收其他对讲索引包。对讲索引：%z8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
 
 							TkbkClntTkbkInfoInit( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] ); //对讲信息初始化。
 						}
@@ -761,7 +762,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						if( CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) != 0 ) goto Out;
 						int p_OldRmtTkbkMode = p_TkbkInfoTmpPt->m_RmtTkbkMode; //设置旧远端对讲模式。
 						p_TkbkInfoTmpPt->m_RmtTkbkMode = TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 2 ]; //设置远端对讲模式。
-						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收对讲模式包。对讲索引：%uzd。对讲模式：%z8s。" ), p_TkbkInfoTmpPt->m_TkbkIdx, g_TkbkModeU8strArrPt[ p_TkbkInfoTmpPt->m_RmtTkbkMode ] );
+						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收对讲模式包。对讲索引：%z32d。对讲模式：%z8s。" ), p_TkbkInfoTmpPt->m_TkbkIdx, g_TkbkModeU8strArrPt[ p_TkbkInfoTmpPt->m_RmtTkbkMode ] );
 						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserTkbkClntTkbkInfoRmtTkbkModeFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, p_TkbkInfoTmpPt, p_OldRmtTkbkMode, p_TkbkInfoTmpPt->m_RmtTkbkMode ); //调用用户定义的对讲客户端对讲信息远端对讲模式函数。
 
 						ClntMediaPocsThrdSetTkbkMode( TkbkClntPt->m_ClntMediaPocsThrdPt, 0, 0 ); //设置对讲模式。
@@ -792,21 +793,21 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 										{
 											if( VQueuePutTail( p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, p_PktLenByt - 1 - 1 - 4, NULL, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 											{
-												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入接收音频输出帧容器成功。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入接收音频输出帧容器成功。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 											}
 											else
 											{
-												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入接收音频输出帧容器失败。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入接收音频输出帧容器失败。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 											}
 										}
 										else
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。接收音频输出帧容器中帧总数为%uzd已经超过上限50，不再放入接收音频输出帧容器。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpElmTotal, p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。接收音频输出帧容器中帧总数为%uzd已经超过上限50，不再放入接收音频输出帧容器。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TmpElmTotal, p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 										}
 									}
 									else //如果该音频输出帧为无语音活动。
 									{
-										if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。无需放入接收音频输出帧容器。对讲索引：%uzd。音频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+										if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。无需放入接收音频输出帧容器。对讲索引：%z32d。音频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 									}
 									break;
 								}
@@ -816,22 +817,22 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 									{
 										if( AAjbPutFrm( p_TkbkInfoTmpPt->m_AAjbPt, p_TmpUint32, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, p_PktLenByt - 1 - 1 - 4, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入音频自适应抖动缓冲器成功。对讲索引：%uzd。音频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入音频自适应抖动缓冲器成功。对讲索引：%z32d。音频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 										}
 										else
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入音频自适应抖动缓冲器失败。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入音频自适应抖动缓冲器失败。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 									else //如果该音频输出帧为无语音活动。
 									{
 										if( AAjbPutFrm( p_TkbkInfoTmpPt->m_AAjbPt, p_TmpUint32, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, 0, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。放入音频自适应抖动缓冲器成功。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。放入音频自适应抖动缓冲器成功。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 										}
 										else
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。放入音频自适应抖动缓冲器失败。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。放入音频自适应抖动缓冲器失败。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 
@@ -843,7 +844,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 									int32_t p_MaxCntuLostFrmCnt; //存放最大连续丢失帧的数量。
 									int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
 									AAjbGetBufFrmCnt( p_TkbkInfoTmpPt->m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_MaxCntuLostFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
-									if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uzd。音频自适应抖动缓冲器：有活动帧：%z32d，无活动帧：%z32d，帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，最大丢帧：%z32d，当前需帧：%z32d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_MaxCntuLostFrmCnt, p_CurNeedBufFrmCnt );
+									if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。音频自适应抖动缓冲器：有活动帧：%z32d，无活动帧：%z32d，帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，最大丢帧：%z32d，当前需帧：%z32d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_MaxCntuLostFrmCnt, p_CurNeedBufFrmCnt );
 									break;
 								}
 							}
@@ -852,11 +853,11 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						{
 							if( p_PktLenByt > 1 + 1 + 4 ) //如果该音频输出帧为有语音活动。
 							{
-								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。但本端对讲模式无音频。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。但本端对讲模式无音频。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 							}
 							else //如果该音频输出帧为无语音活动。
 							{
-								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。但本端对讲模式无音频。对讲索引：%uzd。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。但本端对讲模式无音频。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 							}
 						}
 					}
@@ -886,21 +887,21 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 										{
 											if( VQueuePutTail( p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, p_PktLenByt - 1 - 1 - 4, NULL, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 											{
-												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入接收视频输出帧容器成功。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
+												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入接收视频输出帧容器成功。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
 											}
 											else
 											{
-												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入接收视频输出帧容器失败。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+												if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入接收视频输出帧容器失败。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 											}
 										}
 										else
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。接收视频输出帧容器中帧总数为%uzd已经超过上限20，不再放入接收视频输出帧容器。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TmpElmTotal, p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。接收视频输出帧容器中帧总数为%uzd已经超过上限20，不再放入接收视频输出帧容器。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TmpElmTotal, p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
 										}
 									}
 									else //如果该视频输出帧为无图像活动。
 									{
-										if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无图像活动的视频输出帧包。无需放入接收视频输出帧容器。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+										if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无图像活动的视频输出帧包。无需放入接收视频输出帧容器。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 									}
 									break;
 								}
@@ -910,16 +911,16 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 									{
 										if( VAjbPutFrm( p_TkbkInfoTmpPt->m_VAjbPt, FuncGetTickAsMsec(), p_TmpUint32, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, p_PktLenByt - 1 - 1 - 4, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入视频自适应抖动缓冲器成功。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入视频自适应抖动缓冲器成功。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
 										}
 										else
 										{
-											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入视频自适应抖动缓冲器失败。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入视频自适应抖动缓冲器失败。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 									else //如果该视频输出帧为无图像活动。
 									{
-										if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无图像活动的视频输出帧包。无需放入视频自适应抖动缓冲器。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+										if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无图像活动的视频输出帧包。无需放入视频自适应抖动缓冲器。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 									}
 
 									int32_t p_CurHaveBufFrmCnt; //存放当前已缓冲帧的数量。
@@ -927,7 +928,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 									int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
 									int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
 									VAjbGetBufFrmCnt( p_TkbkInfoTmpPt->m_VAjbPt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
-									if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uzd。视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
+									if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
 									break;
 								}
 							}
@@ -936,11 +937,11 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						{
 							if( p_PktLenByt > 1 + 1 + 4 ) //如果该视频输出帧为有图像活动。
 							{
-								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。但本端对讲模式无视频。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
+								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。但本端对讲模式无视频。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
 							}
 							else //如果该视频输出帧为无图像活动。
 							{
-								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无图像活动的视频输出帧包。但本端对讲模式无视频。对讲索引：%uzd。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
+								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无图像活动的视频输出帧包。但本端对讲模式无视频。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 							}
 						}
 					}
@@ -998,7 +999,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 							goto RecvPktOut;
 						}
 
-						VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：接收退出包。对讲索引：%uz8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+						VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：接收退出包。对讲索引：%z8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
 						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowToastFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -1127,11 +1128,11 @@ void TkbkClntUserReadAdoVdoInptFrm( TkbkClnt * TkbkClntPt,
 
 			if( TkbkClntCnctSendPkt( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 1, 0, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
-				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有语音活动的音频输入帧包成功。对讲索引：%uzd。音频输入帧时间戳：%uz32d。总长度：%uzd。" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
+				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有语音活动的音频输入帧包成功。对讲索引：%z32d。音频输入帧时间戳：%uz32d。总长度：%uzd。" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
 			}
 			else
 			{
-				VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有语音活动的音频输入帧包失败。对讲索引：%uzd。音频输入帧时间戳：%uz32d。总长度：%uzd。原因：" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
+				VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有语音活动的音频输入帧包失败。对讲索引：%z32d。音频输入帧时间戳：%uz32d。总长度：%uzd。原因：" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
@@ -1146,8 +1147,8 @@ void TkbkClntUserReadAdoVdoInptFrm( TkbkClnt * TkbkClntPt,
 
 				//设置数据包类型为音频输入帧包。
 				TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = ClntMediaPocsThrd::PktTypAdoFrm;
-                //设置对讲索引。
-                TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = ( int8_t )TkbkClntPt->m_MyTkbkIdx;
+				//设置对讲索引。
+				TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = ( int8_t )TkbkClntPt->m_MyTkbkIdx;
 				//设置音频输入帧时间戳。
 				TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 2 ] = ( int8_t )( TkbkClntPt->m_LastSendAdoInptFrmTimeStamp & 0xFF );
 				TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 3 ] = ( int8_t )( ( TkbkClntPt->m_LastSendAdoInptFrmTimeStamp & 0xFF00 ) >> 8 );
@@ -1156,11 +1157,11 @@ void TkbkClntUserReadAdoVdoInptFrm( TkbkClnt * TkbkClntPt,
 
 				if( TkbkClntCnctSendPkt( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 1, 0, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
-					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送无语音活动的音频输入帧包成功。对讲索引：%uzd。音频输入帧时间戳：%uz32d，总长度：%uzd。" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
+					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送无语音活动的音频输入帧包成功。对讲索引：%z32d。音频输入帧时间戳：%uz32d，总长度：%uzd。" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
 				}
 				else
 				{
-					VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送无语音活动的音频输入帧包失败。对讲索引：%uzd。音频输入帧时间戳：%uz32d，总长度：%uzd。原因：" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
+					VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送无语音活动的音频输入帧包失败。对讲索引：%z32d。音频输入帧时间戳：%uz32d，总长度：%uzd。原因：" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendAdoInptFrmTimeStamp, p_PktLenByt );
 					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 					TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				}
@@ -1222,11 +1223,11 @@ void TkbkClntUserReadAdoVdoInptFrm( TkbkClnt * TkbkClntPt,
 
 			if( TkbkClntCnctSendPkt( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt, p_PktLenByt, 1, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
-				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有图像活动的视频输入帧包成功。对讲索引：%uzd。视频输入帧时间戳：%uz32d。总长度：%d。类型：%d。" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendVdoInptFrmTimeStamp, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
+				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有图像活动的视频输入帧包成功。对讲索引：%z32d。视频输入帧时间戳：%uz32d。总长度：%d。类型：%d。" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendVdoInptFrmTimeStamp, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
 			}
 			else
 			{
-				VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有图像活动的视频输入帧包失败。对讲索引：%uzd。视频输入帧时间戳：%uz32d。总长度：%d。类型：%d。原因：" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendVdoInptFrmTimeStamp, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
+				VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：发送有图像活动的视频输入帧包失败。对讲索引：%z32d。视频输入帧时间戳：%uz32d。总长度：%d。类型：%d。原因：" ), TkbkClntPt->m_MyTkbkIdx, TkbkClntPt->m_LastSendVdoInptFrmTimeStamp, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
@@ -1391,11 +1392,11 @@ void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx
 
 				if( m_TmpSz != 0 ) //如果视频输出帧为有图像活动。
 				{
-					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uz32d。从接收视频输出帧容器取出有图像活动的视频输出帧。长度：%uzd。" ), VdoOtptStrmIdx, m_TmpSz );
+					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。从接收视频输出帧容器取出有图像活动的视频输出帧。长度：%uzd。" ), VdoOtptStrmIdx, m_TmpSz );
 				}
 				else //如果视频输出帧为无图像活动。
 				{
-					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uz32d。从接收视频输出帧容器取出无图像活动的视频输出帧。长度：%uzd。" ), VdoOtptStrmIdx, m_TmpSz );
+					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。从接收视频输出帧容器取出无图像活动的视频输出帧。长度：%uzd。" ), VdoOtptStrmIdx, m_TmpSz );
 				}
 			}
 			break;
@@ -1410,18 +1411,18 @@ void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx
 
 			if( p_CurHaveBufFrmCnt != 0 ) //如果视频自适应抖动缓冲器不为空。
 			{
-				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uz32d。视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), VdoOtptStrmIdx, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
+				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), VdoOtptStrmIdx, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
 
 				//从视频自适应抖动缓冲器取出视频输出帧。
 				VAjbGetFrm( p_TkbkInfoTmpPt->m_VAjbPt, FuncGetTickAsMsec(), &p_VdoOtptFrmTimeStamp, p_TkbkInfoTmpPt->m_VdoOtptTmpVar.m_TmpBytePt, p_TkbkInfoTmpPt->m_VdoOtptTmpVar.m_TmpByteSz, &m_TmpSz, 1, NULL );
 
 				if( m_TmpSz != 0 ) //如果视频输出帧为有图像活动。
 				{
-					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uz32d。从视频自适应抖动缓冲器取出有图像活动的视频输出帧。视频输出帧时间戳：%uz32d。长度：%uzd。" ), VdoOtptStrmIdx, p_VdoOtptFrmTimeStamp, m_TmpSz );
+					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。从视频自适应抖动缓冲器取出有图像活动的视频输出帧。视频输出帧时间戳：%uz32d。长度：%uzd。" ), VdoOtptStrmIdx, p_VdoOtptFrmTimeStamp, m_TmpSz );
 				}
 				else //如果视频输出帧为无图像活动。
 				{
-					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uz32d。从视频自适应抖动缓冲器取出无图像活动的视频输出帧。视频输出帧时间戳：%uz32d。长度：%uzd。" ), VdoOtptStrmIdx, p_VdoOtptFrmTimeStamp, m_TmpSz );
+					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。从视频自适应抖动缓冲器取出无图像活动的视频输出帧。视频输出帧时间戳：%uz32d。长度：%uzd。" ), VdoOtptStrmIdx, p_VdoOtptFrmTimeStamp, m_TmpSz );
 				}
 			}
 			break;
@@ -1442,7 +1443,7 @@ void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx
 			{
 				*VdoOtptYu12SrcFrmWidthPt = 0;
 				*VdoOtptYu12SrcFrmHeightPt = 0;
-				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uz32d。视频输出帧的长度不等于Yu12格式的长度。视频输出帧：%uzd。Yu12格式：%z32d。" ), VdoOtptStrmIdx, m_TmpSz - 4 - 4, *VdoOtptYu12SrcFrmWidthPt * *VdoOtptYu12SrcFrmHeightPt * 3 / 2 );
+				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。视频输出帧的长度不等于Yu12格式的长度。视频输出帧：%uzd。Yu12格式：%z32d。" ), VdoOtptStrmIdx, m_TmpSz - 4 - 4, *VdoOtptYu12SrcFrmWidthPt * *VdoOtptYu12SrcFrmHeightPt * 3 / 2 );
 				return;
 			}
 
@@ -1454,7 +1455,7 @@ void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx
 			if( m_TmpSz > VdoOtptEncdSrcFrmSzByt )
 			{
 				*VdoOtptEncdSrcFrmLenBytPt = 0;
-				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%uz32d。视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd。已编码格式：%z32d。" ), VdoOtptStrmIdx, m_TmpSz, VdoOtptEncdSrcFrmSzByt );
+				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。视频输出帧的长度已超过已编码格式的长度。视频输出帧：%uzd。已编码格式：%z32d。" ), VdoOtptStrmIdx, m_TmpSz, VdoOtptEncdSrcFrmSzByt );
 				return;
 			}
 

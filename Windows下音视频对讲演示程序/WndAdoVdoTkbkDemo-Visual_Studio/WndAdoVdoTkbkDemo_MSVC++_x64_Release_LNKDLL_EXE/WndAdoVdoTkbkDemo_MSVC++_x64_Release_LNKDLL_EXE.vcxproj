@@ -73,6 +73,7 @@
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\TkbkClnt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoInpt.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\VdoOtpt.h" />
+    <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbk.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkDemo.h" />
     <ClInclude Include="..\..\Source\WndAdoVdoTkbkDemo\WndAdoVdoTkbkStng.h" />
   </ItemGroup>

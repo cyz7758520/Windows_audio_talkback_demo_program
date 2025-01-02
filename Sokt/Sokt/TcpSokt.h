@@ -64,64 +64,64 @@ __SOKT_DLLAPI__ int TcpClntDstoy( TcpClntSokt * TcpClntSoktPt, uint16_t TmotSec,
 #endif
 
 #ifdef __cplusplus
-//因为TcpSrvrSoktCls类中要使用TcpClntSoktCls类中的m_TcpClntSoktPt成员变量，所以要将TcpSrvrSoktCls类定义在TcpClntSoktCls类之后，否则会报“使用了未定义类型”。
+//因为TcpSrvrSoktCls类中要使用TcpClntSoktCls类中的m_Pt成员变量，所以要将TcpSrvrSoktCls类定义在TcpClntSoktCls类之后，否则会报“使用了未定义类型”。
 class TcpClntSoktCls
 {
 public:
-	TcpClntSokt * m_TcpClntSoktPt;
+	TcpClntSokt * m_Pt;
 
-	TcpClntSoktCls() { m_TcpClntSoktPt = NULL; }
+	TcpClntSoktCls() { m_Pt = NULL; }
 	~TcpClntSoktCls() { Dstoy( UINT16_MAX, NULL ); }
 
-	int Init( const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, Vstr * ErrInfoVstrPt ) { return TcpClntInit( &m_TcpClntSoktPt, RmtLclNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ErrInfoVstrPt ); }
+	int Init( const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, Vstr * ErrInfoVstrPt ) { return TcpClntInit( &m_Pt, RmtLclNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ErrInfoVstrPt ); }
 	
-	int WaitCnct( uint16_t TmotMsec, TcpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt ) { return TcpClntWaitCnct( m_TcpClntSoktPt, TmotMsec, CnctStsPt, ErrInfoVstrPt ); }
+	int WaitCnct( uint16_t TmotMsec, TcpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt ) { return TcpClntWaitCnct( m_Pt, TmotMsec, CnctStsPt, ErrInfoVstrPt ); }
 
-	int Locked( Vstr * ErrInfoVstrPt ) { return TcpClntLocked( m_TcpClntSoktPt, ErrInfoVstrPt ); }
-	int Unlock( Vstr * ErrInfoVstrPt ) { return TcpClntUnlock( m_TcpClntSoktPt, ErrInfoVstrPt ); }
+	int Locked( Vstr * ErrInfoVstrPt ) { return TcpClntLocked( m_Pt, ErrInfoVstrPt ); }
+	int Unlock( Vstr * ErrInfoVstrPt ) { return TcpClntUnlock( m_Pt, ErrInfoVstrPt ); }
 
-	int GetLclAddr( int32_t * LclNodeAddrFmlyPt, Vstr * LclNodeAddrVstrPt, Vstr * LclNodePortVstrPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetLclAddr( m_TcpClntSoktPt, LclNodeAddrFmlyPt, LclNodeAddrVstrPt, LclNodePortVstrPt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetRmtAddr( int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRmtAddr( m_TcpClntSoktPt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetLclAddr( int32_t * LclNodeAddrFmlyPt, Vstr * LclNodeAddrVstrPt, Vstr * LclNodePortVstrPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetLclAddr( m_Pt, LclNodeAddrFmlyPt, LclNodeAddrVstrPt, LclNodePortVstrPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetRmtAddr( int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRmtAddr( m_Pt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int SetNoDelay( int IsNoDelay, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetNoDelay( m_TcpClntSoktPt, IsNoDelay, IsAutoLock, ErrInfoVstrPt ); }
-	int GetNoDelay( int * IsNoDelayPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetNoDelay( m_TcpClntSoktPt, IsNoDelayPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetNoDelay( int IsNoDelay, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetNoDelay( m_Pt, IsNoDelay, IsAutoLock, ErrInfoVstrPt ); }
+	int GetNoDelay( int * IsNoDelayPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetNoDelay( m_Pt, IsNoDelayPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SetSendBufSz( size_t SendBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetSendBufSz( m_TcpClntSoktPt, SendBufSzByt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetSendBufSz( size_t * SendBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetSendBufSz( m_TcpClntSoktPt, SendBufSzBytPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetSendBufSz( size_t SendBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetSendBufSz( m_Pt, SendBufSzByt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetSendBufSz( size_t * SendBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetSendBufSz( m_Pt, SendBufSzBytPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SetRecvBufSz( size_t RecvBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetRecvBufSz( m_TcpClntSoktPt, RecvBufSzByt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetRecvBufSz( size_t * RecvBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufSz( m_TcpClntSoktPt, RecvBufSzBytPt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetRecvBufLen( size_t * RecvBufLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufLen( m_TcpClntSoktPt, RecvBufLenBytPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetRecvBufSz( size_t RecvBufSzByt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetRecvBufSz( m_Pt, RecvBufSzByt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetRecvBufSz( size_t * RecvBufSzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufSz( m_Pt, RecvBufSzBytPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetRecvBufLen( size_t * RecvBufLenBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetRecvBufLen( m_Pt, RecvBufLenBytPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SetKeepAlive( int IsUseKeepAlive, int KeepIdle, int KeepIntvl, int KeepCnt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetKeepAlive( m_TcpClntSoktPt, IsUseKeepAlive, KeepIdle, KeepIntvl, KeepCnt, IsAutoLock, ErrInfoVstrPt ); }
-	int GetKeepAlive( int * IsUseKeepAlivePt, int * KeepIdlePt, int * KeepIntvlPt, int * KeepCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetKeepAlive( m_TcpClntSoktPt, IsUseKeepAlivePt, KeepIdlePt, KeepIntvlPt, KeepCntPt, IsAutoLock, ErrInfoVstrPt ); }
+	int SetKeepAlive( int IsUseKeepAlive, int KeepIdle, int KeepIntvl, int KeepCnt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSetKeepAlive( m_Pt, IsUseKeepAlive, KeepIdle, KeepIntvl, KeepCnt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetKeepAlive( int * IsUseKeepAlivePt, int * KeepIdlePt, int * KeepIntvlPt, int * KeepCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntGetKeepAlive( m_Pt, IsUseKeepAlivePt, KeepIdlePt, KeepIntvlPt, KeepCntPt, IsAutoLock, ErrInfoVstrPt ); }
 
-	int SendPkt( const void * DataPt, size_t DataLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendPkt( m_TcpClntSoktPt, DataPt, DataLenByt, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
-	int RecvPkt( void * DataPt, size_t DataSzByt, size_t * DataLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvPkt( m_TcpClntSoktPt, DataPt, DataSzByt, DataLenBytPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
+	int SendPkt( const void * DataPt, size_t DataLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendPkt( m_Pt, DataPt, DataLenByt, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
+	int RecvPkt( void * DataPt, size_t DataSzByt, size_t * DataLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvPkt( m_Pt, DataPt, DataSzByt, DataLenBytPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int SendApkt( const void * DataPt, size_t DataLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendApkt( m_TcpClntSoktPt, DataPt, DataLenByt, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
-	int RecvApkt( void * DataPt, size_t DataSzByt, size_t * DataLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvApkt( m_TcpClntSoktPt, DataPt, DataSzByt, DataLenBytPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
+	int SendApkt( const void * DataPt, size_t DataLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendApkt( m_Pt, DataPt, DataLenByt, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
+	int RecvApkt( void * DataPt, size_t DataSzByt, size_t * DataLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvApkt( m_Pt, DataPt, DataSzByt, DataLenBytPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
 
-	int Dstoy( uint16_t TmotSec, Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpClntDstoy( m_TcpClntSoktPt, TmotSec, ErrInfoVstrPt ); m_TcpClntSoktPt = NULL; return p_Rslt; }
+	int Dstoy( uint16_t TmotSec, Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpClntDstoy( m_Pt, TmotSec, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 };
 
 class TcpSrvrSoktCls
 {
 public:
-	TcpSrvrSokt * m_TcpSrvrSoktPt;
+	TcpSrvrSokt * m_Pt;
 
-	TcpSrvrSoktCls() { m_TcpSrvrSoktPt = NULL; }
+	TcpSrvrSoktCls() { m_Pt = NULL; }
 	~TcpSrvrSoktCls() { Dstoy( NULL ); }
 
-	int Init( const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, Vstr * ErrInfoVstrPt ) { return TcpSrvrInit( &m_TcpSrvrSoktPt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, MaxWait, IsReuseAddr, ErrInfoVstrPt ); }
+	int Init( const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, Vstr * ErrInfoVstrPt ) { return TcpSrvrInit( &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, MaxWait, IsReuseAddr, ErrInfoVstrPt ); }
 	
-	int Locked( Vstr * ErrInfoVstrPt ) { return TcpSrvrLocked( m_TcpSrvrSoktPt, ErrInfoVstrPt ); }
-	int Unlock( Vstr * ErrInfoVstrPt ) { return TcpSrvrUnlock( m_TcpSrvrSoktPt, ErrInfoVstrPt ); }
+	int Locked( Vstr * ErrInfoVstrPt ) { return TcpSrvrLocked( m_Pt, ErrInfoVstrPt ); }
+	int Unlock( Vstr * ErrInfoVstrPt ) { return TcpSrvrUnlock( m_Pt, ErrInfoVstrPt ); }
 
-	int GetLclAddr( int32_t * LclNodeAddrFmlyPt, Vstr * LclNodeAddrVstrPt, Vstr * LclNodePortVstrPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpSrvrGetLclAddr( m_TcpSrvrSoktPt, LclNodeAddrFmlyPt, LclNodeAddrVstrPt, LclNodePortVstrPt, IsAutoLock, ErrInfoVstrPt ); }
+	int GetLclAddr( int32_t * LclNodeAddrFmlyPt, Vstr * LclNodeAddrVstrPt, Vstr * LclNodePortVstrPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpSrvrGetLclAddr( m_Pt, LclNodeAddrFmlyPt, LclNodeAddrVstrPt, LclNodePortVstrPt, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int Acpt( TcpClntSoktCls * TcpClntSoktClsPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpSrvrAcpt( m_TcpSrvrSoktPt, &TcpClntSoktClsPt->m_TcpClntSoktPt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
+	int Acpt( TcpClntSoktCls * TcpClntSoktClsPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpSrvrAcpt( m_Pt, &TcpClntSoktClsPt->m_Pt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
 	
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpSrvrDstoy( m_TcpSrvrSoktPt, ErrInfoVstrPt ); m_TcpSrvrSoktPt = NULL; return p_Rslt; }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpSrvrDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 };
 #endif

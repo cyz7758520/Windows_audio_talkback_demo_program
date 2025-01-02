@@ -34,18 +34,18 @@ __DATASTRUCT_DLLAPI__ int MsgQueueSendMsg( MsgQueue * MsgQueuePt, int IsBlockWai
 class MsgQueueCls
 {
 public:
-	MsgQueue * m_MsgQueuePt;
+	MsgQueue * m_Pt;
 
-	MsgQueueCls() { m_MsgQueuePt = NULL; }
+	MsgQueueCls() { m_Pt = NULL; }
 	~MsgQueueCls() { Dstoy( NULL ); }
 	
 	//用户定义的消息处理回调函数。
 	virtual int UserMsgPocs( unsigned int MsgTyp, void * MsgPt, size_t MsgSzByt ) = 0;
 
-	int Init( ThrdInfo * MsgPocsThrdInfoPt, VstrCls * ErrInfoVstrPt );
-	int Dstoy( VstrCls * ErrInfoVstrPt ) { int p_Rslt = MsgQueueDstoy( m_MsgQueuePt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); m_MsgQueuePt = NULL; return p_Rslt; }
+	int Init( ThrdInfo * MsgPocsThrdInfoPt, Vstr * ErrInfoVstrPt );
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = MsgQueueDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 	
-	int MsgPocsThrdMsgPocs( VstrCls * ErrInfoVstrPt ) { return MsgQueueMsgPocsThrdMsgPocs( m_MsgQueuePt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
-	int SendMsg( int IsBlockWait, int AddFirstOrLast, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, VstrCls * ErrInfoVstrPt ) { return MsgQueueSendMsg( m_MsgQueuePt, IsBlockWait, AddFirstOrLast, MsgTyp, MsgPt, MsgLenByt, ( ErrInfoVstrPt != NULL ) ? ErrInfoVstrPt->m_VstrPt : NULL ); }
+	int MsgPocsThrdMsgPocs( Vstr * ErrInfoVstrPt ) { return MsgQueueMsgPocsThrdMsgPocs( m_Pt, ErrInfoVstrPt ); }
+	int SendMsg( int IsBlockWait, int AddFirstOrLast, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt ) { return MsgQueueSendMsg( m_Pt, IsBlockWait, AddFirstOrLast, MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ); }
 };
 #endif

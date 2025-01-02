@@ -360,7 +360,7 @@ void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 
 				{ //设置远端节点的地址族。
 					ADDRINFOW * p_AddrInfoListPt;
-					if( GetAddrInfo( ( PCWSTR )p_CnctInfoTmpPt->m_RmtNodeNameVstrPt->m_Pt, NULL, NULL, &p_AddrInfoListPt ) == 0 )
+					if( GetAddrInfo( ( PCWSTR )p_CnctInfoTmpPt->m_RmtNodeNameVstrPt->m_StrPt, NULL, NULL, &p_AddrInfoListPt ) == 0 )
 					{
 						p_RmtNodeAddrFamly = ( p_AddrInfoListPt->ai_family == AF_INET ) ? 4 : ( p_AddrInfoListPt->ai_family == AF_INET6 ) ? 6 : 0;
 						FreeAddrInfo( p_AddrInfoListPt );
@@ -481,7 +481,7 @@ void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 					}
 
 					p_PocsRslt = 0; //设置本处理段执行成功。
-                
+				
 					TcpClntSoktCnctOut:
 					if( p_PocsRslt != 0 ) //如果本处理段执行失败。
 					{

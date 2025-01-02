@@ -119,9 +119,9 @@ void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
  * 功能说明：添加音频输出的流。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -161,7 +161,7 @@ void AdoOtptAddStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              StrmIdx：[输入]，存放流索引。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -199,9 +199,9 @@ void AdoOtptDelStrm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
  * 函数名称：AdoOtptSetStrmUsePcm
  * 功能说明：设置音频输出的流要使用Pcm原始数据。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -235,9 +235,9 @@ void AdoOtptSetStrmUsePcm( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
  * 功能说明：设置音频输出的流要使用Speex解码器。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
              IsUsePrcplEnhsmt：[输出]，存放Speex解码器是否使用知觉增强，为非0表示要使用，为0表示不使用。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -271,9 +271,9 @@ void AdoOtptSetStrmUseSpeexDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx, int32_t I
  * 函数名称：AdoOtptSetStrmUseOpusDecd
  * 功能说明：设置音频输出的流要使用Opus解码器。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -306,9 +306,9 @@ void AdoOtptSetStrmUseOpusDecd( AdoOtpt * AdoOtptPt, int32_t StrmIdx )
  * 函数名称：AdoOtptSetStrmIsUse
  * 功能说明：设置音频输出的流是否使用。
  * 参数说明：MediaPocsThrdPt：[输出]，存放媒体处理线程的指针，不能为NULL。
-			 ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
+             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -653,13 +653,13 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 
 				HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged( EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId ) //默认的音频输入输出设备改变回调。
 				{
-					if( ( flow == eRender ) && ( role == eConsole ) ) //如果默认音频输入设备改变，且当前使用默认的音频输入设备。
+					if( ( flow == eRender ) && ( role == eConsole ) ) //如果默认音频输出设备改变，且当前使用默认的音频输出设备。
 					{
-						if( m_AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：接收到默认音频输出设备改变消息，且当前使用默认的音频输出设备，准备切换到新的设备。" ) );
+						if( m_AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：接收到默认音频输出设备改变消息，且当前使用默认的音频输出设备，准备切换到新的设备，发送音频输出设备关闭线程消息。" ) );
 						MediaPocsThrd::ThrdMsgAdoOtptDvcClos p_ThrdMsgAdoOtptDvcClos;
 						if( MsgQueueSendMsg( m_AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcClos, &p_ThrdMsgAdoOtptDvcClos, sizeof( p_ThrdMsgAdoOtptDvcClos ), m_AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
-							if( m_AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：发送音频输入设备关闭线程消息失败。原因：%vs" ), m_AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( m_AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：发送音频输出设备关闭线程消息失败。原因：%vs" ), m_AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 						}
 					}
 					return S_OK;
@@ -692,7 +692,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 		//设置音频输出设备标识符。
 		if( MediaPocsThrdGetAdoOtptDvcId( AdoOtptPt->m_Dvc.m_NameVstrPt, &p_AdoOtptDvcId, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取音频输出设备名称[%vs]的标识符失败。原因：%vs" ), AdoOtptPt->m_Dvc.m_NameVstrPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取音频输出设备名称[%vs]的标识符失败，发送音频输出设备关闭线程消息。原因：%vs" ), AdoOtptPt->m_Dvc.m_NameVstrPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{
 				MediaPocsThrd::ThrdMsgAdoOtptDvcClos p_ThrdMsgAdoOtptDvcClos;
 				if( MsgQueueSendMsg( AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcClos, &p_ThrdMsgAdoOtptDvcClos, sizeof( p_ThrdMsgAdoOtptDvcClos ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -811,6 +811,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 		
 		//发送音频输出设备改变线程消息。
 		{
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：发送音频输出设备改变线程消息。" ) );
 			MediaPocsThrd::ThrdMsgAdoOtptDvcChg p_ThrdMsgAdoOtptDvcChg;
 			if( MsgQueueSendMsg( AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcChg, &p_ThrdMsgAdoOtptDvcChg, sizeof( p_ThrdMsgAdoOtptDvcChg ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 			{
@@ -944,7 +945,7 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 	}
 
 	//销毁Pcm格式空闲帧容器。
-	if( AdoOtptPt->m_PcmIdleFrmCntnr.m_CQueuePt != NULL )
+	if( AdoOtptPt->m_PcmIdleFrmCntnr.m_Pt != NULL )
 	{
 		while( AdoOtptPt->m_PcmIdleFrmCntnr.GetHead( &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
@@ -962,7 +963,7 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 	}
 	
 	//销毁Pcm格式原始帧容器。
-	if( AdoOtptPt->m_PcmSrcFrmCntnr.m_CQueuePt != NULL )
+	if( AdoOtptPt->m_PcmSrcFrmCntnr.m_Pt != NULL )
 	{
 		while( AdoOtptPt->m_PcmSrcFrmCntnr.GetHead( &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
@@ -1122,7 +1123,7 @@ void AdoOtptDstoy( AdoOtpt * AdoOtptPt )
  * 功能说明：音频输出线程主函数。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1173,7 +1174,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 				{
 					if( p_HRslt == AUDCLNT_E_DEVICE_INVALIDATED ) //如果设备已经关闭。
 					{
-						if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：接收设备关闭消息。" ) );
+						if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：接收设备关闭消息，发送音频输出设备关闭线程消息。" ) );
 						{
 							MediaPocsThrd::ThrdMsgAdoOtptDvcClos p_ThrdMsgAdoOtptDvcClos;
 							if( MsgQueueSendMsg( AdoOtptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoOtptDvcClos, &p_ThrdMsgAdoOtptDvcClos, sizeof( p_ThrdMsgAdoOtptDvcClos ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -1432,10 +1433,10 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 		OutPocs:;
 
 		if( AdoOtptPt->m_Thrd.m_ExitFlag == 1 ) //如果退出标记为请求退出。
-        {
-            if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：接收退出请求。" ) );
-            break;
-        }
+		{
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：接收退出请求。" ) );
+			break;
+		}
 	} //音频输出循环结束。
 
 	CoUninitialize(); //销毁COM库。

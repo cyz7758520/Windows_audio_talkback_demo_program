@@ -81,31 +81,31 @@ void RefreshAdoVdoInptOtptDvc( int IsRefresAdoInptDvc, int IsRefresAdoOtptDvc, i
 	//获取音频输入设备、音频输出设备、视频输入设备的名称。
 	if( IsRefresAdoInptDvc != 0 )
 	{
-		if( MediaPocsThrdGetAdoInptDvcName( &p_AdoInptDvcNameVstrArrPt, &p_AdoInptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+		if( MediaPocsThrdGetAdoInptDvcName( &p_AdoInptDvcNameVstrArrPt, &p_AdoInptDvcTotal, g_ErrInfoVstr.m_Pt ) != 0 )
 		{
 			g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取音频输入设备名称失败。原因：" ) );
-			LOGE( g_ErrInfoVstr.m_VstrPt );
-			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+			LOGE( g_ErrInfoVstr.m_Pt );
+			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_Pt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 			goto RefresAdoVdohDvc;
 		}
 	}
 	if( IsRefresAdoOtptDvc != 0 )
 	{
-		if( MediaPocsThrdGetAdoOtptDvcName( &p_AdoOtptDvcNameVstrArrPt, &p_AdoOtptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+		if( MediaPocsThrdGetAdoOtptDvcName( &p_AdoOtptDvcNameVstrArrPt, &p_AdoOtptDvcTotal, g_ErrInfoVstr.m_Pt ) != 0 )
 		{
 			g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取音频输出设备名称失败。原因：" ) );
-			LOGE( g_ErrInfoVstr.m_VstrPt );
-			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+			LOGE( g_ErrInfoVstr.m_Pt );
+			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_Pt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 			goto RefresAdoVdohDvc;
 		}
 	}
 	if( IsRefresVdoInptDvc != 0 )
 	{
-		if( MediaPocsThrdGetVdoInptDvcName( &p_VdoInptDvcNameVstrArrPt, &p_VdoInptDvcTotal, g_ErrInfoVstr.m_VstrPt ) != 0 )
+		if( MediaPocsThrdGetVdoInptDvcName( &p_VdoInptDvcNameVstrArrPt, &p_VdoInptDvcTotal, g_ErrInfoVstr.m_Pt ) != 0 )
 		{
 			g_ErrInfoVstr.Ins( 0, Cu8vstr( "获取视频输入设备名称失败。原因：" ) );
-			LOGE( g_ErrInfoVstr.m_VstrPt );
-			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+			LOGE( g_ErrInfoVstr.m_Pt );
+			{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_Pt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 			goto RefresAdoVdohDvc;
 		}
 	}
@@ -127,7 +127,7 @@ void RefreshAdoVdoInptOtptDvc( int IsRefresAdoInptDvc, int IsRefresAdoOtptDvc, i
 		{
 			for( p_TmpInt = 0; p_TmpInt < p_AdoInptDvcTotal; p_TmpInt++ )
 			{
-				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_StrPt );
 			}
 		}
 		else
@@ -141,7 +141,7 @@ void RefreshAdoVdoInptOtptDvc( int IsRefresAdoInptDvc, int IsRefresAdoOtptDvc, i
 		{
 			for( p_TmpInt = 0; p_TmpInt < p_AdoOtptDvcTotal; p_TmpInt++ )
 			{
-				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoOtptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_AdoOtptDvcNameVstrArrPt[ p_TmpInt ]->m_StrPt );
 			}
 		}
 		else
@@ -155,7 +155,7 @@ void RefreshAdoVdoInptOtptDvc( int IsRefresAdoInptDvc, int IsRefresAdoOtptDvc, i
 		{
 			for( p_TmpInt = 0; p_TmpInt < p_VdoInptDvcTotal; p_TmpInt++ )
 			{
-				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_VdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_Pt );
+				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_ADDSTRING, ( WPARAM )0, ( LPARAM )p_VdoInptDvcNameVstrArrPt[ p_TmpInt ]->m_StrPt );
 			}
 		}
 		else
@@ -445,9 +445,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			if( ( wParam == TRUE ) && ( lParam == 0 ) )
 			{
 				//设置当前窗口的位置相对于父窗口居中。
-				if( FuncSetWndCenter( hDlg, GetParent( hDlg ), g_ErrInfoVstr.m_VstrPt ) != 0 )
+				if( FuncSetWndCenter( hDlg, GetParent( hDlg ), g_ErrInfoVstr.m_Pt ) != 0 )
 				{
-					LOGFE( Cu8vstr( "设置窗口居中失败。原因：%vs" ), g_ErrInfoVstr.m_VstrPt );
+					LOGFE( Cu8vstr( "设置窗口居中失败。原因：%vs" ), g_ErrInfoVstr.m_Pt );
 				}
 				return ( INT_PTR )TRUE;
 			}
@@ -652,25 +652,25 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					p_ClntSrvrUrlHdl = GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId );
 					p_ClntSrvrUrlLenChr = GetWindowTextLength( p_ClntSrvrUrlHdl );
 					VstrInit( &p_ClntSrvrUrlVstrPt, Utf16, p_ClntSrvrUrlLenChr + 1, );
-					GetDlgItemText( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId, ( LPWSTR )p_ClntSrvrUrlVstrPt->m_Pt, p_ClntSrvrUrlLenChr + 1 );
+					GetDlgItemText( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId, ( LPWSTR )p_ClntSrvrUrlVstrPt->m_StrPt, p_ClntSrvrUrlLenChr + 1 );
 					p_ClntSrvrUrlVstrPt->m_LenChr = p_ClntSrvrUrlLenChr;
 
 					VstrInit( &p_PrtclVstrPt, Utf16, ,  );
 					VstrInit( &p_HostnameVstrPt, Utf16, , );
 					VstrInit( &p_PortVstrPt, Utf16, , );
 
-					if( VstrUrlParse( p_ClntSrvrUrlVstrPt, p_PrtclVstrPt, NULL, NULL, p_HostnameVstrPt, p_PortVstrPt, NULL, NULL, NULL, NULL, g_ErrInfoVstr.m_VstrPt ) != 0 )
+					if( VstrUrlParse( p_ClntSrvrUrlVstrPt, p_PrtclVstrPt, NULL, NULL, p_HostnameVstrPt, p_PortVstrPt, NULL, NULL, NULL, NULL, g_ErrInfoVstr.m_Pt ) != 0 )
 					{
 						g_ErrInfoVstr.Ins( 0, Cu8vstr( "解析客户端的服务端Url字符串失败。原因：" ) );
-						LOGE( g_ErrInfoVstr.m_VstrPt );
-						Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
+						LOGE( g_ErrInfoVstr.m_Pt );
+						Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_Pt );
 						goto ClntAddOut;
 					}
 					if( ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Tcp" ), , &p_CmpRslt ),p_CmpRslt != 0 ) && ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Audp" ), , &p_CmpRslt ),p_CmpRslt != 0 ) )
 					{
 						g_ErrInfoVstr.Cpy( Cu8vstr( "客户端的服务端Url字符串的协议不正确。" ) );
-						LOGE( g_ErrInfoVstr.m_VstrPt );
-						Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_VstrPt );
+						LOGE( g_ErrInfoVstr.m_Pt );
+						Toast( g_MainDlgWndHdl, 3000, NULL, g_ErrInfoVstr.m_Pt );
 						goto ClntAddOut;
 					}
 					if( VstrCmp( p_PortVstrPt, , , Cu8vstr( "" ), , &p_CmpRslt ), p_CmpRslt == 0 )
@@ -747,7 +747,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 								CbBoxGetCurSelTxt( g_AdoInptDvcCbBoxWndHdl, p_CurAdoInptDvcNameU16strPt ); //获取当前选择的音频输入设备的名称。
 								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoInptSetUseDvc( 0,
 																								 Cu16vstr( p_CurAdoInptDvcNameU16strPt ),
-																								 &g_ErrInfoVstr );
+																								 g_ErrInfoVstr.m_Pt );
 							}
 							break;
 						}
@@ -767,7 +767,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 								CbBoxGetCurSelTxt( g_AdoOtptDvcCbBoxWndHdl, p_CurAdoOtptDvcNameU16strPt ); //获取当前选择的音频输出设备的名称。
 								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoOtptSetUseDvc( 0,
 																								 Cu16vstr( p_CurAdoOtptDvcNameU16strPt ),
-																								 &g_ErrInfoVstr );
+																								 g_ErrInfoVstr.m_Pt );
 							}
 							break;
 						}
@@ -787,7 +787,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 								CbBoxGetCurSelTxt( g_VdoInptDvcCbBoxWndHdl, p_CurVdoInptDvcNameU16strPt ); //获取当前选择的音频输入设备的名称。
 								g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->VdoInptSetUseDvc( 0,
 																								 Cu16vstr( p_CurVdoInptDvcNameU16strPt ),
-																								 &g_ErrInfoVstr );
+																								 g_ErrInfoVstr.m_Pt );
 							}
 							break;
 						}
@@ -798,7 +798,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				{
 					if( g_MyClntMediaPocsThrdPt != NULL )
 					{
-						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoInptSetIsMute( 1, ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0, &g_ErrInfoVstr );
+						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoInptSetIsMute( 1, ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoInptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0, g_ErrInfoVstr.m_Pt );
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -806,7 +806,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				{
 					if( g_MyClntMediaPocsThrdPt != NULL )
 					{
-						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoOtptSetIsMute( 1, ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0, &g_ErrInfoVstr );
+						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoOtptSetIsMute( 1, ( IsDlgButtonChecked( g_MainDlgWndHdl, AdoOtptIsMuteCkBoxId ) == BST_CHECKED ) ? 1 : 0, g_ErrInfoVstr.m_Pt );
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -814,7 +814,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				{
 					if( g_MyClntMediaPocsThrdPt != NULL )
 					{
-						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->VdoInptSetIsBlack( 1, ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0, &g_ErrInfoVstr );
+						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->VdoInptSetIsBlack( 1, ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoInptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0, g_ErrInfoVstr.m_Pt );
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -822,7 +822,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				{
 					if( g_MyClntMediaPocsThrdPt != NULL )
 					{
-						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->VdoOtptSetStrmIsBlack( 1, 0, ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0, &g_ErrInfoVstr );
+						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->VdoOtptSetStrmIsBlack( 1, 0, ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0, g_ErrInfoVstr.m_Pt );
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -835,13 +835,13 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 																									  ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 																									  GetDlgItem( g_MainDlgWndHdl, AdoInptSrcWavfmTxtId ),
 																									  GetDlgItem( g_MainDlgWndHdl, AdoInptRsltWavfmTxtId ),
-																									  &g_ErrInfoVstr );
+																									  g_ErrInfoVstr.m_Pt );
 
 						//设置音频输出是否绘制音频波形到窗口。
 						g_MyClntMediaPocsThrdPt->m_MediaPocsThrdClsPt->AdoOtptSetIsDrawAdoWavfmToWnd( 1,
 																									  ( IsDlgButtonChecked( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId ) == BST_CHECKED ) ? 1 : 0,
 																									  GetDlgItem( g_MainDlgWndHdl, AdoOtptSrcWavfmTxtId ),
-																									  &g_ErrInfoVstr );
+																									  g_ErrInfoVstr.m_Pt );
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -1104,7 +1104,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 		}
 		case MainDlgWndMsgTypShowLog: //显示日志消息。
 		{
-			if( ( VstrCls * )wParam != NULL )
+			if( ( Vstr * )wParam != NULL )
 			{
 				Vstr * InfoVstrPt = ( Vstr * )wParam;
 
@@ -1113,7 +1113,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					int p_Hour, p_Min, p_Sec, p_Msec;
 					FuncGetTimeAsLclDateTime( NULL, NULL, NULL, &p_Hour, &p_Min, &p_Sec, &p_Msec );
 					VstrFmtIns( InfoVstrPt, 0, Cu8vstr( "%02.2d:%02.2d:%02.2d %03.3d：" ), p_Hour, p_Min, p_Sec, p_Msec );
-					SendMessage( g_LogLstBoxWndHdl, LB_ADDSTRING, 0, ( WPARAM )InfoVstrPt->m_Pt );
+					SendMessage( g_LogLstBoxWndHdl, LB_ADDSTRING, 0, ( WPARAM )InfoVstrPt->m_StrPt );
 					SendMessage( g_LogLstBoxWndHdl, WM_VSCROLL, SB_LINEDOWN, NULL ); //日志列表框窗口的垂直滚动条下移一行。
 				}
 
@@ -1126,7 +1126,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					p_CurSz = ( long )SendDlgItemMessage( hDlg, LogLstBoxId, LB_GETHORIZONTALEXTENT, 0, 0 ); //获取滚动条的当前像素大小。
 
 					p_DcHdl = GetDC( hDlg ); //获取DC句柄。
-					GetTextExtentPoint( p_DcHdl, ( wchar_t *)InfoVstrPt->m_Pt, InfoVstrPt->m_LenChr, &p_NewSz ); //获取字符串的像素大小。
+					GetTextExtentPoint( p_DcHdl, ( wchar_t *)InfoVstrPt->m_StrPt, InfoVstrPt->m_LenChr, &p_NewSz ); //获取字符串的像素大小。
 					if( p_NewSz.cx > p_CurSz ) SendDlgItemMessage( hDlg, LogLstBoxId, LB_SETHORIZONTALEXTENT, ( WPARAM )p_NewSz.cx, 0 ); //设置滚动条的当前像素大小。
 					ReleaseDC( hDlg, p_DcHdl ); //释放DC句柄。
 				}
@@ -1137,7 +1137,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 		}
 		case MainDlgWndMsgTypShowToast: //显示Toast消息。
 		{
-			if( ( VstrCls * )wParam != NULL )
+			if( ( Vstr * )wParam != NULL )
 			{
 				Vstr * InfoVstrPt = ( Vstr * )wParam;
 
@@ -1201,7 +1201,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			EnableWindow( GetDlgItem( g_MainDlgWndHdl, ClntAddBtnId ), FALSE ); //设置客户端添加按钮为不可用。
 			EnableWindow( GetDlgItem( g_MainDlgWndHdl, ClntStngBtnId ), FALSE ); //设置客户端设置按钮为不可用。
 			EnableWindow( GetDlgItem( g_MainDlgWndHdl, ClntDelBtnId ), FALSE ); //设置客户端删除按钮为不可用。
-            if( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_XfrMode == 0 ) ShowWindow( g_PttDlgWndHdl, SW_SHOW ); //设置一键即按即通对话框为显示。
+			if( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_XfrMode == 0 ) ShowWindow( g_PttDlgWndHdl, SW_SHOW ); //设置一键即按即通对话框为显示。
 
 			if( g_MySrvrThrdPt == NULL ) //如果我的服务端线程未初始化。
 			{
@@ -1260,8 +1260,8 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				ListView_InsertItem( g_CnctLstWndHdl, &p_LvItem ); // 如果成功插入，返回项目句柄
 
 				ListView_SetItemText( g_CnctLstWndHdl, p_LvItem.iItem, 0, ( p_MainDlgWndMsgCnctLstAddItemPt->m_IsTcpOrAudpPrtcl == 0 ) ? L"Tcp" : L"Audp" );
-				ListView_SetItemText( g_CnctLstWndHdl, p_LvItem.iItem, 1, ( LPWSTR )p_MainDlgWndMsgCnctLstAddItemPt->m_RmtNodeNameVstrPt->m_Pt );
-				ListView_SetItemText( g_CnctLstWndHdl, p_LvItem.iItem, 2, ( LPWSTR )p_MainDlgWndMsgCnctLstAddItemPt->m_RmtNodeSrvcVstrPt->m_Pt );
+				ListView_SetItemText( g_CnctLstWndHdl, p_LvItem.iItem, 1, ( LPWSTR )p_MainDlgWndMsgCnctLstAddItemPt->m_RmtNodeNameVstrPt->m_StrPt );
+				ListView_SetItemText( g_CnctLstWndHdl, p_LvItem.iItem, 2, ( LPWSTR )p_MainDlgWndMsgCnctLstAddItemPt->m_RmtNodeSrvcVstrPt->m_StrPt );
 				
 				VstrDstoy( p_MainDlgWndMsgCnctLstAddItemPt->m_RmtNodeNameVstrPt );
 				VstrDstoy( p_MainDlgWndMsgCnctLstAddItemPt->m_RmtNodeSrvcVstrPt );
@@ -1280,9 +1280,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			if( p_MainDlgWndMsgCnctLstModifyItemPt != NULL )
 			{
-				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 3, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt->m_Pt );
-				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 4, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt->m_Pt );
-				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt3VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 5, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt3VstrPt->m_Pt );
+				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 3, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt->m_StrPt );
+				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 4, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt->m_StrPt );
+				if( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt3VstrPt != NULL ) ListView_SetItemText( g_CnctLstWndHdl, p_MainDlgWndMsgCnctLstModifyItemPt->m_Num, 5, ( LPWSTR )p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt3VstrPt->m_StrPt );
 				
 				VstrDstoy( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt1VstrPt );
 				VstrDstoy( p_MainDlgWndMsgCnctLstModifyItemPt->m_Txt2VstrPt );
@@ -1303,11 +1303,11 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				for( int p_Num = 0; p_Num < p_ClntLstTotal; p_Num++ )
 				{
 					ListView_GetItemText( g_ClntLstWndHdl, p_Num, 0, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-					if( wcscmp( p_TmpU16strPt, ( wchar_t * )p_MainDlgWndMsgClntLstAddItemPt->m_PrtclVstrPt->m_Pt ) != 0 ) continue;
+					if( wcscmp( p_TmpU16strPt, ( wchar_t * )p_MainDlgWndMsgClntLstAddItemPt->m_PrtclVstrPt->m_StrPt ) != 0 ) continue;
 					ListView_GetItemText( g_ClntLstWndHdl, p_Num, 1, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-					if( wcscmp( p_TmpU16strPt, ( wchar_t * )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeNameVstrPt->m_Pt ) != 0 ) continue;
+					if( wcscmp( p_TmpU16strPt, ( wchar_t * )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeNameVstrPt->m_StrPt ) != 0 ) continue;
 					ListView_GetItemText( g_ClntLstWndHdl, p_Num, 2, p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
-					if( wcscmp( p_TmpU16strPt, ( wchar_t * )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeSrvcVstrPt->m_Pt ) != 0 ) continue;
+					if( wcscmp( p_TmpU16strPt, ( wchar_t * )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeSrvcVstrPt->m_StrPt ) != 0 ) continue;
 					Toast( g_MainDlgWndHdl, 3000, NULL, Cu8vstr( "已存在相同的客户端的服务端，无需重复添加。" ) );
 					goto MainDlgWndMsgTypClntLstAddItemOut;
 				}
@@ -1317,9 +1317,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				p_LvItem.iSubItem = 0;
 				ListView_InsertItem( g_ClntLstWndHdl, &p_LvItem ); // 如果成功插入，返回项目句柄
 
-				ListView_SetItemText( g_ClntLstWndHdl, p_ClntLstTotal, 0, ( LPWSTR )p_MainDlgWndMsgClntLstAddItemPt->m_PrtclVstrPt->m_Pt );
-				ListView_SetItemText( g_ClntLstWndHdl, p_ClntLstTotal, 1, ( LPWSTR )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeNameVstrPt->m_Pt );
-				ListView_SetItemText( g_ClntLstWndHdl, p_ClntLstTotal, 2, ( LPWSTR )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeSrvcVstrPt->m_Pt );
+				ListView_SetItemText( g_ClntLstWndHdl, p_ClntLstTotal, 0, ( LPWSTR )p_MainDlgWndMsgClntLstAddItemPt->m_PrtclVstrPt->m_StrPt );
+				ListView_SetItemText( g_ClntLstWndHdl, p_ClntLstTotal, 1, ( LPWSTR )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeNameVstrPt->m_StrPt );
+				ListView_SetItemText( g_ClntLstWndHdl, p_ClntLstTotal, 2, ( LPWSTR )p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeSrvcVstrPt->m_StrPt );
 				
 				VstrDstoy( p_MainDlgWndMsgClntLstAddItemPt->m_PrtclVstrPt );
 				VstrDstoy( p_MainDlgWndMsgClntLstAddItemPt->m_RmtNodeNameVstrPt );
@@ -1341,9 +1341,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			if( p_MainDlgWndMsgClntLstModifyItemPt != NULL )
 			{
-				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 3, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt->m_Pt );
-				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 4, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt->m_Pt );
-				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 5, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt->m_Pt );
+				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 3, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt->m_StrPt );
+				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 4, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt->m_StrPt );
+				if( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt != NULL ) ListView_SetItemText( g_ClntLstWndHdl, p_MainDlgWndMsgClntLstModifyItemPt->m_Num, 5, ( LPWSTR )p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt->m_StrPt );
 				
 				VstrDstoy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt );
 				VstrDstoy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt2VstrPt );
@@ -1362,7 +1362,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				//标题文本框窗口初始化。
 				p_VdoInptOtptWnd.m_TitleTxtWndHdl = CreateWindowEx( GetWindowExStyle( g_VdoInptOtptTxtWndHdl ),
 																	L"STATIC",
-																	( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_Pt,
+																	( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_StrPt,
 																	GetWindowStyle( g_VdoInptOtptTxtWndHdl ) | WS_VISIBLE,
 																	0, 0,
 																	0, 0,
@@ -1375,7 +1375,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				//显示文本框窗口初始化。
 				p_VdoInptOtptWnd.m_DspyTxtWndHdl = CreateWindowEx( GetWindowExStyle( g_VdoInptOtptTxtWndHdl ),
 																   L"STATIC",
-																   ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_Pt,
+																   ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt->m_StrPt,
 																   GetWindowStyle( g_VdoInptOtptTxtWndHdl ) | WS_VISIBLE,
 																   0, 0,
 																   0, 0,
@@ -1429,8 +1429,8 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 				{
 					if( p_VdoInptOtptWndTmpPt->m_DspyTxtWndHdl == p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_DspyTxtWndHdl )
 					{
-						SetWindowText( p_VdoInptOtptWndTmpPt->m_TitleTxtWndHdl, ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_TitleVstrPt->m_Pt );
-						SetWindowText( p_VdoInptOtptWndTmpPt->m_DspyTxtWndHdl, ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_TitleVstrPt->m_Pt );
+						SetWindowText( p_VdoInptOtptWndTmpPt->m_TitleTxtWndHdl, ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_TitleVstrPt->m_StrPt );
+						SetWindowText( p_VdoInptOtptWndTmpPt->m_DspyTxtWndHdl, ( wchar_t * )p_MainDlgWndMsgVdoInptOtptWndSetTitlePt->m_TitleVstrPt->m_StrPt );
 						break;
 					}
 				}
@@ -1448,7 +1448,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			if( p_AdoInptDvcNameVstrPt != NULL )
 			{
-				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_AdoInptDvcNameVstrPt->m_Pt ); //选择当前使用的音频输入设备。
+				SendMessage( g_AdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_AdoInptDvcNameVstrPt->m_StrPt ); //选择当前使用的音频输入设备。
 
 				VstrDstoy( p_AdoInptDvcNameVstrPt );
 			}
@@ -1462,7 +1462,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			if( p_AdoOtptDvcNameVstrPt != NULL )
 			{
-				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_AdoOtptDvcNameVstrPt->m_Pt ); //选择当前使用的音频输出设备。
+				SendMessage( g_AdoOtptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_AdoOtptDvcNameVstrPt->m_StrPt ); //选择当前使用的音频输出设备。
 
 				VstrDstoy( p_AdoOtptDvcNameVstrPt );
 			}
@@ -1476,7 +1476,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
 			if( p_VdoInptDvcNameVstrPt != NULL )
 			{
-				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_VdoInptDvcNameVstrPt->m_Pt ); //选择当前使用的视频输入设备。
+				SendMessage( g_VdoInptDvcCbBoxWndHdl, CB_SELECTSTRING, ( WPARAM )-1, ( LPARAM )p_VdoInptDvcNameVstrPt->m_StrPt ); //选择当前使用的视频输入设备。
 
 				VstrDstoy( p_VdoInptDvcNameVstrPt );
 			}
@@ -1489,8 +1489,8 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 //主函数。
 int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 					   _In_opt_ HINSTANCE hPrevInstance,
-					   _In_ LPWSTR    lpCmdLine,
-					   _In_ int       nCmdShow )
+					   _In_ LPWSTR lpCmdLine,
+					   _In_ int nCmdShow )
 {
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );
@@ -1513,7 +1513,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	//初始化日志。
 	{
 		DeleteFile( L".\\log.txt" );
-		LogOpenFile( Cu8vstr( ".\\log.txt" ), NULL, 1, g_ErrInfoVstr.m_VstrPt );
+		LogOpenFile( Cu8vstr( ".\\log.txt" ), NULL, 1, g_ErrInfoVstr.m_Pt );
 	}
 
 	//初始化套接字库。
@@ -1531,7 +1531,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		VstrInit( &p_LmtAppNameVstrPt, , , );
 		VstrInit( &p_CurAppNameVstrPt, , , );
 
-		if( AudpGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( AudpGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "本端高级UDP协议套接字限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "本端高级UDP协议套接字剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1541,7 +1541,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取本端高级UDP协议套接字的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( SpeexAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( SpeexAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "Speex声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "Speex声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1551,7 +1551,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取Speex声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( WebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( WebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1561,7 +1561,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取WebRtc浮点版声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( WebRtcAec3GetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( WebRtcAec3GetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1571,7 +1571,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取WebRtc第三版声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( SpeexWebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( SpeexWebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1581,7 +1581,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取SpeexWebRtc三重声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( RNNoiseGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( RNNoiseGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "RNNoise噪音抑制器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "RNNoise噪音抑制器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1591,7 +1591,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取RNNoise噪音抑制器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( OpenH264EncdGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( OpenH264EncdGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "OpenH264编码器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "OpenH264编码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1601,7 +1601,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取OpenH264编码器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( OpenH264DecdGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( OpenH264DecdGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "OpenH264解码器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "OpenH264解码器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1611,7 +1611,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取OpenH264解码器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( AAjbGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( AAjbGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "音频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "音频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1621,7 +1621,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取音频自适应抖动缓冲器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
-		if( VAjbGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_VstrPt ) == 0 )
+		if( VAjbGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "视频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
 			LOGFD( Cu8vstr( "视频自适应抖动缓冲器剩余时间：%uz64d，约%uz64d天。" ), p_RmnTimeSec, p_RmnTimeSec / 24 / 60 / 60 );
@@ -1922,10 +1922,10 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	}
 
 	//打印当前进程活动目录的完整绝对路径到日志。
-	FuncGetCurActPath( g_ErrInfoVstr.m_VstrPt, g_ErrInfoVstr.m_VstrPt );
+	FuncGetCurActPath( g_ErrInfoVstr.m_Pt, g_ErrInfoVstr.m_Pt );
 	g_ErrInfoVstr.Ins( 0, Cu8vstr( "当前进程活动目录的完整绝对路径：" ) );
-	LOGI( g_ErrInfoVstr.m_VstrPt );
-	{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_VstrPt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
+	LOGI( g_ErrInfoVstr.m_Pt );
+	{ Vstr * p_ErrInfoVstrPt = NULL; VstrInit( &p_ErrInfoVstrPt, Utf16, , g_ErrInfoVstr.m_Pt ); PostMessage( g_MainDlgWndHdl, MainDlgWndMsgTypShowLog, ( WPARAM )p_ErrInfoVstrPt, 0 ); }
 	
 	//重置设置。
 	ResetStng();
@@ -2167,7 +2167,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		LocalFree( p_Argv ); //销毁命令行参数的指针数组。
 	}
 
-    //主消息循环。
+	//主消息循环。
 	MSG p_Msg;
 	while( GetMessage( &p_Msg, NULL, 0, 0 ) )
 	{

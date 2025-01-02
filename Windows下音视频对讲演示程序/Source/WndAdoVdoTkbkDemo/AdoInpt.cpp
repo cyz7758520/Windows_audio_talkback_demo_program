@@ -883,7 +883,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 				{
 					if( ( flow == eCapture ) && ( role == eConsole ) ) //如果默认音频输入设备改变，且当前使用默认的音频输入设备。
 					{
-						if( m_AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：接收到默认音频输入设备改变消息，且当前使用默认的音频输入设备，准备切换到新的设备。" ) );
+						if( m_AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：接收到默认音频输入设备改变消息，且当前使用默认的音频输入设备，准备切换到新的设备，发送音频输入设备关闭线程消息。" ) );
 						MediaPocsThrd::ThrdMsgAdoInptDvcClos p_ThrdMsgAdoInptDvcClos;
 						if( MsgQueueSendMsg( m_AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcClos, &p_ThrdMsgAdoInptDvcClos, sizeof( p_ThrdMsgAdoInptDvcClos ), m_AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
@@ -920,7 +920,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 		//设置音频输入设备标识符。
 		if( MediaPocsThrdGetAdoInptDvcId( AdoInptPt->m_Dvc.m_NameVstrPt, &p_AdoInptDvcId, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取音频输入设备名称[%vs]的标识符失败。原因：%vs" ), AdoInptPt->m_Dvc.m_NameVstrPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取音频输入设备名称[%vs]的标识符失败，发送音频输入设备关闭线程消息。原因：%vs" ), AdoInptPt->m_Dvc.m_NameVstrPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			{
 				MediaPocsThrd::ThrdMsgAdoInptDvcClos p_ThrdMsgAdoInptDvcClos;
 				if( MsgQueueSendMsg( AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcClos, &p_ThrdMsgAdoInptDvcClos, sizeof( p_ThrdMsgAdoInptDvcClos ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -1270,6 +1270,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 
 		//发送音频输入设备改变线程消息。
 		{
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：发送音频输入设备改变线程消息。" ) );
 			MediaPocsThrd::ThrdMsgAdoInptDvcChg p_ThrdMsgAdoInptDvcChg;
 			if( MsgQueueSendMsg( AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcChg, &p_ThrdMsgAdoInptDvcChg, sizeof( p_ThrdMsgAdoInptDvcChg ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 			{
@@ -1381,7 +1382,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	}
 
 	//销毁Pcm格式空闲帧容器。
-	if( AdoInptPt->m_PcmIdleFrmCntnr.m_CQueuePt != NULL )
+	if( AdoInptPt->m_PcmIdleFrmCntnr.m_Pt != NULL )
 	{
 		while( AdoInptPt->m_PcmIdleFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
@@ -1399,7 +1400,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	}
 	
 	//销毁Pcm格式原始帧容器。
-	if( AdoInptPt->m_PcmSrcFrmCntnr.m_CQueuePt != NULL )
+	if( AdoInptPt->m_PcmSrcFrmCntnr.m_Pt != NULL )
 	{
 		while( AdoInptPt->m_PcmSrcFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
@@ -1428,7 +1429,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 			free( AdoInptPt->m_Dvc.m_PcmBufFrmPt );
 			AdoInptPt->m_Dvc.m_PcmBufFrmPt = NULL;
 		}
-		if( AdoInptPt->m_Dvc.m_PcmBufFrmBufQueue.m_BufQueuePt != NULL ) //销毁Pcm格式缓冲区帧的缓冲区队列。
+		if( AdoInptPt->m_Dvc.m_PcmBufFrmBufQueue.m_Pt != NULL ) //销毁Pcm格式缓冲区帧的缓冲区队列。
 		{
 			AdoInptPt->m_Dvc.m_PcmBufFrmBufQueue.Dstoy( NULL );
 		}
@@ -1601,7 +1602,7 @@ void AdoInptDstoy( AdoInpt * AdoInptPt )
  * 功能说明：音频输入线程主函数。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
  * 返回说明：0：成功。
-			 非0：失败。
+             非0：失败。
  * 线程安全：是 或 否
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1751,7 +1752,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 				{
 					if( p_HRslt != S_FALSE ) //如果是其他错误。
 					{
-						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息，或系统自带的声学回音消除器、噪音抑制器和自动增益控制器不支持该设备。" ) );
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息，或系统自带的声学回音消除器、噪音抑制器和自动增益控制器不支持该设备，发送音频输入设备关闭线程消息。" ) );
 						{
 							MediaPocsThrd::ThrdMsgAdoInptDvcClos p_ThrdMsgAdoInptDvcClos;
 							if( MsgQueueSendMsg( AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcClos, &p_ThrdMsgAdoInptDvcClos, sizeof( p_ThrdMsgAdoInptDvcClos ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -1797,7 +1798,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 				{
 					if( p_HRslt == AUDCLNT_E_DEVICE_INVALIDATED ) //如果设备已经关闭。
 					{
-						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息。" ) );
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息，发送音频输入设备关闭线程消息。" ) );
 						{
 							MediaPocsThrd::ThrdMsgAdoInptDvcClos p_ThrdMsgAdoInptDvcClos;
 							if( MsgQueueSendMsg( AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcClos, &p_ThrdMsgAdoInptDvcClos, sizeof( p_ThrdMsgAdoInptDvcClos ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -1902,10 +1903,10 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		OutPocs:;
 
 		if( AdoInptPt->m_Thrd.m_ExitFlag == 1 ) //如果退出标记为请求退出。
-        {
-            if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：接收退出请求。" ) );
-            break;
-        }
+		{
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：接收退出请求。" ) );
+			break;
+		}
 	} //音频输入循环结束。
 
 	if( p_SystemAecNsAgcMediaObjPt != NULL ) p_SystemAecNsAgcMediaObjPt->Release();

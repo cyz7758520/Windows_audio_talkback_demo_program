@@ -1059,7 +1059,7 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 	}
 
 	//销毁空闲帧容器。
-	if( VdoInptPt->m_IdleFrmCntnr.m_CQueuePt != NULL )
+	if( VdoInptPt->m_IdleFrmCntnr.m_Pt != NULL )
 	{
 		while( VdoInptPt->m_IdleFrmCntnr.GetHead( &VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
@@ -1092,7 +1092,7 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 	}
 
 	//销毁帧容器。
-	if( VdoInptPt->m_FrmCntnr.m_CQueuePt != NULL )
+	if( VdoInptPt->m_FrmCntnr.m_Pt != NULL )
 	{
 		while( VdoInptPt->m_FrmCntnr.GetHead( &VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, 0, NULL ) == 0 )
 		{

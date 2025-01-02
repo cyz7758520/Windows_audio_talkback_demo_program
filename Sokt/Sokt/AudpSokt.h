@@ -49,34 +49,34 @@ __SOKT_DLLAPI__ int AudpDstoy( AudpSokt * AudpSoktPt, Vstr * ErrInfoVstrPt );
 class AudpSoktCls
 {
 public:
-	AudpSokt * m_AudpSoktPt;
+	AudpSokt * m_Pt;
 
-	AudpSoktCls() { m_AudpSoktPt = NULL; }
+	AudpSoktCls() { m_Pt = NULL; }
 	~AudpSoktCls() { Dstoy( NULL ); }
 
 	static int GetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt ) { return AudpGetAppLmtInfo( LicnCodePt, LmtTimeSecPt, RmnTimeSecPt, ErrInfoVstrPt ); }
 
-	int Init( const void * LicnCodePt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpInit( LicnCodePt, &m_AudpSoktPt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, NewCnctMaxWaitCnt, TmotMsec, ErrInfoVstrPt ); }
+	int Init( const void * LicnCodePt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpInit( LicnCodePt, &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, NewCnctMaxWaitCnt, TmotMsec, ErrInfoVstrPt ); }
 
-	int Acpt( size_t * CnctIdxPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpAcpt( m_AudpSoktPt, CnctIdxPt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, TmotMsec, ErrInfoVstrPt ); }
+	int Acpt( size_t * CnctIdxPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpAcpt( m_Pt, CnctIdxPt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, TmotMsec, ErrInfoVstrPt ); }
 	
-	int Cnct( const int32_t RmtNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, size_t * CnctIdxPt, Vstr * ErrInfoVstrPt ) { return AudpCnct( m_AudpSoktPt, RmtNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, CnctIdxPt, ErrInfoVstrPt ); }
-	int WaitCnct( size_t CnctIdx, uint16_t TmotMsec, AudpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt ) { return AudpWaitCnct( m_AudpSoktPt, CnctIdx, TmotMsec, CnctStsPt, ErrInfoVstrPt ); }
-	int ClosCnct( size_t CnctIdx, Vstr * ErrInfoVstrPt ) { return AudpClosCnct( m_AudpSoktPt, CnctIdx, ErrInfoVstrPt ); }
+	int Cnct( const int32_t RmtNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, size_t * CnctIdxPt, Vstr * ErrInfoVstrPt ) { return AudpCnct( m_Pt, RmtNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, CnctIdxPt, ErrInfoVstrPt ); }
+	int WaitCnct( size_t CnctIdx, uint16_t TmotMsec, AudpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt ) { return AudpWaitCnct( m_Pt, CnctIdx, TmotMsec, CnctStsPt, ErrInfoVstrPt ); }
+	int ClosCnct( size_t CnctIdx, Vstr * ErrInfoVstrPt ) { return AudpClosCnct( m_Pt, CnctIdx, ErrInfoVstrPt ); }
 
-	int GetLclAddr( int32_t * LclNodeAddrFmlyPt, Vstr * LclNodeAddrVstrPt, Vstr * LclNodePortVstrPt, Vstr * ErrInfoVstrPt ) { return AudpGetLclAddr( m_AudpSoktPt, LclNodeAddrFmlyPt, LclNodeAddrVstrPt, LclNodePortVstrPt, ErrInfoVstrPt ); }
-	int GetRmtAddr( size_t CnctIdx, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, Vstr * ErrInfoVstrPt ) { return AudpGetRmtAddr( m_AudpSoktPt, CnctIdx, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, ErrInfoVstrPt ); }
+	int GetLclAddr( int32_t * LclNodeAddrFmlyPt, Vstr * LclNodeAddrVstrPt, Vstr * LclNodePortVstrPt, Vstr * ErrInfoVstrPt ) { return AudpGetLclAddr( m_Pt, LclNodeAddrFmlyPt, LclNodeAddrVstrPt, LclNodePortVstrPt, ErrInfoVstrPt ); }
+	int GetRmtAddr( size_t CnctIdx, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, Vstr * ErrInfoVstrPt ) { return AudpGetRmtAddr( m_Pt, CnctIdx, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, ErrInfoVstrPt ); }
 	
-	int SetSendBufSz( size_t SendBufSzByt, Vstr * ErrInfoVstrPt ) { return AudpSetSendBufSz( m_AudpSoktPt, SendBufSzByt, ErrInfoVstrPt ); }
-	int GetSendBufSz( size_t * SendBufSzBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetSendBufSz( m_AudpSoktPt, SendBufSzBytPt, ErrInfoVstrPt ); }
+	int SetSendBufSz( size_t SendBufSzByt, Vstr * ErrInfoVstrPt ) { return AudpSetSendBufSz( m_Pt, SendBufSzByt, ErrInfoVstrPt ); }
+	int GetSendBufSz( size_t * SendBufSzBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetSendBufSz( m_Pt, SendBufSzBytPt, ErrInfoVstrPt ); }
 
-	int SetRecvBufSz( size_t RecvBufSzByt, Vstr * ErrInfoVstrPt ) { return AudpSetRecvBufSz( m_AudpSoktPt, RecvBufSzByt, ErrInfoVstrPt ); }
-	int GetRecvBufSz( size_t * RecvBufSzBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetRecvBufSz( m_AudpSoktPt, RecvBufSzBytPt, ErrInfoVstrPt ); }
-	int GetRecvBufLen( size_t * RecvBufLenBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetRecvBufLen( m_AudpSoktPt, RecvBufLenBytPt, ErrInfoVstrPt ); }
+	int SetRecvBufSz( size_t RecvBufSzByt, Vstr * ErrInfoVstrPt ) { return AudpSetRecvBufSz( m_Pt, RecvBufSzByt, ErrInfoVstrPt ); }
+	int GetRecvBufSz( size_t * RecvBufSzBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetRecvBufSz( m_Pt, RecvBufSzBytPt, ErrInfoVstrPt ); }
+	int GetRecvBufLen( size_t * RecvBufLenBytPt, Vstr * ErrInfoVstrPt ) { return AudpGetRecvBufLen( m_Pt, RecvBufLenBytPt, ErrInfoVstrPt ); }
 	
-	int SendApkt( size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, int32_t IsRlab, Vstr * ErrInfoVstrPt ) { return AudpSendApkt( m_AudpSoktPt, CnctIdx, PktPt, PktLenByt, Times, IsRlab, ErrInfoVstrPt ); }
-	int RecvApkt( size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, int32_t * IsRlabPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpRecvApkt( m_AudpSoktPt, CnctIdx, PktPt, PktSzByt, PktLenBytPt, IsRlabPt, TmotMsec, ErrInfoVstrPt ); }
+	int SendApkt( size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, int32_t IsRlab, Vstr * ErrInfoVstrPt ) { return AudpSendApkt( m_Pt, CnctIdx, PktPt, PktLenByt, Times, IsRlab, ErrInfoVstrPt ); }
+	int RecvApkt( size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, int32_t * IsRlabPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpRecvApkt( m_Pt, CnctIdx, PktPt, PktSzByt, PktLenBytPt, IsRlabPt, TmotMsec, ErrInfoVstrPt ); }
 
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AudpDstoy( m_AudpSoktPt, ErrInfoVstrPt ); m_AudpSoktPt = NULL; return p_Rslt; }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AudpDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 };
 #endif
