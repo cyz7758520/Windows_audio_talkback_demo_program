@@ -165,8 +165,8 @@ ___
 功能说明：用户定义的消息函数，在接收用户消息时回调一次。  
 参数说明：MediaPocsThrdPt：\[输入\]，存放媒体处理线程的指针。  
 &emsp;&emsp;&emsp;&emsp;&emsp;MsgTyp：\[输入\]，存放消息类型。  
-&emsp;&emsp;&emsp;&emsp;&emsp;MsgPt：\[输入\]，存放消息数据的指针。如果没有消息数据，则本参数为NULL。  
-&emsp;&emsp;&emsp;&emsp;&emsp;MsgLenByt：\[输入\]，存放消息数据的长度，单位为字节。如果没有消息数据，则本参数为0。  
+&emsp;&emsp;&emsp;&emsp;&emsp;MsgParmPt：\[输入\]，存放消息参数的指针。如果没有消息参数，则本参数为NULL。  
+&emsp;&emsp;&emsp;&emsp;&emsp;MsgParmLenByt：\[输入\]，存放消息参数的长度，单位为字节。如果没有消息参数，则本参数为0。  
 返回说明：本次消息处理结果。  
 ___
 函数名称：UserDvcChg  
@@ -264,8 +264,8 @@ ___
 功能说明：用户定义的消息函数，在接收用户消息时回调一次。  
 参数说明：SrvrThrdPt：\[输入\]，存放服务端线程的指针。  
 &emsp;&emsp;&emsp;&emsp;&emsp;MsgTyp：\[输入\]，存放消息类型。  
-&emsp;&emsp;&emsp;&emsp;&emsp;MsgPt：\[输入\]，存放消息数据的指针。如果没有消息数据，则本参数为NULL。  
-&emsp;&emsp;&emsp;&emsp;&emsp;MsgLenByt：\[输入\]，存放消息数据的长度，单位为字节。如果没有消息数据，则本参数为0。  
+&emsp;&emsp;&emsp;&emsp;&emsp;MsgParmPt：\[输入\]，存放消息参数的指针。如果没有消息参数，则本参数为NULL。  
+&emsp;&emsp;&emsp;&emsp;&emsp;MsgParmLenByt：\[输入\]，存放消息参数的长度，单位为字节。如果没有消息参数，则本参数为0。  
 返回说明：本次消息处理结果。  
 ___
 函数名称：UserShowLog  
@@ -316,8 +316,8 @@ ___
 功能说明：用户定义的消息函数，在接收用户消息时回调一次。  
 参数说明：ClntMediaPocsThrdPt：\[输入\]，存放客户端媒体处理线程的指针。  
 &emsp;&emsp;&emsp;&emsp;&emsp;MsgTyp：\[输入\]，存放消息类型。  
-&emsp;&emsp;&emsp;&emsp;&emsp;MsgPt：\[输入\]，存放消息数据的指针。如果没有消息数据，则本参数为NULL。  
-&emsp;&emsp;&emsp;&emsp;&emsp;MsgLenByt：\[输入\]，存放消息数据的长度，单位为字节。如果没有消息数据，则本参数为0。  
+&emsp;&emsp;&emsp;&emsp;&emsp;MsgParmPt：\[输入\]，存放消息参数的指针。如果没有消息参数，则本参数为NULL。  
+&emsp;&emsp;&emsp;&emsp;&emsp;MsgParmLenByt：\[输入\]，存放消息参数的长度，单位为字节。如果没有消息参数，则本参数为0。  
 返回说明：本次消息处理结果。  
 ___
 函数名称：UserDvcChg  

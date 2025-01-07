@@ -95,6 +95,14 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "VdoOtptIsBlack" );
 		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseAdoInptBdctTkbkMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseVdoInptBdctTkbkMode" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		{
 			int p_TmpInt;
@@ -1002,6 +1010,28 @@ void ReadStngFromXmlFile()
 							else
 							{
 								CheckDlgButton( g_MainDlgWndHdl, VdoOtptIsBlackCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseAdoInptBdctTkbkMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseVdoInptBdctTkbkMode" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId, BST_CHECKED );
 							}
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "AdoInptDvc" ) == 0 )
@@ -2189,7 +2219,7 @@ void ResetStng()
 		SendMessage( GetDlgItem( g_MainDlgWndHdl, ClntSrvrUrlCbBoxId ), CB_SETCURSEL, 1, 0 ); //设置客户端Url组合框默认选择第二个Audp协议的Url。
 	}
 	
-	//设置使用什么对讲模式。
+	//设置对讲模式。
 	CheckDlgButton( g_MainDlgWndHdl, UseAdoInptTkbkModeCkBoxId, BST_CHECKED );
 	CheckDlgButton( g_MainDlgWndHdl, UseAdoOtptTkbkModeCkBoxId, BST_CHECKED );
 	CheckDlgButton( g_MainDlgWndHdl, UseVdoInptTkbkModeCkBoxId, BST_UNCHECKED );
@@ -2203,7 +2233,11 @@ void ResetStng()
 	
 	//设置音频输入设备、音频输出设备。
 	RefreshAdoVdoInptOtptDvc( 1, 1, 1 );
-
+	
+	//设置广播对讲模式。
+	CheckDlgButton( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId, BST_CHECKED );
+	CheckDlgButton( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId, BST_UNCHECKED );
+	
 	//设置是否绘制音频波形到窗口。
 	CheckDlgButton( g_MainDlgWndHdl, IsDrawAdoWavfmToWndCkBoxId, BST_CHECKED );
 

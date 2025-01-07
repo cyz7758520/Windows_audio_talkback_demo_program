@@ -173,7 +173,7 @@ typedef struct SrvrThrd //服务端线程。
 	SrvrThrdUserPocsFuncPt m_UserPocsFuncPt;
 	
 	//用户定义的消息函数。
-	typedef int( __cdecl * SrvrThrdUserMsgFuncPt )( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+	typedef int( __cdecl * SrvrThrdUserMsgFuncPt )( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 	SrvrThrdUserMsgFuncPt m_UserMsgFuncPt;
 	
 	//用户定义的显示日志函数。
@@ -233,7 +233,7 @@ __WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, in
 
 __WNDADOVDOTKBK_DLLAPI__ int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
 __WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
-__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
@@ -258,7 +258,7 @@ public:
 	virtual void UserPocs() = 0;
 
 	//用户定义的消息函数。
-	virtual int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt ) = 0;
+	virtual int UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt ) = 0;
 	
 	//用户定义的显示日志函数。
 	virtual void UserShowLog( Vstr * InfoVstrPt ) = 0;
@@ -300,6 +300,6 @@ public:
 
 	int Start( Vstr * ErrInfoVstrPt ) { return SrvrThrdStart( m_SrvrThrdPt, ErrInfoVstrPt ); }
 	int SendRqirExitMsg( int IsBlockWait, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendRqirExitMsg( m_SrvrThrdPt, IsBlockWait, ErrInfoVstrPt ); }
-	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendUserMsg( m_SrvrThrdPt, IsBlockWait, MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ); }
+	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt ) { return SrvrThrdSendUserMsg( m_SrvrThrdPt, IsBlockWait, MsgTyp, MsgParmPt, MsgParmLenByt, ErrInfoVstrPt ); }
 };
 #endif

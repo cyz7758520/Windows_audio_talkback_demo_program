@@ -7,7 +7,7 @@ extern "C" SrvrThrd::CnctInfo * SrvrThrdCnctInfoInit( SrvrThrd * SrvrThrdPt, int
 extern "C" void SrvrThrdCnctInfoDstoy( SrvrThrd * SrvrThrdPt, SrvrThrd::CnctInfo * CnctInfoPt );
 extern "C" void SrvrThrdIsAutoRqirExit( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt );
 extern "C" void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt );
-extern "C" int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+extern "C" int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 extern "C" DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt );
 
 //服务端线程初始化。
@@ -550,7 +550,7 @@ int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrI
 }
 
 //发送用户消息。
-int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt )
+int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
@@ -561,7 +561,7 @@ int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int Ms
 		goto Out;
 	}
 	
-	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypUserMsgMinVal + MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( SrvrThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, SrvrThrd::ThrdMsgTypUserMsgMinVal + MsgTyp, MsgParmPt, MsgParmLenByt, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
@@ -1475,7 +1475,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 }
 
 //线程消息处理。
-int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
+int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt )
 {
 	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为1表示线程消息容器为空，为-1表示失败。
 	int32_t p_TmpInt32;
@@ -1485,7 +1485,7 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 	{
 		case SrvrThrd::ThrdMsgTypSetIsUsePrvntSysSleep:
 		{
-			SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep * p_ThrdMsgSetIsUsePrvntSysSleepPt = ( SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep * )MsgPt;
+			SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep * p_ThrdMsgSetIsUsePrvntSysSleepPt = ( SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep * )MsgParmPt;
 
 			SrvrThrdPt->m_IsUsePrvntSysSleep = p_ThrdMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep;
 			SrvrThrdPrvntSysSleepInitOrDstoy( SrvrThrdPt, SrvrThrdPt->m_IsUsePrvntSysSleep );
@@ -1493,7 +1493,7 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		}
 		case SrvrThrd::ThrdMsgTypSetIsTstNtwkDly:
 		{
-			SrvrThrd::ThrdMsgSetIsTstNtwkDly * p_ThrdMsgSetIsTstNtwkDlyPt = ( SrvrThrd::ThrdMsgSetIsTstNtwkDly * )MsgPt;
+			SrvrThrd::ThrdMsgSetIsTstNtwkDly * p_ThrdMsgSetIsTstNtwkDlyPt = ( SrvrThrd::ThrdMsgSetIsTstNtwkDly * )MsgParmPt;
 
 			SrvrThrdPt->m_TstNtwkDly.m_IsTstNtwkDly = p_ThrdMsgSetIsTstNtwkDlyPt->m_IsTstNtwkDly; //设置是否测试网络延迟。
 			SrvrThrdPt->m_TstNtwkDly.m_SendIntvlMsec = p_ThrdMsgSetIsTstNtwkDlyPt->m_SendIntvlMsec; //设置测试网络延迟包的发送间隔。
@@ -1510,7 +1510,7 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		}
 		case SrvrThrd::ThrdMsgTypSrvrInit:
 		{
-			SrvrThrd::ThrdMsgSrvrInit * p_ThrdMsgSrvrInitPt = ( SrvrThrd::ThrdMsgSrvrInit * )MsgPt;
+			SrvrThrd::ThrdMsgSrvrInit * p_ThrdMsgSrvrInitPt = ( SrvrThrd::ThrdMsgSrvrInit * )MsgParmPt;
 			
 			p_Rslt = SrvrThrdSrvrInit( SrvrThrdPt, p_ThrdMsgSrvrInitPt->m_IsTcpOrAudpPrtcl, p_ThrdMsgSrvrInitPt->m_LclNodeNameVstrPt, p_ThrdMsgSrvrInitPt->m_LclNodeSrvcVstrPt, p_ThrdMsgSrvrInitPt->m_MaxCnctNum, p_ThrdMsgSrvrInitPt->m_IsAutoRqirExit );
 			VstrDstoy( p_ThrdMsgSrvrInitPt->m_LclNodeNameVstrPt );
@@ -1519,14 +1519,14 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		}
 		case SrvrThrd::ThrdMsgTypSrvrDstoy:
 		{
-			SrvrThrd::ThrdMsgSrvrDstoy * p_ThrdMsgSrvrDstoyPt = ( SrvrThrd::ThrdMsgSrvrDstoy * )MsgPt;
+			SrvrThrd::ThrdMsgSrvrDstoy * p_ThrdMsgSrvrDstoyPt = ( SrvrThrd::ThrdMsgSrvrDstoy * )MsgParmPt;
 			
 			SrvrThrdSrvrDstoy( SrvrThrdPt );
 			break;
 		}
 		case SrvrThrd::ThrdMsgTypCnctDstoy:
 		{
-			SrvrThrd::ThrdMsgCnctDstoy * p_ThrdMsgCnctDstoyPt = ( SrvrThrd::ThrdMsgCnctDstoy * )MsgPt;
+			SrvrThrd::ThrdMsgCnctDstoy * p_ThrdMsgCnctDstoyPt = ( SrvrThrd::ThrdMsgCnctDstoy * )MsgParmPt;
 
 			if( ( p_ThrdMsgCnctDstoyPt->m_CnctNum > SrvrThrdPt->m_CnctInfoCurMaxNum ) || ( p_ThrdMsgCnctDstoyPt->m_CnctNum < 0 ) )
 			{
@@ -1560,7 +1560,7 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		}
 		case SrvrThrd::ThrdMsgTypRqirExit:
 		{
-			SrvrThrd::ThrdMsgRqirExit * p_ThrdMsgRqirExitPt = ( SrvrThrd::ThrdMsgRqirExit * )MsgPt;
+			SrvrThrd::ThrdMsgRqirExit * p_ThrdMsgRqirExitPt = ( SrvrThrd::ThrdMsgRqirExit * )MsgParmPt;
 			
 			if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "服务端线程：接收退出请求。" ) );
 			SrvrThrdPt->m_IsRqirExit = 1; //设置已请求退出。
@@ -1569,9 +1569,9 @@ int SrvrThrdThrdMsgPocs( MsgQueue * MsgQueuePt, SrvrThrd * SrvrThrdPt, unsigned 
 		}
 		default: //用户消息。
 		{
-			SrvrThrd::ThrdMsgUserMsg * p_ThrdMsgUserMsgPt = ( SrvrThrd::ThrdMsgUserMsg * )MsgPt;
+			SrvrThrd::ThrdMsgUserMsg * p_ThrdMsgUserMsgParmPt = ( SrvrThrd::ThrdMsgUserMsg * )MsgParmPt;
 
-			p_TmpInt32 = SrvrThrdPt->m_UserMsgFuncPt( SrvrThrdPt, MsgTyp - SrvrThrd::ThrdMsgTypUserMsgMinVal, MsgPt, MsgLenByt );
+			p_TmpInt32 = SrvrThrdPt->m_UserMsgFuncPt( SrvrThrdPt, MsgTyp - SrvrThrd::ThrdMsgTypUserMsgMinVal, MsgParmPt, MsgParmLenByt );
 			if( p_TmpInt32 == 0 )
 			{
 				if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：调用用户定义的消息函数成功。返回值：%d。" ), p_TmpInt32 );
@@ -1661,9 +1661,9 @@ extern "C" void __cdecl SrvrThrdClsUserShowToast( SrvrThrd * SrvrThrdPt, Vstr * 
 }
 
 //回调SrvrThrdCls类的用户定义的销毁函数。
-extern "C" int __cdecl SrvrThrdClsUserMsg( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
+extern "C" int __cdecl SrvrThrdClsUserMsg( SrvrThrd * SrvrThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt )
 {
-	return ( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserMsg( MsgTyp, MsgPt, MsgLenByt );
+	return ( ( SrvrThrdCls * )SrvrThrdPt->m_UserDataPt )->UserMsg( MsgTyp, MsgParmPt, MsgParmLenByt );
 }
 
 //回调SrvrThrdCls类的用户定义的服务端初始化函数。

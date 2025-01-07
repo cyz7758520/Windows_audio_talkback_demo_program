@@ -1,6 +1,6 @@
 ﻿#include "MediaPocsThrd.h"
 
-extern "C" int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+extern "C" int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt );
 DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt );
 
@@ -3443,7 +3443,8 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              MsgTyp：[输入]，存放消息类型。
-             MsgPt：[输入]，存放消息的指针。如果没有消息参数，则本参数为NULL。
+             MsgParmPt：[输入]，存放消息参数的指针。如果没有消息参数，则本参数为NULL。
+             MsgParmLenByt：[输入]，存放消息参数的长度，单位为字节。如果没有消息参数，则本参数为0。
              ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
@@ -3451,7 +3452,7 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
@@ -3462,7 +3463,7 @@ int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, 
 		goto Out;
 	}
 	
-	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, MediaPocsThrd::ThrdMsgTypUserMsgMinVal + MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ) != 0 )
+	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, MediaPocsThrd::ThrdMsgTypUserMsgMinVal + MsgTyp, MsgParmPt, MsgParmLenByt, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
@@ -3990,7 +3991,7 @@ void MediaPocsThrdAdoVdoInptOtptDstoy( MediaPocsThrd * MediaPocsThrdPt )
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
+int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt )
 {
 	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为1表示线程消息容器为空，为-1表示失败。
 	int32_t p_TmpInt32;
@@ -4009,7 +4010,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 	{
 		case MediaPocsThrd::ThrdMsgTypSetAdoInpt:
 		{
-			MediaPocsThrd::ThrdMsgSetAdoInpt * p_ThrdMsgSetAdoInptPt = ( MediaPocsThrd::ThrdMsgSetAdoInpt * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetAdoInpt * p_ThrdMsgSetAdoInptPt = ( MediaPocsThrd::ThrdMsgSetAdoInpt * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4038,7 +4039,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetIsUseSystemAecNsAgc:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetIsUseSystemAecNsAgc * p_ThrdMsgAdoInptSetIsUseSystemAecNsAgcPt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsUseSystemAecNsAgc * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetIsUseSystemAecNsAgc * p_ThrdMsgAdoInptSetIsUseSystemAecNsAgcPt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsUseSystemAecNsAgc * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4061,7 +4062,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseNoAec:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseNoAec * p_ThrdMsgAdoInptSetUseNoAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseNoAec * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseNoAec * p_ThrdMsgAdoInptSetUseNoAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseNoAec * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 0;
@@ -4075,7 +4076,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseSpeexAec:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexAec * p_ThrdMsgAdoInptSetUseSpeexAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexAec * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexAec * p_ThrdMsgAdoInptSetUseSpeexAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexAec * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 1;
@@ -4095,7 +4096,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseWebRtcAecm:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAecm * p_ThrdMsgAdoInptSetUseWebRtcAecmPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAecm * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAecm * p_ThrdMsgAdoInptSetUseWebRtcAecmPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAecm * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 2;
@@ -4112,7 +4113,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseWebRtcAec:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec * p_ThrdMsgAdoInptSetUseWebRtcAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec * p_ThrdMsgAdoInptSetUseWebRtcAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 3;
@@ -4132,7 +4133,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseWebRtcAec3:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec3 * p_ThrdMsgAdoInptSetUseWebRtcAec3Pt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec3 * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec3 * p_ThrdMsgAdoInptSetUseWebRtcAec3Pt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec3 * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 4;
@@ -4147,7 +4148,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseSpeexWebRtcAec:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexWebRtcAec * p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexWebRtcAec * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexWebRtcAec * p_ThrdMsgAdoInptSetUseSpeexWebRtcAecPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexWebRtcAec * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptAecDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec = 5;
@@ -4180,7 +4181,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseNoNs:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseNoNs * p_ThrdMsgAdoInptSetUseNoNsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseNoNs * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseNoNs * p_ThrdMsgAdoInptSetUseNoNsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseNoNs * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4198,7 +4199,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseSpeexPrpocsNs:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexPrpocsNs * p_ThrdMsgAdoInptSetUseSpeexPrpocsNsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexPrpocsNs * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexPrpocsNs * p_ThrdMsgAdoInptSetUseSpeexPrpocsNsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexPrpocsNs * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4219,7 +4220,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseWebRtcNsx:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNsx * p_ThrdMsgAdoInptSetUseWebRtcNsxPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNsx * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNsx * p_ThrdMsgAdoInptSetUseWebRtcNsxPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNsx * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4238,7 +4239,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseWebRtcNs:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNs * p_ThrdMsgAdoInptSetUseWebRtcNsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNs * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNs * p_ThrdMsgAdoInptSetUseWebRtcNsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNs * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4257,7 +4258,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseRNNoise:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseRNNoise * p_ThrdMsgAdoInptSetUseRNNoisePt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseRNNoise * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseRNNoise * p_ThrdMsgAdoInptSetUseRNNoisePt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseRNNoise * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptNsDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4275,7 +4276,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetIsUseSpeexPrpocs:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetIsUseSpeexPrpocs * p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsUseSpeexPrpocs * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetIsUseSpeexPrpocs * p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsUseSpeexPrpocs * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptSpeexPrpocsDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_SpeexPrpocs.m_IsUseSpeexPrpocs = p_ThrdMsgAdoInptSetIsUseSpeexPrpocsPt->m_IsUseSpeexPrpocs;
@@ -4297,7 +4298,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUsePcm:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUsePcm * p_ThrdMsgAdoInptSetUsePcmPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUsePcm * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUsePcm * p_ThrdMsgAdoInptSetUsePcmPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUsePcm * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 0;
@@ -4308,7 +4309,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseSpeexEncd:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexEncd * p_ThrdMsgAdoInptSetUseSpeexEncdPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexEncd * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexEncd * p_ThrdMsgAdoInptSetUseSpeexEncdPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexEncd * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 1;
@@ -4323,7 +4324,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseOpusEncd:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseOpusEncd * p_ThrdMsgAdoInptSetUseOpusEncdPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseOpusEncd * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseOpusEncd * p_ThrdMsgAdoInptSetUseOpusEncdPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseOpusEncd * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptEncdDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_UseWhatEncd = 2;
@@ -4334,7 +4335,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetIsSaveAdoToWaveFile:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetIsSaveAdoToWaveFile * p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsSaveAdoToWaveFile * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetIsSaveAdoToWaveFile * p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsSaveAdoToWaveFile * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_IsSave = p_ThrdMsgAdoInptSetIsSaveAdoToWaveFilePt->m_IsSave;
@@ -4355,7 +4356,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetIsDrawAdoWavfmToWnd:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd * p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWndPt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd * p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWndPt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptWavfmDstoy( &MediaPocsThrdPt->m_AdoInpt );
 
 			MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDraw = p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWndPt->m_IsDraw;
@@ -4367,7 +4368,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetUseDvc:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetUseDvc * p_ThrdMsgAdoInptSetUseDvcPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseDvc * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetUseDvc * p_ThrdMsgAdoInptSetUseDvcPt = ( MediaPocsThrd::ThrdMsgAdoInptSetUseDvc * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
 				AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4391,14 +4392,14 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoInptSetIsMute:
 		{
-			MediaPocsThrd::ThrdMsgAdoInptSetIsMute * p_ThrdMsgAdoInptSetIsMutePt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsMute * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoInptSetIsMute * p_ThrdMsgAdoInptSetIsMutePt = ( MediaPocsThrd::ThrdMsgAdoInptSetIsMute * )MsgParmPt;
 
 			MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_IsMute = p_ThrdMsgAdoInptSetIsMutePt->m_IsMute;
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypSetAdoOtpt:
 		{
-			MediaPocsThrd::ThrdMsgSetAdoOtpt * p_ThrdMsgSetAdoOtptPt = ( MediaPocsThrd::ThrdMsgSetAdoOtpt * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetAdoOtpt * p_ThrdMsgSetAdoOtptPt = ( MediaPocsThrd::ThrdMsgSetAdoOtpt * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 			{
 				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4431,49 +4432,49 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptAddStrm:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptAddStrm * p_ThrdMsgAdoOtptAddStrmPt = ( MediaPocsThrd::ThrdMsgAdoOtptAddStrm * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptAddStrm * p_ThrdMsgAdoOtptAddStrmPt = ( MediaPocsThrd::ThrdMsgAdoOtptAddStrm * )MsgParmPt;
 
 			AdoOtptAddStrm( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptAddStrmPt->m_StrmIdx );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptDelStrm:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptDelStrm * p_ThrdMsgAdoOtptDelStrmPt = ( MediaPocsThrd::ThrdMsgAdoOtptDelStrm * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptDelStrm * p_ThrdMsgAdoOtptDelStrmPt = ( MediaPocsThrd::ThrdMsgAdoOtptDelStrm * )MsgParmPt;
 
 			AdoOtptDelStrm( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptDelStrmPt->m_StrmIdx );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetStrmUsePcm:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetStrmUsePcm * p_ThrdMsgAdoOtptSetStrmUsePcmPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmUsePcm * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetStrmUsePcm * p_ThrdMsgAdoOtptSetStrmUsePcmPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmUsePcm * )MsgParmPt;
 
 			AdoOtptSetStrmUsePcm( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmUsePcmPt->m_StrmIdx );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetStrmUseSpeexDecd:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseSpeexDecd * p_ThrdMsgAdoOtptSetStrmUseSpeexDecdPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseSpeexDecd * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseSpeexDecd * p_ThrdMsgAdoOtptSetStrmUseSpeexDecdPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseSpeexDecd * )MsgParmPt;
 
 			AdoOtptSetStrmUseSpeexDecd( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmUseSpeexDecdPt->m_StrmIdx, p_ThrdMsgAdoOtptSetStrmUseSpeexDecdPt->m_IsUsePrcplEnhsmt );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetStrmUseOpusDecd:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseOpusDecd * p_ThrdMsgAdoOtptSetStrmUseOpusDecdPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseOpusDecd * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseOpusDecd * p_ThrdMsgAdoOtptSetStrmUseOpusDecdPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseOpusDecd * )MsgParmPt;
 
 			AdoOtptSetStrmUseOpusDecd( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmUseOpusDecdPt->m_StrmIdx );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetStrmIsUse:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetStrmIsUse * p_ThrdMsgAdoOtptSetStrmIsUsePt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmIsUse * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetStrmIsUse * p_ThrdMsgAdoOtptSetStrmIsUsePt = ( MediaPocsThrd::ThrdMsgAdoOtptSetStrmIsUse * )MsgParmPt;
 
 			AdoOtptSetStrmIsUse( &MediaPocsThrdPt->m_AdoOtpt, p_ThrdMsgAdoOtptSetStrmIsUsePt->m_StrmIdx, p_ThrdMsgAdoOtptSetStrmIsUsePt->m_IsUse );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetIsSaveAdoToWaveFile:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetIsSaveAdoToWaveFile * p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt = ( MediaPocsThrd::ThrdMsgAdoOtptSetIsSaveAdoToWaveFile * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetIsSaveAdoToWaveFile * p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt = ( MediaPocsThrd::ThrdMsgAdoOtptSetIsSaveAdoToWaveFile * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptWaveFileWriterDstoy( &MediaPocsThrdPt->m_AdoOtpt );
 
 			MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_IsSave = p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFilePt->m_IsSave;
@@ -4489,7 +4490,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetIsDrawAdoWavfmToWnd:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd * p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWndPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd * p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWndPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptWavfmDstoy( &MediaPocsThrdPt->m_AdoOtpt );
 
 			MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDraw = p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWndPt->m_IsDraw;
@@ -4500,7 +4501,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetUseDvc:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetUseDvc * p_ThrdMsgAdoOtptSetUseDvcPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetUseDvc * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetUseDvc * p_ThrdMsgAdoOtptSetUseDvcPt = ( MediaPocsThrd::ThrdMsgAdoOtptSetUseDvc * )MsgParmPt;
 			if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 )
 			{
 				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 ) AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt );
@@ -4529,14 +4530,14 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypAdoOtptSetIsMute:
 		{
-			MediaPocsThrd::ThrdMsgAdoOtptSetIsMute * p_ThrdMsgAdoOtptSetIsMutePt = ( MediaPocsThrd::ThrdMsgAdoOtptSetIsMute * )MsgPt;
+			MediaPocsThrd::ThrdMsgAdoOtptSetIsMute * p_ThrdMsgAdoOtptSetIsMutePt = ( MediaPocsThrd::ThrdMsgAdoOtptSetIsMute * )MsgParmPt;
 
 			MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_IsMute = p_ThrdMsgAdoOtptSetIsMutePt->m_IsMute;
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypSetVdoInpt:
 		{
-			MediaPocsThrd::ThrdMsgSetVdoInpt * p_ThrdMsgSetVdoInptPt = ( MediaPocsThrd::ThrdMsgSetVdoInpt * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetVdoInpt * p_ThrdMsgSetVdoInptPt = ( MediaPocsThrd::ThrdMsgSetVdoInpt * )MsgParmPt;
 			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
 
 			MediaPocsThrdPt->m_VdoInpt.m_MaxSmplRate = p_ThrdMsgSetVdoInptPt->m_MaxSmplRate;
@@ -4553,7 +4554,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoInptSetUseYu12:
 		{
-			MediaPocsThrd::ThrdMsgVdoInptSetUseYu12 * p_ThrdMsgVdoInptSetUseYu12Pt = ( MediaPocsThrd::ThrdMsgVdoInptSetUseYu12 * )MsgPt;
+			MediaPocsThrd::ThrdMsgVdoInptSetUseYu12 * p_ThrdMsgVdoInptSetUseYu12Pt = ( MediaPocsThrd::ThrdMsgVdoInptSetUseYu12 * )MsgParmPt;
 			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
 
 			MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd = 0;
@@ -4563,7 +4564,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoInptSetUseOpenH264Encd:
 		{
-			MediaPocsThrd::ThrdMsgVdoInptSetUseOpenH264Encd * p_ThrdMsgVdoInptSetUseOpenH264EncdPt = ( MediaPocsThrd::ThrdMsgVdoInptSetUseOpenH264Encd * )MsgPt;
+			MediaPocsThrd::ThrdMsgVdoInptSetUseOpenH264Encd * p_ThrdMsgVdoInptSetUseOpenH264EncdPt = ( MediaPocsThrd::ThrdMsgVdoInptSetUseOpenH264Encd * )MsgParmPt;
 			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
 
 			MediaPocsThrdPt->m_VdoInpt.m_UseWhatEncd = 1;
@@ -4578,7 +4579,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoInptSetUseDvc:
 		{
-			MediaPocsThrd::ThrdMsgVdoInptSetUseDvc * p_ThrdMsgVdoInptSetUseDvcPt = ( MediaPocsThrd::ThrdMsgVdoInptSetUseDvc * )MsgPt;
+			MediaPocsThrd::ThrdMsgVdoInptSetUseDvc * p_ThrdMsgVdoInptSetUseDvcPt = ( MediaPocsThrd::ThrdMsgVdoInptSetUseDvc * )MsgParmPt;
 			if( MediaPocsThrdPt->m_VdoInpt.m_IsInit != 0 ) VdoInptDstoy( &MediaPocsThrdPt->m_VdoInpt );
 
 			VstrCpy( MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_NameVstrPt, p_ThrdMsgVdoInptSetUseDvcPt->m_NameVstrPt, , );
@@ -4589,63 +4590,63 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoInptSetIsBlack:
 		{
-			MediaPocsThrd::ThrdMsgSetVdoInptIsBlack * p_ThrdMsgSetVdoInptIsBlackPt = ( MediaPocsThrd::ThrdMsgSetVdoInptIsBlack * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetVdoInptIsBlack * p_ThrdMsgSetVdoInptIsBlackPt = ( MediaPocsThrd::ThrdMsgSetVdoInptIsBlack * )MsgParmPt;
 
 			MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_IsBlack = p_ThrdMsgSetVdoInptIsBlackPt->m_IsBlack;
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoOtptAddStrm:
 		{
-			MediaPocsThrd::ThrdMsgAddVdoOtptStrm * p_ThrdMsgAddVdoOtptStrmPt = ( MediaPocsThrd::ThrdMsgAddVdoOtptStrm * )MsgPt;
+			MediaPocsThrd::ThrdMsgAddVdoOtptStrm * p_ThrdMsgAddVdoOtptStrmPt = ( MediaPocsThrd::ThrdMsgAddVdoOtptStrm * )MsgParmPt;
 
 			VdoOtptAddStrm( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgAddVdoOtptStrmPt->m_StrmIdx );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoOtptDelStrm:
 		{
-			MediaPocsThrd::ThrdMsgDelVdoOtptStrm * p_ThrdMsgDelVdoOtptStrmPt = ( MediaPocsThrd::ThrdMsgDelVdoOtptStrm * )MsgPt;
+			MediaPocsThrd::ThrdMsgDelVdoOtptStrm * p_ThrdMsgDelVdoOtptStrmPt = ( MediaPocsThrd::ThrdMsgDelVdoOtptStrm * )MsgParmPt;
 
 			VdoOtptDelStrm( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgDelVdoOtptStrmPt->m_StrmIdx );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoOtptSetStrm:
 		{
-			MediaPocsThrd::ThrdMsgSetVdoOtptStrm * p_ThrdMsgSetVdoOtptStrmPt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrm * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetVdoOtptStrm * p_ThrdMsgSetVdoOtptStrmPt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrm * )MsgParmPt;
 
 			VdoOtptSetStrm( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmPt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmPt->m_DspyWndHdl );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoOtptSetStrmUseYu12:
 		{
-			MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseYu12 * p_ThrdMsgSetVdoOtptStrmUseYu12Pt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseYu12 * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseYu12 * p_ThrdMsgSetVdoOtptStrmUseYu12Pt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseYu12 * )MsgParmPt;
 
 			VdoOtptSetStrmUseYu12( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmUseYu12Pt->m_StrmIdx );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoOtptSetStrmUseOpenH264Decd:
 		{
-			MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseOpenH264Decd * p_ThrdMsgSetVdoOtptStrmUseOpenH264DecdPt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseOpenH264Decd * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseOpenH264Decd * p_ThrdMsgSetVdoOtptStrmUseOpenH264DecdPt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseOpenH264Decd * )MsgParmPt;
 
 			VdoOtptSetStrmUseOpenH264Decd( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmUseOpenH264DecdPt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmUseOpenH264DecdPt->m_DecdThrdNum );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoOtptSetStrmIsBlack:
 		{
-			MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsBlack * p_ThrdMsgSetVdoOtptStrmIsBlackPt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsBlack * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsBlack * p_ThrdMsgSetVdoOtptStrmIsBlackPt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsBlack * )MsgParmPt;
 
 			VdoOtptSetStrmIsBlack( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmIsBlackPt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmIsBlackPt->m_IsBlack );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypVdoOtptSetStrmIsUse:
 		{
-			MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsUse * p_ThrdMsgSetVdoOtptStrmIsUsePt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsUse * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsUse * p_ThrdMsgSetVdoOtptStrmIsUsePt = ( MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsUse * )MsgParmPt;
 
 			VdoOtptSetStrmIsUse( &MediaPocsThrdPt->m_VdoOtpt, p_ThrdMsgSetVdoOtptStrmIsUsePt->m_StrmIdx, p_ThrdMsgSetVdoOtptStrmIsUsePt->m_IsUse );
 			break;
 		}
 		case MediaPocsThrd::ThrdMsgTypSetIsUseAdoVdoInptOtpt:
 		{
-			MediaPocsThrd::ThrdMsgSetIsUseAdoVdoInptOtpt * p_ThrdMsgSetIsUseAdoVdoInptOtptPt = ( MediaPocsThrd::ThrdMsgSetIsUseAdoVdoInptOtpt * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetIsUseAdoVdoInptOtpt * p_ThrdMsgSetIsUseAdoVdoInptOtptPt = ( MediaPocsThrd::ThrdMsgSetIsUseAdoVdoInptOtpt * )MsgParmPt;
 
 			if( p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoInpt >= 0 ) MediaPocsThrdPt->m_AdoInpt.m_IsUse = p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoInpt;
 			if( p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoOtpt >= 0 ) MediaPocsThrdPt->m_AdoOtpt.m_IsUse = p_ThrdMsgSetIsUseAdoVdoInptOtptPt->m_IsUseAdoOtpt;
@@ -4662,7 +4663,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypSetIsUsePrvntSysSleep:
 		{
-			MediaPocsThrd::ThrdMsgSetIsUsePrvntSysSleep * p_ThrdMsgSetIsUsePrvntSysSleepPt = ( MediaPocsThrd::ThrdMsgSetIsUsePrvntSysSleep * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetIsUsePrvntSysSleep * p_ThrdMsgSetIsUsePrvntSysSleepPt = ( MediaPocsThrd::ThrdMsgSetIsUsePrvntSysSleep * )MsgParmPt;
 
 			MediaPocsThrdPt->m_IsUsePrvntSysSleep = p_ThrdMsgSetIsUsePrvntSysSleepPt->m_IsUsePrvntSysSleep;
 			MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrdPt, MediaPocsThrdPt->m_IsUsePrvntSysSleep );
@@ -4670,7 +4671,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypSetIsSaveAdoVdoInptOtptToAviFile:
 		{
-			MediaPocsThrd::ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile * p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt = ( MediaPocsThrd::ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile * )MsgPt;
+			MediaPocsThrd::ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile * p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt = ( MediaPocsThrd::ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile * )MsgParmPt;
 			int p_CmpRslt;
 			if( ( VstrCmp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, , , p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_FullPathVstrPt, , &p_CmpRslt ), p_CmpRslt != 0 ) || //当完整路径字符串或写入缓冲区的大小或最大流数量有修改时，才销毁。
 				( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt != p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFilePt->m_WrBufSzByt ) )
@@ -4693,7 +4694,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypSaveStsToTxtFile:
 		{
-			MediaPocsThrd::ThrdMsgSaveStsToTxtFile * p_ThrdMsgSaveStsToTxtFilePt = ( MediaPocsThrd::ThrdMsgSaveStsToTxtFile * )MsgPt;
+			MediaPocsThrd::ThrdMsgSaveStsToTxtFile * p_ThrdMsgSaveStsToTxtFilePt = ( MediaPocsThrd::ThrdMsgSaveStsToTxtFile * )MsgParmPt;
 			File * p_StsFilePt;
 
 			if( FileInitByPath( &p_StsFilePt, p_ThrdMsgSaveStsToTxtFilePt->m_FullPathVstrPt, NoRd_Wr, Create_AlExist_Clr, 8192, MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -4907,7 +4908,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypRqirExit:
 		{
-			MediaPocsThrd::ThrdMsgRqirExit * p_ThrdMsgRqirExitPt = ( MediaPocsThrd::ThrdMsgRqirExit * )MsgPt;
+			MediaPocsThrd::ThrdMsgRqirExit * p_ThrdMsgRqirExitPt = ( MediaPocsThrd::ThrdMsgRqirExit * )MsgParmPt;
 
 			switch( p_ThrdMsgRqirExitPt->m_ExitFlag )
 			{
@@ -4999,7 +5000,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypUserInit:
 		{
-			MediaPocsThrd::ThrdMsgUserInit * p_ThrdMsgUserInitPt = ( MediaPocsThrd::ThrdMsgUserInit * )MsgPt;
+			MediaPocsThrd::ThrdMsgUserInit * p_ThrdMsgUserInitPt = ( MediaPocsThrd::ThrdMsgUserInit * )MsgParmPt;
 
 			MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 0; //设置上一次调用了用户定义的初始化函数。
 			MediaPocsThrdPt->m_UserInitFuncPt( MediaPocsThrdPt ); //调用用户定义的初始化函数。
@@ -5008,7 +5009,7 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		case MediaPocsThrd::ThrdMsgTypUserDstoy:
 		{
-			MediaPocsThrd::ThrdMsgUserDstoy * p_ThrdMsgUserDstoyPt = ( MediaPocsThrd::ThrdMsgUserDstoy * )MsgPt;
+			MediaPocsThrd::ThrdMsgUserDstoy * p_ThrdMsgUserDstoyPt = ( MediaPocsThrd::ThrdMsgUserDstoy * )MsgParmPt;
 
 			MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 1; //设置上一次调用了用户定义的销毁函数。
 			MediaPocsThrdPt->m_UserDstoyFuncPt( MediaPocsThrdPt ); //调用用户定义的销毁函数。
@@ -5104,9 +5105,9 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 		}
 		default: //用户消息。
 		{
-			MediaPocsThrd::ThrdMsgUserMsg * p_ThrdMsgUserMsgPt = ( MediaPocsThrd::ThrdMsgUserMsg * )MsgPt;
+			MediaPocsThrd::ThrdMsgUserMsg * p_ThrdMsgUserMsgParmPt = ( MediaPocsThrd::ThrdMsgUserMsg * )MsgParmPt;
 
-			p_TmpInt32 = MediaPocsThrdPt->m_UserMsgFuncPt( MediaPocsThrdPt, MsgTyp - MediaPocsThrd::ThrdMsgTypUserMsgMinVal, MsgPt, MsgLenByt );
+			p_TmpInt32 = MediaPocsThrdPt->m_UserMsgFuncPt( MediaPocsThrdPt, MsgTyp - MediaPocsThrd::ThrdMsgTypUserMsgMinVal, MsgParmPt, MsgParmLenByt );
 			if( p_TmpInt32 == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的消息函数成功。返回值：%d。" ), p_TmpInt32 );
@@ -5851,9 +5852,9 @@ extern "C" void __cdecl MediaPocsThrdClsUserPocs( MediaPocsThrd * MediaPocsThrdP
 }
 
 //回调MediaPocsThrdCls类的用户定义的消息函数。
-extern "C" int __cdecl MediaPocsThrdClsUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
+extern "C" int __cdecl MediaPocsThrdClsUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt )
 {
-	return ( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserMsg( MsgTyp, MsgPt, MsgLenByt );
+	return ( ( MediaPocsThrdCls * )MediaPocsThrdPt->m_UserDataPt )->UserMsg( MsgTyp, MsgParmPt, MsgParmLenByt );
 }
 
 //回调MediaPocsThrdCls类的用户定义的设备改变函数。

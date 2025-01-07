@@ -83,9 +83,9 @@ typedef struct TkbkClnt //对讲客户端。
 
 	int32_t m_MyTkbkIdx; //存放我的对讲索引。
 	int32_t m_LclTkbkMode; //存放本端对讲模式。
-	int32_t m_LastSendAdoInptFrmIsAct; //存放最后一个发送的音频输入帧有无语音活动，为1表示有语音活动，为0表示无语音活动。
-	uint32_t m_LastSendAdoInptFrmTimeStamp; //存放最后一个发送音频输入帧的时间戳。
-	uint32_t m_LastSendVdoInptFrmTimeStamp; //存放最后一个发送视频输入帧的时间戳。
+	int32_t m_LastSendAdoInptFrmIsAct; //存放最后发送的音频输入帧有无语音活动，为1表示有语音活动，为0表示无语音活动。
+	uint32_t m_LastSendAdoInptFrmTimeStamp; //存放最后发送音频输入帧的时间戳。
+	uint32_t m_LastSendVdoInptFrmTimeStamp; //存放最后发送视频输入帧的时间戳。
 	int32_t m_IsRecvExitPkt; //存放是否接收退出包，为0表示未接收，为1表示已接收。
 } TkbkClnt;
 

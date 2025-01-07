@@ -489,7 +489,7 @@ typedef struct MediaPocsThrd //媒体处理线程。
 	MediaPocsThrdUserPocsFuncPt m_UserPocsFuncPt;
 
 	//用户定义的消息函数。
-	typedef int( __cdecl * MediaPocsThrdUserMsgFuncPt )( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+	typedef int( __cdecl * MediaPocsThrdUserMsgFuncPt )( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 	MediaPocsThrdUserMsgFuncPt m_UserMsgFuncPt;
 
 	//用户定义的设备改变函数。
@@ -617,7 +617,7 @@ __WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * Medi
 
 __WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt );
 __WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int ExitFlag, Vstr * ErrInfoVstrPt );
-__WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * UserMsgPt, size_t UserMsgLenByt, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * UserMsgParmPt, size_t UserMsgParmLenByt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
@@ -642,7 +642,7 @@ public:
 	virtual void UserPocs() = 0;
 
 	//用户定义的消息函数。
-	virtual int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt ) = 0;
+	virtual int UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt ) = 0;
 	
 	//用户定义的设备改变函数。
 	virtual void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt ) = 0;
@@ -752,6 +752,6 @@ public:
 	
 	int Start( Vstr * ErrInfoVstrPt ) { return MediaPocsThrdStart( m_MediaPocsThrdPt, ErrInfoVstrPt ); }
 	int RqirExit( int IsBlockWait, int ExitFlag, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdRqirExit( m_MediaPocsThrdPt, IsBlockWait, ExitFlag, ErrInfoVstrPt ); }
-	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdSendUserMsg( m_MediaPocsThrdPt, IsBlockWait, MsgTyp, MsgPt, MsgLenByt, ErrInfoVstrPt ); }
+	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdSendUserMsg( m_MediaPocsThrdPt, IsBlockWait, MsgTyp, MsgParmPt, MsgParmLenByt, ErrInfoVstrPt ); }
 };
 #endif

@@ -111,6 +111,7 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 	typedef struct ThrdMsgBdctClntInit
 	{
 		int32_t m_CnctNumIsDecr;
+		int32_t m_LclTkbkMode;
 	} ThrdMsgBdctClntInit;
 	typedef struct ThrdMsgBdctClntDstoy
 	{
@@ -148,7 +149,7 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 	ClntMediaPocsThrdUserPocsFuncPt m_UserPocsFuncPt;
 
 	//用户定义的消息函数。
-	typedef int( __cdecl * ClntMediaPocsThrdUserMsgFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+	typedef int( __cdecl * ClntMediaPocsThrdUserMsgFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 	ClntMediaPocsThrdUserMsgFuncPt m_UserMsgFuncPt;
 	
 	//用户定义的设备改变函数。
@@ -239,12 +240,12 @@ __WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendTkbkClntLclTkbkModeMsg( ClntMe
 __WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendTkbkClntPttBtnDownMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
 __WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendTkbkClntPttBtnUpMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
 
-__WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendBdctClntInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t CnctNumIsDecr, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendBdctClntInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t CnctNumIsDecr, int32_t LclTkbkMode, Vstr * ErrInfoVstrPt );
 __WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendBdctClntDstoyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
 __WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendBdctClntCnctInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt, Vstr * ErrInfoVstrPt );
 __WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendBdctClntCnctDstoyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt );
 
-__WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendUserMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * UserMsgPt, size_t UserMsgLenByt, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdSendUserMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * UserMsgParmPt, size_t UserMsgParmLenByt, Vstr * ErrInfoVstrPt );
 
 void ClntMediaPocsThrdIsAutoRqirExit( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * ErrInfoVstrPt );
 void ClntMediaPocsThrdSetTkbkMode( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int SetMode );
@@ -252,7 +253,7 @@ void ClntMediaPocsThrdSetTkbkMode( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int 
 void ClntMediaPocsThrdUserInit( MediaPocsThrd * MediaPocsThrdPt );
 void ClntMediaPocsThrdUserDstoy( MediaPocsThrd * MediaPocsThrdPt );
 void ClntMediaPocsThrdUserPocs( MediaPocsThrd * MediaPocsThrdPt );
-int ClntMediaPocsThrdUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+int ClntMediaPocsThrdUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 void ClntMediaPocsThrdUserDvcChg( MediaPocsThrd * MediaPocsThrdPt, Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
 void ClntMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsThrdPt,
 											 int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
@@ -297,7 +298,7 @@ public:
 	virtual void UserPocs() = 0;
 
 	//用户定义的消息函数。
-	virtual int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt ) = 0;
+	virtual int UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt ) = 0;
 	
 	//用户定义的设备改变函数。
 	virtual void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt ) = 0;
@@ -360,11 +361,11 @@ public:
 	int SendTkbkClntPttBtnDownMsg( int IsBlockWait, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendTkbkClntPttBtnDownMsg( m_ClntMediaPocsThrdPt, IsBlockWait, ErrInfoVstrPt ); }
 	int SendTkbkClntPttBtnUpMsg( int IsBlockWait, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendTkbkClntPttBtnUpMsg( m_ClntMediaPocsThrdPt, IsBlockWait, ErrInfoVstrPt ); }
 	
-	int SendBdctClntInitMsg( int IsBlockWait, int32_t CnctNumIsDecr, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendBdctClntInitMsg( m_ClntMediaPocsThrdPt, IsBlockWait, CnctNumIsDecr, ErrInfoVstrPt ); }
+	int SendBdctClntInitMsg( int IsBlockWait, int32_t CnctNumIsDecr, int32_t LclTkbkMode, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendBdctClntInitMsg( m_ClntMediaPocsThrdPt, IsBlockWait, CnctNumIsDecr, LclTkbkMode, ErrInfoVstrPt ); }
 	int SendBdctClntDstoyMsg( int IsBlockWait, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendBdctClntDstoyMsg( m_ClntMediaPocsThrdPt, IsBlockWait, ErrInfoVstrPt ); }
 	int SendBdctClntCnctInitMsg( int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendBdctClntCnctInitMsg( m_ClntMediaPocsThrdPt, IsBlockWait, IsTcpOrAudpPrtcl, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, ErrInfoVstrPt ); }
 	int SendBdctClntCnctDstoyMsg( int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendBdctClntCnctDstoyMsg( m_ClntMediaPocsThrdPt, IsBlockWait, CnctNum, ErrInfoVstrPt ); }
 
-	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * UserMsgPt, size_t UserMsgLenByt, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendUserMsg( m_ClntMediaPocsThrdPt, IsBlockWait, MsgTyp, UserMsgPt, UserMsgLenByt, ErrInfoVstrPt ); }
+	int SendUserMsg( int IsBlockWait, unsigned int MsgTyp, void * UserMsgParmPt, size_t UserMsgParmLenByt, Vstr * ErrInfoVstrPt ) { return ClntMediaPocsThrdSendUserMsg( m_ClntMediaPocsThrdPt, IsBlockWait, MsgTyp, UserMsgParmPt, UserMsgParmLenByt, ErrInfoVstrPt ); }
 };
 #endif

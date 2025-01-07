@@ -1085,7 +1085,7 @@ void TkbkClntUserReadAdoVdoInptFrm( TkbkClnt * TkbkClntPt,
 	size_t p_PktLenByt = 0; //存放数据包的长度，单位为字节。
 
 	//发送音频输入帧。
-	if( AdoInptPcmSrcFrmPt != NULL ) //如果有音频输入Pcm格式原始帧。
+	if( ( ( TkbkClntPt->m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) != 0 ) && ( AdoInptPcmSrcFrmPt != NULL ) ) //如果本端对讲模式有音频输入，且有音频输入Pcm格式原始帧。
 	{
 		if( AdoInptEncdRsltFrmPt == NULL ) //如果没有音频输入已编码格式结果帧。
 		{
@@ -1176,7 +1176,7 @@ void TkbkClntUserReadAdoVdoInptFrm( TkbkClnt * TkbkClntPt,
 	}
 
 	//发送视频输入帧。
-	if( VdoInptYu12RsltFrmPt != NULL ) //如果有视频输入Yu12格式结果帧。
+	if( ( ( TkbkClntPt->m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) != 0 ) && ( VdoInptYu12RsltFrmPt != NULL ) ) //如果本端对讲模式有视频输入，且有视频输入Yu12格式结果帧。
 	{
 		if( VdoInptEncdRsltFrmPt == NULL ) //如果没有视频输入已编码格式结果帧。
 		{

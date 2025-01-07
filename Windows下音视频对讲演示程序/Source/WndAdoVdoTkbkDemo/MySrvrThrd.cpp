@@ -133,7 +133,7 @@ void MySrvrThrdCls::UserPocs()
 }
 
 //用户定义的消息函数。
-int MySrvrThrdCls::UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
+int MySrvrThrdCls::UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt )
 {
 	return 0;
 }

@@ -191,7 +191,11 @@ int MyClntMediaPocsThrdCls::BdctInit( const void * LicnCodePt )
 	}
 
 	//发送广播客户端初始化消息。
-	SendBdctClntInitMsg( 0, 0, g_ErrInfoVstr.m_Pt );
+	SendBdctClntInitMsg( 0,
+						 0,
+						 ( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeAdoInpt : 0 ) +
+						 ( ( IsDlgButtonChecked( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId ) == BST_CHECKED ) ? ClntMediaPocsThrd::TkbkModeVdoInpt : 0 ),
+						 g_ErrInfoVstr.m_Pt );
 
 	//添加客户端列表。
 	VstrInit( &p_RmtNodeNameVstrPt, Utf16, ,  );
@@ -248,7 +252,7 @@ void MyClntMediaPocsThrdCls::UserPocs()
 }
 
 //用户定义的消息函数。
-int MyClntMediaPocsThrdCls::UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt )
+int MyClntMediaPocsThrdCls::UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt )
 {
 	return 0;
 }
@@ -280,6 +284,18 @@ void MyClntMediaPocsThrdCls::UserTkbkClntCnctInit( int32_t IsSrvrOrClntCnct, Vst
 //用户定义的对讲客户端连接销毁函数。
 void MyClntMediaPocsThrdCls::UserTkbkClntCnctDstoy()
 {
+	if( ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) != 0 ) //如果对讲客户端要使用音频输入，且广播客户端未初始化或不使用音频输入。
+		&& ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_IsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) == 0 ) ) )
+	{
+		SetNotUseAdoInpt(); //设置不使用音频输入。
+	}
+
+	if( ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) != 0 ) //如果对讲客户端要使用视频输入，且广播客户端未初始化或不使用视频输入。
+		&& ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_IsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) == 0 ) ) )
+	{
+		SetNotUseVdoInpt(); //设置不使用视频输入。
+	}
+
 	MainDlgWndMsgClntLstModifyItem * p_MainDlgWndMsgClntLstModifyItemPt = ( MainDlgWndMsgClntLstModifyItem * )malloc( sizeof( MainDlgWndMsgClntLstModifyItem ) );
 
 	p_MainDlgWndMsgClntLstModifyItemPt->m_Num = m_TkbkClntNum;
@@ -288,7 +304,6 @@ void MyClntMediaPocsThrdCls::UserTkbkClntCnctDstoy()
 	VstrInit( &p_MainDlgWndMsgClntLstModifyItemPt->m_Txt3VstrPt, Utf16, ,  );
 	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypClntLstModifyItem, ( WPARAM )p_MainDlgWndMsgClntLstModifyItemPt, 0 );
 	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypTkbkClntCnctDstoy, 0, 0 );
-	SendVdoInptOtptWndDstoyMsg( m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_VdoInpt.m_Dvc.m_PrvwWndHdl );
 }
 
 //用户定义的对讲客户端连接状态函数。
@@ -339,7 +354,7 @@ void MyClntMediaPocsThrdCls::UserTkbkClntLclTkbkMode( int32_t OldLclTkbkMode, in
 	{
 		if( ( OldLclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) == 0 ) //如果旧对讲模式无音频输入。
 		{
-			if( m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoInpt.m_IsInit == 0 ) //如果音频输入未初始化。
+			if( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_IsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) == 0 ) ) //如果广播客户端未初始化或不使用音频输入。
 			{
 				SetToUseAdoInpt(); //设置要使用音频输入。
 			}
@@ -349,7 +364,10 @@ void MyClntMediaPocsThrdCls::UserTkbkClntLclTkbkMode( int32_t OldLclTkbkMode, in
 	{
 		if( ( OldLclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) != 0 ) //如果旧对讲模式有音频输入。
 		{
-			SetNotUseAdoInpt(); //设置不使用音频输入。
+			if( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_IsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) == 0 ) ) //如果广播客户端未初始化或不使用音频输入。
+			{
+				SetNotUseAdoInpt(); //设置不使用音频输入。
+			}
 		}
 	}
 
@@ -372,14 +390,20 @@ void MyClntMediaPocsThrdCls::UserTkbkClntLclTkbkMode( int32_t OldLclTkbkMode, in
 	{
 		if( ( OldLclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) == 0 ) //如果旧对讲模式无视频输入。
 		{
-			SetToUseVdoInpt(); //设置要使用视频输入。
+			if( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_IsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) == 0 ) ) //如果广播客户端未初始化或不使用视频输入。
+			{
+				SetToUseVdoInpt(); //设置要使用视频输入。
+			}
 		}
 	}
 	else //如果新对讲模式无视频输入。
 	{
 		if( ( OldLclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) != 0 ) //如果旧对讲模式有视频输入。
 		{
-			SetNotUseVdoInpt(); //设置不使用视频输入。
+			if( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_IsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) == 0 ) ) //如果广播客户端未初始化或不使用视频输入。
+			{
+				SetNotUseVdoInpt(); //设置不使用视频输入。
+			}
 		}
 	}
 
@@ -513,16 +537,33 @@ void MyClntMediaPocsThrdCls::UserTkbkClntTstNtwkDly( uint64_t NtwkDlyMsec )
 //用户定义的广播客户端初始化函数。
 void MyClntMediaPocsThrdCls::UserBdctClntInit()
 {
-	if( m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoInpt.m_IsInit == 0 ) //如果音频输入未初始化。
+	if( ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) != 0 ) //如果广播客户端要使用音频输入，且对讲客户端未初始化或不使用音频输入。
+		&& ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) == 0 ) ) )
 	{
 		SetToUseAdoInpt(); //设置要使用音频输入。
+	}
+
+	if( ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) != 0 ) //如果广播客户端要使用视频输入，且对讲客户端未初始化或不使用视频输入。
+		&& ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) == 0 ) ) )
+	{
+		SetToUseVdoInpt(); //设置要使用视频输入。
 	}
 }
 
 //用户定义的广播客户端销毁函数。
 void MyClntMediaPocsThrdCls::UserBdctClntDstoy()
 {
-	
+	if( ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) != 0 ) //如果广播客户端要使用音频输入，且对讲客户端未初始化或不使用音频输入。
+		&& ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoInpt ) == 0 ) ) )
+	{
+		SetNotUseAdoInpt(); //设置不使用音频输入。
+	}
+
+	if( ( ( m_ClntMediaPocsThrdPt->m_BdctClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) != 0 ) //如果广播客户端要使用视频输入，且对讲客户端未初始化或不使用视频输入。
+		&& ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) || ( ( m_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoInpt ) == 0 ) ) )
+	{
+		SetNotUseVdoInpt(); //设置不使用视频输入。
+	}
 }
 
 //用户定义的广播客户端连接初始化函数。

@@ -24,7 +24,7 @@ public:
 	void UserPocs();
 	
 	//用户定义的消息函数。
-	int UserMsg( unsigned int MsgTyp, void * MsgPt, size_t MsgLenByt );
+	int UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 	
 	//用户定义的显示日志函数。
 	void UserShowLog( Vstr * InfoVstrPt );

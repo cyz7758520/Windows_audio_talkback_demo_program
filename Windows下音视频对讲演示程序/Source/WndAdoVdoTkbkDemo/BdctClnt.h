@@ -38,18 +38,20 @@ typedef struct BdctClnt //广播客户端。
 	} CnctInfo;
 	CQueue * m_CnctInfoCntnrPt; //存放连接信息容器的指针。
 	int m_CnctInfoCurMaxNum; //存放连接信息的当前最大序号。
-
+	
+	int32_t m_LclTkbkMode; //存放本端对讲模式。
 	int m_LastSendAdoInptFrmIsAct; //存放最后发送的音频输入帧有无语音活动，为1表示有语音活动，为0表示无语音活动。
 	uint32_t m_LastSendAdoInptFrmTimeStamp; //存放最后发送音频输入帧的时间戳。
+	uint32_t m_LastSendVdoInptFrmTimeStamp; //存放最后发送视频输入帧的时间戳。
 } BdctClnt;
 
-int BdctClntInit( BdctClnt * BdctClntPt, int32_t CnctNumIsDecr );
+int BdctClntInit( BdctClnt * BdctClntPt, int32_t CnctNumIsDecr, int32_t LclTkbkMode );
 void BdctClntDstoy( BdctClnt * BdctClntPt );
 BdctClnt::CnctInfo * BdctClntCnctInfoInit( BdctClnt * BdctClntPt, int IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt );
 void BdctClntCnctInfoDstoy( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfoPt );
 int BdctClntCnctInfoSendPkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfoPt, const void * PktPt, size_t PktLenByt, uint32_t Times, int IsRlab, Vstr * ErrInfoVstrPt );
 int BdctClntCnctInfoSendTkbkModePkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfoPt, int LclTkbkMode );
-void BdctClntAllCnctSendAdoPkt( BdctClnt * BdctClntPt, const void * PktPt, size_t PktLenByt, uint32_t Times, int IsRlab );
+void BdctClntAllCnctSendAdoVdoPkt( BdctClnt * BdctClntPt, const void * PktPt, size_t PktLenByt, uint32_t Times, int IsRlab );
 void BdctClntCnctPocs( BdctClnt * BdctClntPt );
 void BdctClntUserReadAdoVdoInptFrm( BdctClnt * BdctClntPt,
 									short AdoInptPcmSrcFrmPt[], short AdoInptPcmRsltFrmPt[], long AdoInptPcmFrmLenUnit, int AdoInptPcmRsltFrmVoiceActSts,
