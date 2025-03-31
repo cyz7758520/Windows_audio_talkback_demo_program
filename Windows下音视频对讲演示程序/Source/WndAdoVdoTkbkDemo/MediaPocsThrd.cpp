@@ -3421,7 +3421,7 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int
 	}
 	
 	p_ThrdMsgRqirExit.m_ExitFlag = ExitFlag;
-	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, MediaPocsThrd::ThrdMsgTypRqirExit, &p_ThrdMsgRqirExit, sizeof( p_ThrdMsgRqirExit ), ErrInfoVstrPt ) != 0 )
+	if( ( MediaPocsThrdPt->m_Thrd.m_ThrdInfoPt != NULL ) && ( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, MediaPocsThrd::ThrdMsgTypRqirExit, &p_ThrdMsgRqirExit, sizeof( p_ThrdMsgRqirExit ), ErrInfoVstrPt ) != 0 ) )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
 		goto Out;
@@ -3497,17 +3497,23 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 	{
 		if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt == NULL )
 		{
+			#if IsIcludMediaFile
 			if( AviFileWriterInit( MediaPocsThrdPt->m_LicnCodePt, &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WrBufSzByt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_MaxStrmNum, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件 %vs Avi文件写入器成功。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：初始化音视频输入输出Avi文件 %vs Avi文件写入器失败。原因：%vs" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_FullPathVstrPt, MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
 			}
 			uint64_t p_AdoVdoStartTimeStamp = FuncGetTickAsMsec();
+			#if IsIcludMediaFile
 			AviFileWriterSetStartTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, p_AdoVdoStartTimeStamp, NULL );
+			#endif
 			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件时间线起始时间戳为 %uz64d 。" ), p_AdoVdoStartTimeStamp );
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx = UINT32_MAX;
 			MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx = UINT32_MAX;
@@ -3525,20 +3531,28 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 		{
 			if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx == UINT32_MAX )
 			{
+				#if IsIcludMediaFile
 				if( AviFileWriterAddAdoStrm( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, WAVE_FORMAT_PCM, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, 1, &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加音频输入Pcm格式原始流成功。索引：%uz32d。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx );
 				}
 				else
+				#else
+				VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加音频输入Pcm格式原始流失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 					goto Out;
 				}
+				#if IsIcludMediaFile
 				if( AviFileWriterAddAdoStrm( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, WAVE_FORMAT_PCM, MediaPocsThrdPt->m_AdoInpt.m_SmplRate, 1, &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加音频输入Pcm格式结果流成功。索引：%uz32d。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx );
 				}
 				else
+				#else
+				VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加音频输入Pcm格式结果流失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 					goto Out;
@@ -3550,11 +3564,15 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 		{
 			if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx == UINT32_MAX )
 			{
+				#if IsIcludMediaFile
 				if( AviFileWriterAddAdoStrm( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, WAVE_FORMAT_PCM, MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, 1, &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加音频输出Pcm格式原始流成功。索引：%uz32d。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx );
 				}
 				else
+				#else
+				VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加音频输出Pcm格式原始流失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 					goto Out;
@@ -3566,11 +3584,15 @@ int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdP
 		{
 			if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoInptEncdRsltStrmIdx == UINT32_MAX )
 			{
+				#if IsIcludMediaFile
 				if( AviFileWriterAddVdoStrm( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, '462H', 50, &MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoInptEncdRsltStrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //最大采样频率应该尽量被1000整除。
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加视频输入已编码格式结果流成功。索引：%uz32d。" ), MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoInptEncdRsltStrmIdx );
 				}
 				else
+				#else
+				VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音视频输入输出Avi文件添加视频输入已编码格式结果流失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 					goto Out;
@@ -3603,11 +3625,15 @@ void MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrd * MediaPocsThr
 {
 	if( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt != NULL )
 	{
+		#if IsIcludMediaFile
 		if( AviFileWriterDstoy( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：销毁音视频输入输出Avi文件写入器成功。" ) );
 		}
 		else
+		#else
+		VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+		#endif
 		{
 			if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：销毁音视频输入输出Avi文件写入器失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
@@ -4729,6 +4755,8 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenData );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUseSystemAecNsAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUseSystemAecNsAgc );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_SpeexAec.m_FilterLenMsec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_SpeexAec.m_FilterLenMsec );
@@ -5236,12 +5264,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 				}
 				case 2: //如果要使用WebRtc定点版声学回音消除器。
 				{
+					#if IsIcludWebRtc
 					if( WebRtcAecmPocs( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 )
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用WebRtc定点版声学回音消除器成功。" ) );
 						SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
 					}
 					else
+					#endif
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用WebRtc定点版声学回音消除器失败。" ) );
 					}
@@ -5249,12 +5279,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 				}
 				case 3: //如果要使用WebRtc浮点版声学回音消除器。
 				{
+					#if IsIcludWebRtc
 					if( ( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Pt != NULL ) && ( WebRtcAecPocs( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 ) )
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用WebRtc浮点版声学回音消除器成功。" ) );
 						SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
 					}
 					else
+					#endif
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用WebRtc浮点版声学回音消除器失败。" ) );
 					}
@@ -5262,12 +5294,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 				}
 				case 4: //如果要使用WebRtc第三版声学回音消除器。
 				{
+					#if IsIcludWebRtc3
 					if( ( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt != NULL ) && ( WebRtcAec3Pocs( MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 ) )
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用WebRtc第三版声学回音消除器成功。" ) );
 						SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
 					}
 					else
+					#endif
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用WebRtc第三版声学回音消除器失败。" ) );
 					}
@@ -5275,12 +5309,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 				}
 				case 5: //如果要使用SpeexWebRtc三重声学回音消除器。
 				{
+					#if IsIcludSpeexWebRtcAec
 					if( SpeexWebRtcAecPocs( MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 )
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用SpeexWebRtc三重声学回音消除器成功。" ) );
 						SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
 					}
 					else
+					#endif
 					{
 						if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用SpeexWebRtc三重声学回音消除器失败。" ) );
 					}
@@ -5304,12 +5340,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			case 2: //如果要使用WebRtc定点版噪音抑制器。
 			{
+				#if IsIcludWebRtc
 				if( WebRtcNsxPocs( MediaPocsThrdPt->m_AdoInpt.m_WebRtcNsx.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用WebRtc定点版噪音抑制器成功。" ) );
 					SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
 				}
 				else
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用WebRtc定点版噪音抑制器失败。" ) );
 				}
@@ -5317,12 +5355,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			case 3: //如果要使用WebRtc浮点版噪音抑制器。
 			{
+				#if IsIcludWebRtc
 				if( WebRtcNsPocs( MediaPocsThrdPt->m_AdoInpt.m_WebRtcNs.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用WebRtc浮点版噪音抑制器成功。" ) );
 					SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
 				}
 				else
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用WebRtc浮点版噪音抑制器失败。" ) );
 				}
@@ -5330,12 +5370,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			case 4: //如果要使用RNNoise噪音抑制器。
 			{
+				#if IsIcludRNNoise
 				if( RNNoisePocs( MediaPocsThrdPt->m_AdoInpt.m_RNNoise.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用RNNoise噪音抑制器成功。" ) );
 					SWAPPT( MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmTmpFrmPt ); //交换音频输入Pcm格式结果帧和音频输入Pcm格式临时帧。
 				}
 				else
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用RNNoise噪音抑制器失败。" ) );
 				}
@@ -5377,11 +5419,13 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			case 1: //如果要使用Speex编码器。
 			{
+				#if IsIcludSpeex
 				if( SpeexEncdPocs( MediaPocsThrdPt->m_AdoInpt.m_SpeexEncd.m_Pt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt, &MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmLenByt, &MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用Speex编码器成功。音频输入已编码格式结果帧的长度：%uzd，是否需要传输：%z32d" ), MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmLenByt, MediaPocsThrdPt->m_Thrd.m_AdoInptEncdRsltFrmIsNeedTrans );
 				}
 				else
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用Speex编码器失败。" ) );
 				}
@@ -5393,23 +5437,31 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 				break;
 			}
 		}
-					
+
 		//使用波形器。
 		if( MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_IsDraw != 0 )
 		{
+			#if IsIcludAdoWavfm
 			if( AdoWavfmDrawToWnd( MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit, MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_SrcWndHdl, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入原始波形器绘制音频输入原始波形到窗口成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入原始波形器绘制音频输入原始波形到窗口失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
+			#if IsIcludAdoWavfm
 			if( AdoWavfmDrawToWnd( MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltPt, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenUnit, MediaPocsThrdPt->m_AdoInpt.m_Wavfm.m_RsltWndHdl, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入结果波形器绘制音频输入结果波形到窗口成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入结果波形器绘制音频输入结果波形到窗口失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
@@ -5418,19 +5470,23 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		//使用Wave文件写入器。
 		if( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_IsSave != 0 )
 		{
+			#if IsIcludMediaFile
 			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入原始Wave文件写入器写入音频输入Pcm格式原始帧成功。" ) );
 			}
 			else
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输入原始Wave文件写入器写入音频输入Pcm格式原始帧失败。" ) );
 			}
+			#if IsIcludMediaFile
 			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_RsltWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入结果Wave文件写入器写入音频输入Pcm格式结果帧成功。" ) );
 			}
 			else
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输入结果Wave文件写入器写入音频输入Pcm格式结果帧失败。" ) );
 			}
@@ -5443,26 +5499,36 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				p_NowTickMsec = FuncGetTickAsMsec();
 
+				#if IsIcludMediaFile
 				AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, p_NowTickMsec, NULL );
 				AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx, p_NowTickMsec, NULL );
+				#endif
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件音频输入Pcm格式原始结果流当前时间戳为 %uz64d 。" ), p_NowTickMsec );
 
 				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 0; //设置音视频输入输出Avi文件音频输入流时间戳不重置。
 			}
 
+			#if IsIcludMediaFile
 			if( AviFileWriterAdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmSrcStrmIdx, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输入Pcm格式原始帧成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输入Pcm格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
+			#if IsIcludMediaFile
 			if( AviFileWriterAdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptPcmRsltStrmIdx, MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenMsec, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输入Pcm格式结果帧成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输入Pcm格式结果帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
@@ -5483,11 +5549,15 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		//使用波形器。
 		if( MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_IsDraw != 0 )
 		{
+			#if IsIcludAdoWavfm
 			if( AdoWavfmDrawToWnd( MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcPt, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit, MediaPocsThrdPt->m_AdoOtpt.m_Wavfm.m_SrcWndHdl, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输出原始波形器绘制音频输出原始波形到窗口成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输出原始波形器绘制音频输出原始波形到窗口失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
@@ -5496,11 +5566,13 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		//使用Wave文件写入器。
 		if( MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_IsSave != 0 )
 		{
+			#if IsIcludMediaFile
 			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_SrcPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输出原始Wave文件写入器写入音频输出Pcm格式原始帧成功。" ) );
 			}
 			else
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输出原始Wave文件写入器写入音频输出Pcm格式原始帧失败。" ) );
 			}
@@ -5513,17 +5585,23 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				p_NowTickMsec = FuncGetTickAsMsec();
 
+				#if IsIcludMediaFile
 				AviFileWriterAdoStrmSetCurTimeStamp( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, p_NowTickMsec, NULL );
+				#endif
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：设置音视频输入输出Avi文件音频输出Pcm格式原始流当前时间戳为 %uz64d 。" ), p_NowTickMsec );
 
 				MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptStrmTimeStampIsReset = 0; //设置音视频输入输出Avi文件音频输出流时间戳不重置。
 			}
 
+			#if IsIcludMediaFile
 			if( AviFileWriterAdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoOtptPcmSrcStrmIdx, MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输出Pcm格式原始帧成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入音频输出Pcm格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
@@ -5550,11 +5628,15 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		//使用音视频输入输出Avi文件。
 		if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt != 0 ) && ( MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_EncdRsltFrmLenByt != 0 ) )
 		{
+			#if IsIcludMediaFile
 			if( AviFileWriterVdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoInptEncdRsltStrmIdx, MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_TimeStampMsec, MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_EncdRsltFrmPt, MediaPocsThrdPt->m_Thrd.m_VdoInptFrmPt->m_EncdRsltFrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入视频输入已编码格式结果帧成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+			#endif
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音视频输入输出Avi文件写入器写入视频输入已编码格式结果帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
@@ -5590,12 +5672,16 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			else
 			{
+				#if IsIcludMediaFile
 				if( AviFileWriterAddVdoStrm( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, '462H', 50, &p_VdoOtptStrmAviFileIdx, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //最大采样频率应该尽量被1000整除。
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：音视频输入输出Avi文件添加视频输出已编码格式原始流成功。索引：%uz32d。" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, p_VdoOtptStrmAviFileIdx );
 					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_VdoOtptEncdSrcStrmIdxMapPt->insert( std::map< uint32_t, uint32_t >::value_type( MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, p_VdoOtptStrmAviFileIdx ) );
 				}
 				else
+				#else
+				VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：音视频输入输出Avi文件添加视频输出已编码格式原始流失败。原因：%vs" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt );
 				}
@@ -5603,11 +5689,15 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 
 			if( p_VdoOtptStrmAviFileIdx != UINT32_MAX )
 			{
+				#if IsIcludMediaFile
 				if( AviFileWriterVdoStrmWrite( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_WriterPt, p_VdoOtptStrmAviFileIdx, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_TimeStampMsec, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_EncdSrcFrmPt, MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_EncdSrcFrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧成功。" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx );
 				}
 				else
+				#else
+				VstrCpy( MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含MediaFile。" ), , );
+				#endif
 				{
 					if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：使用音视频输入输出Avi文件写入器写入视频输出已编码格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_Thrd.m_VdoOtptFrmPt->m_StrmIdx, MediaPocsThrdPt->m_ErrInfoVstrPt );
 				}

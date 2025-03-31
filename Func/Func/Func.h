@@ -204,6 +204,7 @@ typedef int HANDLE;
 #include <android/bitmap.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
+#include <sys/system_properties.h>
 #endif
 
 #if( defined __KEIL_ARMC__ )

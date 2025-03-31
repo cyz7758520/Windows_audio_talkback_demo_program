@@ -1511,10 +1511,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	g_ErrInfoVstr.Init();
 	
 	//初始化日志。
-	{
-		DeleteFile( L".\\log.txt" );
-		LogOpenFile( Cu8vstr( ".\\log.txt" ), NULL, 1, g_ErrInfoVstr.m_Pt );
-	}
+	LogOpenFile( Cu8vstr( ".\\log.txt" ), NULL, 1, 1, g_ErrInfoVstr.m_Pt );
 
 	//初始化套接字库。
 	{
@@ -1551,6 +1548,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			LOGFD( Cu8vstr( "获取Speex声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
 		
+		#if IsIcludWebRtc
 		if( WebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "WebRtc浮点版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
@@ -1560,7 +1558,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			LOGFD( Cu8vstr( "获取WebRtc浮点版声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
+		#endif
 		
+		#if IsIcludWebRtc3
 		if( WebRtcAec3GetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "WebRtc第三版声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
@@ -1570,7 +1570,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			LOGFD( Cu8vstr( "获取WebRtc第三版声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
+		#endif
 		
+		#if IsIcludSpeexWebRtcAec
 		if( SpeexWebRtcAecGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "SpeexWebRtc三重声学回音消除器限制时间：%uz64d。" ), p_LmtTimeSec );
@@ -1580,7 +1582,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			LOGFD( Cu8vstr( "获取SpeexWebRtc三重声学回音消除器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
+		#endif
 		
+		#if IsIcludRNNoise
 		if( RNNoiseGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "RNNoise噪音抑制器限制时间：%uz64d。" ), p_LmtTimeSec );
@@ -1590,7 +1594,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			LOGFD( Cu8vstr( "获取RNNoise噪音抑制器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
+		#endif
 		
+		#if IsIcludOpenH264
 		if( OpenH264EncdGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "OpenH264编码器限制时间：%uz64d。" ), p_LmtTimeSec );
@@ -1610,7 +1616,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			LOGFD( Cu8vstr( "获取OpenH264解码器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
+		#endif
 		
+		#if IsIcludAjb
 		if( AAjbGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, g_ErrInfoVstr.m_Pt ) == 0 )
 		{
 			LOGFD( Cu8vstr( "音频自适应抖动缓冲器限制时间：%uz64d。" ), p_LmtTimeSec );
@@ -1630,7 +1638,9 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			LOGFD( Cu8vstr( "获取视频自适应抖动缓冲器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
+		#endif
 		
+		#if IsIcludMediaFile
 		if( AviFileWriterGetAppLmtInfo( g_LicnCodePt, &p_LmtTimeSec, &p_RmnTimeSec, NULL ) == 0 )
 		{
 			LOGFD( Cu8vstr( "Avi文件写入器限制时间：%uz64d。" ), p_LmtTimeSec );
@@ -1640,6 +1650,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		{
 			LOGFD( Cu8vstr( "获取Avi文件写入器的应用程序限制信息失败。原因：%vs" ), g_ErrInfoVstr );
 		}
+		#endif
 
 		VstrDstoy( p_LmtAppNameVstrPt );
 		VstrDstoy( p_CurAppNameVstrPt );

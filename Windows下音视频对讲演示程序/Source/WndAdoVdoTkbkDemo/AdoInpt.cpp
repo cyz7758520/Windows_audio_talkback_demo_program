@@ -43,11 +43,15 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 2: //如果要使用WebRtc定点版声学回音消除器。
 		{
+			#if IsIcludWebRtc
 			if( WebRtcAecmInit( &AdoInptPt->m_WebRtcAecm.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcAecm.m_IsUseCNGMode, AdoInptPt->m_WebRtcAecm.m_EchoMode, AdoInptPt->m_WebRtcAecm.m_Delay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc定点版声学回音消除器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含WebRtc。" ), , );
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc定点版声学回音消除器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -56,11 +60,15 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 3: //如果要使用WebRtc浮点版声学回音消除器。
 		{
+			#if IsIcludWebRtc
 			if( WebRtcAecInit( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_WebRtcAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcAec.m_EchoMode, AdoInptPt->m_WebRtcAec.m_Delay, AdoInptPt->m_WebRtcAec.m_IsUseDelayAgstcMode, AdoInptPt->m_WebRtcAec.m_IsUseExtdFilterMode, AdoInptPt->m_WebRtcAec.m_IsUseRefinedFilterAdaptAecMode, AdoInptPt->m_WebRtcAec.m_IsUseAdaptAdjDelay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc浮点版声学回音消除器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含WebRtc。" ), , );
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc浮点版声学回音消除器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -69,11 +77,15 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 4: //如果要使用WebRtc第三版声学回音消除器。
 		{
+			#if IsIcludWebRtc3
 			if( WebRtcAec3Init( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_WebRtcAec3.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcAec3.m_Delay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc第三版声学回音消除器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含WebRtc3。" ), , );
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc第三版声学回音消除器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -82,11 +94,15 @@ int AdoInptAecInit( AdoInpt * AdoInptPt )
 		}
 		case 5: //如果要使用SpeexWebRtc三重声学回音消除器。
 		{
+			#if IsIcludSpeexWebRtcAec
 			if( SpeexWebRtcAecInit( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_SpeexWebRtcAec.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_SpeexWebRtcAec.m_WorkMode, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecFilterLenMsec, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecIsUseRec, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoMutp, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoCntu, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoSupes, AdoInptPt->m_SpeexWebRtcAec.m_SpeexAecEchoSupesAct, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmIsUseCNGMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmEchoMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecmDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecEchoMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseDelayAgstcMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseExtdFilterMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseRefinedFilterAdaptAecMode, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAecIsUseAdaptAdjDelay, AdoInptPt->m_SpeexWebRtcAec.m_WebRtcAec3Delay, AdoInptPt->m_SpeexWebRtcAec.m_IsUseSameRoomAec, AdoInptPt->m_SpeexWebRtcAec.m_SameRoomEchoMinDelay, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化SpeexWebRtc三重声学回音消除器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含SpeexWebRtcAec。" ), , );
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化SpeexWebRtc三重声学回音消除器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -147,11 +163,13 @@ void AdoInptAecDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_WebRtcAecm.m_Pt != NULL )
 			{
+				#if IsIcludWebRtc
 				if( WebRtcAecmDstoy( AdoInptPt->m_WebRtcAecm.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc定点版声学回音消除器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc定点版声学回音消除器失败。" ) );
 				}
@@ -163,11 +181,13 @@ void AdoInptAecDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_WebRtcAec.m_Pt != NULL )
 			{
+				#if IsIcludWebRtc
 				if( WebRtcAecDstoy( AdoInptPt->m_WebRtcAec.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc浮点版声学回音消除器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc浮点版声学回音消除器失败。" ) );
 				}
@@ -179,11 +199,13 @@ void AdoInptAecDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_WebRtcAec3.m_Pt != NULL )
 			{
+				#if IsIcludWebRtc3
 				if( WebRtcAec3Dstoy( AdoInptPt->m_WebRtcAec3.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc第三版声学回音消除器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc第三版声学回音消除器失败。" ) );
 				}
@@ -195,11 +217,15 @@ void AdoInptAecDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_SpeexWebRtcAec.m_Pt != NULL )
 			{
+				#if IsIcludSpeexWebRtcAec
 				if( SpeexWebRtcAecDstoy( AdoInptPt->m_SpeexWebRtcAec.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁SpeexWebRtc三重声学回音消除器成功。" ) );
 				}
 				else
+				#else
+				VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含SpeexWebRtcAec。" ), , );
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁SpeexWebRtc三重声学回音消除器失败。" ) );
 				}
@@ -293,11 +319,15 @@ int AdoInptNsInit( AdoInpt * AdoInptPt )
 		}
 		case 2: //如果要使用WebRtc定点版噪音抑制器。
 		{
+			#if IsIcludWebRtc
 			if( WebRtcNsxInit( &AdoInptPt->m_WebRtcNsx.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcNsx.m_PolicyMode, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc定点版噪音抑制器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含WebRtc。" ), , );
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc定点版噪音抑制器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -306,11 +336,15 @@ int AdoInptNsInit( AdoInpt * AdoInptPt )
 		}
 		case 3: //如果要使用WebRtc浮点版噪音抑制器。
 		{
+			#if IsIcludWebRtc
 			if( WebRtcNsInit( &AdoInptPt->m_WebRtcNs.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_WebRtcNs.m_PolicyMode, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc浮点版噪音抑制器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含WebRtc。" ), , );
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化WebRtc浮点版噪音抑制器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -319,11 +353,15 @@ int AdoInptNsInit( AdoInpt * AdoInptPt )
 		}
 		case 4: //如果要使用RNNoise噪音抑制器。
 		{
+			#if IsIcludRNNoise
 			if( RNNoiseInit( AdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &AdoInptPt->m_RNNoise.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_FrmLenUnit, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化RNNoise噪音抑制器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含RNNoise。" ), , );
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化RNNoise噪音抑制器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -373,11 +411,13 @@ void AdoInptNsDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_WebRtcNsx.m_Pt != NULL )
 			{
+				#if IsIcludWebRtc
 				if( WebRtcNsxDstoy( AdoInptPt->m_WebRtcNsx.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc定点版噪音抑制器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc定点版噪音抑制器失败。" ) );
 				}
@@ -389,11 +429,13 @@ void AdoInptNsDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_WebRtcNs.m_Pt != NULL )
 			{
+				#if IsIcludWebRtc
 				if( WebRtcNsDstoy( AdoInptPt->m_WebRtcNs.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc浮点版噪音抑制器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁WebRtc浮点版噪音抑制器失败。" ) );
 				}
@@ -405,11 +447,13 @@ void AdoInptNsDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_RNNoise.m_Pt != NULL )
 			{
+				#if IsIcludRNNoise
 				if( RNNoiseDstoy( AdoInptPt->m_RNNoise.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁RNNoise噪音抑制器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁RNNoise噪音抑制器失败。" ) );
 				}
@@ -537,11 +581,13 @@ int AdoInptEncdInit( AdoInpt * AdoInptPt )
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：帧的长度不为20毫秒不能使用Speex编码器。" ) );
 				goto Out;
 			}
+			#if IsIcludSpeex
 			if( SpeexEncdInit( &AdoInptPt->m_SpeexEncd.m_Pt, AdoInptPt->m_SmplRate, AdoInptPt->m_SpeexEncd.m_UseCbrOrVbr, AdoInptPt->m_SpeexEncd.m_Qualt, AdoInptPt->m_SpeexEncd.m_Cmplxt, AdoInptPt->m_SpeexEncd.m_PlcExptLossRate ) == 0 )
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Speex编码器成功。" ) );
 			}
 			else
+			#endif
 			{
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化Speex编码器失败。" ) );
 				goto Out;
@@ -592,11 +638,13 @@ void AdoInptEncdDstoy( AdoInpt * AdoInptPt )
 		{
 			if( AdoInptPt->m_SpeexEncd.m_Pt != NULL )
 			{
+				#if IsIcludSpeex
 				if( SpeexEncdDstoy( AdoInptPt->m_SpeexEncd.m_Pt ) == 0 )
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁Speex编码器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁Speex编码器失败。" ) );
 				}
@@ -631,20 +679,28 @@ int AdoInptWavfmInit( AdoInpt * AdoInptPt )
 
 	if( AdoInptPt->m_Wavfm.m_IsDraw != 0 )
 	{
+		#if IsIcludAdoWavfm
 		if( AdoWavfmInit( &AdoInptPt->m_Wavfm.m_SrcPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化原始波形器成功。" ) );
 		}
 		else
+		#else
+		VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化原始波形器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			goto Out;
 		}
+		#if IsIcludAdoWavfm
 		if( AdoWavfmInit( &AdoInptPt->m_Wavfm.m_RsltPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化结果波形器成功。" ) );
 		}
 		else
+		#else
+		VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化结果波形器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			goto Out;
@@ -679,11 +735,15 @@ void AdoInptWavfmDstoy( AdoInpt * AdoInptPt )
 {
 	if( AdoInptPt->m_Wavfm.m_SrcPt != NULL )
 	{
+		#if IsIcludAdoWavfm
 		if( AdoWavfmDstoy( AdoInptPt->m_Wavfm.m_SrcPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁原始波形器成功。" ) );
 		}
 		else
+		#else
+		VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁原始波形器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
@@ -691,11 +751,15 @@ void AdoInptWavfmDstoy( AdoInpt * AdoInptPt )
 	}
 	if( AdoInptPt->m_Wavfm.m_RsltPt != NULL )
 	{
+		#if IsIcludAdoWavfm
 		if( AdoWavfmDstoy( AdoInptPt->m_Wavfm.m_RsltPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁结果波形器成功。" ) );
 		}
 		else
+		#else
+		VstrCpy( AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁结果波形器失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
@@ -723,20 +787,24 @@ int AdoInptWaveFileWriterInit( AdoInpt * AdoInptPt )
 
 	if( AdoInptPt->m_WaveFileWriter.m_IsSave != 0 )
 	{
+		#if IsIcludMediaFile
 		if( WaveFileWriterInit( &AdoInptPt->m_WaveFileWriter.m_SrcWriterPt, AdoInptPt->m_WaveFileWriter.m_SrcFullPathVstrPt, AdoInptPt->m_WaveFileWriter.m_WrBufSzByt, 1, AdoInptPt->m_SmplRate, 16 ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化原始Wave文件 %vs 写入器成功。" ), AdoInptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
 		}
 		else
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化原始Wave文件 %vs 写入器失败。" ), AdoInptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
 			goto Out;
 		}
+		#if IsIcludMediaFile
 		if( WaveFileWriterInit( &AdoInptPt->m_WaveFileWriter.m_RsltWriterPt, AdoInptPt->m_WaveFileWriter.m_RsltFullPathVstrPt, AdoInptPt->m_WaveFileWriter.m_WrBufSzByt, 1, AdoInptPt->m_SmplRate, 16 ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化结果Wave文件 %vs 写入器成功。" ), AdoInptPt->m_WaveFileWriter.m_RsltFullPathVstrPt );
 		}
 		else
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化结果Wave文件 %vs 写入器失败。" ), AdoInptPt->m_WaveFileWriter.m_RsltFullPathVstrPt );
 			goto Out;
@@ -771,11 +839,13 @@ void AdoInptWaveFileWriterDstoy( AdoInpt * AdoInptPt )
 {
 	if( AdoInptPt->m_WaveFileWriter.m_SrcWriterPt != NULL )
 	{
+		#if IsIcludMediaFile
 		if( WaveFileWriterDstoy( AdoInptPt->m_WaveFileWriter.m_SrcWriterPt ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁原始Wave文件写入器成功。" ) );
 		}
 		else
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁原始Wave文件写入器失败。" ) );
 		}
@@ -783,11 +853,13 @@ void AdoInptWaveFileWriterDstoy( AdoInpt * AdoInptPt )
 	}
 	if( AdoInptPt->m_WaveFileWriter.m_RsltWriterPt != NULL )
 	{
+		#if IsIcludMediaFile
 		if( WaveFileWriterDstoy( AdoInptPt->m_WaveFileWriter.m_RsltWriterPt ) == 0 )
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁结果Wave文件写入器成功。" ) );
 		}
 		else
+		#endif
 		{
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：销毁结果Wave文件写入器失败。" ) );
 		}
@@ -1662,6 +1734,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		p_Delay = p_AdoInptDelay + p_AdoOtptDelay;
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：回音延迟 %z32d 毫秒。" ), p_Delay );
 
+		#if IsIcludWebRtc
 		if( ( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Pt != NULL ) && ( WebRtcAecmGetDelay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Pt, &p_TmpInt32 ) == 0 ) && ( p_TmpInt32 == 0 ) ) //如果要使用WebRtc定点版声学回音消除器，且需要自适应设置回音延迟。
 		{
 			WebRtcAecmSetDelay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAecm.m_Pt, p_Delay / 2 ); //WebRtc定点版声学回音消除器的回音延迟应为实际回音延迟的二分之一，这样效果最好。
@@ -1682,12 +1755,16 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			}
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：自适应设置WebRtc浮点版声学回音消除器的回音延迟为 %z32d 毫秒。" ), p_TmpInt32 );
 		}
+		#endif
+		#if IsIcludWebRtc3
 		if( ( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt != NULL ) && ( WebRtcAec3GetDelay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt, &p_TmpInt32 ) == 0 ) && ( p_TmpInt32 == 0 ) ) //如果要使用WebRtc第三版声学回音消除器，且需要自适应设置回音延迟。
 		{
 			WebRtcAec3SetDelay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt, p_Delay );
 			WebRtcAec3GetDelay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_WebRtcAec3.m_Pt, &p_TmpInt32 );
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：自适应设置WebRtc第三版声学回音消除器的回音延迟为 %z32d 毫秒。" ), p_TmpInt32 );
 		}
+		#endif
+		#if IsIcludSpeexWebRtcAec
 		if( ( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_Pt != NULL ) && ( SpeexWebRtcAecGetWebRtcAecmDelay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_Pt, &p_TmpInt32 ) == 0 ) && ( p_TmpInt32 == 0 ) ) //如果要使用SpeexWebRtc三重声学回音消除器，且WebRtc定点版声学回音消除器需要自适应设置回音延迟。
 		{
 			SpeexWebRtcAecSetWebRtcAecmDelay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_Pt, p_Delay / 2 ); //设置WebRtc定点版声学回音消除器的回音延迟为实际回音延迟的二分之一，这样效果最好。
@@ -1714,6 +1791,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			SpeexWebRtcAecGetWebRtcAec3Delay( AdoInptPt->m_MediaPocsThrdPt->m_AdoInpt.m_SpeexWebRtcAec.m_Pt, &p_TmpInt32 );
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：自适应设置SpeexWebRtc三重声学回音消除器的WebRtc第三版声学回音消除器的回音延迟为 %z32d 毫秒。" ), p_TmpInt32 );
 		}
+		#endif
 	} //自适应设置回音延迟完毕。
 	{
 		if( p_SystemAecNsAgcMediaObjPt != NULL ) p_SystemAecNsAgcMediaObjPt->AllocateStreamingResources(); //让音频输入设备开始录音。

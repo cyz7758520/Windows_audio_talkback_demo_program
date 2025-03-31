@@ -55,7 +55,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2025年01月07日",IDC_STATIC,7,7,325,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2025年04月01日",IDC_STATIC,7,7,325,16
     LTEXT           "服务端：",IDC_STATIC,7,26,33,8
     COMBOBOX        SrvrUrlCbBoxId,39,24,236,273,CBS_DROPDOWN | WS_TABSTOP
     DEFPUSHBUTTON   "创建",SrvrCreateOrDstoyBtnId,276,23,28,14
@@ -166,7 +166,7 @@ BEGIN
     CTEXT           "————————————    一般设置    ————————————",IDC_STATIC,7,72,295,12,SS_CENTERIMAGE | WS_TABSTOP
     LTEXT           "接收输出帧：",IDC_STATIC,7,84,74,24,SS_CENTERIMAGE
     CONTROL         "容器",UseCntnrRecvOtptFrmRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,97,84,137,12
-    CONTROL         "自己设计的自适应抖动缓冲器",UseAjbRecvOtptFrmRdBtnId,"Button",BS_AUTORADIOBUTTON | BS_MULTILINE,97,96,137,12
+    CONTROL         "*自己设计的自适应抖动缓冲器",UseAjbRecvOtptFrmRdBtnId,"Button",BS_AUTORADIOBUTTON | BS_MULTILINE,97,96,137,12
     PUSHBUTTON      "设置",AjbStngBtnId,252,96,50,12
     CONTROL         "保存状态到Txt文件",IsSaveStsToTxtFileCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,108,203,12
     PUSHBUTTON      "设置",SaveStsToTxtFileStngBtnId,252,108,50,12
@@ -174,7 +174,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,120,253,12
     CONTROL         "使用阻止系统休眠",IsUsePrvntSysSleepCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,132,253,12
     CONTROL         "测试网络延迟",IsTstNtwkDlyCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,144,253,12
-    CONTROL         "保存音视频输入输出到Avi文件",IsSaveAdoVdoInptOtptToAviFileCkBoxId,
+    CONTROL         "*保存音视频输入输出到Avi文件",IsSaveAdoVdoInptOtptToAviFileCkBoxId,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,156,203,12
     PUSHBUTTON      "设置",SaveAdoVdoInptOtptToAviFileStngBtnId,252,156,50,12
     CTEXT           "————————————    音频设置    ————————————",IDC_STATIC,7,168,295,12,SS_CENTERIMAGE | WS_TABSTOP
@@ -191,15 +191,15 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,204,295,12
     LTEXT           "声学回音消除器：",IDC_STATIC,7,216,74,73,SS_CENTERIMAGE
     CONTROL         "不使用",UseNoAecRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,216,137,12
-    CONTROL         "Speex声学回音消除器",UseSpeexAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,228,137,12
+    CONTROL         "*Speex声学回音消除器",UseSpeexAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,228,137,12
     PUSHBUTTON      "设置",SpeexAecStngBtnId,252,228,50,12
     CONTROL         "WebRtc定点版声学回音消除器",UseWebRtcAecmRdBtnId,"Button",BS_AUTORADIOBUTTON,98,240,137,12
     PUSHBUTTON      "设置",WebRtcAecmStngBtnId,252,240,50,12
-    CONTROL         "WebRtc浮点版声学回音消除器",UseWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,252,137,12
+    CONTROL         "*WebRtc浮点版声学回音消除器",UseWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,252,137,12
     PUSHBUTTON      "设置",WebRtcAecStngBtnId,252,252,50,12
-    CONTROL         "WebRtc第三版声学回音消除器",UseWebRtcAec3RdBtnId,"Button",BS_AUTORADIOBUTTON,98,264,137,12
+    CONTROL         "*WebRtc第三版声学回音消除器",UseWebRtcAec3RdBtnId,"Button",BS_AUTORADIOBUTTON,98,264,137,12
     PUSHBUTTON      "设置",WebRtcAec3StngBtnId,252,264,50,12
-    CONTROL         "SpeexWebRtc三重声学回音消除器",UseSpeexWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,276,137,12
+    CONTROL         "*SpeexWebRtc三重声学回音消除器",UseSpeexWebRtcAecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,276,137,12
     PUSHBUTTON      "设置",SpeexWebRtcAecStngBtnId,252,276,50,12
     LTEXT           "噪音抑制器：",IDC_STATIC,7,288,74,60,SS_CENTERIMAGE
     CONTROL         "不使用",UseNoNsRdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,288,137,12
@@ -209,7 +209,7 @@ BEGIN
     PUSHBUTTON      "设置",WebRtcNsxStngBtnId,252,312,50,12
     CONTROL         "WebRtc浮点版噪音抑制器",UseWebRtcNsRdBtnId,"Button",BS_AUTORADIOBUTTON,98,324,137,12
     PUSHBUTTON      "设置",WebRtcNsStngBtnId,252,324,50,12
-    CONTROL         "RNNoise噪音抑制器",UseRNNoiseRdBtnId,"Button",BS_AUTORADIOBUTTON,98,336,137,12
+    CONTROL         "*RNNoise噪音抑制器",UseRNNoiseRdBtnId,"Button",BS_AUTORADIOBUTTON,98,336,137,12
     CONTROL         "使用Speex预处理器",IsUseSpeexPrpocsCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,348,203,12
     PUSHBUTTON      "设置",SpeexPrpocsStngBtnId,252,348,50,12
     LTEXT           "编解码器：",IDC_STATIC,7,360,74,12
@@ -236,7 +236,7 @@ BEGIN
     EDITTEXT        VdoFrmSzOtherHeightEdTxtId,261,432,26,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "编解码器：",IDC_STATIC,7,444,74,24
     CONTROL         "Yu12原始数据",UseYu12RdBtnId,"Button",BS_AUTORADIOBUTTON | WS_GROUP,98,444,137,12
-    CONTROL         "OpenH264编解码器",UseOpenH264CodecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,456,137,12
+    CONTROL         "*OpenH264编解码器",UseOpenH264CodecRdBtnId,"Button",BS_AUTORADIOBUTTON,98,456,137,12
     PUSHBUTTON      "设置",OpenH264CodecStngBtnId,252,456,50,12
     DEFPUSHBUTTON   "确定",StngOkBtnId,7,468,295,12
 END

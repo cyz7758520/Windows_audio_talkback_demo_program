@@ -760,11 +760,15 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		int32_t p_IsUseSameRoomAec;
 		int32_t p_SameRoomEchoMinDelay;
 
+		#if IsIcludSpeexWebRtcAec
 		p_WorkMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecm :
 						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec :
 						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAecRdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec :
 						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeWebRtcAecmWebRtcAec3 :
 						( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3RdBtnId ) == BST_CHECKED ) ? SpeexWebRtcAecWorkModeSpeexAecWebRtcAecmWebRtcAec3 : 0;
+		#else
+		p_WorkMode = 0;
+		#endif
 		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
 		p_SpeexAecFilterLenMsec = _wtoi( p_TmpU16strPt );
 		p_SpeexAecIsUseRec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED );

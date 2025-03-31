@@ -3,21 +3,38 @@
 #include "Func.h"
 #include "DataStruct.h"
 #include "SpeexDsp.h"
+#if IsIcludWebRtc
 #include "WebRtc.h"
+#endif
+#if IsIcludWebRtc3
 #include "WebRtc3.h"
+#endif
+#if IsIcludSpeexWebRtcAec
 #include "SpeexWebRtcAec.h"
+#endif
+#if IsIcludRNNoise
 #include "RNNoise.h"
+#endif
+#if IsIcludSpeex
 #include "Speex.h"
+#endif
+#if IsIcludAdoWavfm
 #include "AdoWavfm.h"
+#endif
 #include "LibYUV.h"
+#if IsIcludOpenH264
 #include "OpenH264.h"
+#endif
+#if IsIcludMediaFile
 #include "MediaFile.h"
-#include "WndAdoVdoTkbk.h"
+#endif
 
 #include "AdoInpt.h"
 #include "AdoOtpt.h"
 #include "VdoInpt.h"
 #include "VdoOtpt.h"
+
+#include "WndAdoVdoTkbk.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -30,6 +47,7 @@ typedef struct IMediaEventEx IMediaEventEx;
 typedef struct IBaseFilter IBaseFilter;
 typedef struct VdoInptThrd VdoInptThrd;
 typedef struct MediaPocsThrd MediaPocsThrd;
+typedef struct AviFileWriter AviFileWriter;
 
 typedef struct MediaPocsThrd //媒体处理线程。
 {
@@ -677,10 +695,10 @@ public:
 	int Init( const void * LicnCodePt, Vstr * ErrInfoVstrPt );
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = MediaPocsThrdDstoy( m_MediaPocsThrdPt, ErrInfoVstrPt ); m_MediaPocsThrdPt = NULL; return p_Rslt; }
 
-	int GetAdoInptDvcName( Vstr * * * AdoInptDvcNameArrPtPtPt, UINT * AdoInptDvcTotalPt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdGetAdoInptDvcName( AdoInptDvcNameArrPtPtPt, AdoInptDvcTotalPt, ErrInfoVstrPt ); }
-	int GetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameArrPtPtPt, UINT * AdoOtptDvcTotalPt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdGetAdoOtptDvcName( AdoOtptDvcNameArrPtPtPt, AdoOtptDvcTotalPt, ErrInfoVstrPt ); }
-	int GetVdoInptDvcName( Vstr * * * VdoInptDvcNameArrPtPtPt, UINT * VdoInptDvcTotalPt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdGetVdoInptDvcName( VdoInptDvcNameArrPtPtPt, VdoInptDvcTotalPt, ErrInfoVstrPt ); }
-	int DstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdDstoyDvcName( DvcNameArrPtPt, DvcTotal, ErrInfoVstrPt ); }
+	static int GetAdoInptDvcName( Vstr * * * AdoInptDvcNameArrPtPtPt, UINT * AdoInptDvcTotalPt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdGetAdoInptDvcName( AdoInptDvcNameArrPtPtPt, AdoInptDvcTotalPt, ErrInfoVstrPt ); }
+	static int GetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameArrPtPtPt, UINT * AdoOtptDvcTotalPt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdGetAdoOtptDvcName( AdoOtptDvcNameArrPtPtPt, AdoOtptDvcTotalPt, ErrInfoVstrPt ); }
+	static int GetVdoInptDvcName( Vstr * * * VdoInptDvcNameArrPtPtPt, UINT * VdoInptDvcTotalPt, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdGetVdoInptDvcName( VdoInptDvcNameArrPtPtPt, VdoInptDvcTotalPt, ErrInfoVstrPt ); }
+	static int DstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdDstoyDvcName( DvcNameArrPtPt, DvcTotal, ErrInfoVstrPt ); }
 
 	int SetAdoInpt( int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoInpt( m_MediaPocsThrdPt, IsBlockWait, SmplRate, FrmLenMsec, ErrInfoVstrPt ); }
 

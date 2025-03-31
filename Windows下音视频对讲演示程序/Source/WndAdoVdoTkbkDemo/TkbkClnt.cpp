@@ -274,11 +274,15 @@ TkbkClnt::TkbkInfo * TkbkClntTkbkInfoInit( TkbkClnt * TkbkClntPt, int32_t TkbkId
 		case 1: //如果要使用自适应抖动缓冲器。
 		{
 			//初始化音频自适应抖动缓冲器。
+			#if IsIcludAjb
 			if( AAjbInit( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_LicnCodePt, &p_TkbkInfoTmpPt->m_AAjbPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_SmplRate, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit, 1, 1, 0, TkbkClntPt->m_AAjbParm.m_MinNeedBufFrmCnt, TkbkClntPt->m_AAjbParm.m_MaxNeedBufFrmCnt, TkbkClntPt->m_AAjbParm.m_MaxCntuLostFrmCnt, TkbkClntPt->m_AAjbParm.m_AdaptSensitivity, ( TkbkClntPt->m_XfrMode == 0 ) ? 0 : 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "初始化音频自适应抖动缓冲器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含Ajb。" ), , );
+			#endif
 			{
 				VstrIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化音频自适应抖动缓冲器失败。原因：" ) );
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -287,11 +291,15 @@ TkbkClnt::TkbkInfo * TkbkClntTkbkInfoInit( TkbkClnt * TkbkClntPt, int32_t TkbkId
 			}
 
 			//初始化视频自适应抖动缓冲器。
+			#if IsIcludAjb
 			if( VAjbInit( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_LicnCodePt, &p_TkbkInfoTmpPt->m_VAjbPt, 1, TkbkClntPt->m_VAjbParm.m_MinNeedBufFrmCnt, TkbkClntPt->m_VAjbParm.m_MaxNeedBufFrmCnt, TkbkClntPt->m_VAjbParm.m_AdaptSensitivity, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "初始化视频自适应抖动缓冲器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含Ajb。" ), , );
+			#endif
 			{
 				VstrIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化视频自适应抖动缓冲器失败。原因：" ) );
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -383,7 +391,9 @@ void TkbkClntTkbkInfoDstoy( TkbkClnt * TkbkClntPt, int32_t TkbkIdx )
 		//销毁音频自适应抖动缓冲器。
 		if( p_TkbkInfoTmpPt->m_AAjbPt != NULL )
 		{
+			#if IsIcludAjb
 			AAjbDstoy( p_TkbkInfoTmpPt->m_AAjbPt, NULL );
+			#endif
 			p_TkbkInfoTmpPt->m_AAjbPt = NULL;
 			if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁音频自适应抖动缓冲器成功。" ) );
 		}
@@ -391,7 +401,9 @@ void TkbkClntTkbkInfoDstoy( TkbkClnt * TkbkClntPt, int32_t TkbkIdx )
 		//销毁视频自适应抖动缓冲器。
 		if( p_TkbkInfoTmpPt->m_VAjbPt != NULL )
 		{
+			#if IsIcludAjb
 			VAjbDstoy( p_TkbkInfoTmpPt->m_VAjbPt, NULL );
+			#endif
 			p_TkbkInfoTmpPt->m_VAjbPt = NULL;
 			if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "客户端媒体处理线程：对讲客户端：销毁视频自适应抖动缓冲器成功。" ) );
 		}
@@ -759,7 +771,8 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 							goto RecvPktOut;
 						}
 
-						if( CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) != 0 ) goto Out;
+						if( CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) != 0 ) goto RecvPktOut;
+						if( p_TkbkInfoTmpPt->m_IsInit == 0 ) goto RecvPktOut;
 						int p_OldRmtTkbkMode = p_TkbkInfoTmpPt->m_RmtTkbkMode; //设置旧远端对讲模式。
 						p_TkbkInfoTmpPt->m_RmtTkbkMode = TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 2 ]; //设置远端对讲模式。
 						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收对讲模式包。对讲索引：%z32d。对讲模式：%z8s。" ), p_TkbkInfoTmpPt->m_TkbkIdx, g_TkbkModeU8strArrPt[ p_TkbkInfoTmpPt->m_RmtTkbkMode ] );
@@ -779,7 +792,8 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						p_TmpUint32 = ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 2 ] & 0xFF ) + ( ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 3 ] & 0xFF ) << 8 ) + ( ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 4 ] & 0xFF ) << 16 ) + ( ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 5 ] & 0xFF ) << 24 );
 
 						//将音频输出帧放入容器或自适应抖动缓冲器。
-						if( CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) != 0 ) goto Out;
+						if( CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) != 0 ) goto RecvPktOut;
+						if( p_TkbkInfoTmpPt->m_IsInit == 0 ) goto RecvPktOut;
 						if( ( TkbkClntPt->m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeAdoOtpt ) != 0 ) //如果本端对讲模式有音频输出。
 						{
 							switch( TkbkClntPt->m_UseWhatRecvOtptFrm ) //使用什么接收输出帧。
@@ -815,22 +829,30 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 								{
 									if( p_PktLenByt > 1 + 1 + 4 ) //如果该音频输出帧为有语音活动。
 									{
+										#if IsIcludAjb
 										if( AAjbPutFrm( p_TkbkInfoTmpPt->m_AAjbPt, p_TmpUint32, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, p_PktLenByt - 1 - 1 - 4, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 										{
 											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入音频自适应抖动缓冲器成功。对讲索引：%z32d。音频输出帧时间戳：%uz32d。总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 										}
 										else
+										#else
+										VstrCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含Ajb。" ), , );
+										#endif
 										{
 											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有语音活动的音频输出帧包。放入音频自适应抖动缓冲器失败。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 										}
 									}
 									else //如果该音频输出帧为无语音活动。
 									{
+										#if IsIcludAjb
 										if( AAjbPutFrm( p_TkbkInfoTmpPt->m_AAjbPt, p_TmpUint32, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, 0, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 										{
 											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。放入音频自适应抖动缓冲器成功。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt );
 										}
 										else
+										#else
+										VstrCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含Ajb。" ), , );
+										#endif
 										{
 											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收无语音活动的音频输出帧包。放入音频自适应抖动缓冲器失败。对讲索引：%z32d。音频输出帧时间戳：%uz32d，总长度：%uzd。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 										}
@@ -843,7 +865,17 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 									int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
 									int32_t p_MaxCntuLostFrmCnt; //存放最大连续丢失帧的数量。
 									int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
+									#if IsIcludAjb
 									AAjbGetBufFrmCnt( p_TkbkInfoTmpPt->m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_MaxCntuLostFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
+									#else
+									p_CurHaveBufActFrmCnt = -1;
+									p_CurHaveBufInactFrmCnt = -1;
+									p_CurHaveBufFrmCnt = -1;
+									p_MinNeedBufFrmCnt = -1;
+									p_MaxNeedBufFrmCnt = -1;
+									p_MaxCntuLostFrmCnt = -1;
+									p_CurNeedBufFrmCnt = -1;
+									#endif
 									if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。音频自适应抖动缓冲器：有活动帧：%z32d，无活动帧：%z32d，帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，最大丢帧：%z32d，当前需帧：%z32d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_MaxCntuLostFrmCnt, p_CurNeedBufFrmCnt );
 									break;
 								}
@@ -873,7 +905,8 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						p_TmpUint32 = ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 2 ] & 0xFF ) + ( ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 3 ] & 0xFF ) << 8 ) + ( ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 4 ] & 0xFF ) << 16 ) + ( ( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 5 ] & 0xFF ) << 24 );
 
 						//将视频输出帧放入容器或自适应抖动缓冲器。
-						if( CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) != 0 ) goto Out;
+						if( CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ], NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) != 0 ) goto RecvPktOut;
+						if( p_TkbkInfoTmpPt->m_IsInit == 0 ) goto RecvPktOut;
 						if( ( TkbkClntPt->m_LclTkbkMode & ClntMediaPocsThrd::TkbkModeVdoOtpt ) != 0 ) //如果本端对讲模式有视频输出。
 						{
 							switch( TkbkClntPt->m_UseWhatRecvOtptFrm ) //使用什么接收输出帧。
@@ -909,11 +942,15 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 								{
 									if( p_PktLenByt > 1 + 1 + 4 ) //如果该视频输出帧为有图像活动。
 									{
+										#if IsIcludAjb
 										if( VAjbPutFrm( p_TkbkInfoTmpPt->m_VAjbPt, FuncGetTickAsMsec(), p_TmpUint32, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt + 1 + 1 + 4, p_PktLenByt - 1 - 1 - 4, 1, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 										{
 											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入视频自适应抖动缓冲器成功。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff );
 										}
 										else
+										#else
+										VstrCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含Ajb。" ), , );
+										#endif
 										{
 											if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收有图像活动的视频输出帧包。放入视频自适应抖动缓冲器失败。对讲索引：%z32d。视频输出帧时间戳：%uz32d。总长度：%uzd。类型：%uz8d。原因：%vs" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_TmpUint32, p_PktLenByt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 10 ] & 0xff, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 										}
@@ -927,7 +964,14 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 									int32_t p_MinNeedBufFrmCnt; //存放最小需缓冲帧的数量。
 									int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
 									int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
+									#if IsIcludAjb
 									VAjbGetBufFrmCnt( p_TkbkInfoTmpPt->m_VAjbPt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
+									#else
+									p_CurHaveBufFrmCnt = -1;
+									p_MinNeedBufFrmCnt = -1;
+									p_MaxNeedBufFrmCnt = -1;
+									p_CurNeedBufFrmCnt = -1;
+									#endif
 									if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), p_TkbkInfoTmpPt->m_TkbkIdx, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
 									break;
 								}
@@ -1283,11 +1327,23 @@ void TkbkClntUserWriteAdoOtptFrm( TkbkClnt * TkbkClntPt, int32_t AdoOtptStrmIdx,
 				int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
 				int32_t p_MaxCntuLostFrmCnt; //存放最大连续丢失帧的数量。
 				int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
+				#if IsIcludAjb
 				AAjbGetBufFrmCnt( p_TkbkInfoTmpPt->m_AAjbPt, &p_CurHaveBufActFrmCnt, &p_CurHaveBufInactFrmCnt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_MaxCntuLostFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
+				#else
+				p_CurHaveBufActFrmCnt = -1;
+				p_CurHaveBufInactFrmCnt = -1;
+				p_CurHaveBufFrmCnt = -1;
+				p_MinNeedBufFrmCnt = -1;
+				p_MaxNeedBufFrmCnt = -1;
+				p_MaxCntuLostFrmCnt = -1;
+				p_CurNeedBufFrmCnt = -1;
+				#endif
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。音频自适应抖动缓冲器：有活动帧：%z32d，无活动帧：%z32d，帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，最大丢帧：%z32d，当前需帧：%z32d。" ), AdoOtptStrmIdx, p_CurHaveBufActFrmCnt, p_CurHaveBufInactFrmCnt, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_MaxCntuLostFrmCnt, p_CurNeedBufFrmCnt );
 
 				//从音频自适应抖动缓冲器取出音频输出帧。
+				#if IsIcludAjb
 				AAjbGetFrm( p_TkbkInfoTmpPt->m_AAjbPt, &p_AdoOtptFrmTimeStamp, p_TkbkInfoTmpPt->m_AdoOtptTmpVar.m_TmpBytePt, p_TkbkInfoTmpPt->m_AdoOtptTmpVar.m_TmpByteSz, &m_TmpSz, 1, NULL );
+				#endif
 
 				if( ( m_TmpSz > 0 ) && ( m_TmpSz != SIZE_MAX ) ) //如果音频输出帧为有语音活动。
 				{
@@ -1407,14 +1463,23 @@ void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx
 			int32_t p_MinNeedBufFrmCnt; //存放最小需缓冲帧的数量。
 			int32_t p_MaxNeedBufFrmCnt; //存放最大需缓冲帧的数量。
 			int32_t p_CurNeedBufFrmCnt; //存放当前需缓冲帧的数量。
+			#if IsIcludAjb
 			VAjbGetBufFrmCnt( p_TkbkInfoTmpPt->m_VAjbPt, &p_CurHaveBufFrmCnt, &p_MinNeedBufFrmCnt, &p_MaxNeedBufFrmCnt, &p_CurNeedBufFrmCnt, 1, NULL );
+			#else
+			p_CurHaveBufFrmCnt = -1;
+			p_MinNeedBufFrmCnt = -1;
+			p_MaxNeedBufFrmCnt = -1;
+			p_CurNeedBufFrmCnt = -1;
+			#endif
 
 			if( p_CurHaveBufFrmCnt != 0 ) //如果视频自适应抖动缓冲器不为空。
 			{
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "客户端媒体处理线程：对讲客户端：对讲索引：%z32d。视频自适应抖动缓冲器：帧：%z32d，最小需帧：%z32d，最大需帧：%z32d，当前需帧：%z32d。" ), VdoOtptStrmIdx, p_CurHaveBufFrmCnt, p_MinNeedBufFrmCnt, p_MaxNeedBufFrmCnt, p_CurNeedBufFrmCnt );
 
 				//从视频自适应抖动缓冲器取出视频输出帧。
+				#if IsIcludAjb
 				VAjbGetFrm( p_TkbkInfoTmpPt->m_VAjbPt, FuncGetTickAsMsec(), &p_VdoOtptFrmTimeStamp, p_TkbkInfoTmpPt->m_VdoOtptTmpVar.m_TmpBytePt, p_TkbkInfoTmpPt->m_VdoOtptTmpVar.m_TmpByteSz, &m_TmpSz, 1, NULL );
+				#endif
 
 				if( m_TmpSz != 0 ) //如果视频输出帧为有图像活动。
 				{

@@ -292,6 +292,7 @@ public:
 				}
 				case 1: //如果要使用OpenH264编码器。
 				{
+					#if IsIcludOpenH264
 					if( OpenH264EncdPocs( m_VdoInptPt->m_OpenH264Encd.m_Pt,
 										  m_VdoInptPt->m_Thrd.m_FrmPt->m_Yu12RsltFrmPt, m_VdoInptPt->m_FrmWidth, m_VdoInptPt->m_FrmHeight, m_VdoInptPt->m_Thrd.m_LastTickMsec,
 										  m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmPt, m_VdoInptPt->m_Yu12FrmLenByt, &m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmLenByt,
@@ -300,6 +301,7 @@ public:
 						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "视频输入线程：使用OpenH264编码器成功。H264格式结果帧的长度：%uzd，时间戳：%uz64d，类型：%hhd。" ), m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmLenByt, m_VdoInptPt->m_Thrd.m_LastTickMsec, m_VdoInptPt->m_Thrd.m_FrmPt->m_EncdRsltFrmPt[ 4 ] );
 					}
 					else
+					#endif
 					{
 						if( m_VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "视频输入线程：使用OpenH264编码器失败，本次帧丢弃。" ) );
 						goto OutPocs;
@@ -921,11 +923,15 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		}
 		case 1: //如果要使用OpenH264编码器。
 		{
+			#if IsIcludOpenH264
 			if( OpenH264EncdInit( VdoInptPt->m_MediaPocsThrdPt->m_LicnCodePt, &VdoInptPt->m_OpenH264Encd.m_Pt, VdoInptPt->m_FrmWidth, VdoInptPt->m_FrmHeight, VdoInptPt->m_OpenH264Encd.m_VdoType, VdoInptPt->m_OpenH264Encd.m_EncdBitrate, VdoInptPt->m_OpenH264Encd.m_BitrateCtrlMode, VdoInptPt->m_MaxSmplRate, VdoInptPt->m_OpenH264Encd.m_IDRFrmIntvl, VdoInptPt->m_OpenH264Encd.m_Cmplxt, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：视频输入：初始化OpenH264编码器成功。" ) );
 			}
 			else
+			#else
+			VstrCpy( VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含OpenH264。" ), , );
+			#endif
 			{
 				if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：初始化OpenH264编码器失败。原因：%vs" ), VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -1136,11 +1142,13 @@ void VdoInptDstoy( VdoInpt * VdoInptPt )
 		{
 			if( VdoInptPt->m_OpenH264Encd.m_Pt != NULL )
 			{
+				#if IsIcludOpenH264
 				if( OpenH264EncdDstoy( VdoInptPt->m_OpenH264Encd.m_Pt, NULL ) == 0 )
 				{
 					if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：销毁OpenH264编码器成功。" ) );
 				}
 				else
+				#endif
 				{
 					if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输入：销毁OpenH264编码器失败。" ) );
 				}

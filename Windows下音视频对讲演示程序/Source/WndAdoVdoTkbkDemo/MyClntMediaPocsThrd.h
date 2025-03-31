@@ -1,9 +1,5 @@
 ﻿#pragma once
 
-#include "Func.h"
-#include "DataStruct.h"
-#include "Sokt.h"
-#include "Ajb.h"
 #include "ClntMediaPocsThrd.h"
 
 class MyClntMediaPocsThrdCls : public ClntMediaPocsThrdCls //我的客户端媒体处理线程。

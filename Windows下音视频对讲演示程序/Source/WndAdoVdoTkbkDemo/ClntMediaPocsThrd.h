@@ -3,7 +3,6 @@
 #include "Func.h"
 #include "DataStruct.h"
 #include "Sokt.h"
-#include "Ajb.h"
 #include "MediaPocsThrd.h"
 #include "TkbkClnt.h"
 #include "BdctClnt.h"

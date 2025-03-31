@@ -3,7 +3,9 @@
 #include "Func.h"
 #include "DataStruct.h"
 #include "Sokt.h"
+#if IsIcludAjb
 #include "Ajb.h"
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -11,6 +13,8 @@ extern "C"
 #endif
 
 typedef struct ClntMediaPocsThrd ClntMediaPocsThrd;
+typedef struct AAjb AAjb;
+typedef struct VAjb VAjb;
 
 typedef struct TkbkClnt //对讲客户端。
 {

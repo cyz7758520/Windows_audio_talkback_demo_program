@@ -3,7 +3,6 @@
 #include "Func.h"
 #include "DataStruct.h"
 #include "Sokt.h"
-#include "Ajb.h"
 
 #ifdef __cplusplus
 extern "C"

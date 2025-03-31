@@ -57,6 +57,7 @@ __FUNC_DLLAPI__ int GetJavaStringClsObjU16str( JNIEnv * env, jstring StringClsOb
 __FUNC_DLLAPI__ int DstoyJavaStringClsObjU16str( JNIEnv * env, jstring StringClsObj, const uint16_t * CharArrPt );
 
 __FUNC_DLLAPI__ int GetAndrdPkgName( JNIEnv * env, uint8_t * PkgNameU8strPt, size_t PkgNameU8strSzChr, size_t * PkgNameU8strLenChrPt );
+__FUNC_DLLAPI__ int GetAndrdDvcModel( JNIEnv * env, uint8_t * DvcModelU8strPt, size_t DvcModelU8strSzChr, size_t * DvcModelU8strLenChrPt );
 
 #ifdef __cplusplus
 }

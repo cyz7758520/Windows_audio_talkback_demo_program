@@ -3,14 +3,31 @@
 #include "Func.h"
 #include "DataStruct.h"
 #include "SpeexDsp.h"
+#if IsIcludWebRtc
 #include "WebRtc.h"
+#endif
+#if IsIcludWebRtc3
+#include "WebRtc3.h"
+#endif
+#if IsIcludSpeexWebRtcAec
 #include "SpeexWebRtcAec.h"
+#endif
+#if IsIcludRNNoise
 #include "RNNoise.h"
+#endif
+#if IsIcludSpeex
 #include "Speex.h"
+#endif
+#if IsIcludAdoWavfm
 #include "AdoWavfm.h"
+#endif
 #include "LibYUV.h"
+#if IsIcludOpenH264
 #include "OpenH264.h"
+#endif
+#if IsIcludMediaFile
 #include "MediaFile.h"
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -18,6 +35,9 @@ extern "C"
 #endif
 
 typedef struct MediaPocsThrd MediaPocsThrd;
+typedef struct SpeexDecd SpeexDecd;
+typedef struct AdoWavfm AdoWavfm;
+typedef struct WaveFileWriter WaveFileWriter;
 
 typedef struct AdoOtpt //音频输出。
 {

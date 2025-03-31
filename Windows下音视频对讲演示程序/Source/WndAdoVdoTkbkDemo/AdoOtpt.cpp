@@ -36,11 +36,13 @@ int AdoOtptStrmInit( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：帧的长度不为20毫秒不能使用Speex解码器。" ), StrmPt->m_Idx );
 				goto Out;
 			}
+			#if IsIcludSpeex
 			if( SpeexDecdInit( &StrmPt->m_SpeexDecd.m_Pt, AdoOtptPt->m_SmplRate, StrmPt->m_SpeexDecd.m_IsUsePrcplEnhsmt ) == 0 )
 			{
 				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：初始化Speex解码器成功。" ), StrmPt->m_Idx );
 			}
 			else
+				#endif
 			{
 				if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：初始化Speex解码器失败。" ), StrmPt->m_Idx );
 				goto Out;
@@ -92,11 +94,13 @@ void AdoOtptStrmDstoy( AdoOtpt * AdoOtptPt, AdoOtpt::Strm * StrmPt )
 		{
 			if( StrmPt->m_SpeexDecd.m_Pt != NULL )
 			{
+				#if IsIcludSpeex
 				if( SpeexDecdDstoy( StrmPt->m_SpeexDecd.m_Pt ) == 0 )
 				{
 					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：销毁Speex解码器成功。" ), StrmPt->m_Idx );
 				}
 				else
+				#endif
 				{
 					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出流索引%z32d：销毁Speex解码器失败。" ), StrmPt->m_Idx );
 				}
@@ -445,11 +449,15 @@ int AdoOtptWavfmInit( AdoOtpt * AdoOtptPt )
 
 	if( AdoOtptPt->m_Wavfm.m_IsDraw != 0 )
 	{
+		#if IsIcludAdoWavfm
 		if( AdoWavfmInit( &AdoOtptPt->m_Wavfm.m_SrcPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化原始波形器成功。" ) );
 		}
 		else
+		#else
+		VstrCpy( AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+		#endif
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化原始波形器失败。原因：%vs" ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			goto Out;
@@ -484,11 +492,15 @@ void AdoOtptWavfmDstoy( AdoOtpt * AdoOtptPt )
 {
 	if( AdoOtptPt->m_Wavfm.m_SrcPt != NULL )
 	{
+		#if IsIcludAdoWavfm
 		if( AdoWavfmDstoy( AdoOtptPt->m_Wavfm.m_SrcPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁原始波形器成功。" ) );
 		}
 		else
+		#else
+		VstrCpy( AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含AdoWavfm。" ), , );
+		#endif
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：销毁原始波形器失败。原因：%vs" ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
@@ -516,11 +528,13 @@ int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt )
 
 	if( AdoOtptPt->m_WaveFileWriter.m_IsSave != 0 )
 	{
+		#if IsIcludMediaFile
 		if( WaveFileWriterInit( &AdoOtptPt->m_WaveFileWriter.m_SrcPt, AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt, AdoOtptPt->m_WaveFileWriter.m_WrBufSzByt, 1, AdoOtptPt->m_SmplRate, 16 ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs 写入器成功。" ), AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
 		}
 		else
+		#endif
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs 写入器失败。" ), AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
 			goto Out;
@@ -555,11 +569,13 @@ void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt )
 {
 	if( AdoOtptPt->m_WaveFileWriter.m_SrcPt != NULL )
 	{
+		#if IsIcludMediaFile
 		if( WaveFileWriterDstoy( AdoOtptPt->m_WaveFileWriter.m_SrcPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁原始Wave文件写入器成功。" ) );
 		}
 		else
+		#endif
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：销毁原始Wave文件写入器失败。" ) );
 		}
@@ -1291,11 +1307,13 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 																							   AdoOtptPt->m_Thrd.m_EncdSrcFrmPt, AdoOtptPt->m_Thrd.m_EncdSrcFrmSzByt, &AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt );
 
 									//使用Speex解码器。
+									#if IsIcludSpeex
 									if( SpeexDecdPocs( p_StrmPt->m_SpeexDecd.m_Pt, AdoOtptPt->m_Thrd.m_EncdSrcFrmPt, AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt, AdoOtptPt->m_Thrd.m_PcmSrcFrmPt ) == 0 )
 									{
 										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器成功。" ), p_StrmPt->m_Idx );
 									}
 									else
+									#endif
 									{
 										if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器失败。" ), p_StrmPt->m_Idx );
 									}
@@ -1350,11 +1368,13 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 																								   AdoOtptPt->m_Thrd.m_EncdSrcFrmPt, AdoOtptPt->m_Thrd.m_EncdSrcFrmSzByt, &AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt );
 
 										//使用Speex解码器。
+										#if IsIcludSpeex
 										if( SpeexDecdPocs( p_StrmPt->m_SpeexDecd.m_Pt, AdoOtptPt->m_Thrd.m_EncdSrcFrmPt, AdoOtptPt->m_Thrd.m_EncdSrcFrmLenByt, AdoOtptPt->m_Thrd.m_PcmSrcFrmPt ) == 0 )
 										{
 											if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器成功。" ), p_StrmPt->m_Idx );
 										}
 										else
+										#endif
 										{
 											if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：音频输出流索引%z32d：使用Speex解码器失败。" ), p_StrmPt->m_Idx );
 										}

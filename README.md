@@ -67,15 +67,33 @@
 &emsp;&emsp;2、如果自己的软件已有传输协议：继承MediaPocsThrd媒体处理线程类，实现UserInit、UserDstoy、UserPocs、UserMsg、UserDvcChg、UserReadAdoVdoInptFrm、UserWriteAdoOtptFrm、UserGetAdoOtptFrm、UserWriteVdoOtptFrm、UserGetVdoOtptFrm这些回调成员函数。  
 &emsp;&emsp;&emsp;&emsp;如果自己的软件没有传输协议：继承SrvrThrd服务端线程类，实现UserInit、UserDstoy、UserPocs、UserMsg、UserShowLog、UserShowToast、UserSrvrInit、UserSrvrDstoy、UserCnctInit、UserCnctDstoy、UserCnctSts、UserCnctRmtTkbkMode、UserCnctTstNtwkDly这些回调成员函数。  
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;继承ClntMediaPocsThrd客户端媒体处理线程类，实现UserInit、UserDstoy、UserPocs、UserMsg、UserDvcChg、UserShowLog、UserShowToast、UserTkbkClntCnctInit、UserTkbkClntCnctDstoy、UserTkbkClntCnctSts、UserTkbkClntMyTkbkIdx、UserTkbkClntLclTkbkMode、UserTkbkClntTkbkInfoInit、UserTkbkClntTkbkInfoDstoy、UserTkbkClntTkbkInfoRmtTkbkMode、UserTkbkClntTstNtwkDly、UserBdctClntInit、UserBdctClntDstoy、UserBdctClntCnctInit、UserBdctClntCnctDstoy、UserBdctClntCnctSts这些回调成员函数。  
-&emsp;&emsp;3、new这个继承的类，然后调用类的相关设置成员函数，最后调用start()成员函数启动该线程即可。  
+&emsp;&emsp;3、new这个继承的类，然后先调用类的Init()成员函数，再调用相关设置成员函数，最后调用start()成员函数启动该线程即可。  
 &emsp;&emsp;4、当需要线程退出时，调用线程类的RqirExit()成员函数即可。  
 
-&emsp;&emsp;如果有不需要的部分功能，则只需要删除该功能对应头文件和库文件，然后修改MediaPocsThrd.h、MediaPocsThrd.cpp文件即可。  
+&emsp;&emsp;如果有不需要的部分功能，则只需要修改该功能对应的宏开关即可。  
 &emsp;&emsp;如果只移植部分功能，没有移植MediaPocsThrd媒体处理线程类，则效果可能不好，因为MediaPocsThrd类做了很多优化。  
 
 &emsp;&emsp;**普通免费功能包括：WebRtc定点版声学回音消除器、Speex预处理器的噪音抑制、WebRtc定点版噪音抑制器、WebRtc浮点版噪音抑制器、Speex预处理器、Speex编解码器、Wave文件读取器、Wave文件写入器、音频波形器、本端TCP协议服务端套接字、本端TCP协议客户端套接字、本端UDP协议套接字。**  
 
 &emsp;&emsp;**高级收费功能包括：Speex声学回音消除器、WebRtc浮点版声学回音消除器、WebRtc第三版声学回音消除器、SpeexWebRtc三重声学回音消除器、RNNoise噪音抑制器、OpenH264编解码器、自己设计的自适应抖动缓冲器、Avi文件写入器、本端高级UDP协议套接字。**  
+
+&emsp;&emsp;各个功能对应的文件如下：  
+&emsp;&emsp;* Speex声学回音消除器：SpeexDsp.h、Func_*.lib/dll、SpeexDsp_*.lib/dll。  
+&emsp;&emsp;* WebRtc定点版声学回音消除器：IsIcludWebRtc宏、WebRtc.h、Func_*.lib/dll、WebRtc_*.lib/dll。  
+&emsp;&emsp;* WebRtc浮点版声学回音消除器：IsIcludWebRtc宏、WebRtc.h、Func_*.lib/dll、WebRtc_*.lib/dll。  
+&emsp;&emsp;* WebRtc第三版声学回音消除器：IsIcludWebRtc3宏、WebRtc3.h、Func_*.lib/dll、WebRtc_*.lib/dll、WebRtc3_*.lib/dll。  
+&emsp;&emsp;* SpeexWebRtc三重声学回音消除器：IsIcludSpeexWebRtcAec宏、SpeexWebRtcAec.h、Func_*.lib/dll、SpeexDsp_*.lib/dll、WebRtc_*.lib/dll、WebRtc3_*.lib/dll、SpeexWebRtcAec_*.lib/dll。  
+&emsp;&emsp;* WebRtc定点版噪音抑制器：IsIcludWebRtc宏、WebRtc.h、Func_*.lib/dll、WebRtc_*.lib/dll。  
+&emsp;&emsp;* WebRtc浮点版噪音抑制器：IsIcludWebRtc宏、WebRtc.h、Func_*.lib/dll、WebRtc_*.lib/dll。  
+&emsp;&emsp;* RNNoise噪音抑制器：IsIcludRNNoise宏、RNNoise.h、Func_*.lib/dll、WebRtc_*.lib/dll、RNNoise_*.lib/dll。  
+&emsp;&emsp;* Speex预处理器：SpeexDsp.h、Func_*.lib/dll、SpeexDsp_*.lib/dll。  
+&emsp;&emsp;* Speex编解码器：IsIcludSpeex宏、Speex.h、Func_*.lib/dll、Speex_*.lib/dll。  
+&emsp;&emsp;* 音频波形器：IsIcludAdoWavfm宏、AdoWavfm.h、Func_*.lib/dll、AdoWavfm_*.lib/dll。  
+&emsp;&emsp;* OpenH264编解码器：IsIcludOpenH264宏、OpenH264.h、Func_*.lib/dll、OpenH264_*.lib/dll。  
+&emsp;&emsp;* 图片处理：LibYUV.h、Func_*.lib/dll、LibYUV_*.lib/dll。  
+&emsp;&emsp;* 音视频自适应抖动缓冲器：IsIcludAjb宏、Ajb.h、Func_*.lib/dll、Ajb_*.lib/dll。  
+&emsp;&emsp;* 本端TCP协议UDP协议套接字：Sokt.h、Func_*.lib/dll、DataStruct_*.lib/dll、Sokt_*.lib/dll。  
+&emsp;&emsp;* Wave文件Avi文件写入读取器：IsIcludMediaFile宏、MediaFile.h、Func_*.lib/dll、MediaFile_*.lib/dll。  
 
 # 命令
 &emsp;&emsp;本软件支持通过命令行参数来设置，参数如下：  

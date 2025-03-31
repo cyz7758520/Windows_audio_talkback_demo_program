@@ -36,11 +36,15 @@ int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 		}
 		case 1: //如果要使用OpenH264解码器。
 		{
+			#if IsIcludOpenH264
 			if( OpenH264DecdInit( VdoOtptPt->m_MediaPocsThrdPt->m_LicnCodePt, &StrmPt->m_OpenH264Decd.m_Pt, StrmPt->m_OpenH264Decd.m_DecdThrdNum, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：初始化OpenH264解码器成功。" ), StrmPt->m_Idx );
 			}
 			else
+			#else
+			VstrCpy( VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "未包含OpenH264。" ), , );
+			#endif
 			{
 				if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：初始化OpenH264解码器失败。原因：%vs" ), StrmPt->m_Idx, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -86,11 +90,13 @@ void VdoOtptStrmDecdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 		{
 			if( StrmPt->m_OpenH264Decd.m_Pt != NULL )
 			{
+				#if IsIcludOpenH264
 				if( OpenH264DecdDstoy( StrmPt->m_OpenH264Decd.m_Pt, NULL ) == 0 )
 				{
 					if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：销毁OpenH264解码器成功。" ), StrmPt->m_Idx );
 				}
 				else
+				#endif
 				{
 					if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：视频输出流索引%uz32d：销毁OpenH264解码器失败。" ), StrmPt->m_Idx );
 				}
@@ -393,6 +399,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 					if( p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmLenByt > 0 ) //如果本次写入了帧。
 					{
 						//使用OpenH264解码器。
+						#if IsIcludOpenH264
 						if( OpenH264DecdPocs( p_StrmPt->m_OpenH264Decd.m_Pt,
 											  p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmPt, p_StrmPt->m_Thrd.m_FrmPt->m_EncdSrcFrmLenByt,
 											  p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmPt, p_VdoOtptPt->m_FrmMaxWidth * p_VdoOtptPt->m_FrmMaxHeight * 3 / 2, &p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth, &p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight,
@@ -402,6 +409,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 							if( ( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmWidth == 0 ) || ( p_StrmPt->m_Thrd.m_FrmPt->m_Yu12SrcFrmHeight == 0 ) ) goto OutPocs; //如果未解码出Yu12格式帧，就把本次帧丢弃。
 						}
 						else
+						#endif
 						{
 							if( p_VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "视频输出线程：视频输出流索引%uz32d：使用OpenH264解码器失败，本次帧丢弃。" ), p_StrmPt->m_Idx );
 							goto OutPocs;
