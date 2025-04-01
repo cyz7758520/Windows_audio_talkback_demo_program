@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x86_Debug_LNKDLL_DLL", "WndAdoVdoTkbk_MSVC++_x86_Debug_LNKDLL_DLL\WndAdoVdoTkbk_MSVC++_x86_Debug_LNKDLL_DLL.vcxproj", "{638F2A27-28D7-4167-B6AB-9911F7C9274B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x86_Release_LNKDLL_DLL", "WndAdoVdoTkbk_MSVC++_x86_Release_LNKDLL_DLL\WndAdoVdoTkbk_MSVC++_x86_Release_LNKDLL_DLL.vcxproj", "{EFBBF83E-4A13-4C8B-8CF9-92DE0DB73492}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x64_Debug_LNKDLL_DLL", "WndAdoVdoTkbk_MSVC++_x64_Debug_LNKDLL_DLL\WndAdoVdoTkbk_MSVC++_x64_Debug_LNKDLL_DLL.vcxproj", "{E7A04EE7-28E9-4B8C-8DF1-8A86AF8843A1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x64_Release_LNKDLL_DLL", "WndAdoVdoTkbk_MSVC++_x64_Release_LNKDLL_DLL\WndAdoVdoTkbk_MSVC++_x64_Release_LNKDLL_DLL.vcxproj", "{DD5DAF1F-9931-42BC-ADEE-85A5DDE42CA4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x64_Debug_LNKLIB_LIB", "WndAdoVdoTkbk_MSVC++_x64_Debug_LNKLIB_LIB\WndAdoVdoTkbk_MSVC++_x64_Debug_LNKLIB_LIB.vcxproj", "{3C0FB2F6-1963-4E3C-9271-7C86E92A8027}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x64_Release_LNKLIB_LIB", "WndAdoVdoTkbk_MSVC++_x64_Release_LNKLIB_LIB\WndAdoVdoTkbk_MSVC++_x64_Release_LNKLIB_LIB.vcxproj", "{89B25460-AC0F-4E9B-B928-68BEDB72895E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x86_Debug_LNKLIB_LIB", "WndAdoVdoTkbk_MSVC++_x86_Debug_LNKLIB_LIB\WndAdoVdoTkbk_MSVC++_x86_Debug_LNKLIB_LIB.vcxproj", "{9F21E536-6A2E-4121-829F-8E29B8DE83CF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndAdoVdoTkbk_MSVC++_x86_Release_LNKLIB_LIB", "WndAdoVdoTkbk_MSVC++_x86_Release_LNKLIB_LIB\WndAdoVdoTkbk_MSVC++_x86_Release_LNKLIB_LIB.vcxproj", "{2BAE27A8-A16D-4D8B-8686-F5267152A894}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		ALL|ALL = ALL|ALL
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{638F2A27-28D7-4167-B6AB-9911F7C9274B}.ALL|ALL.ActiveCfg = Debug|Win32
+		{638F2A27-28D7-4167-B6AB-9911F7C9274B}.ALL|ALL.Build.0 = Debug|Win32
+		{EFBBF83E-4A13-4C8B-8CF9-92DE0DB73492}.ALL|ALL.ActiveCfg = Release|Win32
+		{EFBBF83E-4A13-4C8B-8CF9-92DE0DB73492}.ALL|ALL.Build.0 = Release|Win32
+		{E7A04EE7-28E9-4B8C-8DF1-8A86AF8843A1}.ALL|ALL.ActiveCfg = Debug|x64
+		{E7A04EE7-28E9-4B8C-8DF1-8A86AF8843A1}.ALL|ALL.Build.0 = Debug|x64
+		{DD5DAF1F-9931-42BC-ADEE-85A5DDE42CA4}.ALL|ALL.ActiveCfg = Release|x64
+		{DD5DAF1F-9931-42BC-ADEE-85A5DDE42CA4}.ALL|ALL.Build.0 = Release|x64
+		{3C0FB2F6-1963-4E3C-9271-7C86E92A8027}.ALL|ALL.ActiveCfg = Debug|x64
+		{3C0FB2F6-1963-4E3C-9271-7C86E92A8027}.ALL|ALL.Build.0 = Debug|x64
+		{89B25460-AC0F-4E9B-B928-68BEDB72895E}.ALL|ALL.ActiveCfg = Release|x64
+		{89B25460-AC0F-4E9B-B928-68BEDB72895E}.ALL|ALL.Build.0 = Release|x64
+		{9F21E536-6A2E-4121-829F-8E29B8DE83CF}.ALL|ALL.ActiveCfg = Debug|Win32
+		{9F21E536-6A2E-4121-829F-8E29B8DE83CF}.ALL|ALL.Build.0 = Debug|Win32
+		{2BAE27A8-A16D-4D8B-8686-F5267152A894}.ALL|ALL.ActiveCfg = Release|Win32
+		{2BAE27A8-A16D-4D8B-8686-F5267152A894}.ALL|ALL.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72314CCF-8262-488D-9D36-2EC8F4ADAB87}
+	EndGlobalSection
+EndGlobal
