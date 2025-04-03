@@ -1037,6 +1037,9 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 				p_ProVar.vt = VT_I4;
 				p_ProVar.intVal = ( ( p_AdoInptDvcId - 1 ) & 0xFFFF ) | ( ( ( p_AdoOtptDvcId - 1 ) & 0xFFFF ) << 16 );
 				p_PrptStorPt->SetValue( MFPKEY_WMAAECMA_DEVICE_INDEXES, p_ProVar ); //设置音频输入输出设备的索引。
+				p_ProVar.vt = VT_BOOL;
+				p_ProVar.boolVal = VARIANT_FALSE;
+				p_PrptStorPt->SetValue( MFPKEY_WMAAECMA_MIC_GAIN_BOUNDER, p_ProVar ); //关闭修改麦克风增益边界功能。因为打开时系统自带的声学回音消除器会自动调节麦克风的系统音量，不太友好。
 				p_PrptStorPt->Release();
 
 				DMO_MEDIA_TYPE p_MediaTyp;
@@ -1858,10 +1861,18 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 						memset( p_PcmBufFrmPt, 0, p_DvcBufLenByt );
 					}
 
-					if( AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels == 2 ) //如果Pcm格式缓冲区帧为双声道。
+					if( AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels > 1 ) //如果Pcm格式缓冲区帧为多声道。
 					{
-						for( UINT i = 0; i < p_DvcBufLenByt; i += sizeof( int16_t ) ) //双声道合并为单声道。
-							p_PcmBufFrmPt[ i / sizeof( int16_t ) ] = ( p_PcmBufFrmPt[ i ] + p_PcmBufFrmPt[ i + 1 ] ) / 2;
+						int32_t p_PcmMix;
+						for( int i = 0; i < p_DvcBufLenUnit; i++ ) //多声道合并为单声道。
+						{
+							p_PcmMix = 0;
+							for( int j = AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels - 1; j >= 0; j-- )
+							{
+								p_PcmMix = p_PcmBufFrmPt[ i * AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels + j ] + p_PcmMix - ( ( p_PcmBufFrmPt[ i * AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels + j ] * p_PcmMix ) >> 0x10 );
+							}
+							p_PcmBufFrmPt[ i ] = p_PcmMix;
+						}
 					}
 					//fwrite( p_PcmBufFrmPt, p_DvcBufLenByt, 1, AdoInptFile1Pt );
 
@@ -1988,6 +1999,12 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 	} //音频输入循环结束。
 
 	if( p_SystemAecNsAgcMediaObjPt != NULL ) p_SystemAecNsAgcMediaObjPt->Release();
+	if( p_DvcCptrClntPt != NULL ) p_DvcCptrClntPt->Release();
+
+	/*if( AdoInptFile1Pt != NULL ) fclose( AdoInptFile1Pt );
+	if( AdoInptFile2Pt != NULL ) fclose( AdoInptFile2Pt );
+	if( AdoInptFile3Pt != NULL ) fclose( AdoInptFile3Pt );*/
+
 	CoUninitialize(); //销毁COM库。
 	
 	if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：本线程已退出。" ) );
