@@ -18,7 +18,8 @@ enum AudpCnctSts
 
 __SOKT_DLLAPI__ int AudpGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int AudpInit( const void * LicnCodePt, AudpSokt * * AudpSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int AudpInit( const void * LicnCodePt, AudpSokt * * AudpSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t NtwkTmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int AudpDstoy( AudpSokt * AudpSoktPt, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int AudpAcpt( AudpSokt * AudpSoktPt, size_t * CnctIdxPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
 
@@ -39,8 +40,6 @@ __SOKT_DLLAPI__ int AudpGetRecvBufLen( AudpSokt * AudpSoktPt, size_t * RecvBufLe
 __SOKT_DLLAPI__ int AudpSendApkt( AudpSokt * AudpSoktPt, size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, int32_t IsRlab, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int AudpRecvApkt( AudpSokt * AudpSoktPt, size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, int32_t * IsRlabPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int AudpDstoy( AudpSokt * AudpSoktPt, Vstr * ErrInfoVstrPt );
-
 #ifdef __cplusplus
 }
 #endif
@@ -56,7 +55,8 @@ public:
 
 	static int GetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt ) { return AudpGetAppLmtInfo( LicnCodePt, LmtTimeSecPt, RmnTimeSecPt, ErrInfoVstrPt ); }
 
-	int Init( const void * LicnCodePt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpInit( LicnCodePt, &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, NewCnctMaxWaitCnt, TmotMsec, ErrInfoVstrPt ); }
+	int Init( const void * LicnCodePt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NewCnctMaxWaitCnt, uint16_t NtwkTmotMsec, Vstr * ErrInfoVstrPt ) { return AudpInit( LicnCodePt, &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, NewCnctMaxWaitCnt, NtwkTmotMsec, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AudpDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 
 	int Acpt( size_t * CnctIdxPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpAcpt( m_Pt, CnctIdxPt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, TmotMsec, ErrInfoVstrPt ); }
 	
@@ -76,7 +76,5 @@ public:
 	
 	int SendApkt( size_t CnctIdx, const void * PktPt, size_t PktLenByt, uint32_t Times, int32_t IsRlab, Vstr * ErrInfoVstrPt ) { return AudpSendApkt( m_Pt, CnctIdx, PktPt, PktLenByt, Times, IsRlab, ErrInfoVstrPt ); }
 	int RecvApkt( size_t CnctIdx, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, int32_t * IsRlabPt, uint16_t TmotMsec, Vstr * ErrInfoVstrPt ) { return AudpRecvApkt( m_Pt, CnctIdx, PktPt, PktSzByt, PktLenBytPt, IsRlabPt, TmotMsec, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AudpDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 };
 #endif

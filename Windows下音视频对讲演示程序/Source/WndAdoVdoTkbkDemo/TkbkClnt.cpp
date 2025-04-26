@@ -504,7 +504,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 					if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 					TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
-					if( TcpClntInit( &TkbkClntPt->m_TcpClntSoktPt, p_RmtNodeAddrFamly, TkbkClntPt->m_RmtNodeNameVstrPt, TkbkClntPt->m_RmtNodeSrvcVstrPt, NULL, NULL, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果初始化本端Tcp协议客户端套接字，并连接远端Tcp协议服务端套接字失败。
+					if( TcpClntInit( &TkbkClntPt->m_TcpClntSoktPt, p_RmtNodeAddrFamly, TkbkClntPt->m_RmtNodeNameVstrPt, TkbkClntPt->m_RmtNodeSrvcVstrPt, NULL, NULL, 5000, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果初始化本端Tcp协议客户端套接字，并连接远端Tcp协议服务端套接字失败。
 					{
 						VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：初始化本端Tcp协议客户端套接字，并连接远端Tcp协议服务端套接字[%vs:%vs]失败。原因：" ), TkbkClntPt->m_RmtNodeNameVstrPt, TkbkClntPt->m_RmtNodeSrvcVstrPt );
 						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );

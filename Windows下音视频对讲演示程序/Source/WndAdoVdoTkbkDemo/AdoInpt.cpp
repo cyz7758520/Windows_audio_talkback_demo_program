@@ -1005,256 +1005,408 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 			goto Out;
 		}
 
-		if( ( AdoInptPt->m_IsUseSystemAecNsAgc != 0 ) && ( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) ) //如果要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器，且已初始化音频输出。如果没有音频输出，则系统自带的声学回音消除器、噪音抑制器和自动增益控制器不会输出音频数据。
+		//初始化设备。
+		if( p_AdoInptDvcId == 0 ) //如果要使用默认的设备。
 		{
-			//初始化系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象。
+			p_HRslt = AdoInptPt->m_Dvc.m_EnumPt->GetDefaultAudioEndpoint( eCapture, eConsole, &AdoInptPt->m_Dvc.m_Pt ); //初始化设备。
+			if( p_HRslt != S_OK )
 			{
-				UINT p_AdoOtptDvcId; //存放音频输出设备的标识符，取值范围为从1到音频输出设备的总数，为0表示使用默认设备。
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) ToastFmt( AdoInptPt->m_MediaPocsThrdPt->m_ShowToastWndHdl, 3000, NULL, Cu8vstr( "媒体处理线程：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+				goto Out;
+			}
+		}
+		else //如果要使用指定的设备。
+		{
+			p_HRslt = AdoInptPt->m_Dvc.m_EnumPt->EnumAudioEndpoints( eCapture, DEVICE_STATE_ACTIVE, &AdoInptPt->m_Dvc.m_ClctPt ); //获取设备收集器。只收集激活的设备。
+			if( p_HRslt != S_OK )
+			{
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取设备收集器失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+				goto Out;
+			}
 
-				//设置音频输出设备标识符。
-				if( MediaPocsThrdGetAdoOtptDvcId( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_NameVstrPt, &p_AdoOtptDvcId, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
-				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取音频输出设备名称[%vs]的标识符失败。原因：%vs" ), AdoInptPt->m_Dvc.m_NameVstrPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-					p_Rslt = 0; //这里返回成功是为了防止媒体处理线程报错退出，且让音频输出线程发送音频输出设备关闭线程消息到媒体处理线程。
-					goto Out;
-				}
+			p_HRslt = AdoInptPt->m_Dvc.m_ClctPt->Item( p_AdoInptDvcId - 1, &AdoInptPt->m_Dvc.m_Pt ); //初始化设备。
+			if( p_HRslt != S_OK )
+			{
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) ToastFmt( AdoInptPt->m_MediaPocsThrdPt->m_ShowToastWndHdl, 3000, NULL, Cu8vstr( "媒体处理线程：音频输入：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+				goto Out;
+			}
+		}
 
-				p_HRslt = CoCreateInstance( CLSID_CWMAudioAEC, NULL, CLSCTX_INPROC_SERVER, IID_IMediaObject, ( void * * )&AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt );
+		if( AdoInptPt->m_IsUseSystemAecNsAgc != 0 ) //如果要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+		{
+			//初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+			{
+				int p_OneInitSystemAecNsAgcRslt = -1; //存放本处理段执行结果，为0表示成功，为非0表示失败。
+				LPWSTR p_AdoOtptDvcIdStrPt = NULL;
+
+				p_HRslt = AdoInptPt->m_Dvc.m_Pt->Activate( IID_IAudioClient2, CLSCTX_INPROC_SERVER, NULL, ( void * * )&AdoInptPt->m_Dvc.m_ClntPt ); //激活设备的客户端接口。
 				if( p_HRslt != S_OK )
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：激活设备的客户端接口失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+					goto OutOneInitSystemAecNsAgc;
 				}
 
-				IPropertyStore * p_PrptStorPt;
-				PROPVARIANT p_ProVar = { 0 };
-				p_HRslt = AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt->QueryInterface( IID_IPropertyStore, ( void * * )&p_PrptStorPt );
+				//设置音频类别。
+				{
+					AudioClientProperties p_ClntPrpt = {};
+					p_ClntPrpt.cbSize = sizeof( AudioClientProperties );
+					//p_ClntPrpt.eCategory = AudioCategory_FarFieldSpeech; //这个类别会增大回音。
+					p_ClntPrpt.eCategory = AudioCategory_Communications;
+					p_HRslt = ( ( IAudioClient2 * )AdoInptPt->m_Dvc.m_ClntPt )->SetClientProperties( &p_ClntPrpt );
+					if( p_HRslt != S_OK )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：设置音频类别失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutOneInitSystemAecNsAgc;
+					}
+				}
+
+				p_HRslt = AdoInptPt->m_Dvc.m_ClntPt->GetMixFormat( &AdoInptPt->m_Dvc.m_WaveFmtExPt ); //获取设备的格式。
 				if( p_HRslt != S_OK )
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的属性接口失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：获取设备的格式失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+					goto OutOneInitSystemAecNsAgc;
 				}
-				p_ProVar.vt = VT_I4;
-				p_ProVar.intVal = ( ( p_AdoInptDvcId - 1 ) & 0xFFFF ) | ( ( ( p_AdoOtptDvcId - 1 ) & 0xFFFF ) << 16 );
-				p_PrptStorPt->SetValue( MFPKEY_WMAAECMA_DEVICE_INDEXES, p_ProVar ); //设置音频输入输出设备的索引。
-				p_ProVar.vt = VT_BOOL;
-				p_ProVar.boolVal = VARIANT_FALSE;
-				p_PrptStorPt->SetValue( MFPKEY_WMAAECMA_MIC_GAIN_BOUNDER, p_ProVar ); //关闭修改麦克风增益边界功能。因为打开时系统自带的声学回音消除器会自动调节麦克风的系统音量，不太友好。
-				p_PrptStorPt->Release();
 
-				DMO_MEDIA_TYPE p_MediaTyp;
-				p_MediaTyp.majortype = MEDIATYPE_Audio;
-				p_MediaTyp.subtype = MEDIASUBTYPE_PCM;
-				p_MediaTyp.lSampleSize = 0;
-				p_MediaTyp.bFixedSizeSamples = TRUE;
-				p_MediaTyp.bTemporalCompression = FALSE;
-				p_MediaTyp.formattype = FORMAT_WaveFormatEx;
+				//修改格式为16位整型，不能修改采样频率和声道数。
+				if( AdoInptPt->m_Dvc.m_WaveFmtExPt->wFormatTag != WAVE_FORMAT_EXTENSIBLE )
+				{
+					AdoInptPt->m_Dvc.m_WaveFmtExPt->wFormatTag = WAVE_FORMAT_PCM;
+					AdoInptPt->m_Dvc.m_WaveFmtExPt->wBitsPerSample = 16;
+					AdoInptPt->m_Dvc.m_WaveFmtExPt->nBlockAlign = AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels * AdoInptPt->m_Dvc.m_WaveFmtExPt->wBitsPerSample / 8;
+					AdoInptPt->m_Dvc.m_WaveFmtExPt->nAvgBytesPerSec = AdoInptPt->m_Dvc.m_WaveFmtExPt->nBlockAlign * AdoInptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec;
+				}
+				else
+				{
+					( ( WAVEFORMATEXTENSIBLE * )AdoInptPt->m_Dvc.m_WaveFmtExPt )->SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+					( ( WAVEFORMATEXTENSIBLE * )AdoInptPt->m_Dvc.m_WaveFmtExPt )->Samples.wValidBitsPerSample = 16;
+					AdoInptPt->m_Dvc.m_WaveFmtExPt->wBitsPerSample = 16;
+					AdoInptPt->m_Dvc.m_WaveFmtExPt->nBlockAlign = AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels * AdoInptPt->m_Dvc.m_WaveFmtExPt->wBitsPerSample / 8;
+					AdoInptPt->m_Dvc.m_WaveFmtExPt->nAvgBytesPerSec = AdoInptPt->m_Dvc.m_WaveFmtExPt->nBlockAlign * AdoInptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec;
+				}
 
-				p_HRslt = MoInitMediaType( &p_MediaTyp, sizeof( WAVEFORMATEX ) );
+				p_HRslt = AdoInptPt->m_Dvc.m_ClntPt->Initialize( AUDCLNT_SHAREMODE_SHARED, 0, 1000 * 1000 * 10, 0, AdoInptPt->m_Dvc.m_WaveFmtExPt, NULL ); //初始化设备客户端。这里缓冲区大小要比帧的长度大一点，就算1000 * 1000 * 10 * 100纳秒=1000毫秒，否则缓冲区很快就会被填满导致丢数据。
 				if( p_HRslt != S_OK )
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化媒体类型失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：初始化设备的客户端失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+					goto OutOneInitSystemAecNsAgc;
 				}
 
-				WAVEFORMATEX * p_WaveFmtExPt = ( WAVEFORMATEX * )p_MediaTyp.pbFormat;
-				p_WaveFmtExPt->wFormatTag = WAVE_FORMAT_PCM;
-				p_WaveFmtExPt->nChannels = 1;
-				p_WaveFmtExPt->nSamplesPerSec = ( AdoInptPt->m_SmplRate <= 22050 ) ? AdoInptPt->m_SmplRate : 22050;
-				p_WaveFmtExPt->nAvgBytesPerSec = p_WaveFmtExPt->nSamplesPerSec * 2;
-				p_WaveFmtExPt->wBitsPerSample = 16;
-				p_WaveFmtExPt->nBlockAlign = p_WaveFmtExPt->wBitsPerSample / 8;
-				p_WaveFmtExPt->cbSize = 0;
-				AdoInptPt->m_Dvc.m_WaveFmtExPt = ( WAVEFORMATEX * )CoTaskMemAlloc( sizeof( WAVEFORMATEX ) );
-				if( AdoInptPt->m_Dvc.m_WaveFmtExPt == NULL )
-				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：创建格式的内存块失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
-				}
-				memcpy( AdoInptPt->m_Dvc.m_WaveFmtExPt, p_WaveFmtExPt, sizeof( WAVEFORMATEX ) );
-				AdoInptPt->m_Dvc.m_PcmBufFrmLenUnit = AdoInptPt->m_FrmLenMsec * AdoInptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec / 1000; //设置Pcm格式缓冲区帧的长度。
-				AdoInptPt->m_Dvc.m_PcmBufFrmLenByt = AdoInptPt->m_Dvc.m_PcmBufFrmLenUnit * sizeof( int16_t ); //设置Pcm格式缓冲区帧的长度。
-
-				p_HRslt = AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt->SetOutputType( 0, &p_MediaTyp, 0 );
-				if( p_HRslt == S_FALSE )
-				{
-					MoFreeMediaType( &p_MediaTyp );
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：设置媒体类型失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
-				}
-
-				MoFreeMediaType( &p_MediaTyp );
-
-				p_HRslt = CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&AdoInptPt->m_Dvc.m_GlblIntfcTablePt ); //初始化设备全局接口表。
+				p_HRslt = AdoInptPt->m_Dvc.m_ClntPt->GetService( IID_IAcousticEchoCancellationControl, ( void * * )&AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt );
 				if( p_HRslt != S_OK )
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化设备的全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：获取声学回音消除控制器失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+					goto OutOneInitSystemAecNsAgc;
 				}
 
-				p_HRslt = AdoInptPt->m_Dvc.m_GlblIntfcTablePt->RegisterInterfaceInGlobal( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt, IID_IMediaObject, &AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjCookie ); //注册系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象到全局接口表。
+				p_HRslt = AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_Pt->GetId( &p_AdoOtptDvcIdStrPt );
 				if( p_HRslt != S_OK )
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：注册系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象到全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：获取音频输出设备的Id字符串失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+					goto OutOneInitSystemAecNsAgc;
+				}
+
+				p_HRslt = AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt->SetEchoCancellationRenderEndpoint( p_AdoOtptDvcIdStrPt );
+				if( p_HRslt != S_OK )
+				{
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：设置声学回音消除参考的音频输出设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+					goto OutOneInitSystemAecNsAgc;
+				}
+
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器成功。" ) );
+				
+				p_OneInitSystemAecNsAgcRslt = 0; //设置本处理段执行成功。
+
+				OutOneInitSystemAecNsAgc:
+				if( p_OneInitSystemAecNsAgcRslt != 0 ) //如果本处理段执行失败。
+				{
+					if( p_AdoOtptDvcIdStrPt != NULL )
+					{
+						CoTaskMemFree( p_AdoOtptDvcIdStrPt );
+						p_AdoOtptDvcIdStrPt = NULL;
+					}
+					if( AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt != NULL )
+					{
+						AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt->Release();
+						AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt = NULL;
+					}
+					if( AdoInptPt->m_Dvc.m_WaveFmtExPt != NULL ) //销毁设备的格式。
+					{
+						CoTaskMemFree( AdoInptPt->m_Dvc.m_WaveFmtExPt );
+						AdoInptPt->m_Dvc.m_WaveFmtExPt = NULL;
+					}
+					if( AdoInptPt->m_Dvc.m_ClntPt != NULL ) //销毁设备的客户端。
+					{
+						AdoInptPt->m_Dvc.m_ClntPt->Stop();
+						AdoInptPt->m_Dvc.m_ClntPt->Release();
+						AdoInptPt->m_Dvc.m_ClntPt = NULL;
+					}
 				}
 			}
 
-			//初始化系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象。
+			//初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+			if( AdoInptPt->m_Dvc.m_ClntPt == NULL ) //如果初始化第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。
 			{
-				AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt = ( DMO_OUTPUT_DATA_BUFFER * )calloc( 1, sizeof( DMO_OUTPUT_DATA_BUFFER ) );
-				if( AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt == NULL )
+				int p_TwoInitSystemAecNsAgcRslt = -1; //存放本处理段执行结果，为0表示成功，为非0表示失败。
+
+				if( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_IsInit == 0 )
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象失败。原因：内存不足。" ) );
-					goto Out;
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：没有初始化音频输出，会导致第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器不会输出音频数据。" ) );
+					goto OutTwoInitSystemAecNsAgc;
 				}
-				class MyMediaBuffer final : public IMediaBuffer
+
+				if( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_WaveFmtExPt->nChannels >= 8 )
 				{
-				public:
-					BYTE m_BufArr[ 4096 ];
-					DWORD m_BufLenByt;
-					ULONG m_RefCnt;
+					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：音频输出大于等于8声道，会导致第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器无法正常工作。" ) );
+					goto OutTwoInitSystemAecNsAgc;
+				}
 
-					MyMediaBuffer()
-					{
-						m_BufLenByt = 0;
-						m_RefCnt = 0;
-						AddRef();
-					}
-
-					~MyMediaBuffer()
-					{
-
-					}
-					
-					HRESULT STDMETHODCALLTYPE QueryInterface( REFIID riid, _COM_Outptr_ void __RPC_FAR *__RPC_FAR * ppvObject )
-					{
-						if( !ppvObject )
-						{
-							return E_POINTER;
-						}
-						else if( riid != IID_IMediaBuffer && riid != IID_IUnknown )
-						{
-							return E_NOINTERFACE;
-						}
-
-						*ppvObject = static_cast< IMediaBuffer * >( this );
-						AddRef();
-						return S_OK;
-					}
-					
-					ULONG STDMETHODCALLTYPE AddRef()
-					{
-						return InterlockedIncrement( &m_RefCnt );
-					}
-
-					ULONG STDMETHODCALLTYPE Release()
-					{
-						LONG p_RefCnt = InterlockedDecrement( &m_RefCnt );
-						if( p_RefCnt == 0 )
-						{
-							delete this;
-						}
-						return p_RefCnt;
-					}
-
-					HRESULT STDMETHODCALLTYPE SetLength( DWORD cbLength )
-					{
-						int p_Rslt = S_FALSE; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-
-						if( cbLength > sizeof( m_BufArr ) )
-						{
-							goto Out;
-						}
-
-						m_BufLenByt = cbLength;
-
-						p_Rslt = S_OK; //设置本函数执行成功。
-
-						Out:
-						//if( p_Rslt != 0 ) //如果本函数执行失败。
-						{
-
-						}
-						return p_Rslt;
-					}
-
-					HRESULT STDMETHODCALLTYPE GetMaxLength( DWORD * pcbMaxLength )
-					{
-						int p_Rslt = S_FALSE; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-
-						if( pcbMaxLength == NULL )
-						{
-							goto Out;
-						}
-
-						*pcbMaxLength = sizeof( m_BufArr );
-
-						p_Rslt = S_OK; //设置本函数执行成功。
-
-						Out:
-						//if( p_Rslt != 0 ) //如果本函数执行失败。
-						{
-
-						}
-						return p_Rslt;
-					}
-
-					HRESULT STDMETHODCALLTYPE GetBufferAndLength( _Outptr_opt_result_bytebuffer_( *pcbLength ) BYTE * * ppBuffer, DWORD * pcbLength )
-					{
-						int p_Rslt = S_FALSE; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-
-						if( ppBuffer != NULL ) *ppBuffer = m_BufArr;
-						if( pcbLength != NULL ) *pcbLength = m_BufLenByt;
-
-						p_Rslt = S_OK; //设置本函数执行成功。
-
-						Out:
-						//if( p_Rslt != 0 ) //如果本函数执行失败。
-						{
-
-						}
-						return p_Rslt;
-					}
-				};
-				AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt->pBuffer = new MyMediaBuffer();
-				if( AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt->pBuffer == NULL )
+				//初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象。
 				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象失败。原因：内存不足。" ) );
-					goto Out;
+					UINT p_AdoOtptDvcId; //存放音频输出设备的标识符，取值范围为从1到音频输出设备的总数，为0表示使用默认设备。
+
+					//设置音频输出设备标识符。
+					if( MediaPocsThrdGetAdoOtptDvcId( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_NameVstrPt, &p_AdoOtptDvcId, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：获取音频输出设备名称[%vs]的标识符失败。原因：%vs" ), AdoInptPt->m_Dvc.m_NameVstrPt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+
+					p_HRslt = CoCreateInstance( CLSID_CWMAudioAEC, NULL, CLSCTX_INPROC_SERVER, IID_IMediaObject, ( void * * )&AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt );
+					if( p_HRslt != S_OK )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+
+					IPropertyStore * p_PrptStorPt;
+					PROPVARIANT p_ProVar = { 0 };
+					p_HRslt = AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt->QueryInterface( IID_IPropertyStore, ( void * * )&p_PrptStorPt );
+					if( p_HRslt != S_OK )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：获取第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的属性接口失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+					p_ProVar.vt = VT_I4;
+					p_ProVar.intVal = ( ( p_AdoInptDvcId - 1 ) & 0xFFFF ) | ( ( ( p_AdoOtptDvcId - 1 ) & 0xFFFF ) << 16 );
+					p_PrptStorPt->SetValue( MFPKEY_WMAAECMA_DEVICE_INDEXES, p_ProVar ); //设置音频输入输出设备的索引。
+					p_ProVar.vt = VT_BOOL;
+					p_ProVar.boolVal = VARIANT_FALSE;
+					p_PrptStorPt->SetValue( MFPKEY_WMAAECMA_MIC_GAIN_BOUNDER, p_ProVar ); //关闭修改麦克风增益边界功能。因为打开时系统自带的声学回音消除器会自动调节麦克风的系统音量，不太友好。
+					p_PrptStorPt->Release();
+
+					DMO_MEDIA_TYPE p_MediaTyp;
+					p_MediaTyp.majortype = MEDIATYPE_Audio;
+					p_MediaTyp.subtype = MEDIASUBTYPE_PCM;
+					p_MediaTyp.lSampleSize = 0;
+					p_MediaTyp.bFixedSizeSamples = TRUE;
+					p_MediaTyp.bTemporalCompression = FALSE;
+					p_MediaTyp.formattype = FORMAT_WaveFormatEx;
+
+					p_HRslt = MoInitMediaType( &p_MediaTyp, sizeof( WAVEFORMATEX ) );
+					if( p_HRslt != S_OK )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：初始化媒体类型失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+
+					WAVEFORMATEX * p_WaveFmtExPt = ( WAVEFORMATEX * )p_MediaTyp.pbFormat;
+					p_WaveFmtExPt->wFormatTag = WAVE_FORMAT_PCM;
+					p_WaveFmtExPt->nChannels = 1;
+					p_WaveFmtExPt->nSamplesPerSec = ( AdoInptPt->m_SmplRate <= 22050 ) ? AdoInptPt->m_SmplRate : 22050;
+					p_WaveFmtExPt->nAvgBytesPerSec = p_WaveFmtExPt->nSamplesPerSec * 2;
+					p_WaveFmtExPt->wBitsPerSample = 16;
+					p_WaveFmtExPt->nBlockAlign = p_WaveFmtExPt->wBitsPerSample / 8;
+					p_WaveFmtExPt->cbSize = 0;
+					AdoInptPt->m_Dvc.m_WaveFmtExPt = ( WAVEFORMATEX * )CoTaskMemAlloc( sizeof( WAVEFORMATEX ) );
+					if( AdoInptPt->m_Dvc.m_WaveFmtExPt == NULL )
+					{
+						MoFreeMediaType( &p_MediaTyp );
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：创建格式的内存块失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+					memcpy( AdoInptPt->m_Dvc.m_WaveFmtExPt, p_WaveFmtExPt, sizeof( WAVEFORMATEX ) );
+
+					p_HRslt = AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt->SetOutputType( 0, &p_MediaTyp, 0 );
+					if( p_HRslt == S_FALSE )
+					{
+						MoFreeMediaType( &p_MediaTyp );
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：设置媒体类型失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+
+					MoFreeMediaType( &p_MediaTyp );
+
+					p_HRslt = CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&AdoInptPt->m_Dvc.m_GlblIntfcTablePt ); //初始化设备全局接口表。
+					if( p_HRslt != S_OK )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：初始化设备的全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+
+					p_HRslt = AdoInptPt->m_Dvc.m_GlblIntfcTablePt->RegisterInterfaceInGlobal( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt, IID_IMediaObject, &AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjCookie ); //注册系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象到全局接口表。
+					if( p_HRslt != S_OK )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：注册第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象到全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+				}
+
+				//初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象。
+				{
+					AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt = ( DMO_OUTPUT_DATA_BUFFER * )calloc( 1, sizeof( DMO_OUTPUT_DATA_BUFFER ) );
+					if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt == NULL )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：初始化输出数据缓冲区对象失败。原因：内存不足。" ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+					class MyMediaBuffer final : public IMediaBuffer
+					{
+					public:
+						BYTE m_BufArr[ 4096 ];
+						DWORD m_BufLenByt;
+						ULONG m_RefCnt;
+
+						MyMediaBuffer()
+						{
+							m_BufLenByt = 0;
+							m_RefCnt = 0;
+							AddRef();
+						}
+
+						~MyMediaBuffer()
+						{
+
+						}
+					
+						HRESULT STDMETHODCALLTYPE QueryInterface( REFIID riid, _COM_Outptr_ void __RPC_FAR *__RPC_FAR * ppvObject )
+						{
+							if( !ppvObject )
+							{
+								return E_POINTER;
+							}
+							else if( riid != IID_IMediaBuffer && riid != IID_IUnknown )
+							{
+								return E_NOINTERFACE;
+							}
+
+							*ppvObject = static_cast< IMediaBuffer * >( this );
+							AddRef();
+							return S_OK;
+						}
+					
+						ULONG STDMETHODCALLTYPE AddRef()
+						{
+							return InterlockedIncrement( &m_RefCnt );
+						}
+
+						ULONG STDMETHODCALLTYPE Release()
+						{
+							LONG p_RefCnt = InterlockedDecrement( &m_RefCnt );
+							if( p_RefCnt == 0 )
+							{
+								delete this;
+							}
+							return p_RefCnt;
+						}
+
+						HRESULT STDMETHODCALLTYPE SetLength( DWORD cbLength )
+						{
+							int p_Rslt = S_FALSE; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+
+							if( cbLength > sizeof( m_BufArr ) )
+							{
+								goto Out;
+							}
+
+							m_BufLenByt = cbLength;
+
+							p_Rslt = S_OK; //设置本函数执行成功。
+
+							Out:
+							//if( p_Rslt != 0 ) //如果本函数执行失败。
+							{
+
+							}
+							return p_Rslt;
+						}
+
+						HRESULT STDMETHODCALLTYPE GetMaxLength( DWORD * pcbMaxLength )
+						{
+							int p_Rslt = S_FALSE; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+
+							if( pcbMaxLength == NULL )
+							{
+								goto Out;
+							}
+
+							*pcbMaxLength = sizeof( m_BufArr );
+
+							p_Rslt = S_OK; //设置本函数执行成功。
+
+							Out:
+							//if( p_Rslt != 0 ) //如果本函数执行失败。
+							{
+
+							}
+							return p_Rslt;
+						}
+
+						HRESULT STDMETHODCALLTYPE GetBufferAndLength( _Outptr_opt_result_bytebuffer_( *pcbLength ) BYTE * * ppBuffer, DWORD * pcbLength )
+						{
+							int p_Rslt = S_FALSE; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+
+							if( ppBuffer != NULL ) *ppBuffer = m_BufArr;
+							if( pcbLength != NULL ) *pcbLength = m_BufLenByt;
+
+							p_Rslt = S_OK; //设置本函数执行成功。
+
+							Out:
+							//if( p_Rslt != 0 ) //如果本函数执行失败。
+							{
+
+							}
+							return p_Rslt;
+						}
+					};
+					AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer = new MyMediaBuffer();
+					if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer == NULL )
+					{
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器失败。原因：初始化输出数据缓冲区对象失败。原因：内存不足。" ) );
+						goto OutTwoInitSystemAecNsAgc;
+					}
+				}
+				
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器成功。" ) );
+
+				p_TwoInitSystemAecNsAgcRslt = 0; //设置本处理段执行成功。
+
+				OutTwoInitSystemAecNsAgc:
+				if( p_TwoInitSystemAecNsAgcRslt != 0 ) //如果本处理段执行失败。
+				{
+					if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt != NULL )
+					{
+						if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer != NULL )
+						{
+							AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer->Release();
+							AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer = NULL;
+						}
+						free( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt );
+						AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt = NULL;
+					}
+					if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt != NULL )
+					{
+						AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt->FreeStreamingResources();
+						AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt->Release();
+						AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt = NULL;
+					}
 				}
 			}
 		}
-		else //如果不使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+
+		if( ( AdoInptPt->m_Dvc.m_ClntPt == NULL ) && ( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt == NULL ) )
 		{
-			if( p_AdoInptDvcId == 0 ) //如果要使用默认的设备。
-			{
-				p_HRslt = AdoInptPt->m_Dvc.m_EnumPt->GetDefaultAudioEndpoint( eCapture, eConsole, &AdoInptPt->m_Dvc.m_Pt ); //初始化设备。
-				if( p_HRslt != S_OK )
-				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) ToastFmt( AdoInptPt->m_MediaPocsThrdPt->m_ShowToastWndHdl, 3000, NULL, Cu8vstr( "媒体处理线程：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
-				}
-			}
-			else //如果要使用指定的设备。
-			{
-				p_HRslt = AdoInptPt->m_Dvc.m_EnumPt->EnumAudioEndpoints( eCapture, DEVICE_STATE_ACTIVE, &AdoInptPt->m_Dvc.m_ClctPt ); //获取设备收集器。只收集激活的设备。
-				if( p_HRslt != S_OK )
-				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取设备收集器失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
-				}
-
-				p_HRslt = AdoInptPt->m_Dvc.m_ClctPt->Item( p_AdoInptDvcId - 1, &AdoInptPt->m_Dvc.m_Pt ); //初始化设备。
-				if( p_HRslt != S_OK )
-				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) ToastFmt( AdoInptPt->m_MediaPocsThrdPt->m_ShowToastWndHdl, 3000, NULL, Cu8vstr( "媒体处理线程：音频输入：初始化设备失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-					goto Out;
-				}
-			}
-
 			p_HRslt = AdoInptPt->m_Dvc.m_Pt->Activate( IID_IAudioClient, CLSCTX_INPROC_SERVER, NULL, ( void * * )&AdoInptPt->m_Dvc.m_ClntPt ); //激活设备的客户端接口。
 			if( p_HRslt != S_OK )
 			{
@@ -1292,7 +1444,10 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：初始化设备的客户端失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 				goto Out;
 			}
+		}
 
+		if( AdoInptPt->m_Dvc.m_ClntPt != NULL )
+		{
 			p_HRslt = AdoInptPt->m_Dvc.m_ClntPt->GetBufferSize( &AdoInptPt->m_Dvc.m_BufSzUnit ); //获取设备的缓冲区大小。
 			if( p_HRslt != S_OK )
 			{
@@ -1306,7 +1461,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输入：获取设备的捕获客户端失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 				goto Out;
 			}
-			
+
 			p_HRslt = CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&AdoInptPt->m_Dvc.m_GlblIntfcTablePt ); //初始化设备全局接口表。
 			if( p_HRslt != S_OK )
 			{
@@ -1354,11 +1509,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 			}
 		}
 
-		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
-		{
-			if( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt != NULL ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化系统自带的声学回音消除器、噪音抑制器和自动增益控制器成功。" ) );
-			else LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化设备成功。采样频率：%z32d, 声道数：%z16d，缓冲区大小：%uz32d。" ), AdoInptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec, AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels, AdoInptPt->m_Dvc.m_BufSzUnit );
-		}
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化设备成功。采样频率：%z32d, 声道数：%z16d，缓冲区大小：%uz32d。" ), AdoInptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec, AdoInptPt->m_Dvc.m_WaveFmtExPt->nChannels, AdoInptPt->m_Dvc.m_BufSzUnit );
 	}
 
 	//初始化Pcm格式原始帧容器。
@@ -1525,25 +1676,25 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 			AdoInptPt->m_Dvc.m_GlblIntfcTablePt->Release();
 			AdoInptPt->m_Dvc.m_GlblIntfcTablePt = NULL;
 		}
-		if( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt != NULL )
+		if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt != NULL )
 		{
-			if( AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt != NULL ) //销毁系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象。
+			if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt != NULL ) //销毁第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象。
 			{
-				if( AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt->pBuffer != NULL )
+				if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer != NULL )
 				{
-					AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt->pBuffer->Release();
-					AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt->pBuffer = NULL;
+					AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer->Release();
+					AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer = NULL;
 				}
-				free( AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt );
-				AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt = NULL;
+				free( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt );
+				AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt = NULL;
 			}
-			if( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt != NULL ) //销毁系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象。
+			if( AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt != NULL ) //销毁第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象。
 			{
-				AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt->FreeStreamingResources();
-				AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt->Release();
-				AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjPt = NULL;
+				AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt->FreeStreamingResources();
+				AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt->Release();
+				AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcMediaObjPt = NULL;
 			}
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：销毁系统自带的声学回音消除器、噪音抑制器和自动增益控制器成功。" ) );
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：销毁第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器成功。" ) );
 		}
 		if( AdoInptPt->m_Dvc.m_Pt != NULL )
 		{
@@ -1551,6 +1702,11 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 			{
 				AdoInptPt->m_Dvc.m_CptrClntPt->Release();
 				AdoInptPt->m_Dvc.m_CptrClntPt = NULL;
+			}
+			if( AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt != NULL ) //销毁第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器的声学回音消除控制器。
+			{
+				AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt->Release();
+				AdoInptPt->m_Dvc.m_OneSystemAecNsAgcAecCtrlPt = NULL;
 			}
 			AdoInptPt->m_Dvc.m_BufSzUnit = 0; //销毁设备的缓冲区大小。
 			if( AdoInptPt->m_Dvc.m_WaveFmtExPt != NULL ) //销毁设备的格式。
@@ -1684,7 +1840,7 @@ void AdoInptDstoy( AdoInpt * AdoInptPt )
 
 DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 {
-	IMediaObject * p_SystemAecNsAgcMediaObjPt = NULL; //存放系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的指针。
+	IMediaObject * p_TwoSystemAecNsAgcMediaObjPt = NULL; //存放第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的指针。
 	IAudioCaptureClient * p_DvcCptrClntPt = NULL; //存放设备捕获客户端的指针。
 	int16_t * p_PcmBufFrmPt; //存放Pcm格式缓冲区帧的指针。
 	UINT32 p_DvcBufLenUnit; //存放设备缓冲区的长度，单位为采样单元。
@@ -1712,7 +1868,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&p_DvcGlblIntfcTablePt );
 		if( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjCookie != 0 )
 		{
-			p_DvcGlblIntfcTablePt->GetInterfaceFromGlobal( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjCookie, IID_IMediaObject, ( void * * )&p_SystemAecNsAgcMediaObjPt );
+			p_DvcGlblIntfcTablePt->GetInterfaceFromGlobal( AdoInptPt->m_Dvc.m_SystemAecNsAgcMediaObjCookie, IID_IMediaObject, ( void * * )&p_TwoSystemAecNsAgcMediaObjPt );
 		}
 		else
 		{
@@ -1797,7 +1953,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		#endif
 	} //自适应设置回音延迟完毕。
 	{
-		if( p_SystemAecNsAgcMediaObjPt != NULL ) p_SystemAecNsAgcMediaObjPt->AllocateStreamingResources(); //让音频输入设备开始录音。
+		if( p_TwoSystemAecNsAgcMediaObjPt != NULL ) p_TwoSystemAecNsAgcMediaObjPt->AllocateStreamingResources(); //让音频输入设备开始录音。
 		else AdoInptPt->m_Dvc.m_ClntPt->Start(); //让音频输入设备开始录音。
 		AdoInptPt->m_Thrd.m_IsStartAdoOtptThrd = 1; //设置已开始音频输出线程。在开始音频输出线程前设置，这样可以保证不会误判断。
 		if( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) //如果已初始化音频输出。
@@ -1812,18 +1968,18 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 	while( 1 )
 	{
 		{
-			if( p_SystemAecNsAgcMediaObjPt != NULL ) //如果要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+			if( p_TwoSystemAecNsAgcMediaObjPt != NULL ) //如果要使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
 			{
-				p_HRslt = p_SystemAecNsAgcMediaObjPt->ProcessOutput( DMO_PROCESS_OUTPUT_DISCARD_WHEN_NO_BUFFER, 1, AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt, &p_DvcBufFlag ); //从系统自带的声学回音消除器、噪音抑制器和自动增益控制器获取Pcm格式缓冲区帧。
+				p_HRslt = p_TwoSystemAecNsAgcMediaObjPt->ProcessOutput( DMO_PROCESS_OUTPUT_DISCARD_WHEN_NO_BUFFER, 1, AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt, &p_DvcBufFlag ); //从第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器获取Pcm格式缓冲区帧。
 				if( p_HRslt == S_OK ) //如果获取成功。
 				{
-					AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt->pBuffer->GetBufferAndLength( ( BYTE * * )&p_PcmBufFrmPt, ( DWORD * )&p_DvcBufLenByt );
+					AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer->GetBufferAndLength( ( BYTE * * )&p_PcmBufFrmPt, ( DWORD * )&p_DvcBufLenByt );
 					if( p_DvcBufLenByt > 0 )
 					{
 						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：PcmBufFrmPt：%P，p_DvcBufLenByt：%uz32d，DvcBufFlag：%uz32d。" ), p_PcmBufFrmPt, p_DvcBufLenByt, p_DvcBufFlag );
 						//fwrite( p_PcmBufFrmPt, p_DvcBufLenByt, 1, AdoInptFile1Pt );
 						AdoInptPt->m_Dvc.m_PcmBufFrmBufQueue.PutTail( p_PcmBufFrmPt, p_DvcBufLenByt, 0, NULL ); //将Pcm格式缓冲区帧放入Pcm格式缓冲区帧的缓冲区队列。
-						AdoInptPt->m_Dvc.m_SystemAecNsAgcOtptDataBufPt->pBuffer->SetLength( 0 ); //清空系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区。
+						AdoInptPt->m_Dvc.m_TwoSystemAecNsAgcOtptDataBufPt->pBuffer->SetLength( 0 ); //清空第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区。
 					}
 
 					AdoInptPt->m_Dvc.m_PcmBufFrmBufQueue.GetLen( &p_TmpSz, 0, NULL ); //获取Pcm格式缓冲区帧缓冲区队列的长度。
@@ -1833,7 +1989,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 				{
 					if( p_HRslt != S_FALSE ) //如果是其他错误。
 					{
-						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息，或系统自带的声学回音消除器、噪音抑制器和自动增益控制器不支持该设备，发送音频输入设备关闭线程消息。" ) );
+						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：接收设备关闭消息，或第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器不支持该设备，发送音频输入设备关闭线程消息。" ) );
 						{
 							MediaPocsThrd::ThrdMsgAdoInptDvcClos p_ThrdMsgAdoInptDvcClos;
 							if( MsgQueueSendMsg( AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcClos, &p_ThrdMsgAdoInptDvcClos, sizeof( p_ThrdMsgAdoInptDvcClos ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
@@ -1846,7 +2002,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 					goto OutPocs;
 				}
 			}
-			else //如果不使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+			else //如果不使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
 			{
 				//获取设备的缓冲区，并将Pcm格式缓冲区帧放入Pcm格式缓冲区帧的缓冲区队列。
 				p_HRslt = p_DvcCptrClntPt->GetBuffer( ( BYTE * * )&p_PcmBufFrmPt, &p_DvcBufLenUnit, &p_DvcBufFlag, NULL, NULL ); //获取设备的Pcm格式缓冲区。
@@ -1998,7 +2154,7 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		}
 	} //音频输入循环结束。
 
-	if( p_SystemAecNsAgcMediaObjPt != NULL ) p_SystemAecNsAgcMediaObjPt->Release();
+	if( p_TwoSystemAecNsAgcMediaObjPt != NULL ) p_TwoSystemAecNsAgcMediaObjPt->Release();
 	if( p_DvcCptrClntPt != NULL ) p_DvcCptrClntPt->Release();
 
 	/*if( AdoInptFile1Pt != NULL ) fclose( AdoInptFile1Pt );

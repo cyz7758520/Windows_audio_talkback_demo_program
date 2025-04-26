@@ -102,13 +102,6 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * Use
 		goto Out;
 	}
 	
-	//设置最小计时器分辨率为1毫秒，可以防止Sleep()函数休眠时间过长。放在这里是防止下面的代码初始化失败导致跳过设置最小计时器分辨率，从而在调用销毁函数时多取消了一次最小计时器分辨率。
-	if( timeBeginPeriod( 1 ) != TIMERR_NOERROR )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置最小计时器分辨率失败。" ), , );
-		goto Out;
-	}
-	
 	if( MsgQueueInit( &p_SrvrThrdPt->m_ThrdMsgQueuePt, NULL, p_SrvrThrdPt, ( MsgQueue::MsgQueueUserMsgPocsFuncPt )SrvrThrdThrdMsgPocs, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化线程消息队列失败。原因：" ) );
@@ -266,9 +259,6 @@ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 	{
 		MsgQueueDstoy( SrvrThrdPt->m_ThrdMsgQueuePt, NULL );
 	}
-
-	//取消最小计时器分辨率。
-	timeEndPeriod( 1 );
 
 	//销毁服务端线程内存块。
 	free( SrvrThrdPt );
@@ -607,7 +597,7 @@ int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * Lc
 
 	if( IsTcpOrAudpPrtcl == 0 ) //如果要使用Tcp协议。
 	{
-		if( TcpSrvrInit( &SrvrThrdPt->m_TcpSrvrSoktPt, p_RmtNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, 1, 1, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议服务端套接字成功。
+		if( TcpSrvrInit( &SrvrThrdPt->m_TcpSrvrSoktPt, p_RmtNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, 1, 1, 5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议服务端套接字成功。
 		{
 			if( TcpSrvrGetLclAddr( SrvrThrdPt->m_TcpSrvrSoktPt, NULL, SrvrThrdPt->m_Thrd.m_LclNodeAddrPt, SrvrThrdPt->m_Thrd.m_LclNodePortPt, 0, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取本端TCP协议服务端套接字绑定的本地节点地址和端口失败。
 			{

@@ -199,12 +199,13 @@ typedef struct AdoInpt //存放音频输入。
 		Vstr * m_NameVstrPt; //存放名称动态字符串的指针。
 		IMMDeviceEnumerator * m_EnumPt; //存放枚举器的指针。
 		IMMNotificationClient * m_NotificationClientPt; //存放默认设备改变消息客户端的指针。
-		IMediaObject * m_SystemAecNsAgcMediaObjPt; //存放系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的指针。
-		DMO_OUTPUT_DATA_BUFFER * m_SystemAecNsAgcOtptDataBufPt; //存放系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象的指针。
+		IMediaObject * m_TwoSystemAecNsAgcMediaObjPt; //存放第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的指针。
+		DMO_OUTPUT_DATA_BUFFER * m_TwoSystemAecNsAgcOtptDataBufPt; //存放第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象的指针。
 		IMMDeviceCollection * m_ClctPt; //存放收集器的指针。
 		IMMDevice * m_Pt; //存放指针。
-		IAudioClient * m_ClntPt; //存放客户端的指针。
+		IAudioClient2 * m_ClntPt; //存放客户端的指针。
 		WAVEFORMATEX * m_WaveFmtExPt; //存放格式的指针。
+		IAcousticEchoCancellationControl * m_OneSystemAecNsAgcAecCtrlPt; //存放第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器的声学回音消除控制器的指针。
 		UINT32 m_BufSzUnit; //存放缓冲区大小，单位为采样单元。
 		IAudioCaptureClient * m_CptrClntPt; //存放捕获客户端的指针。
 		IGlobalInterfaceTable * m_GlblIntfcTablePt; //存放全局接口表的指针。

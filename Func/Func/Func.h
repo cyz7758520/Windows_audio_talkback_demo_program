@@ -11,7 +11,8 @@
 #include <string.h>							//memchr、memcmp、memcpy、memmove、memset、strcat、strncat、strchr、strcmp、strncmp、strcoll、strcpy、strncpy、strcspn、strerror、strlen、strpbrk、strrchr、strspn、strstr、strtok、strxfrm
 #include <inttypes.h>						//PRId*、PRIi*、PRIu*、PRIo*、PRIx*、PRIX*、SCNd*、SCNi*、SCNu*、SCNo*、SCNx*
 #include <locale.h>							//setlocale
-#include <math.h>
+#define _USE_MATH_DEFINES					//设置包含数学定义宏
+#include <math.h>							//M_E、M_PI
 
 #ifdef __cplusplus
 #include <iostream>							//std::cin、std::cout
@@ -29,13 +30,14 @@
 #endif
 
 #if( defined __MS_VCXX__ )
-#include <winsdkver.h>						//包含Windows SDK支持的最高版本Windows的相关宏
+#include <winsdkver.h>						//包含Windows SDK支持的最高版本Windows的相关宏、_WIN32_MAXVER、_WIN32_WINDOWS_MAXVER、NTDDI_MAXVER、_WIN32_IE_MAXVER、_WIN32_WINNT_MAXVER、WINVER_MAXVER、
 #define _WIN32_WINNT     0xFFFF				//设置_WIN32_WINNT宏为最高版本Windows
 #define WINVER           0xFFFF				//设置WINVER宏为最高版本Windows
 #define NTDDI_VERSION    0xFFFFFFFF			//设置NTDDI_VERSION宏为最高版本Windows
 #define _WIN32_IE        0xFFFF				//设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN					//设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
 #define NOMINMAX							//设置NOMINMAX宏，防止min和max被定义为宏
+#define _CRTDBG_MAP_ALLOC					//设置检查内存泄漏宏
 #include <windows.h>						//包含整个Windows SDK支持的API
 #include <windowsx.h>						//ComboBox_AddString、ComboBox_ResetContent
 #include <commctrl.h>						//ListView_InsertItem、ListView_DeleteItem、ListView_DeleteAllItems、ListView_SetItem、ListView_GetItem
@@ -70,7 +72,6 @@
 #include <initguid.h>						//必须放在mmdeviceapi.h前面，其他的后面。
 #include <mmdeviceapi.h>					//IMMDevice、IMMDeviceEnumerator、IMMDeviceCollection、IMMNotificationClient、PROPVARIANT、
 
-
 #undef StrCpy
 #undef StrTrim
 #undef StrToInt
@@ -79,8 +80,10 @@
 #define CLSID_MMDeviceEnumerator __uuidof( MMDeviceEnumerator )
 #define IID_IMMDeviceEnumerator __uuidof( IMMDeviceEnumerator )
 #define IID_IAudioClient __uuidof( IAudioClient )
+#define IID_IAudioClient2 __uuidof( IAudioClient2 )
 #define IID_IAudioCaptureClient __uuidof( IAudioCaptureClient )
 #define IID_IAudioRenderClient __uuidof( IAudioRenderClient )
+#define IID_IAcousticEchoCancellationControl __uuidof( IAcousticEchoCancellationControl )
 
 //获取位置结构体的宽度和高度。
 #define RectWidth( Rect ) ( ( Rect ).right - ( Rect ).left )

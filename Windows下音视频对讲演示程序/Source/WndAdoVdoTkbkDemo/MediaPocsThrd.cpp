@@ -103,13 +103,6 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, const void * LicnCod
 		goto Out;
 	}
 	
-	//设置最小计时器分辨率为1毫秒，可以防止Sleep()函数休眠时间过长。放在这里是防止下面的代码初始化失败导致跳过设置最小计时器分辨率，从而在调用销毁函数时多取消了一次最小计时器分辨率。
-	if( timeBeginPeriod( 1 ) != TIMERR_NOERROR )
-	{
-		VstrCpy( ErrInfoVstrPt, Cu8vstr( "设置最小计时器分辨率失败。" ), , );
-		goto Out;
-	}
-	
 	p_MediaPocsThrdPt->m_LastCallUserInitOrDstoy = 1; //设置上一次调用了用户定义的销毁函数。
 
 	if( MsgQueueInit( &p_MediaPocsThrdPt->m_ThrdMsgQueuePt, NULL, p_MediaPocsThrdPt, ( MsgQueue::MsgQueueUserMsgPocsFuncPt )MediaPocsThrdThrdMsgPocs, ErrInfoVstrPt ) != 0 )
@@ -337,9 +330,6 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 		MsgQueueDstoy( MediaPocsThrdPt->m_ThrdMsgQueuePt, NULL );
 	}
 
-	//取消最小计时器分辨率。
-	timeEndPeriod( 1 );
-
 	//销毁媒体处理线程内存块。
 	free( MediaPocsThrdPt );
 
@@ -435,6 +425,19 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT
 				}
 				VstrIns( p_AdoInptDvcNameArrPtPt[ 0 ], 0, Cu8vstr( "默认：" ) );
 				
+				{
+					LPWSTR p_AdoInptDvcIdStrPt = NULL;
+
+					p_HRslt = p_AdoInptDvcPt->GetId( &p_AdoInptDvcIdStrPt );
+
+					if( VstrFmtCat( p_AdoInptDvcNameArrPtPt[ 0 ], Cu8vstr( " (%z16s）" ), p_AdoInptDvcIdStrPt ) != 0 )
+					{
+						VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输入设备名称动态字符串失败。" ), , );
+						goto Out;
+					}
+					CoTaskMemFree( p_AdoInptDvcIdStrPt );
+				}
+
 				p_PrptStorePt->Release(); //销毁属性存储器。
 
 				p_AdoInptDvcPt->Release(); //销毁音频输入设备。
@@ -459,6 +462,19 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT
 			{
 				VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输入设备名称动态字符串失败。" ), , );
 				goto Out;
+			}
+
+			{
+				LPWSTR p_AdoInptDvcIdStrPt = NULL;
+
+				p_HRslt = p_AdoInptDvcPt->GetId( &p_AdoInptDvcIdStrPt );
+
+				if( VstrFmtCat( p_AdoInptDvcNameArrPtPt[ p_DvcNum ], Cu8vstr( " (%z16s）" ), p_AdoInptDvcIdStrPt ) != 0 )
+				{
+					VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输入设备名称动态字符串失败。" ), , );
+					goto Out;
+				}
+				CoTaskMemFree( p_AdoInptDvcIdStrPt );
 			}
 
 			p_PrptStorePt->Release(); //销毁属性存储器。
@@ -568,6 +584,19 @@ int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT
 				}
 				VstrIns( p_AdoOtptDvcNameArrPtPt[ 0 ], 0, Cu8vstr( "默认：" ) );
 				
+				{
+					LPWSTR p_AdoOtptDvcIdStrPt = NULL;
+
+					p_HRslt = p_AdoOtptDvcPt->GetId( &p_AdoOtptDvcIdStrPt );
+
+					if( VstrFmtCat( p_AdoOtptDvcNameArrPtPt[ 0 ], Cu8vstr( " (%z16s）" ), p_AdoOtptDvcIdStrPt ) != 0 )
+					{
+						VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输出设备名称动态字符串失败。" ), , );
+						goto Out;
+					}
+					CoTaskMemFree( p_AdoOtptDvcIdStrPt );
+				}
+
 				p_PrptStorePt->Release(); //销毁属性存储器。
 
 				p_AdoOtptDvcPt->Release(); //销毁音频输出设备。
@@ -592,6 +621,19 @@ int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT
 			{
 				VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输出设备名称动态字符串失败。" ), , );
 				goto Out;
+			}
+
+			{
+				LPWSTR p_AdoOtptDvcIdStrPt = NULL;
+
+				p_HRslt = p_AdoOtptDvcPt->GetId( &p_AdoOtptDvcIdStrPt );
+
+				if( VstrFmtCat( p_AdoOtptDvcNameArrPtPt[ p_DvcNum ], Cu8vstr( " (%z16s）" ), p_AdoOtptDvcIdStrPt ) != 0 )
+				{
+					VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建音频输出设备名称动态字符串失败。" ), , );
+					goto Out;
+				}
+				CoTaskMemFree( p_AdoOtptDvcIdStrPt );
 			}
 
 			p_PrptStorePt->Release(); //销毁属性存储器。
@@ -693,17 +735,7 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 
 					if( SUCCEEDED( p_PropertyBagPt->Read( L"DevicePath", &varName, 0 ) ) )
 					{
-						if( VstrCat( p_VdoInptDvcNameArrPtPt[ p_VdoInptDvcTotal - 1 ], Cu8vstr( " (" ) ) != 0 )
-						{
-							VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建视频输入设备名称动态字符串失败。" ), , );
-							goto Out;
-						}
-						if( VstrCat( p_VdoInptDvcNameArrPtPt[ p_VdoInptDvcTotal - 1 ], Cu16vstr( varName.bstrVal ) ) != 0 )
-						{
-							VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建视频输入设备名称动态字符串失败。" ), , );
-							goto Out;
-						}
-						if( VstrCat( p_VdoInptDvcNameArrPtPt[ p_VdoInptDvcTotal - 1 ], Cu8vstr( ")" ) ) != 0 )
+						if( VstrFmtCat( p_VdoInptDvcNameArrPtPt[ p_VdoInptDvcTotal - 1 ], Cu8vstr( " (%z16s）" ), varName.bstrVal ) != 0 )
 						{
 							VstrCpy( ErrInfoVstrPt, Cu8vstr( "创建视频输入设备名称动态字符串失败。" ), , );
 							goto Out;
@@ -3900,9 +3932,9 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			else //如果不使用音频输出。
 			{
-				if( ( MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_SystemAecNsAgcMediaObjPt != NULL ) ) //如果要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+				if( ( MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_TwoSystemAecNsAgcMediaObjPt != NULL ) ) //如果要使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
 				{
-					AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt ); //销毁并初始化音频输入设备和线程，因为系统自带的声学回音消除器、噪音抑制器和自动增益控制器没有音频输出无法工作。
+					AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt ); //销毁并初始化音频输入设备和线程，因为第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器没有音频输出无法工作。
 					AdoInptSetIsCanUseAec( &MediaPocsThrdPt->m_AdoInpt );
 					if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
 					MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_AdoInptStrmTimeStampIsReset = 1; //设置音视频输入输出Avi文件音频输入流时间戳要重置。

@@ -16,7 +16,8 @@ enum TcpCnctSts
 	TcpCnctStsFail, //连接状态：连接失败。
 };
 
-__SOKT_DLLAPI__ int TcpSrvrInit( TcpSrvrSokt * * TcpSrvrSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpSrvrInit( TcpSrvrSokt * * TcpSrvrSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, uint16_t TcpClntSoktNtwkTmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpSrvrDstoy( TcpSrvrSokt * TcpSrvrSoktPt, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int TcpSrvrLocked( TcpSrvrSokt * TcpSrvrSoktPt, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int TcpSrvrUnlock( TcpSrvrSokt * TcpSrvrSoktPt, Vstr * ErrInfoVstrPt );
@@ -25,10 +26,9 @@ __SOKT_DLLAPI__ int TcpSrvrGetLclAddr( TcpSrvrSokt * TcpSrvrSoktPt, int32_t * Lc
 
 __SOKT_DLLAPI__ int TcpSrvrAcpt( TcpSrvrSokt * TcpSrvrSoktPt, TcpClntSokt * * TcpClntSoktPtPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int TcpSrvrDstoy( TcpSrvrSokt * TcpSrvrSoktPt, Vstr * ErrInfoVstrPt );
 
-
-__SOKT_DLLAPI__ int TcpClntInit( TcpClntSokt * * TcpClntSoktPtPt, const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntInit( TcpClntSokt * * TcpClntSoktPtPt, const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NtwkTmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpClntDstoy( TcpClntSokt * TcpClntSoktPt, uint16_t TmotSec, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int TcpClntWaitCnct( TcpClntSokt * TcpClntSoktPt, uint16_t TmotMsec, TcpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt );
 
@@ -57,8 +57,6 @@ __SOKT_DLLAPI__ int TcpClntRecvPkt( TcpClntSokt * TcpClntSoktPt, void * PktPt, s
 __SOKT_DLLAPI__ int TcpClntSendApkt( TcpClntSokt * TcpClntSoktPt, const void * PktPt, size_t PktLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int TcpClntRecvApkt( TcpClntSokt * TcpClntSoktPt, void * PktPt, size_t PktSzByt, size_t * PktLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
-__SOKT_DLLAPI__ int TcpClntDstoy( TcpClntSokt * TcpClntSoktPt, uint16_t TmotSec, Vstr * ErrInfoVstrPt );
-
 #ifdef __cplusplus
 }
 #endif
@@ -73,8 +71,9 @@ public:
 	TcpClntSoktCls() { m_Pt = NULL; }
 	~TcpClntSoktCls() { Dstoy( UINT16_MAX, NULL ); }
 
-	int Init( const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, Vstr * ErrInfoVstrPt ) { return TcpClntInit( &m_Pt, RmtLclNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ErrInfoVstrPt ); }
-	
+	int Init( const int RmtLclNodeAddrFmly, const Vstr * RmtNodeNameVstrPt, const Vstr * RmtNodeSrvcVstrPt, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, uint16_t NtwkTmotMsec, Vstr * ErrInfoVstrPt ) { return TcpClntInit( &m_Pt, RmtLclNodeAddrFmly, RmtNodeNameVstrPt, RmtNodeSrvcVstrPt, LclNodeNameVstrPt, LclNodeSrvcVstrPt, NtwkTmotMsec, ErrInfoVstrPt ); }
+	int Dstoy( uint16_t TmotSec, Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpClntDstoy( m_Pt, TmotSec, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
+
 	int WaitCnct( uint16_t TmotMsec, TcpCnctSts * CnctStsPt, Vstr * ErrInfoVstrPt ) { return TcpClntWaitCnct( m_Pt, TmotMsec, CnctStsPt, ErrInfoVstrPt ); }
 
 	int Locked( Vstr * ErrInfoVstrPt ) { return TcpClntLocked( m_Pt, ErrInfoVstrPt ); }
@@ -101,8 +100,6 @@ public:
 	
 	int SendApkt( const void * DataPt, size_t DataLenByt, uint16_t TmotMsec, uint32_t Times, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntSendApkt( m_Pt, DataPt, DataLenByt, TmotMsec, Times, IsAutoLock, ErrInfoVstrPt ); }
 	int RecvApkt( void * DataPt, size_t DataSzByt, size_t * DataLenBytPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpClntRecvApkt( m_Pt, DataPt, DataSzByt, DataLenBytPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( uint16_t TmotSec, Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpClntDstoy( m_Pt, TmotSec, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 };
 
 class TcpSrvrSoktCls
@@ -113,15 +110,14 @@ public:
 	TcpSrvrSoktCls() { m_Pt = NULL; }
 	~TcpSrvrSoktCls() { Dstoy( NULL ); }
 
-	int Init( const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, Vstr * ErrInfoVstrPt ) { return TcpSrvrInit( &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, MaxWait, IsReuseAddr, ErrInfoVstrPt ); }
-	
+	int Init( const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, uint16_t TcpClntSoktNtwkTmotMsec, Vstr * ErrInfoVstrPt ) { return TcpSrvrInit( &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, MaxWait, IsReuseAddr, TcpClntSoktNtwkTmotMsec, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpSrvrDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
+
 	int Locked( Vstr * ErrInfoVstrPt ) { return TcpSrvrLocked( m_Pt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return TcpSrvrUnlock( m_Pt, ErrInfoVstrPt ); }
 
 	int GetLclAddr( int32_t * LclNodeAddrFmlyPt, Vstr * LclNodeAddrVstrPt, Vstr * LclNodePortVstrPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpSrvrGetLclAddr( m_Pt, LclNodeAddrFmlyPt, LclNodeAddrVstrPt, LclNodePortVstrPt, IsAutoLock, ErrInfoVstrPt ); }
 	
 	int Acpt( TcpClntSoktCls * TcpClntSoktClsPt, int32_t * RmtNodeAddrFmlyPt, Vstr * RmtNodeAddrVstrPt, Vstr * RmtNodePortVstrPt, uint16_t TmotMsec, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return TcpSrvrAcpt( m_Pt, &TcpClntSoktClsPt->m_Pt, RmtNodeAddrFmlyPt, RmtNodeAddrVstrPt, RmtNodePortVstrPt, TmotMsec, IsAutoLock, ErrInfoVstrPt ); }
-	
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpSrvrDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 };
 #endif
