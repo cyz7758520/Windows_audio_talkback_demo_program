@@ -36,22 +36,24 @@ __FUNC_DLLAPI__ int StrTrim( char * SrcStrPt, const char * TrimStrPt, char TrimP
 
 //__FUNC_DLLAPI__ int MemCmp( const void * Buf1Pt, const void * Buf2Pt, size_t MemSzByt );
 
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
-#if( ( defined __X86__ ) || ( defined __X64__ ) )
+#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) )
+
 //__FUNC_DLLAPI__ void * __cdecl memcpy( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
 //__FUNC_DLLAPI__ void * __cdecl memmove( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
-__FUNC_DLLAPI__ void * __cdecl MemCpy( void * DstPt, void const * SrcPt, size_t SzByt );
-__FUNC_DLLAPI__ void * __cdecl MemCpyAvx( void * DstPt, void const * SrcPt, size_t SzByt );
-__FUNC_DLLAPI__ void * __cdecl MemCpySse2( void * DstPt, void const * SrcPt, size_t SzByt );
-#elif( defined __ARMAT32__ )
-//__FUNC_DLLAPI__ void * __cdecl memcpy( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
-//__FUNC_DLLAPI__ void * __cdecl memmove( void * DstPt, void const * SrcPt, size_t SzByt ); //这里不需要声明，因为编译器会报重定义，不影响调用。
+
+#if( ( defined __X86__ ) || ( defined __X64__ ) || ( defined __ARMAT32__ ) || ( defined __ARMA64__ ) )
 __FUNC_DLLAPI__ void * __cdecl MemCpy( void * DstPt, void const * SrcPt, size_t SzByt );
 #endif
+
+#if( ( ( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) ) && ( ( defined __X86__ ) || ( defined __X64__ ) ) ) || ( ( ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) ) && ( defined __X64__ ) ) ) //Android x86下不能直接调用MemCpyAvx和MemCpySse2函数，因为MemCpy函数会获取GOT指针，而MemCpyAvx和MemCpySse2函数不会获取GOT指针。Harmony下只有x64。
+__FUNC_DLLAPI__ void * __cdecl MemCpyAvx( void * DstPt, void const * SrcPt, size_t SzByt );
+__FUNC_DLLAPI__ void * __cdecl MemCpySse2( void * DstPt, void const * SrcPt, size_t SzByt );
+#endif
+
 #endif
 
 //获取错误信息。
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
+#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) )
 typedef enum
 {
     ErrTypeErrno,

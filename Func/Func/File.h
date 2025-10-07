@@ -7,7 +7,6 @@ extern "C"
 {
 #endif
 
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 //文件。
 typedef struct File File;
 
@@ -60,21 +59,19 @@ __FUNC_DLLAPI__ int FileSetSz( File * FilePt, uint64_t SzByt, int32_t IsAutoLock
 __FUNC_DLLAPI__ int FileGetSz( File * FilePt, uint64_t * SzBytPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 
 __FUNC_DLLAPI__ int FileDstoy( File * FilePt, int32_t IsDstoyFd, Vstr * ErrInfoVstrPt );
-#endif
+
 
 //删除文件。
 __FUNC_DLLAPI__ int DelFile( const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt );
 
 //获取文件大小。
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 __FUNC_DLLAPI__ int FuncGetFileSzByPath( const Vstr * FullPathVstrPt, uint64_t * FileSzBytPt, Vstr * ErrInfoVstrPt );
-#endif
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __FUNC_DLLAPI__ int FuncGetFileSzByHdl( HANDLE FileHdl, uint64_t * FileSzBytPt, Vstr * ErrInfoVstrPt );
 #endif
 
 //路径字符串查找文件名。
-__FUNC_DLLAPI__ int FuncPathFindFileName( const Vstr * FullPathVstrPt, const void * * FileNameStrPtPt );
+__FUNC_DLLAPI__ int FuncPathFindFileName( const Vstr * FullPathVstrPt, const void * * FileNameStrPtPt, size_t * FileNameStrLenChrPt );
 
 //路径字符串移除文件名。
 __FUNC_DLLAPI__ int FuncPathRmvFileName( Vstr * FullPathVstrPt );

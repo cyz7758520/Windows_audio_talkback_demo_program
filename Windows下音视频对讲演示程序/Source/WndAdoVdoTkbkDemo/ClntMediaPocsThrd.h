@@ -44,6 +44,7 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 	{
 		CnctStsWait, //等待远端接受连接。
 		CnctStsCnct, //已连接。
+		CnctStsSrvrMaxCnct, //服务端达到最大连接数。
 		CnctStsTmot, //超时未接收任何数据包。异常断开。
 		CnctStsDsct, //已断开。
 	} CnctSts;

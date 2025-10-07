@@ -12,7 +12,7 @@
 		#elif( defined __COMEXE__ ) //如果正在编译EXE可执行文件。
 			#define __SPEEXDSP_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#if( defined __COMLIB__ ) //如果正在编译LIB静态库文件。
 			#define __SPEEXDSP_DLLAPI__
 		#elif( defined __COMDLL__ ) //如果正在编译DLL动态库文件。
@@ -30,7 +30,7 @@
 		#elif( defined __LNKDLL__ ) //如果正在链接DLL动态库文件。
 			#define __SPEEXDSP_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#define __SPEEXDSP_DLLAPI__
 	#else //如果正在使用未知编译器。
 		#define __SPEEXDSP_DLLAPI__
@@ -45,22 +45,29 @@ extern "C"
 typedef struct SpeexAec SpeexAec;
 
 __SPEEXDSP_DLLAPI__ int SpeexAecGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+
 __SPEEXDSP_DLLAPI__ int SpeexAecInit( const void * LicnCodePt, SpeexAec * * SpeexAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecGetIsCnvgnc( SpeexAec * SpeexAecPt, int32_t * IsCnvgncPt );
-__SPEEXDSP_DLLAPI__ int SpeexAecPocs( SpeexAec * SpeexAecPt, int16_t * InptFrmPt, int16_t * OtptFrmPt, int16_t * RsltFrmPt );
 __SPEEXDSP_DLLAPI__ int SpeexAecDstoy( SpeexAec * SpeexAecPt );
+
+__SPEEXDSP_DLLAPI__ int SpeexAecGetIsCnvgnc( SpeexAec * SpeexAecPt, int32_t * IsCnvgncPt );
+
+__SPEEXDSP_DLLAPI__ int SpeexAecPocs( SpeexAec * SpeexAecPt, int16_t * InptFrmPt, int16_t * OtptFrmPt, int16_t * RsltFrmPt );
+
 
 typedef struct SpeexPreprocessState_ SpeexPreprocessState;
 
 __SPEEXDSP_DLLAPI__ int SpeexPrpocsInit( SpeexPreprocessState * * SpeexPrpocsPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCntu, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain, Vstr * ErrInfoVstrPt );
-__SPEEXDSP_DLLAPI__ int SpeexPrpocsPocs( SpeexPreprocessState * SpeexPrpocsPt, int16_t * FrmPt, int16_t * RsltFrmPt, int32_t * VoiceActStsPt );
 __SPEEXDSP_DLLAPI__ int SpeexPrpocsDstoy( SpeexPreprocessState * SpeexPrpocsPt );
+
+__SPEEXDSP_DLLAPI__ int SpeexPrpocsPocs( SpeexPreprocessState * SpeexPrpocsPt, int16_t * FrmPt, int16_t * RsltFrmPt, int32_t * VoiceActStsPt );
+
 
 typedef struct SpeexResamplerState_ SpeexResamplerState;
 
 __SPEEXDSP_DLLAPI__ int SpeexResamplerInit( SpeexResamplerState * * SpeexResamplerPtPt, int32_t BeforeSmplRate, int32_t AfterSmplRate, int32_t Quality, Vstr * ErrInfoVstrPt );
-__SPEEXDSP_DLLAPI__ int SpeexResamplerPocs( SpeexResamplerState * SpeexResamplerPt, int16_t * BeforeFrmPt, size_t BeforeFrmLenUnit, int16_t * AfterFrmPt, size_t AfterFrmSzUnit, size_t * AfterFrmLenUnitPt );
 __SPEEXDSP_DLLAPI__ int SpeexResamplerDstoy( SpeexResamplerState * SpeexResamplerPt );
+
+__SPEEXDSP_DLLAPI__ int SpeexResamplerPocs( SpeexResamplerState * SpeexResamplerPt, int16_t * BeforeFrmPt, size_t BeforeFrmLenUnit, int16_t * AfterFrmPt, size_t AfterFrmSzUnit, size_t * AfterFrmLenUnitPt );
 
 #ifdef __cplusplus
 }

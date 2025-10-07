@@ -55,7 +55,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2025年06月28日",IDC_STATIC,7,7,325,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2025年10月07日",IDC_STATIC,7,7,325,16
     LTEXT           "服务端：",IDC_STATIC,7,26,33,8
     COMBOBOX        SrvrUrlCbBoxId,39,24,236,273,CBS_DROPDOWN | WS_TABSTOP
     DEFPUSHBUTTON   "创建",SrvrCreateOrDstoyBtnId,276,23,28,14
@@ -110,16 +110,15 @@ BEGIN
     LTEXT           "广播对讲模式：",IDC_STATIC,7,247,56,8
 END
 
-SrvrStngDlgId DIALOGEX 0, 0, 309, 89
+SrvrStngDlgId DIALOGEX 0, 0, 309, 72
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Windows下音频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CTEXT           "服务端\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
-    CONTROL         "自动激活连接",IsAutoActCnctCkBoxId,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,32,213,10
-    LTEXT           "最大连接数，取值区间为[1,2147483647]：",IDC_STATIC,7,50,213,10
-    EDITTEXT        MaxCnctNumEdTxtId,231,48,71,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "确定",SrvrStngOkBtnId,7,68,295,14
+    LTEXT           "最大连接数，取值区间为[1,2147483647]：",IDC_STATIC,7,32,213,10
+    EDITTEXT        MaxCnctNumEdTxtId,231,30,71,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",SrvrStngOkBtnId,7,51,295,14
 END
 
 ClntStngDlgId DIALOGEX 0, 0, 309, 105
@@ -556,7 +555,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302
         TOPMARGIN, 7
-        BOTTOMMARGIN, 82
+        BOTTOMMARGIN, 65
     END
 
     ClntStngDlgId, DIALOG

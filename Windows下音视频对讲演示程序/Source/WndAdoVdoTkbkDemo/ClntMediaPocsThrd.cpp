@@ -835,10 +835,10 @@ int __cdecl ClntMediaPocsThrdUserMsg( MediaPocsThrd * MediaPocsThrdPt, unsigned 
 			int32_t p_OldLclTkbkMode = p_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode; //设置旧本端对讲模式。
 
 			if( p_LclTkbkMode != ClntMediaPocsThrd::TkbkModeNoChg ) p_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode = p_LclTkbkMode; //设置本端对讲模式。
-			ClntMediaPocsThrdSetTkbkMode( p_ClntMediaPocsThrdPt, 1, 1 ); //只设置不使用的对讲模式。因为在调用用户定义的对讲客户端本端对讲模式函数时，可能会对不使用的做一些销毁工作，并对要使用的做一些初始化工作，所以先只设置不使用的。
+			if( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_MyTkbkIdx != -1 ) ClntMediaPocsThrdSetTkbkMode( p_ClntMediaPocsThrdPt, 1, 1 ); //如果已设置我的对讲索引，就只设置不使用的对讲模式。因为在调用用户定义的对讲客户端本端对讲模式函数时，可能会对不使用的做一些销毁工作，并对要使用的做一些初始化工作，所以先只设置不使用的。
 			p_ClntMediaPocsThrdPt->m_UserTkbkClntLclTkbkModeFuncPt( p_ClntMediaPocsThrdPt, p_OldLclTkbkMode, p_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode ); //调用用户定义的对讲客户端本端对讲模式函数。
-			if( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct ) TkbkClntCnctSendTkbkModePkt( &p_ClntMediaPocsThrdPt->m_TkbkClnt, p_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode ); //发送对讲模式包。
-			ClntMediaPocsThrdSetTkbkMode( p_ClntMediaPocsThrdPt, 1, 2 ); //只设置要使用的对讲模式。
+			if( ( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct ) && ( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_MyTkbkIdx != -1 ) ) TkbkClntCnctSendTkbkModePkt( &p_ClntMediaPocsThrdPt->m_TkbkClnt, p_ClntMediaPocsThrdPt->m_TkbkClnt.m_LclTkbkMode ); //如果当前连接状态为已连接，且已设置我的对讲索引，就发送对讲模式包。
+			if( p_ClntMediaPocsThrdPt->m_TkbkClnt.m_MyTkbkIdx != -1 ) ClntMediaPocsThrdSetTkbkMode( p_ClntMediaPocsThrdPt, 1, 2 ); //如果已设置我的对讲索引，就只设置要使用的对讲模式。
 			break;
 		}
 		case ClntMediaPocsThrd::ThrdMsgTypTkbkClntPttBtnDown:

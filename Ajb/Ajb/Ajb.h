@@ -12,7 +12,7 @@
 		#elif( defined __COMEXE__ ) //如果正在编译EXE可执行文件。
 			#define __AJB_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#if( defined __COMLIB__ ) //如果正在编译LIB静态库文件。
 			#define __AJB_DLLAPI__
 		#elif( defined __COMDLL__ ) //如果正在编译DLL动态库文件。
@@ -30,7 +30,7 @@
 		#elif( defined __LNKDLL__ ) //如果正在链接DLL动态库文件。
 			#define __AJB_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#define __AJB_DLLAPI__
 	#else //如果正在使用未知编译器。
 		#define __AJB_DLLAPI__
@@ -47,6 +47,7 @@ typedef struct AAjb AAjb;
 __AJB_DLLAPI__ int AAjbGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int AAjbInit( const void * LicnCodePt, AAjb * * AAjbPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, int32_t IsDelObsltFrm, Vstr * ErrInfoVstrPt );
+__AJB_DLLAPI__ int AAjbDstoy( AAjb * AAjbPt, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int AAjbLocked( AAjb * AAjbPt, Vstr * ErrInfoVstrPt );
 __AJB_DLLAPI__ int AAjbUnlock( AAjb * AAjbPt, Vstr * ErrInfoVstrPt );
@@ -58,8 +59,6 @@ __AJB_DLLAPI__ int AAjbGetBufFrmCnt( AAjb * AAjbPt, int32_t * CurHaveBufActFrmCn
 
 __AJB_DLLAPI__ int AAjbClear( AAjb * AAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __AJB_DLLAPI__ int AAjbReset( AAjb * AAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-
-__AJB_DLLAPI__ int AAjbDstoy( AAjb * AAjbPt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
@@ -77,7 +76,8 @@ public:
 	static int GetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt ) { return AAjbGetAppLmtInfo( LicnCodePt, LmtTimeSecPt, RmnTimeSecPt, ErrInfoVstrPt ); }
 
 	int Init( const void * LicnCodePt, int32_t SmplRate, size_t FrmLenUnit, int32_t IsHaveTimeStamp, int32_t TimeStampStep, int32_t InactIsContPut, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, int32_t MaxCntuLostFrmCnt, float AdaptSensitivity, int32_t IsDelObsltFrm, Vstr * ErrInfoVstrPt ) { return AAjbInit( LicnCodePt, &m_AAjbPt, SmplRate, FrmLenUnit, IsHaveTimeStamp, TimeStampStep, InactIsContPut, MinNeedBufFrmCnt, MaxNeedBufFrmCnt, MaxCntuLostFrmCnt, AdaptSensitivity, IsDelObsltFrm, ErrInfoVstrPt ); }
-	
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AAjbDstoy( m_AAjbPt, ErrInfoVstrPt ); m_AAjbPt = NULL; return p_Rslt; }
+
 	int Locked( Vstr * ErrInfoVstrPt ) { return AAjbLocked( m_AAjbPt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return AAjbUnlock( m_AAjbPt, ErrInfoVstrPt ); }
 	
@@ -87,8 +87,6 @@ public:
 	int GetBufFrmCnt( int32_t * CurHaveBufActFrmCntPt, int32_t * CurHaveBufInactFrmCntPt, int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * MaxCntuLostFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return AAjbGetBufFrmCnt( m_AAjbPt, CurHaveBufActFrmCntPt, CurHaveBufInactFrmCntPt, CurHaveBufFrmCntPt, MinNeedBufFrmCntPt, MaxNeedBufFrmCntPt, MaxCntuLostFrmCntPt, CurNeedBufFrmCntPt, IsAutoLock, ErrInfoVstrPt ); }
 
 	int Clear( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return AAjbClear( m_AAjbPt, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = AAjbDstoy( m_AAjbPt, ErrInfoVstrPt ); m_AAjbPt = NULL; return p_Rslt; }
 };
 #endif
 
@@ -103,6 +101,7 @@ typedef struct VAjb VAjb;
 __AJB_DLLAPI__ int VAjbGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int VAjbInit( const void * LicnCodePt, VAjb * * VAjbPtPt, int32_t IsHaveTimeStamp, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, float AdaptSensitivity, Vstr * ErrInfoVstrPt );
+__AJB_DLLAPI__ int VAjbDstoy( VAjb * VAjbPt, Vstr * ErrInfoVstrPt );
 
 __AJB_DLLAPI__ int VAjbLocked( VAjb * VAjbPt, Vstr * ErrInfoVstrPt );
 __AJB_DLLAPI__ int VAjbUnlock( VAjb * VAjbPt, Vstr * ErrInfoVstrPt );
@@ -114,8 +113,6 @@ __AJB_DLLAPI__ int VAjbGetBufFrmCnt( VAjb * VAjbPt, int32_t * CurHaveBufFrmCntPt
 
 __AJB_DLLAPI__ int VAjbClear( VAjb * VAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
 __AJB_DLLAPI__ int VAjbReset( VAjb * VAjbPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt );
-
-__AJB_DLLAPI__ int VAjbDstoy( VAjb * VAjbPt, Vstr * ErrInfoVstrPt );
 
 #ifdef __cplusplus
 }
@@ -133,6 +130,7 @@ public:
 	static int GetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt ) { return VAjbGetAppLmtInfo( LicnCodePt, LmtTimeSecPt, RmnTimeSecPt, ErrInfoVstrPt ); }
 
 	int Init( const void * LicnCodePt, int32_t IsHaveTimeStamp, int32_t MinNeedBufFrmCnt, int32_t MaxNeedBufFrmCnt, float AdaptSensitivity, Vstr * ErrInfoVstrPt ) { return VAjbInit( LicnCodePt, &m_VAjbPt, IsHaveTimeStamp, MinNeedBufFrmCnt, MaxNeedBufFrmCnt, AdaptSensitivity, ErrInfoVstrPt ); }
+	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VAjbDstoy( m_VAjbPt, ErrInfoVstrPt ); m_VAjbPt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return VAjbLocked( m_VAjbPt, ErrInfoVstrPt ); }
 	int Unlock( Vstr * ErrInfoVstrPt ) { return VAjbUnlock( m_VAjbPt, ErrInfoVstrPt ); }
@@ -143,7 +141,5 @@ public:
 	int GetBufFrmCnt( int32_t * CurHaveBufFrmCntPt, int32_t * MinNeedBufFrmCntPt, int32_t * MaxNeedBufFrmCntPt, int32_t * CurNeedBufFrmCntPt, int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VAjbGetBufFrmCnt( m_VAjbPt, CurHaveBufFrmCntPt, MinNeedBufFrmCntPt, MaxNeedBufFrmCntPt, CurNeedBufFrmCntPt, IsAutoLock, ErrInfoVstrPt ); }
 
 	int Clear( int32_t IsAutoLock, Vstr * ErrInfoVstrPt ) { return VAjbClear( m_VAjbPt, IsAutoLock, ErrInfoVstrPt ); }
-
-	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VAjbDstoy( m_VAjbPt, ErrInfoVstrPt ); m_VAjbPt = NULL; return p_Rslt; }
 };
 #endif

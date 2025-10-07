@@ -326,6 +326,10 @@ void MyClntMediaPocsThrdCls::UserTkbkClntCnctSts( int32_t CurCnctSts )
 	{
 		VstrCpy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt, Cu8vstr( "已连接" ), ,  );
 	}
+	else if( CurCnctSts == ClntMediaPocsThrd::CnctStsSrvrMaxCnct )
+	{
+		VstrCpy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt, Cu8vstr( "服务端达到最大连接数" ), ,  );
+	}
 	else if( CurCnctSts == ClntMediaPocsThrd::CnctStsTmot )
 	{
 		VstrCpy( p_MainDlgWndMsgClntLstModifyItemPt->m_Txt1VstrPt, Cu8vstr( "异常断开" ), ,  );
@@ -673,16 +677,16 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		int32_t p_EchoSupes;
 		int32_t p_EchoSupesAct;
 
-		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_FilterLenMsec = _wtoi( p_TmpU16strPt );
 		p_IsUseRec = ( IsDlgButtonChecked( g_SpeexAecStngDlgWndHdl, SpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EchoMultiple = _wtof( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EchoCntu = _wtof( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EchoSupes = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexAecStngDlgWndHdl, SpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EchoSupesAct = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexAec( 0, p_FilterLenMsec, p_IsUseRec, p_EchoMultiple, p_EchoCntu, p_EchoSupes, p_EchoSupesAct, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -696,9 +700,9 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		int32_t p_Delay;
 
 		p_IsUseCNGMode = ( IsDlgButtonChecked( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EchoMode = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_WebRtcAecmStngDlgWndHdl, WebRtcAecmDelayEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_Delay = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAecm( 0, p_IsUseCNGMode, p_EchoMode, p_Delay, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -714,9 +718,9 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		int32_t p_IsUseRefinedFilterAdaptAecMode;
 		int32_t p_IsUseAdaptAdjDelay;
 
-		GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EchoMode = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_WebRtcAecStngDlgWndHdl, WebRtcAecDelayEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_Delay = _wtoi( p_TmpU16strPt );
 		p_IsUseDelayAgstcMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
 		p_IsUseExtdFilterMode = ( IsDlgButtonChecked( g_WebRtcAecStngDlgWndHdl, WebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
@@ -731,7 +735,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 	{
 		int32_t p_Delay;
 
-		GetWindowText( GetDlgItem( g_WebRtcAec3StngDlgWndHdl, WebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_WebRtcAec3StngDlgWndHdl, WebRtcAec3DelayEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_Delay = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcAec3( 0, p_Delay, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -769,34 +773,34 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		#else
 		p_WorkMode = 0;
 		#endif
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecFilterLenMsecEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_SpeexAecFilterLenMsec = _wtoi( p_TmpU16strPt );
 		p_SpeexAecIsUseRec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecIsUseRecCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoMutpEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_SpeexAecEchoMultiple = _wtof( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoCntuEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_SpeexAecEchoCntu = _wtof( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_SpeexAecEchoSupes = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSpeexAecEchoSupesActEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_SpeexAecEchoSupesAct = _wtoi( p_TmpU16strPt );
 		p_WebRtcAecmIsUseCNGMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmIsUseCNGModeCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmEchoModeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_WebRtcAecmEchoMode = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecmDelayEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_WebRtcAecmDelay = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecEchoModeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_WebRtcAecEchoMode = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecDelayEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_WebRtcAecDelay = _wtoi( p_TmpU16strPt );
 		p_WebRtcAecIsUseDelayAgstcMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseDelayAgstcModeCkBoxId ) == BST_CHECKED );
 		p_WebRtcAecIsUseExtdFilterMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseExtdFilterModeCkBoxId ) == BST_CHECKED );
 		p_WebRtcAecIsUseRefinedFilterAdaptAecMode = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseRefinedFilterAdaptAecModeCkBoxId ) == BST_CHECKED );
 		p_WebRtcAecIsUseAdaptAdjDelay = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_WebRtcAec3Delay = _wtoi( p_TmpU16strPt );
 		p_IsUseSameRoomAec = ( IsDlgButtonChecked( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_SameRoomEchoMinDelay = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexWebRtcAec( 0, p_WorkMode, p_SpeexAecFilterLenMsec, p_SpeexAecIsUseRec, p_SpeexAecEchoMultiple, p_SpeexAecEchoCntu, p_SpeexAecEchoSupes, p_SpeexAecEchoSupesAct, p_WebRtcAecmIsUseCNGMode, p_WebRtcAecmEchoMode, p_WebRtcAecmDelay, p_WebRtcAecEchoMode, p_WebRtcAecDelay, p_WebRtcAecIsUseDelayAgstcMode, p_WebRtcAecIsUseExtdFilterMode, p_WebRtcAecIsUseRefinedFilterAdaptAecMode, p_WebRtcAecIsUseAdaptAdjDelay, p_WebRtcAec3Delay, p_IsUseSameRoomAec, p_SameRoomEchoMinDelay, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -816,7 +820,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		int32_t p_IsUseDereverb;
 
 		p_IsUseNs = ( IsDlgButtonChecked( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_NoiseSupes = _wtoi( p_TmpU16strPt );
 		p_IsUseDereverb = ( IsDlgButtonChecked( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseDereverbCkBoxId ) == BST_CHECKED );
 
@@ -828,7 +832,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 	{
 		int32_t p_PolicyMode;
 
-		GetWindowText( GetDlgItem( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_WebRtcNsxStngDlgWndHdl, WebRtcNsxPolicyModeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_PolicyMode = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcNsx( 0, p_PolicyMode, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -839,7 +843,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 	{
 		int32_t p_PolicyMode;
 
-		GetWindowText( GetDlgItem( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_WebRtcNsStngDlgWndHdl, WebRtcNsPolicyModeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_PolicyMode = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetUseWebRtcNs( 0, p_PolicyMode, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -863,18 +867,18 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		int32_t p_AgcMaxGain;
 
 		p_IsUseVad = ( IsDlgButtonChecked( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseVadCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbStartEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_VadProbStart = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsVadProbCntuEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_VadProbCont = _wtoi( p_TmpU16strPt );
 		p_IsUseAgc = ( IsDlgButtonChecked( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsIsUseAgcCkBoxId ) == BST_CHECKED );
-		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcLevelEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_AgcLevel = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcIncrementEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_AgcIncrement = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcDecrementEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_AgcDecrement = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexPrpocsStngDlgWndHdl, SpeexPrpocsAgcMaxGainEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_AgcMaxGain = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetIsUseSpeexPrpocs( 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSpeexPrpocsCkBoxId ) == BST_CHECKED ) ? 1 : 0, p_IsUseVad, p_VadProbStart, p_VadProbCont, p_IsUseAgc, p_AgcLevel, p_AgcIncrement, p_AgcDecrement, p_AgcMaxGain, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -895,11 +899,11 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 		int32_t p_EncdPlcExptLossRate;
 
 		p_EncdUseCbrOrVbr = ( IsDlgButtonChecked( g_SpeexCodecStngDlgWndHdl, SpeexEncdUseCbrRdBtnId ) == BST_CHECKED ) ? 0 : 1;
-		GetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdQualtEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdQualtEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EncdQualt = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdCmplxtEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EncdCmplxt = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_SpeexCodecStngDlgWndHdl, SpeexEncdPlcExptLossRateEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_EncdPlcExptLossRate = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->AdoInptSetUseSpeexEncd( 0, p_EncdUseCbrOrVbr, p_EncdQualt, p_EncdCmplxt, p_EncdPlcExptLossRate, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
@@ -1110,9 +1114,9 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 		int32_t p_VdoFrmSzOtherWidth;
 		int32_t p_VdoFrmSzOtherHeight;
 
-		GetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherWidthEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_VdoFrmSzOtherWidth = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_StngDlgWndHdl, VdoFrmSzOtherHeightEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_VdoFrmSzOtherHeight = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->SetVdoInpt( 0,
@@ -1142,15 +1146,15 @@ void MyClntMediaPocsThrdCls::SetToUseVdoInpt()
 		int32_t p_OpenH264EncdIDRFrmIntvl;
 		int32_t p_OpenH264EncdCmplxt;
 
-		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdVdoTypeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdVdoTypeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_OpenH264EncdVdoType = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdEncdBitrateEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdEncdBitrateEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_OpenH264EncdEncdBitrate = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdBitrateCtrlModeEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdBitrateCtrlModeEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_OpenH264EncdBitrateCtrlMode = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdIDRFrmIntvlEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdIDRFrmIntvlEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_OpenH264EncdIDRFrmIntvl = _wtoi( p_TmpU16strPt );
-		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdCmplxtEdTxtId ), p_TmpU16strPt, sizeof( p_TmpU16strPt ) );
+		GetWindowText( GetDlgItem( g_OpenH264CodecStngDlgWndHdl, OpenH264EncdCmplxtEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
 		p_OpenH264EncdCmplxt = _wtoi( p_TmpU16strPt );
 
 		m_MediaPocsThrdClsPt->VdoInptSetUseOpenH264Encd( 0,

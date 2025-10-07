@@ -1665,7 +1665,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		//获取Windows应用程序的进程名字符串。
 		p_CurProcHdl = GetCurrentProcess();
 		GetProcessImageFileName( p_CurProcHdl, p_PocsImageFileName, sizeof( p_PocsImageFileName ) );
-		FuncPathFindFileName( Cu16vstr( p_PocsImageFileName ), ( const void * * )&p_AppFileNameStrPt );
+		FuncPathFindFileName( Cu16vstr( p_PocsImageFileName ), ( const void * * )&p_AppFileNameStrPt, NULL );
 		CloseHandle( p_CurProcHdl );
 		if( ( memcmp( p_AppFileNameStrPt, L"Windows下音视频对讲演示程序.exe", ( wcslen( L"Windows下音视频对讲演示程序.exe" ) + 1 ) * sizeof( wchar_t ) ) != 0 ) &&
 			( memcmp( p_AppFileNameStrPt, L"WndAdoVdoTkbkDemo", wcslen( L"WndAdoVdoTkbkDemo" ) * sizeof( wchar_t ) ) != 0 ) &&

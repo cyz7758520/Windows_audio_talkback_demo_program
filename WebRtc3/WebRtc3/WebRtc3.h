@@ -18,7 +18,7 @@ extern "C"
 		#elif( defined __COMEXE__ ) //如果正在编译EXE可执行文件。
 			#define __WEBRTC3_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#if( defined __COMLIB__ ) //如果正在编译LIB静态库文件。
 			#define __WEBRTC3_DLLAPI__
 		#elif( defined __COMDLL__ ) //如果正在编译DLL动态库文件。
@@ -34,7 +34,7 @@ extern "C"
 		#elif( defined __LNKDLL__ )
 			#define __WEBRTC3_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#define __WEBRTC3_DLLAPI__
 	#endif
 #endif
@@ -42,12 +42,15 @@ extern "C"
 typedef struct WebRtcAec3 WebRtcAec3;
 
 __WEBRTC3_DLLAPI__ int WebRtcAec3GetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+
 __WEBRTC3_DLLAPI__ int WebRtcAec3Init( const void * LicnCodePt, WebRtcAec3 * * WebRtcAec3PtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t Delay, Vstr * ErrInfoVstrPt );
+__WEBRTC3_DLLAPI__ int WebRtcAec3Dstoy( WebRtcAec3 * WebRtcAec3Pt );
+
 __WEBRTC3_DLLAPI__ int WebRtcAec3SetDelay( WebRtcAec3 * WebRtcAec3Pt, int32_t Delay );
 __WEBRTC3_DLLAPI__ int WebRtcAec3GetDelay( WebRtcAec3 * WebRtcAec3Pt, int32_t * DelayPt );
 __WEBRTC3_DLLAPI__ int WebRtcAec3GetIsCnvgnc( WebRtcAec3 * WebRtcAec3Pt, int32_t * IsCnvgncPt );
+
 __WEBRTC3_DLLAPI__ int WebRtcAec3Pocs( WebRtcAec3 * WebRtcAec3Pt, int16_t * InputFramePt, int16_t * OutputFramePt, int16_t * ResultFramePt );
-__WEBRTC3_DLLAPI__ int WebRtcAec3Dstoy( WebRtcAec3 * WebRtcAec3Pt );
 
 #ifdef __cplusplus
 }

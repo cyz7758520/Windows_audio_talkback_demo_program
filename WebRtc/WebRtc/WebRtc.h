@@ -12,7 +12,7 @@
 		#elif( defined __COMEXE__ ) //如果正在编译EXE可执行文件。
 			#define __WEBRTC_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#if( defined __COMLIB__ ) //如果正在编译LIB静态库文件。
 			#define __WEBRTC_DLLAPI__
 		#elif( defined __COMDLL__ ) //如果正在编译DLL动态库文件。
@@ -30,7 +30,7 @@
 		#elif( defined __LNKDLL__ ) //如果正在链接DLL动态库文件。
 			#define __WEBRTC_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#define __WEBRTC_DLLAPI__
 	#else //如果正在使用未知编译器。
 		#define __WEBRTC_DLLAPI__
@@ -45,36 +45,48 @@ extern "C"
 typedef struct WebRtcAecm WebRtcAecm;
 
 __WEBRTC_DLLAPI__ int WebRtcAecmInit( WebRtcAecm * * WebRtcAecmPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t IsUseCNGMode, int32_t EchoMode, int32_t Delay, Vstr * ErrInfoVstrPt );
+__WEBRTC_DLLAPI__ int WebRtcAecmDstoy( WebRtcAecm * WebRtcAecmPt );
+
 __WEBRTC_DLLAPI__ int WebRtcAecmSetDelay( WebRtcAecm * WebRtcAecmPt, int32_t Delay );
 __WEBRTC_DLLAPI__ int WebRtcAecmGetDelay( WebRtcAecm * WebRtcAecmPt, int32_t * DelayPt );
+
 __WEBRTC_DLLAPI__ int WebRtcAecmPocs( WebRtcAecm * WebRtcAecmPt, int16_t * InptFrmPt, int16_t * OtptFrmPt, int16_t * RsltFrmPt );
-__WEBRTC_DLLAPI__ int WebRtcAecmDstoy( WebRtcAecm * WebRtcAecmPt );
+
 
 typedef struct WebRtcAec WebRtcAec;
 
 __WEBRTC_DLLAPI__ int WebRtcAecGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+
 __WEBRTC_DLLAPI__ int WebRtcAecInit( const void * LicnCodePt, WebRtcAec * * WebRtcAecPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, Vstr * ErrInfoVstrPt );
+__WEBRTC_DLLAPI__ int WebRtcAecDstoy( WebRtcAec * WebRtcAecPt );
+
 __WEBRTC_DLLAPI__ int WebRtcAecSetDelay( WebRtcAec * WebRtcAecPt, int32_t Delay );
 __WEBRTC_DLLAPI__ int WebRtcAecGetDelay( WebRtcAec * WebRtcAecPt, int32_t * DelayPt );
 __WEBRTC_DLLAPI__ int WebRtcAecGetIsCnvgnc( WebRtcAec * WebRtcAecPt, int32_t * IsCnvgncPt );
+
 __WEBRTC_DLLAPI__ int WebRtcAecPocs( WebRtcAec * WebRtcAecPt, int16_t * InptFrmPt, int16_t * OtptFrmPt, int16_t * RsltFrmPt );
-__WEBRTC_DLLAPI__ int WebRtcAecDstoy( WebRtcAec * WebRtcAecPt );
+
 
 typedef struct WebRtcNsx WebRtcNsx;
 
 __WEBRTC_DLLAPI__ int WebRtcNsxInit( WebRtcNsx * * WebRtcNsxPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t PolicyMode, Vstr * ErrInfoVstrPt );
-__WEBRTC_DLLAPI__ int WebRtcNsxPocs( WebRtcNsx * WebRtcNsxPt, int16_t * FrmPt, int16_t * RsltFrmPt );
 __WEBRTC_DLLAPI__ int WebRtcNsxDstoy( WebRtcNsx * WebRtcNsxPt );
+
+__WEBRTC_DLLAPI__ int WebRtcNsxPocs( WebRtcNsx * WebRtcNsxPt, int16_t * FrmPt, int16_t * RsltFrmPt );
+
 
 typedef struct WebRtcNs WebRtcNs;
 
 __WEBRTC_DLLAPI__ int WebRtcNsInit( WebRtcNs * * WebRtcNsPtPt, int32_t SmplRate, size_t FrmLenUnit, int32_t PolicyMode, Vstr * ErrInfoVstrPt );
-__WEBRTC_DLLAPI__ int WebRtcNsPocs( WebRtcNs * WebRtcNsPt, int16_t * FrmPt, int16_t * RsltFrmPt );
 __WEBRTC_DLLAPI__ int WebRtcNsDstoy( WebRtcNs * WebRtcNsPt );
 
+__WEBRTC_DLLAPI__ int WebRtcNsPocs( WebRtcNs * WebRtcNsPt, int16_t * FrmPt, int16_t * RsltFrmPt );
+
+
 __WEBRTC_DLLAPI__ int WebRtcResamplerInit( void * * WebRtcResamplerPtPt, int32_t BeforeSmplRate, int32_t AfterSmplRate, Vstr * ErrInfoVstrPt );
-__WEBRTC_DLLAPI__ int WebRtcResamplerPocs( void * WebRtcResamplerPt, int16_t * BeforeFrmPt, size_t BeforeFrmLenUnit, int16_t * AfterFrmPt, size_t AfterFrmSzUnit, size_t * AfterFrmLenUnitPt );
 __WEBRTC_DLLAPI__ int WebRtcResamplerDstoy( void * WebRtcResamplerPt );
+
+__WEBRTC_DLLAPI__ int WebRtcResamplerPocs( void * WebRtcResamplerPt, int16_t * BeforeFrmPt, size_t BeforeFrmLenUnit, int16_t * AfterFrmPt, size_t AfterFrmSzUnit, size_t * AfterFrmLenUnitPt );
 
 #ifdef __cplusplus
 }

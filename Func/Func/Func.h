@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+#define _CRT_SECURE_NO_WARNINGS				//设置允许使用不安全的函数
+#define __LARGE64_FILES						//Cygwin下：ftello64、fseeko64、fgetpos64、fsetpos64
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE							//Cygwin下：CLOCK_MONOTONIC_RAW
+#endif
 #include <stdio.h>							//*printf、*scanf、fopen、fseek、fread、fwrite、fclose、SEEK_CUR、SEEK_END、SEEK_SET
 #include <stdlib.h>							//*alloc、free、exit、system、rand
 #include <stddef.h>							//size_t、wchar_t、NULL、offsetof
@@ -181,7 +186,7 @@ typedef int HANDLE;
 #define __stdcall __attribute__( ( __stdcall__ ) )
 #endif
 
-#if( defined __ANDROID_GCC__ )
+#if( defined __ANDROID_NDK__ )
 #include <sys/types.h>						//ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
 #include <sys/socket.h>						//socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
 #include <netinet/tcp.h>					//TCP_NODELAY
@@ -208,6 +213,32 @@ typedef int HANDLE;
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <sys/system_properties.h>
+#endif
+
+#if( defined __HARMONY_NDK__ )
+#include <sys/types.h>						//ushort、uint、ulong、blkcnt_t、blksize_t、clock_t、time_t、daddr_t、caddr_t、fsblkcnt_t、fsfilcnt_t、id_t、ino_t、addr_t、vm_offset_t、vm_size_t、off_t、dev_t、uid_t、gid_t、pid_t、key_t、ssize_t、mode_t、nlink_t、clockid_t、timer_t、useconds_t、suseconds_t、sbintime_t
+#include <sys/socket.h>						//socket、bind、listen、accept、connect、getpeername、getsockname、send、sendto、sendmsg、recv、recvfrom、recvmsg、setsockopt、getsockopt、shutdown
+#include <netinet/tcp.h>					//TCP_NODELAY
+#include <sys/select.h>						//fd_set、FD_SETSIZE、FD_ZERO、FD_SET、FD_ISSET、FD_CLR、FD_COPY、select
+#include <asm/ioctls.h>						//ioctl
+#include <sys/ioctl.h>
+#include <sys/syscall.h>
+#include <sys/stat.h>						//struct stat、fstat、chmod、fchmod、mkdir、stat
+#include <sys/time.h>						//gettimeofday
+#include <fcntl.h>							//open、fcntl
+#include <unistd.h>							//getpid、getopt、close
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <pthread.h>						//pthread_create、pthread_join
+#if( ( defined __X86__ ) || ( defined __X64__ ) )
+#include <immintrin.h>						//_mm_pause
+#endif
+
+typedef int HANDLE;
+#define Sleep( Msec ) usleep( ( Msec ) * 1000 )
+
+#include <napi/native_api.h>
+#include <hilog/log.h>
 #endif
 
 #if( defined __KEIL_ARMC__ )
@@ -256,7 +287,7 @@ typedef int64_t ssize_t;
 //字符串字符集。
 #if( defined __MS_VCXX__ ) //MSVC++编译器要使用UTF-16字符集，不要使用多字节字符集，因为国际间不通用。
 #define L( Str ) L ## Str
-#elif( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) //GCC编译器要使用UTF-8字符集，不要使用UTF-32字符集，因为UTF-32字符集太占空间。
+#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) ) //GCC编译器要使用UTF-8字符集，不要使用UTF-32字符集，因为UTF-32字符集太占空间。
 #define L( Str ) L ## Str
 #endif
 
@@ -291,15 +322,15 @@ typedef enum DataTyp
 
 #ifndef __cplusplus
 #define GetDataTyp( x ) ( _Generic( ( x ), \
-	char : DtChar, \
+	signed char : DtChar, \
 	unsigned char : DtUChar, \
-	short : DtShort, \
+	signed short : DtShort, \
 	unsigned short : DtUShort, \
-	int : DtInt, \
+	signed int : DtInt, \
 	unsigned int : DtUInt, \
-	long : DtLong, \
+	signed long : DtLong, \
 	unsigned long : DtULong, \
-	long long : DtLLong, \
+	signed long long : DtLLong, \
 	unsigned long long : DtULLong, \
 	float : DtFlt, \
 	double : DtDbl, \
@@ -308,15 +339,15 @@ typedef enum DataTyp
 	) )
 #else
 #define GetDataTyp( x ) ( \
-	( typeid( x ) == typeid( char ) ) ? DtChar : \
+	( typeid( x ) == typeid( signed char ) ) ? DtChar : \
 	( typeid( x ) == typeid( unsigned char ) ) ? DtUChar : \
-	( typeid( x ) == typeid( short ) ) ? DtShort : \
+	( typeid( x ) == typeid( signed short ) ) ? DtShort : \
 	( typeid( x ) == typeid( unsigned short ) ) ? DtUShort : \
-	( typeid( x ) == typeid( int ) ) ? DtInt : \
+	( typeid( x ) == typeid( signed int ) ) ? DtInt : \
 	( typeid( x ) == typeid( unsigned int ) ) ? DtUInt : \
-	( typeid( x ) == typeid( long ) ) ? DtLong : \
+	( typeid( x ) == typeid( signed long ) ) ? DtLong : \
 	( typeid( x ) == typeid( unsigned long ) ) ? DtULong : \
-	( typeid( x ) == typeid( long long ) ) ? DtLLong : \
+	( typeid( x ) == typeid( signed long long ) ) ? DtLLong : \
 	( typeid( x ) == typeid( unsigned long long ) ) ? DtULLong : \
 	( typeid( x ) == typeid( float ) ) ? DtFlt : \
 	( typeid( x ) == typeid( double ) ) ? DtDbl : \
@@ -372,7 +403,7 @@ typedef enum BufAutoAdjMeth
 		#elif( defined __COMEXE__ ) //如果正在编译EXE可执行文件。
 			#define __FUNC_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#if( defined __COMLIB__ ) //如果正在编译LIB静态库文件。
 			#define __FUNC_DLLAPI__
 		#elif( defined __COMDLL__ ) //如果正在编译DLL动态库文件。
@@ -390,7 +421,7 @@ typedef enum BufAutoAdjMeth
 		#elif( defined __LNKDLL__ ) //如果正在链接DLL动态库文件。
 			#define __FUNC_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#define __FUNC_DLLAPI__
 	#else //如果正在使用未知编译器。
 		#define __FUNC_DLLAPI__
@@ -399,7 +430,7 @@ typedef enum BufAutoAdjMeth
 
 #include "Vstr.h"
 #include "Log.h"
-#include "ThrdLock.h"
+#include "MutexLock.h"
 #include "ChrStrMem.h"
 #include "Utf.h"
 #include "DateTime.h"
@@ -407,8 +438,11 @@ typedef enum BufAutoAdjMeth
 #include "PocsThrd.h"
 #include "Toast.h"
 #include "Ado.h"
-#if( defined __ANDROID_GCC__ )
+#if( defined __ANDROID_NDK__ )
 #include "JavaNtvIntfc.h"
+#endif
+#if( defined __HARMONY_NDK__ )
+#include "ArkTsNtvIntfc.h"
 #endif
 
 #ifdef __cplusplus
@@ -425,7 +459,7 @@ __FUNC_DLLAPI__ void __cdecl GetCpuId( uint32_t Eax, uint32_t Ecx, uint32_t * Ea
 __FUNC_DLLAPI__ extern char g_CpuNameStrArr[ 4 * 4 * 3 + 1 ]; //Cpu名称字符串数组。
 __FUNC_DLLAPI__ extern uint16_t g_CpuCacheLineSzByt; //Cpu缓存行的大小，单位为字节。
 __FUNC_DLLAPI__ extern int8_t g_CpuIsSupt64Bit; //Cpu是否支持64位。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptEnhancedFastStringsRepMovsbStosb; //Cpu是否支持增强的快速字符串Rep Movsb/Stosb指令。
+__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptEnhncFastStrRepMovsbStosb; //Cpu是否支持增强的快速字符串Rep Movsb/Stosb指令。
 __FUNC_DLLAPI__ extern int8_t g_CpuIsSuptMMX; //Cpu是否支持MMX指令。
 __FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE; //Cpu是否支持SSE指令。
 __FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE2; //Cpu是否支持SSE2指令。
@@ -467,7 +501,7 @@ __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
 //休眠函数。
 #if( defined __MS_VCXX__ )
 #define FuncSleep( SleepTimeMesc ) WaitForSingleObject( ( HANDLE )-1, SleepTimeMesc )
-#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
+#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) )
 #define FuncSleep( SleepTimeMesc ) usleep( SleepTimeMesc * 1000 )
 #endif
 

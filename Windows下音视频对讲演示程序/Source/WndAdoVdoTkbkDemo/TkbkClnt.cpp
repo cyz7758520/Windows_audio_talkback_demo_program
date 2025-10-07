@@ -669,7 +669,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 					{
 						//重新循环，继续等待本端高级Udp协议套接字连接远端。
 					}
-					else if( p_AudpCnctSts == AudpCnctStsCnct ) //如果连接成功。
+					else if( ( p_AudpCnctSts == AudpCnctStsCnct ) || ( p_AudpCnctSts == AudpCnctStsDsct ) ) //如果连接成功活连接断开。因为连接断开其实也是连接成功后断开的。
 					{
 						if( AudpGetRmtAddr( TkbkClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, TkbkClntPt->m_AudpClntCnctIdx, NULL, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodeAddrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_RmtNodePortPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
@@ -690,13 +690,6 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 					else if( p_AudpCnctSts == AudpCnctStsTmot ) //如果连接超时。
 					{
 						VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：用本端高级Udp协议客户端套接字连接远端高级Udp协议服务端套接字[%vs:%vs]失败。原因：连接超时。" ), TkbkClntPt->m_RmtNodeNameVstrPt, TkbkClntPt->m_RmtNodeSrvcVstrPt );
-						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-						goto AudpClntSoktCnctOut;
-					}
-					else if( p_AudpCnctSts == AudpCnctStsDsct ) //如果连接断开。
-					{
-						VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：用本端高级Udp协议客户端套接字连接远端高级Udp协议服务端套接字[%vs:%vs]失败。原因：连接断开。" ), TkbkClntPt->m_RmtNodeNameVstrPt, TkbkClntPt->m_RmtNodeSrvcVstrPt );
 						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 						goto AudpClntSoktCnctOut;
@@ -1019,7 +1012,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 					}
 					else if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] == ClntMediaPocsThrd::PktTypTstNtwkDlyRply ) //如果是测试网络延迟应答包。
 					{
-						if( p_PktLenByt < 1 + 1 ) //如果退出包的长度小于1 + 1，表示没有对讲索引。
+						if( p_PktLenByt < 1 + 1 ) //如果测试网络延迟应答包的长度小于1 + 1，表示没有对讲索引。
 						{
 							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "客户端媒体处理线程：对讲客户端：接收测试网络延迟应答包。长度为%uzd小于1 + 1，表示没有对讲索引，无法继续接收。" ), p_PktLenByt );
 							goto RecvPktOut;
@@ -1043,12 +1036,28 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 							goto RecvPktOut;
 						}
 
-						VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：接收退出包。对讲索引：%z8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
-						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-						TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
-						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowToastFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+						{
+							VstrFmtCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：接收退出包。对讲索引：%z8d。" ), TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] );
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+							TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowToastFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+						}
 						
-						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] == TkbkClntPt->m_MyTkbkIdx ) //如果对讲索引是我的对讲索引。
+						if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] == -1 ) //如果对讲索引是服务端达到最大连接数。
+						{
+							{
+								VstrCpy( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, Cu8vstr( "客户端媒体处理线程：对讲客户端：服务端达到最大连接数。" ), , );
+								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsShowToast != 0 ) TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowToastFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+							}
+
+							TkbkClntPt->m_IsRecvExitPkt = 1; //设置已接收退出包。
+							TkbkClntPt->m_CurCnctSts = ClntMediaPocsThrd::CnctStsSrvrMaxCnct; //设置当前连接状态为服务端达到最大连接数。
+							TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserTkbkClntCnctStsFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_CurCnctSts ); //调用用户定义的对讲客户端连接状态函数。
+							TkbkClntPt->m_IsRqstDstoy = 1; //设置已请求销毁。
+						}
+						else if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] == TkbkClntPt->m_MyTkbkIdx ) //如果对讲索引是我的对讲索引。
 						{
 							TkbkClntPt->m_IsRecvExitPkt = 1; //设置已接收退出包。
 							TkbkClntPt->m_IsRqstDstoy = 1; //设置已请求销毁。
@@ -1057,7 +1066,6 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 						{
 							TkbkClntTkbkInfoDstoy( TkbkClntPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] ); //对讲信息销毁。
 						}
-
 					}
 				} //如果用本端套接字接收连接的远端套接字发送的数据包超时，就重新接收。
 			}

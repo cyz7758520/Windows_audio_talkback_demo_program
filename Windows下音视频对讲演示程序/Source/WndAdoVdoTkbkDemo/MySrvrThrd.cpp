@@ -5,8 +5,7 @@
 int MySrvrThrdCls::Init( const void * LicnCodePt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	HWND p_SrvrUrlHdl;
-	int p_SrvrUrlLenChr;
+	wchar_t p_TmpU16strPt[ 1024 ];
 	Vstr * p_SrvrUrlVstrPt = NULL;
 	Vstr * p_PrtclVstrPt = NULL;
 	Vstr * p_HostnameVstrPt = NULL;
@@ -15,12 +14,8 @@ int MySrvrThrdCls::Init( const void * LicnCodePt )
 
 	if( m_SrvrThrdPt == NULL ) //如果我的服务端线程未启动。
 	{
-		p_SrvrUrlHdl = GetDlgItem( m_MainDlgWndHdl, SrvrUrlCbBoxId );
-		p_SrvrUrlLenChr = GetWindowTextLength( p_SrvrUrlHdl );
-		VstrInit( &p_SrvrUrlVstrPt, Utf16, p_SrvrUrlLenChr + 1, );
-		GetDlgItemText( m_MainDlgWndHdl, SrvrUrlCbBoxId, ( LPWSTR )p_SrvrUrlVstrPt->m_StrPt, p_SrvrUrlLenChr + 1 );
-		p_SrvrUrlVstrPt->m_LenChr = p_SrvrUrlLenChr;
-
+		GetWindowText( GetDlgItem( m_MainDlgWndHdl, SrvrUrlCbBoxId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
+		VstrInit( &p_SrvrUrlVstrPt, Utf16, StrLen( p_TmpU16strPt, Utf16, , ), Cu16vstr( p_TmpU16strPt ) );
 		VstrInit( &p_PrtclVstrPt, Utf16, , );
 		VstrInit( &p_HostnameVstrPt, Utf16, , );
 		VstrInit( &p_PortVstrPt, Utf16, , );
@@ -74,13 +69,20 @@ int MySrvrThrdCls::Init( const void * LicnCodePt )
 								g_ErrInfoVstr.m_Pt );
 
 		//服务端初始化。
-		SendSrvrInitMsg( 0,
-						 ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Tcp" ), , &p_CmpRslt ), p_CmpRslt == 0 ) ? 0 : 1,
-						 p_HostnameVstrPt,
-						 p_PortVstrPt,
-						 10,
-						 2,
-						 NULL );
+		{
+			int32_t p_MaxCnctNum;
+
+			GetWindowText( GetDlgItem( g_SrvrStngDlgWndHdl, MaxCnctNumEdTxtId ), p_TmpU16strPt, SzOfArr( p_TmpU16strPt ) );
+			p_MaxCnctNum = _wtoi( p_TmpU16strPt );
+
+			SendSrvrInitMsg( 0,
+							 ( VstrCmp( p_PrtclVstrPt, , , Cu8vstr( "Tcp" ), , &p_CmpRslt ), p_CmpRslt == 0 ) ? 0 : 1,
+							 p_HostnameVstrPt,
+							 p_PortVstrPt,
+							 p_MaxCnctNum,
+							 2,
+							 NULL );
+		}
 
 		//我的服务端线程启动。
 		if( Start( g_ErrInfoVstr.m_Pt ) != 0 )

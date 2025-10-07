@@ -146,10 +146,6 @@ void SaveStngToXmlFile()
 		p_TmpXMLElement1Pt = p_XMLDocument.NewElement( "SrvrStng" );
 		p_StngXMLElementPt->InsertEndChild( p_TmpXMLElement1Pt );
 		
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsAutoActCnct" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
-		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
-		
 		GetDlgItemText( g_SrvrStngDlgWndHdl, MaxCnctNumEdTxtId, ( wchar_t * )p_U16TxtVstrPt->m_StrPt, p_U16TxtVstrPt->m_SzChr );
 		VstrCpy( p_U8TxtVstrPt, p_U16TxtVstrPt, , );
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "MaxCnctNum" );
@@ -1066,18 +1062,7 @@ void ReadStngFromXmlFile()
 				{
 					for( p_TmpXMLElement2Pt = p_TmpXMLElement1Pt->FirstChildElement(); p_TmpXMLElement2Pt != NULL; p_TmpXMLElement2Pt = p_TmpXMLElement2Pt->NextSiblingElement() )
 					{
-						if( strcmp( p_TmpXMLElement2Pt->Name(), "IsAutoActCnct" ) == 0 )
-						{
-							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
-							{
-								CheckDlgButton( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId, BST_UNCHECKED );
-							}
-							else
-							{
-								CheckDlgButton( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId, BST_CHECKED );
-							}
-						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "MaxCnctNum" ) == 0 )
+						if( strcmp( p_TmpXMLElement2Pt->Name(), "MaxCnctNum" ) == 0 )
 						{
 							VstrCpy( p_U16TxtVstrPt, Cu8vstr( p_TmpXMLElement2Pt->GetText() ), , );
 							SetDlgItemText( g_SrvrStngDlgWndHdl, MaxCnctNumEdTxtId, ( LPCWSTR )p_U16TxtVstrPt->m_StrPt );
@@ -2126,7 +2111,6 @@ void DelStngXmlFile()
 void ResetStng()
 {
 	//设置服务端。
-	CheckDlgButton( g_SrvrStngDlgWndHdl, IsAutoActCnctCkBoxId, BST_CHECKED );
 	SetWindowText( GetDlgItem( g_SrvrStngDlgWndHdl, MaxCnctNumEdTxtId ), L"10" );
 
 	//设置传输协议。

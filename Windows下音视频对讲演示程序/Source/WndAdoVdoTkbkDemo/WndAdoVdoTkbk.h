@@ -1,38 +1,38 @@
 #pragma once
 
-//WndAdoVdoTkbkÏîÄ¿µÄDLL¶¯Ì¬¿âÎÄ¼şµ¼Èëµ¼³ö·ûºÅºê¡£
+//WndAdoVdoTkbké¡¹ç›®çš„DLLåŠ¨æ€åº“æ–‡ä»¶å¯¼å…¥å¯¼å‡ºç¬¦å·å®ã€‚
 #if( defined __NAME_WNDADOVDOTKBKDEMO__ )
 	#define __WNDADOVDOTKBK_DLLAPI__
-#elif( defined __NAME_WNDADOVDOTKBK__ ) //Èç¹ûÕıÔÚ±àÒëWndAdoVdoTkbkÏîÄ¿¡£
-	#if( ( defined __MS_VCXX__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃMS VC++±àÒëÆ÷¡£
-		#if( defined __COMLIB__ ) //Èç¹ûÕıÔÚ±àÒëLIB¾²Ì¬¿âÎÄ¼ş¡£
+#elif( defined __NAME_WNDADOVDOTKBK__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘WndAdoVdoTkbké¡¹ç›®ã€‚
+	#if( ( defined __MS_VCXX__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨MS VC++ç¼–è¯‘å™¨ã€‚
+		#if( defined __COMLIB__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘LIBé™æ€åº“æ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__
-		#elif( defined __COMDLL__ ) //Èç¹ûÕıÔÚ±àÒëDLL¶¯Ì¬¿âÎÄ¼ş¡£
+		#elif( defined __COMDLL__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘DLLåŠ¨æ€åº“æ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__ __declspec( dllexport )
-		#elif( defined __COMEXE__ ) //Èç¹ûÕıÔÚ±àÒëEXE¿ÉÖ´ĞĞÎÄ¼ş¡£
+		#elif( defined __COMEXE__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘EXEå¯æ‰§è¡Œæ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃCygwin GCC/G++¡¢Linux GCC/G++¡¢Android GCC/G++¡¢KEIL ARMCLANG/ARMCC±àÒëÆ÷¡£
-		#if( defined __COMLIB__ ) //Èç¹ûÕıÔÚ±àÒëLIB¾²Ì¬¿âÎÄ¼ş¡£
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨Cygwin GCC/G++ã€Linux GCC/G++ã€Android GCC/G++ã€KEIL ARMCLANG/ARMCCç¼–è¯‘å™¨ã€‚
+		#if( defined __COMLIB__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘LIBé™æ€åº“æ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__
-		#elif( defined __COMDLL__ ) //Èç¹ûÕıÔÚ±àÒëDLL¶¯Ì¬¿âÎÄ¼ş¡£
+		#elif( defined __COMDLL__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘DLLåŠ¨æ€åº“æ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__ __attribute__( ( visibility( "default" ) ) )
-		#elif( defined __COMEXE__ ) //Èç¹ûÕıÔÚ±àÒëEXE¿ÉÖ´ĞĞÎÄ¼ş¡£
+		#elif( defined __COMEXE__ ) //å¦‚æœæ­£åœ¨ç¼–è¯‘EXEå¯æ‰§è¡Œæ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__
 		#endif
-	#else //Èç¹ûÕıÔÚÊ¹ÓÃÎ´Öª±àÒëÆ÷¡£
+	#else //å¦‚æœæ­£åœ¨ä½¿ç”¨æœªçŸ¥ç¼–è¯‘å™¨ã€‚
 		#define __WNDADOVDOTKBK_DLLAPI__
 	#endif
-#else //Èç¹ûÕıÔÚ±àÒëÆäËûÏîÄ¿¡£
-	#if( ( defined __MS_VCXX__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃMS VC++±àÒëÆ÷¡£
-		#if( defined __LNKLIB__ ) //Èç¹ûÕıÔÚÁ´½ÓLIB¾²Ì¬¿âÎÄ¼ş¡£
+#else //å¦‚æœæ­£åœ¨ç¼–è¯‘å…¶ä»–é¡¹ç›®ã€‚
+	#if( ( defined __MS_VCXX__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨MS VC++ç¼–è¯‘å™¨ã€‚
+		#if( defined __LNKLIB__ ) //å¦‚æœæ­£åœ¨é“¾æ¥LIBé™æ€åº“æ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__
-		#elif( defined __LNKDLL__ ) //Èç¹ûÕıÔÚÁ´½ÓDLL¶¯Ì¬¿âÎÄ¼ş¡£
+		#elif( defined __LNKDLL__ ) //å¦‚æœæ­£åœ¨é“¾æ¥DLLåŠ¨æ€åº“æ–‡ä»¶ã€‚
 			#define __WNDADOVDOTKBK_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //Èç¹ûÕıÔÚÊ¹ÓÃCygwin GCC/G++¡¢Linux GCC/G++¡¢Android GCC/G++¡¢KEIL ARMCLANG/ARMCC±àÒëÆ÷¡£
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //å¦‚æœæ­£åœ¨ä½¿ç”¨Cygwin GCC/G++ã€Linux GCC/G++ã€Android GCC/G++ã€KEIL ARMCLANG/ARMCCç¼–è¯‘å™¨ã€‚
 		#define __WNDADOVDOTKBK_DLLAPI__
-	#else //Èç¹ûÕıÔÚÊ¹ÓÃÎ´Öª±àÒëÆ÷¡£
+	#else //å¦‚æœæ­£åœ¨ä½¿ç”¨æœªçŸ¥ç¼–è¯‘å™¨ã€‚
 		#define __WNDADOVDOTKBK_DLLAPI__
 	#endif
 #endif

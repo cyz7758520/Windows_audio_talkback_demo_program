@@ -12,7 +12,7 @@
 		#elif( defined __COMEXE__ ) //如果正在编译EXE可执行文件。
 			#define __RNNOISE_DLLAPI__
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#if( defined __COMLIB__ ) //如果正在编译LIB静态库文件。
 			#define __RNNOISE_DLLAPI__
 		#elif( defined __COMDLL__ ) //如果正在编译DLL动态库文件。
@@ -30,7 +30,7 @@
 		#elif( defined __LNKDLL__ ) //如果正在链接DLL动态库文件。
 			#define __RNNOISE_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __LINUX_GCC__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __ANDROID_GCC__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android GCC/G++、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#define __RNNOISE_DLLAPI__
 	#else //如果正在使用未知编译器。
 		#define __RNNOISE_DLLAPI__
@@ -45,9 +45,11 @@ extern "C"
 typedef struct RNNoise RNNoise;
 
 __RNNOISE_DLLAPI__ int RNNoiseGetAppLmtInfo( const void * LicnCodePt, uint64_t * LmtTimeSecPt, uint64_t * RmnTimeSecPt, Vstr * ErrInfoVstrPt );
+
 __RNNOISE_DLLAPI__ int RNNoiseInit( const void * LicnCodePt, RNNoise * * RNNoisePtPt, int32_t SmplRate, size_t FrmLenUnit, Vstr * ErrInfoVstrPt );
-__RNNOISE_DLLAPI__ int RNNoisePocs( RNNoise * RNNoisePt, int16_t * FrmPt, int16_t * RsltFrmPt );
 __RNNOISE_DLLAPI__ int RNNoiseDstoy( RNNoise * RNNoisePt );
+
+__RNNOISE_DLLAPI__ int RNNoisePocs( RNNoise * RNNoisePt, int16_t * FrmPt, int16_t * RsltFrmPt );
 
 #ifdef __cplusplus
 }

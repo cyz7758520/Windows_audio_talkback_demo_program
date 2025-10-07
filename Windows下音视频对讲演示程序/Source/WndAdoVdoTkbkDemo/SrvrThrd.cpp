@@ -1123,7 +1123,8 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 			if( p_TcpClntSoktTmpPt != NULL )
 			{
 				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = SrvrThrd::PktTypExit; //设置退出包。
-				TcpClntSendApkt( p_TcpClntSoktTmpPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 1, 0, 1, 0, NULL ); //发送退出包。
+				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = -1; //设置对讲索引为达到最大连接数。
+				TcpClntSendApkt( p_TcpClntSoktTmpPt, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 0, 1, 0, NULL ); //发送退出包。
 				TcpClntDstoy( p_TcpClntSoktTmpPt, UINT16_MAX, NULL );
 			}
 		}
@@ -1172,7 +1173,8 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 			if( p_AudpCnctIdx != SIZE_MAX )
 			{
 				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = SrvrThrd::PktTypExit; //设置退出包。
-				AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_AudpCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 1, 1, 1, NULL ); //发送退出包。
+				SrvrThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = -1; //设置对讲索引为达到最大连接数。
+				AudpSendApkt( SrvrThrdPt->m_AudpSrvrSoktPt, p_AudpCnctIdx, SrvrThrdPt->m_Thrd.m_TmpBytePt, 2, 1, 1, NULL ); //发送退出包。
 				AudpClosCnct( SrvrThrdPt->m_AudpSrvrSoktPt, p_AudpCnctIdx, NULL );
 			}
 		}

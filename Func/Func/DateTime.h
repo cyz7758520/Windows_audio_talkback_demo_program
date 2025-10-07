@@ -7,7 +7,6 @@ extern "C"
 {
 #endif
 	
-#if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_GCC__ ) )
 __FUNC_DLLAPI__ uint64_t FuncGetTickAsSec();
 __FUNC_DLLAPI__ uint64_t FuncGetTickAsMsec();
 
@@ -19,7 +18,6 @@ __FUNC_DLLAPI__ int FuncSecToLclDateTime( uint64_t Sec, int * YearPt, int * MonP
 __FUNC_DLLAPI__ int FuncMsecToLclDateTime( uint64_t Msec, int * YearPt, int * MonPt, int * DayPt, int * HourPt, int * MinPt, int * SecPt, int * MsecPt );
 __FUNC_DLLAPI__ int FuncLclDateTimeToSec( int Year, int Mon, int Day, int Hour, int Min, int Sec, uint64_t * SecPt );
 __FUNC_DLLAPI__ int FuncLclDateTimeToMsec( int Year, int Mon, int Day, int Hour, int Min, int Sec, int Msec, uint64_t * MsecPt );
-#endif
 
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
 __FUNC_DLLAPI__ uint64_t FuncFileTimeToSec( FILETIME FileTime, uint64_t * SecPt );

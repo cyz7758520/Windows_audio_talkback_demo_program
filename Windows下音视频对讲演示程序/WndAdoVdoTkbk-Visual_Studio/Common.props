@@ -7,7 +7,7 @@
     <ClCompile>
       <AdditionalOptions>/execution-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>..\..\..\Func\Func;..\..\..\Sokt\Sokt;..\..\..\DataStruct\DataStruct;..\..\..\SpeexDsp\SpeexDsp;..\..\..\WebRtc\WebRtc;..\..\..\WebRtc3\WebRtc3;..\..\..\SpeexWebRtcAec\SpeexWebRtcAec;..\..\..\RNNoise\RNNoise;..\..\..\Speex\Speex;..\..\..\AdoWavfm\AdoWavfm;..\..\..\LibYUV\LibYUV;..\..\..\OpenH264\OpenH264;..\..\..\Ajb\Ajb;..\..\..\MediaFile\MediaFile;$(UCRTContentRoot)\Include\10.0.17763.0\um;$(UCRTContentRoot)\Include\10.0.17763.0\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRTDBG_MAP_ALLOC;_USE_MATH_DEFINES;IsIcludWebRtc=1;IsIcludWebRtc3=1;IsIcludSpeexWebRtcAec=1;IsIcludRNNoise=1;IsIcludSpeex=1;IsIcludAdoWavfm=1;IsIcludOpenH264=1;IsIcludAjb=1;IsIcludMediaFile=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IsIcludWebRtc=1;IsIcludWebRtc3=1;IsIcludSpeexWebRtcAec=1;IsIcludRNNoise=1;IsIcludSpeex=1;IsIcludAdoWavfm=1;IsIcludOpenH264=1;IsIcludAjb=1;IsIcludMediaFile=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <MASM>
       <AdditionalOptions>/safeseh %(AdditionalOptions)</AdditionalOptions>
