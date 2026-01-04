@@ -623,17 +623,17 @@ int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * Lc
 	{
 		if( AudpInit( SrvrThrdPt->m_LicnCodePt, &SrvrThrdPt->m_AudpSrvrSoktPt, p_RmtNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ( short )1, ( short )5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议服务端套接字成功。
 		{
-			if( AudpSetSendBufSz( SrvrThrdPt->m_AudpSrvrSoktPt, 1024 * 1024, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的发送缓冲区大小失败。
+			if( AudpSetSendBufSz( SrvrThrdPt->m_AudpSrvrSoktPt, 1024 * 1024, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的发送缓冲区的大小失败。
 			{
-				VstrFmtIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端高级UDP协议套接字的发送缓冲区大小失败。原因：" ) );
+				VstrFmtIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端高级UDP协议套接字的发送缓冲区的大小失败。原因：" ) );
 				if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGE( SrvrThrdPt->m_ErrInfoVstrPt );
 				SrvrThrdPt->m_UserShowLogFuncPt( SrvrThrdPt, SrvrThrdPt->m_ErrInfoVstrPt );
 				goto Out;
 			}
 
-			if( AudpSetRecvBufSz( SrvrThrdPt->m_AudpSrvrSoktPt, 1024 * 1024 * 3, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的接收缓冲区大小失败。
+			if( AudpSetRecvBufSz( SrvrThrdPt->m_AudpSrvrSoktPt, 1024 * 1024 * 3, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的接收缓冲区的大小失败。
 			{
-				VstrFmtIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端高级UDP协议套接字的接收缓冲区大小失败。原因：" ) );
+				VstrFmtIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端高级UDP协议套接字的接收缓冲区的大小失败。原因：" ) );
 				if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGE( SrvrThrdPt->m_ErrInfoVstrPt );
 				SrvrThrdPt->m_UserShowLogFuncPt( SrvrThrdPt, SrvrThrdPt->m_ErrInfoVstrPt );
 				goto Out;
@@ -1070,7 +1070,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 
 					if( TcpClntSetSendBufSz( p_TcpClntSoktTmpPt, 1024 * 1024, 0, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 )
 					{
-						VstrIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端Tcp协议客户端套接字的发送缓冲区大小失败。原因：" ) );
+						VstrIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端Tcp协议客户端套接字的发送缓冲区的大小失败。原因：" ) );
 						if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGE( SrvrThrdPt->m_ErrInfoVstrPt );
 						SrvrThrdPt->m_UserShowLogFuncPt( SrvrThrdPt, SrvrThrdPt->m_ErrInfoVstrPt );
 						goto TcpSrvrSoktAcptOut;
@@ -1078,7 +1078,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 
 					if( TcpClntSetRecvBufSz( p_TcpClntSoktTmpPt, 1024 * 1024, 0, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 )
 					{
-						VstrIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端Tcp协议客户端套接字的接收缓冲区大小失败。原因：" ) );
+						VstrIns( SrvrThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "服务端线程：设置本端Tcp协议客户端套接字的接收缓冲区的大小失败。原因：" ) );
 						if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGE( SrvrThrdPt->m_ErrInfoVstrPt );
 						SrvrThrdPt->m_UserShowLogFuncPt( SrvrThrdPt, SrvrThrdPt->m_ErrInfoVstrPt );
 						goto TcpSrvrSoktAcptOut;
@@ -1610,7 +1610,7 @@ DWORD WINAPI SrvrThrdRun( SrvrThrd * SrvrThrdPt )
 
 		//if( SrvrThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "服务端线程：连接处理全部完毕，耗时 %uz64d 毫秒。" ), FuncGetTickAsMsec() - p_LastTickMsec );
 
-		FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
+		SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
 	} //媒体处理循环结束。
 	
 	SrvrThrdPt->m_UserDstoyFuncPt( SrvrThrdPt ); //调用用户定义的销毁函数。

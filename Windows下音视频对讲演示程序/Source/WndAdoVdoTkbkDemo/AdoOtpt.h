@@ -93,7 +93,7 @@ typedef struct AdoOtpt //音频输出。
 		IMMDevice * m_Pt; //存放指针。
 		IAudioClient * m_ClntPt; //存放客户端的指针。
 		WAVEFORMATEX * m_WaveFmtExPt; //存放格式的指针。
-		UINT32 m_BufSzUnit; //存放缓冲区大小，单位为采样单元。
+		UINT32 m_BufSzUnit; //存放缓冲区的大小，单位为采样单元。
 		IAudioRenderClient * m_RndrClntPt; //存放渲染客户端的指针。
 		IGlobalInterfaceTable * m_GlblIntfcTablePt; //存放全局接口表的指针。
 		DWORD m_RndrClntCookie; //存放渲染客户端的Cookie。

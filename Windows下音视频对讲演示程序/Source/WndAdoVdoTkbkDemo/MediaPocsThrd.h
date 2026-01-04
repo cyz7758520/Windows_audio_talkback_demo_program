@@ -450,7 +450,7 @@ typedef struct MediaPocsThrd //媒体处理线程。
 	{
 		AviFileWriter * m_WriterPt; //存放写入器的指针。
 		Vstr * m_FullPathVstrPt; //存放完整路径动态字符串的指针。
-		size_t m_WrBufSzByt; //存放写入缓冲区大小，单位为字节。
+		size_t m_WrBufSzByt; //存放写入缓冲区的大小，单位为字节。
 		int32_t m_MaxStrmNum; //存放最大流数量，取值区间为[1,100]。
 		int32_t m_IsSaveAdoInpt; //存放是否保存音频输入，为非0表示要保存，为0表示不保存。
 		int32_t m_IsSaveAdoOtpt; //存放是否保存音频输出，为非0表示要保存，为0表示不保存。

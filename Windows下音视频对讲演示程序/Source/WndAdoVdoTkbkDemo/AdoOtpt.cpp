@@ -529,14 +529,14 @@ int AdoOtptWaveFileWriterInit( AdoOtpt * AdoOtptPt )
 	if( AdoOtptPt->m_WaveFileWriter.m_IsSave != 0 )
 	{
 		#if IsIcludMediaFile
-		if( WaveFileWriterInit( &AdoOtptPt->m_WaveFileWriter.m_SrcPt, AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt, AdoOtptPt->m_WaveFileWriter.m_WrBufSzByt, 1, AdoOtptPt->m_SmplRate, 16 ) == 0 )
+		if( WaveFileWriterInit( &AdoOtptPt->m_WaveFileWriter.m_SrcPt, AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt, AdoOtptPt->m_WaveFileWriter.m_WrBufSzByt, 1, AdoOtptPt->m_SmplRate, 16, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs 写入器成功。" ), AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
 		}
 		else
 		#endif
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs 写入器失败。" ), AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化原始Wave文件 %vs 写入器失败。原因：%vs" ), AdoOtptPt->m_WaveFileWriter.m_SrcFullPathVstrPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 			goto Out;
 		}
 	}
@@ -570,14 +570,14 @@ void AdoOtptWaveFileWriterDstoy( AdoOtpt * AdoOtptPt )
 	if( AdoOtptPt->m_WaveFileWriter.m_SrcPt != NULL )
 	{
 		#if IsIcludMediaFile
-		if( WaveFileWriterDstoy( AdoOtptPt->m_WaveFileWriter.m_SrcPt ) == 0 )
+		if( WaveFileWriterDstoy( AdoOtptPt->m_WaveFileWriter.m_SrcPt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 		{
 			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输出：销毁原始Wave文件写入器成功。" ) );
 		}
 		else
 		#endif
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：销毁原始Wave文件写入器失败。" ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：销毁原始Wave文件写入器失败。原因：%vs" ), AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 		}
 		AdoOtptPt->m_WaveFileWriter.m_SrcPt = NULL;
 	}
@@ -787,10 +787,10 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 			goto Out;
 		}
 
-		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetBufferSize( &AdoOtptPt->m_Dvc.m_BufSzUnit ); //获取设备的缓冲区大小。
+		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->GetBufferSize( &AdoOtptPt->m_Dvc.m_BufSzUnit ); //获取设备的缓冲区的大小。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备的缓冲区大小失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：获取设备的缓冲区的大小失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
@@ -836,7 +836,7 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 			}
 		}
 
-		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化设备成功。采样频率：%z32d, 声道数：%z16d，缓冲区大小：%uz32d。" ), AdoOtptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec, AdoOtptPt->m_Dvc.m_WaveFmtExPt->nChannels, AdoOtptPt->m_Dvc.m_BufSzUnit );
+		if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输出：初始化设备成功。采样频率：%z32d, 声道数：%z16d，缓冲区的大小：%uz32d。" ), AdoOtptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec, AdoOtptPt->m_Dvc.m_WaveFmtExPt->nChannels, AdoOtptPt->m_Dvc.m_BufSzUnit );
 	}
 
 	//初始化Pcm格式原始帧容器。
@@ -1021,7 +1021,7 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 			AdoOtptPt->m_Dvc.m_RndrClntPt->Release();
 			AdoOtptPt->m_Dvc.m_RndrClntPt = NULL;
 		}
-		AdoOtptPt->m_Dvc.m_BufSzUnit = 0; //销毁设备的缓冲区大小。
+		AdoOtptPt->m_Dvc.m_BufSzUnit = 0; //销毁设备的缓冲区的大小。
 		if( AdoOtptPt->m_Dvc.m_WaveFmtExPt != NULL ) //销毁设备的格式。
 		{
 			CoTaskMemFree( AdoOtptPt->m_Dvc.m_WaveFmtExPt );
@@ -1171,7 +1171,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 		p_DvcGlblIntfcTablePt->Release();
 	}
 	
-	while( ( AdoOtptPt->m_Thrd.m_ThrdIsStart == 0 ) && ( AdoOtptPt->m_Thrd.m_ExitFlag == 0 ) ) FuncSleep( 1 ); //等待线程开始。这里判断退出标记是因为音频输入可能会初始化失败导致不会让线程开始。
+	while( ( AdoOtptPt->m_Thrd.m_ThrdIsStart == 0 ) && ( AdoOtptPt->m_Thrd.m_ExitFlag == 0 ) ) SleepMsec( 1 ); //等待线程开始。这里判断退出标记是因为音频输入可能会初始化失败导致不会让线程开始。
 
 	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输出线程：开始准备音频输出。" ) );
 
@@ -1207,7 +1207,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 					else if( p_HRslt == AUDCLNT_E_BUFFER_TOO_LARGE ) //如果获取设备的Pcm格式缓冲区还不够一帧。
 					{
 						//if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：AUDCLNT_E_BUFFER_TOO_LARGE。" ) );
-						FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
+						SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
 					}
 					else if( p_HRslt == AUDCLNT_E_BUFFER_SIZE_ERROR )
 					{
@@ -1257,14 +1257,14 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 					else
 					{
 						if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输出线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧失败。原因：内存不足。" ) );
-						FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
+						SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
 						goto OutPocs;
 					}
 				}
 				else
 				{
 					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：Pcm格式原始帧容器中帧总数为%uzd已经超过上限50，不再创建Pcm格式空闲帧。" ), AdoOtptPt->m_Thrd.m_ElmTotal );
-					FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
+					SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
 					goto OutPocs;
 				}
 			}

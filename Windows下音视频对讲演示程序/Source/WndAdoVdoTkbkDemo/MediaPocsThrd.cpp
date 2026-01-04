@@ -1874,7 +1874,7 @@ int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
              IsSave：[输入]，存放是否保存，为非0表示要保存，为0表示不保存。
              SrcFullPathVstrPt：[输入]，存放原始完整路径动态字符串的指针。
              RsltFullPathVstrPt：[输入]，存放结果完整路径动态字符串的指针。
-             WrBufSzByt：[输入]，存放写入缓冲区大小，单位为字节。
+             WrBufSzByt：[输入]，存放写入缓冲区的大小，单位为字节。
              ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
@@ -2400,7 +2400,7 @@ int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
              IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              IsSave：[输入]，存放是否保存，为非0表示要使用，为0表示不使用。
              SrcFullPathVstrPt：[输入]，存放原始Wave文件完整路径动态字符串的指针。
-             WrBufSzByt：[输入]，存放Wave文件写入缓冲区大小，单位为字节。
+             WrBufSzByt：[输入]，存放Wave文件写入缓冲区的大小，单位为字节。
              ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
@@ -3239,7 +3239,7 @@ int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsB
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
              FullPathVstrPt：[输入]，存放完整路径动态字符串的指针。
-             WrBufSzByt：[输入]，存放写入缓冲区大小，单位为字节。
+             WrBufSzByt：[输入]，存放写入缓冲区的大小，单位为字节。
              MaxStrmNum：[输入]，存放最大流数量，取值区间为[1,100]。
              IsSaveAdoInpt：[输入]，存放是否保存音频输入，为非0表示要保存，为0表示不保存。
              IsSaveAdoOtpt：[输入]，存放是否保存音频输出，为非0表示要保存，为0表示不保存。
@@ -5503,24 +5503,24 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		if( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_IsSave != 0 )
 		{
 			#if IsIcludMediaFile
-			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ) == 0 )
+			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_SrcWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoInptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入原始Wave文件写入器写入音频输入Pcm格式原始帧成功。" ) );
 			}
 			else
 			#endif
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输入原始Wave文件写入器写入音频输入Pcm格式原始帧失败。" ) );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输入原始Wave文件写入器写入音频输入Pcm格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
 			#if IsIcludMediaFile
-			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_RsltWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt ) == 0 )
+			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoInpt.m_WaveFileWriter.m_RsltWriterPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoInptPcmRsltFrmPt, MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输入结果Wave文件写入器写入音频输入Pcm格式结果帧成功。" ) );
 			}
 			else
 			#endif
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输入结果Wave文件写入器写入音频输入Pcm格式结果帧失败。" ) );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输入结果Wave文件写入器写入音频输入Pcm格式结果帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
 		}
 
@@ -5599,14 +5599,14 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		if( MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_IsSave != 0 )
 		{
 			#if IsIcludMediaFile
-			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_SrcPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt ) == 0 )
+			if( WaveFileWriterWrite( MediaPocsThrdPt->m_AdoOtpt.m_WaveFileWriter.m_SrcPt, ( char * )MediaPocsThrdPt->m_Thrd.m_AdoOtptPcmSrcFrmPt, MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：使用音频输出原始Wave文件写入器写入音频输出Pcm格式原始帧成功。" ) );
 			}
 			else
 			#endif
 			{
-				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输出原始Wave文件写入器写入音频输出Pcm格式原始帧失败。" ) );
+				if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：使用音频输出原始Wave文件写入器写入音频输出Pcm格式原始帧失败。原因：%vs" ), MediaPocsThrdPt->m_ErrInfoVstrPt );
 			}
 		}
 
@@ -5940,7 +5940,7 @@ DWORD WINAPI MediaPocsThrdRun( MediaPocsThrd * MediaPocsThrdPt )
 
 		//if( MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音视频输入输出帧处理全部完毕，耗时 %uz64d 毫秒。" ), FuncGetTickAsMsec() - p_LastTickMsec );
 
-		FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
+		SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
 	} //媒体处理循环结束。
 	
 	MediaPocsThrdTmpVarDstoy( MediaPocsThrdPt );

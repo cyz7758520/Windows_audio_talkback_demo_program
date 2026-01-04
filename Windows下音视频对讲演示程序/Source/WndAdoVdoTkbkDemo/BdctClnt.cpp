@@ -422,7 +422,7 @@ void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 
 							if( TcpClntSetSendBufSz( p_CnctInfoTmpPt->m_TcpClntSoktPt, 1024 * 1024, 0, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 							{
-								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：连接%uzd：设置本端Tcp协议客户端套接字的发送缓冲区大小失败。原因：" ), p_CnctInfoTmpPt->m_Idx );
+								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：连接%uzd：设置本端Tcp协议客户端套接字的发送缓冲区的大小失败。原因：" ), p_CnctInfoTmpPt->m_Idx );
 								if( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								BdctClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( BdctClntPt->m_ClntMediaPocsThrdPt, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								goto TcpClntSoktCnctOut;
@@ -430,7 +430,7 @@ void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 
 							if( TcpClntSetRecvBufSz( p_CnctInfoTmpPt->m_TcpClntSoktPt, 1024 * 1024 * 3, 0, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 							{
-								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：连接%uzd：设置本端Tcp协议客户端套接字的接收缓冲区大小失败。原因：" ), p_CnctInfoTmpPt->m_Idx );
+								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：连接%uzd：设置本端Tcp协议客户端套接字的接收缓冲区的大小失败。原因：" ), p_CnctInfoTmpPt->m_Idx );
 								if( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								BdctClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( BdctClntPt->m_ClntMediaPocsThrdPt, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								goto TcpClntSoktCnctOut;
@@ -504,17 +504,17 @@ void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 					{
 						if( AudpInit( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_LicnCodePt, &BdctClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, p_RmtNodeAddrFamly, NULL, NULL, 0, 5000, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议客户端套接字成功。
 						{
-							if( AudpSetSendBufSz( BdctClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, 1024 * 1024, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的发送缓冲区大小失败。
+							if( AudpSetSendBufSz( BdctClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, 1024 * 1024, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的发送缓冲区的大小失败。
 							{
-								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：设置本端高级UDP协议套接字的发送缓冲区大小失败。原因：" ) );
+								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：设置本端高级UDP协议套接字的发送缓冲区的大小失败。原因：" ) );
 								if( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								BdctClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( BdctClntPt->m_ClntMediaPocsThrdPt, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								goto AudpClntSoktCnctOut;
 							}
 
-							if( AudpSetRecvBufSz( BdctClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, 1024 * 1024 * 3, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的接收缓冲区大小失败。
+							if( AudpSetRecvBufSz( BdctClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt, 1024 * 1024 * 3, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的接收缓冲区的大小失败。
 							{
-								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：设置本端高级UDP协议套接字的接收缓冲区大小失败。原因：" ) );
+								VstrFmtIns( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：广播客户端：设置本端高级UDP协议套接字的接收缓冲区的大小失败。原因：" ) );
 								if( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								BdctClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( BdctClntPt->m_ClntMediaPocsThrdPt, BdctClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 								goto AudpClntSoktCnctOut;

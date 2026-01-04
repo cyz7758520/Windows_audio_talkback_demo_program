@@ -531,7 +531,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 
 						if( TcpClntSetSendBufSz( TkbkClntPt->m_TcpClntSoktPt, 1024 * 1024, 0, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
-							VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：设置本端Tcp协议客户端套接字的发送缓冲区大小失败。原因：" ) );
+							VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：设置本端Tcp协议客户端套接字的发送缓冲区的大小失败。原因：" ) );
 							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 							TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto TcpClntSoktCnctOut;
@@ -539,7 +539,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 
 						if( TcpClntSetRecvBufSz( TkbkClntPt->m_TcpClntSoktPt, 1024 * 1024 * 3, 0, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
 						{
-							VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：设置本端Tcp协议客户端套接字的接收缓冲区大小失败。原因：" ) );
+							VstrFmtIns( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt, 0, Cu8vstr( "客户端媒体处理线程：对讲客户端：设置本端Tcp协议客户端套接字的接收缓冲区的大小失败。原因：" ) );
 							if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 							TkbkClntPt->m_ClntMediaPocsThrdPt->m_UserShowLogFuncPt( TkbkClntPt->m_ClntMediaPocsThrdPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 							goto TcpClntSoktCnctOut;

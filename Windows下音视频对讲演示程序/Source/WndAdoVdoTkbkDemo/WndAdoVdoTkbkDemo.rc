@@ -55,7 +55,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS
 CAPTION "Windows下音视频对讲演示程序"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CTEXT           "Windows下音视频对讲演示程序\n版本：2025年10月07日",IDC_STATIC,7,7,325,16
+    CTEXT           "Windows下音视频对讲演示程序\n版本：2025年01月04日",IDC_STATIC,7,7,325,16
     LTEXT           "服务端：",IDC_STATIC,7,26,33,8
     COMBOBOX        SrvrUrlCbBoxId,39,24,236,273,CBS_DROPDOWN | WS_TABSTOP
     DEFPUSHBUTTON   "创建",SrvrCreateOrDstoyBtnId,276,23,28,14
@@ -282,7 +282,7 @@ BEGIN
     CTEXT           "保存音视频输入输出到Avi文件\n设置",IDC_STATIC,7,7,295,16,WS_TABSTOP
     LTEXT           "音视频输入输出Avi文件完整路径：",IDC_STATIC,7,32,213,9
     EDITTEXT        SaveAdoVdoInptOtptToAviFileFullPathEdTxtId,231,30,71,14,ES_AUTOHSCROLL
-    LTEXT           "写入缓冲区大小，单位为字节：",IDC_STATIC,7,50,213,9
+    LTEXT           "写入缓冲区的大小，单位为字节：",IDC_STATIC,7,50,213,9
     EDITTEXT        SaveAdoVdoInptOtptToAviFileWrBufSzBytEdTxtId,231,48,71,14,ES_AUTOHSCROLL
     CONTROL         "保存音频输入",SaveAdoVdoInptOtptToAviFileIsSaveAdoInptCkBoxId,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,83,295,10
@@ -509,7 +509,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,78,295,10
     LTEXT           "音频输出原始Wave文件完整路径：",IDC_STATIC,7,94,213,9
     EDITTEXT        SaveAdoInptOtptToWaveFileAdoOtptSrcFullPathEdTxtId,231,92,71,14,ES_AUTOHSCROLL
-    LTEXT           "写入缓冲区大小，单位为字节：",IDC_STATIC,7,114,213,9
+    LTEXT           "写入缓冲区的大小，单位为字节：",IDC_STATIC,7,114,213,9
     EDITTEXT        SaveAdoInptOtptToWaveFileWrBufSzBytEdTxtId,231,112,71,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "确定",SaveAdoInptOtptToWaveFileStngOkBtnId,7,131,295,14
 END

@@ -482,7 +482,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 			goto Out;
 		}
 		
-		FuncSleep( 1 ); //暂停一下，避免CPU使用率过高。
+		SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
 	} //视频输出循环完毕。
 	
 	Out:
