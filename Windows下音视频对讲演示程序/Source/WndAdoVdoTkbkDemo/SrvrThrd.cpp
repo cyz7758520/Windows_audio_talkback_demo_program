@@ -245,6 +245,7 @@ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 	if( SrvrThrdPt->m_CnctInfoCntnrPt != NULL )
 	{
 		CQueueDstoy( SrvrThrdPt->m_CnctInfoCntnrPt, NULL );
+		SrvrThrdPt->m_CnctInfoCntnrPt = NULL;
 	}
 	
 	//销毁授权码。
@@ -258,6 +259,7 @@ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 	if( SrvrThrdPt->m_ThrdMsgQueuePt != NULL )
 	{
 		MsgQueueDstoy( SrvrThrdPt->m_ThrdMsgQueuePt, NULL );
+		SrvrThrdPt->m_ThrdMsgQueuePt = NULL;
 	}
 
 	//销毁服务端线程内存块。

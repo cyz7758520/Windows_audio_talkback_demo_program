@@ -223,6 +223,8 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ), SW_SHOW ); //设置音频输入设备组合框为显示。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ), SW_SHOW ); //设置音频输出设备组合框为显示。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ), SW_SHOW ); //设置视频输入设备组合框为显示。
+				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId ), SW_SHOW ); //设置音频输入广播对讲模式复选框为显示。
+				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId ), SW_SHOW ); //设置视频输入广播对讲模式复选框为显示。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, PtbBtnId ), SW_SHOW ); //设置一键即按即广播按钮为显示。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, StngBtnId ), SW_SHOW ); //设置设置按钮为显示。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, SaveStngBtnId ), SW_SHOW ); //设置保存设置按钮为显示。
@@ -289,6 +291,8 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ), SW_HIDE ); //设置音频输入设备组合框为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ), SW_HIDE ); //设置音频输出设备组合框为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ), SW_HIDE ); //设置视频输入设备组合框为隐藏。
+				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId ), SW_HIDE ); //设置音频输入广播对讲模式复选框为隐藏。
+				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId ), SW_HIDE ); //设置视频输入广播对讲模式复选框为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, PtbBtnId ), SW_HIDE ); //设置一键即按即广播按钮为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, StngBtnId ), SW_HIDE ); //设置设置按钮为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, SaveStngBtnId ), SW_HIDE ); //设置保存设置按钮为隐藏。
@@ -355,6 +359,8 @@ void SetVdoWndShowMode( int VdoWndShowMode )
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoInptDvcCbBoxId ), SW_HIDE ); //设置音频输入设备组合框为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoOtptDvcCbBoxId ), SW_HIDE ); //设置音频输出设备组合框为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ), SW_HIDE ); //设置视频输入设备组合框为隐藏。
+				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseAdoInptBdctTkbkModeCkBoxId ), SW_HIDE ); //设置音频输入广播对讲模式复选框为隐藏。
+				ShowWindow( GetDlgItem( g_MainDlgWndHdl, UseVdoInptBdctTkbkModeCkBoxId ), SW_HIDE ); //设置视频输入广播对讲模式复选框为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, PtbBtnId ), SW_HIDE ); //设置一键即按即广播按钮为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, StngBtnId ), SW_HIDE ); //设置设置按钮为隐藏。
 				ShowWindow( GetDlgItem( g_MainDlgWndHdl, SaveStngBtnId ), SW_HIDE ); //设置保存设置按钮为隐藏。
@@ -1498,7 +1504,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 	// TODO: 在此处放置代码。
 	#ifdef __DEBUG__
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF );
-	//_CrtSetBreakAlloc( 2829 );
+	//_CrtSetBreakAlloc( 742 );
 	#endif
 
 	CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。

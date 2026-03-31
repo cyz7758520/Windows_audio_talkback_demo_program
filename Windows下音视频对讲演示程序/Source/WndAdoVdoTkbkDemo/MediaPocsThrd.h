@@ -458,9 +458,7 @@ typedef struct MediaPocsThrd //媒体处理线程。
 		int32_t m_IsSaveVdoOtpt; //存放是否保存视频输出，为非0表示要保存，为0表示不保存。
 		uint32_t m_AdoInptPcmSrcStrmIdx; //存放音频输入Pcm格式原始流索引。
 		uint32_t m_AdoInptPcmRsltStrmIdx; //存放音频输入Pcm格式结果流索引。
-		int32_t m_AdoInptStrmTimeStampIsReset; //存放音频输入流时间戳是否重置，为非0表示要重置，为0表示不重置。
 		uint32_t m_AdoOtptPcmSrcStrmIdx; //存放音频输出Pcm格式原始流索引。
-		int32_t m_AdoOtptStrmTimeStampIsReset; //存放音频输出流时间戳是否重置，为非0表示要重置，为0表示不重置。
 		uint32_t m_VdoInptEncdRsltStrmIdx; //存放视频输入已编码格式结果流索引。
 		std::map< uint32_t, uint32_t > * m_VdoOtptEncdSrcStrmIdxMapPt; //存放视频输出已编码格式原始流索引映射指针。
 	} m_AdoVdoInptOtptAviFile;
@@ -473,10 +471,10 @@ typedef struct MediaPocsThrd //媒体处理线程。
 	struct //存放线程。
 	{
 		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程临时变量。
-		int16_t * m_AdoInptPcmSrcFrmPt; //存放音频输入Pcm格式原始帧的指针。
+		AdoInpt::Frm * m_AdoInptPcmSrcFrmPt; //存放音频输入Pcm格式原始帧的指针。
 		int16_t * m_AdoInptPcmRsltFrmPt; //存放音频输入Pcm格式结果帧的指针。
 		int16_t * m_AdoInptPcmTmpFrmPt; //存放音频输入Pcm格式临时帧的指针。
-		int16_t * m_AdoOtptPcmSrcFrmPt; //存放音频输出Pcm格式原始帧的指针。
+		AdoOtpt::Frm * m_AdoOtptPcmSrcFrmPt; //存放音频输出Pcm格式原始帧的指针。
 		int32_t m_AdoInptPcmRsltFrmVoiceActSts; //存放音频输入Pcm格式结果帧语音活动状态，为非0表示有语音活动，为0表示无语音活动。
 		uint8_t * m_AdoInptEncdRsltFrmPt; //存放音频输入已编码格式结果帧的指针，大小为 m_AdoInpt.m_FrmLenByt 字节。
 		size_t m_AdoInptEncdRsltFrmLenByt; //存放音频输入已编码格式结果帧的长度，单位为字节。

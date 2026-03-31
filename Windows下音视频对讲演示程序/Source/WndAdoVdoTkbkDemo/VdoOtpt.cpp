@@ -462,7 +462,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 			p_StrmPt->m_Thrd.m_FrmPt->m_StrmIdx = p_StrmPt->m_Idx; //设置流索引。
 			p_StrmPt->m_Thrd.m_FrmPt->m_TimeStampMsec = p_StrmPt->m_Thrd.m_LastTickMsec; //设置时间戳。
 			
-			//追加本次帧到帧容器。注意：从取出到放入过程中可以跳出，跳出后会再次使用本次帧。
+			//放入本次帧到帧容器。注意：从取出到放入过程中可以跳出，跳出后会再次使用本次帧。
 			{
 				p_VdoOtptPt->m_FrmCntnr.PutTail( &p_StrmPt->m_Thrd.m_FrmPt, NULL, 1, NULL );
 				p_StrmPt->m_Thrd.m_FrmPt = NULL;
@@ -486,7 +486,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 	} //视频输出循环完毕。
 	
 	Out:
-	if( p_StrmPt->m_Thrd.m_FrmPt != NULL ) //如果获取的空闲帧没有追加到帧容器。
+	if( p_StrmPt->m_Thrd.m_FrmPt != NULL ) //如果获取的空闲帧没有放入到帧容器。
 	{
 		p_VdoOtptPt->m_IdleFrmCntnr.PutTail( &p_StrmPt->m_Thrd.m_FrmPt, NULL, 1, NULL );
 		p_StrmPt->m_Thrd.m_FrmPt = NULL;

@@ -218,15 +218,22 @@ typedef struct AdoInpt //存放音频输入。
 		SpeexResamplerState * m_PcmSrcFrmSpeexResamplerPt; //存放Pcm格式原始帧Speex重采样器的指针。
 		int32_t m_IsMute; //存放是否静音，为0表示有声音，为非0表示静音。
 	} m_Dvc;
-
+	
+	typedef struct //存放Pcm格式帧。
+	{
+		int16_t * m_PcmFrmPt; //存放Pcm格式帧的指针。
+		uint64_t m_TimeStampMsec; //存放时间戳，单位为毫秒。
+	} Frm;
 	CQueueCls m_PcmSrcFrmCntnr; //存放Pcm格式原始帧容器。
 	CQueueCls m_PcmIdleFrmCntnr; //存放Pcm格式空闲帧容器。
 
 	struct //存放线程。
 	{
 		int32_t m_IsInitThrdTmpVar; //存放是否初始化线程的临时变量。
-		int16_t * m_PcmSrcFrmPt; //存放Pcm格式原始帧的指针。
-		size_t m_ElmTotal; //存放元素总数。
+		Frm * m_PcmSrcFrmPt; //存放Pcm格式原始帧的指针。
+		uint64_t m_CurFrmTimeStampMsec; //存放当前帧的时间戳，为帧的起始时间，单位为毫秒。用于判断是否需要补帧或丢帧。
+		uint64_t m_AddOrDropFrmStartTimeStampMsec; //存放补帧或丢帧的起始时间戳，为帧的起始时间，单位为毫秒。用于判断是否需要补帧或丢帧。
+		Frm * m_AddPcmSrcFrmPt; //存放补的Pcm格式原始帧的指针。
 		uint64_t m_LastTickMsec; //存放上次的嘀嗒钟，单位为毫秒。
 		uint64_t m_NowTickMsec; //存放本次的嘀嗒钟，单位为毫秒。
 
@@ -238,7 +245,6 @@ typedef struct AdoInpt //存放音频输入。
 
 int AdoInptAecInit( AdoInpt * AdoInptPt );
 void AdoInptAecDstoy( AdoInpt * AdoInptPt );
-void AdoInptSetIsCanUseAec( AdoInpt * AdoInptPt );
 int AdoInptNsInit( AdoInpt * AdoInptPt );
 void AdoInptNsDstoy( AdoInpt * AdoInptPt );
 int AdoInptSpeexPrpocsInit( AdoInpt * AdoInptPt );

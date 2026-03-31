@@ -237,57 +237,6 @@ void AdoInptAecDstoy( AdoInpt * AdoInptPt )
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 函数名称：AdoInptSetIsCanUseAec
- * 功能说明：设置音频输入是否可以使用声学回音消除器。
- * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
-             参数2名称：[输入|输出|输入&输出]，存放此参数的使用说明。
-             ……
-             ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
- * 返回说明：0：成功。
-             非0：失败。
-             ……
- * 线程安全：是 或 否
- * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-void AdoInptSetIsCanUseAec( AdoInpt * AdoInptPt )
-{
-	if( AdoInptPt->m_UseWhatAec != 0 ) //如果要使用声学回音消除器。
-	{
-		if( AdoInptPt->m_IsUse == 0 )
-		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：因为不使用音频输入，所以不可以使用声学回音消除器。" ) );
-			AdoInptPt->m_IsCanUseAec = 0; //设置是否可以使用声学回音消除器为不可以。
-		}
-		else if( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_IsUse == 0 )
-		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：因为不使用音频输出，所以不可以使用声学回音消除器。" ) );
-			AdoInptPt->m_IsCanUseAec = 0; //设置是否可以使用声学回音消除器为不可以。
-		}
-		else if( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_SmplRate != AdoInptPt->m_SmplRate )
-		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：因为音频输出的采样频率与音频输入不一致，所以不可以使用声学回音消除器。" ) );
-			AdoInptPt->m_IsCanUseAec = 0; //设置是否可以使用声学回音消除器为不可以。
-		}
-		else if( ( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenMsec != AdoInptPt->m_FrmLenMsec ) || ( AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenUnit != AdoInptPt->m_FrmLenUnit ) )
-		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：因为音频输出帧的长度与音频输入不一致，所以不可以使用声学回音消除器。" ) );
-			AdoInptPt->m_IsCanUseAec = 0; //设置是否可以使用声学回音消除器为不可以。
-		}
-		else
-		{
-			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：因为要使用声学回音消除器，所以可以使用声学回音消除器。" ) );
-			AdoInptPt->m_IsCanUseAec = 1; //设置是否可以使用声学回音消除器为可以。
-		}
-	}
-	else //如果不使用声学回音消除器。
-	{
-		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：因为不使用声学回音消除器，所以不可以使用声学回音消除器。" ) );
-		AdoInptPt->m_IsCanUseAec = 0; //设置是否可以使用声学回音消除器为不可以。
-	}
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoInptNsInit
  * 功能说明：初始化音频输入的噪音抑制器。
  * 参数说明：参数1名称：[输入|输出|输入&输出]，存放此参数的使用说明。
@@ -1513,7 +1462,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	}
 
 	//初始化Pcm格式原始帧容器。
-	if( AdoInptPt->m_PcmSrcFrmCntnr.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( AdoInptPt->m_PcmSrcFrmCntnr.Init( sizeof( AdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式原始帧容器成功。" ) );
 	}
@@ -1524,7 +1473,7 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	}
 
 	//初始化Pcm格式空闲帧容器。
-	if( AdoInptPt->m_PcmIdleFrmCntnr.Init( sizeof( int16_t * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( AdoInptPt->m_PcmIdleFrmCntnr.Init( sizeof( AdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：音频输入：初始化Pcm格式空闲帧容器成功。" ) );
 	}
@@ -1538,7 +1487,9 @@ int AdoInptDvcAndThrdInit( AdoInpt * AdoInptPt )
 	{
 		AdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程的临时变量。
 		AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //初始化Pcm格式原始帧的指针。
-		AdoInptPt->m_Thrd.m_ElmTotal = 0; //初始化元素总数。
+		AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec = 0; //初始化当前帧的时间戳。
+		AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec = 0; //初始化补帧或丢帧的起始时间戳。
+		AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt = NULL; //初始化补的Pcm格式原始帧的指针。
 		AdoInptPt->m_Thrd.m_LastTickMsec = 0; //初始化上次的嘀嗒钟。
 		AdoInptPt->m_Thrd.m_NowTickMsec = 0; //初始化本次的嘀嗒钟。
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：初始化线程的临时变量成功。" ) );
@@ -1601,7 +1552,9 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	{
 		AdoInptPt->m_Thrd.m_IsInitThrdTmpVar = 0; //设置未初始化线程的临时变量。
 		AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL; //销毁Pcm格式原始帧的指针。
-		AdoInptPt->m_Thrd.m_ElmTotal = 0; //销毁元素总数。
+		AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec = 0; //销毁当前帧的时间戳。
+		AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec = 0; //销毁补帧或丢帧的起始时间戳。
+		AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt = NULL; //销毁补的Pcm格式原始帧的指针。
 		AdoInptPt->m_Thrd.m_LastTickMsec = 0; //销毁上次的嘀嗒钟。
 		AdoInptPt->m_Thrd.m_NowTickMsec = 0; //销毁本次的嘀嗒钟。
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "媒体处理线程：音频输入：销毁线程的临时变量成功。" ) );
@@ -1612,6 +1565,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	{
 		while( AdoInptPt->m_PcmIdleFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
+			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt );
 			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
 		}
@@ -1630,6 +1584,7 @@ void AdoInptDvcAndThrdDstoy( AdoInpt * AdoInptPt )
 	{
 		while( AdoInptPt->m_PcmSrcFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 0, NULL ) == 0 )
 		{
+			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt );
 			free( AdoInptPt->m_Thrd.m_PcmSrcFrmPt );
 			AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
 		}
@@ -1829,6 +1784,73 @@ void AdoInptDstoy( AdoInpt * AdoInptPt )
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * 函数名称：AdoInptGetPcmIdleFrm
+ * 功能说明：音频输入获取一个Pcm格式空闲帧。
+ * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
+			 IsChkPcmSrcFrmCntnrElmTotal：[输入]，存放是否检查Pcm格式原始帧容器的元素总数，为非0表示要检查，为0表示不检查。
+ * 返回说明：NULL：失败。
+             其他：空闲帧的指针。
+ * 线程安全：是 或 否
+ * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+inline AdoInpt::Frm * AdoInptGetPcmIdleFrm( AdoInpt * AdoInptPt, int IsChkPcmSrcFrmCntnrElmTotal )
+{
+	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	AdoInpt::Frm * p_IdleFrmPt = NULL; //存放空闲帧的指针。
+	size_t p_ElmTotal; //存放元素总数。
+
+	AdoInptPt->m_PcmIdleFrmCntnr.GetTotal( &p_ElmTotal, 1, NULL ); //获取Pcm格式空闲帧容器的元素总数。
+	if( p_ElmTotal > 0 ) //如果Pcm格式空闲帧容器中有帧。
+	{
+		AdoInptPt->m_PcmIdleFrmCntnr.GetHead( &p_IdleFrmPt, NULL, 1, 1, NULL ); //从Pcm格式空闲帧容器中取出并删除第一个帧。
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从Pcm格式空闲帧容器中取出并删除第一个帧，Pcm格式空闲帧容器元素总数：%uzd。" ), p_ElmTotal );
+	}
+	else //如果Pcm格式空闲帧容器中没有帧。
+	{
+		if( IsChkPcmSrcFrmCntnrElmTotal != 0 )
+		{
+			AdoInptPt->m_PcmSrcFrmCntnr.GetTotal( &p_ElmTotal, 1, NULL ); //获取Pcm格式原始帧容器的元素总数。
+			if( p_ElmTotal > 50 )
+			{
+				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：Pcm格式原始帧容器中帧总数为%uzd已经超过上限50，不再创建Pcm格式空闲帧。" ), p_ElmTotal );
+				goto Out;
+			}
+		}
+
+		p_IdleFrmPt = ( AdoInpt::Frm * )calloc( sizeof( AdoInpt::Frm ), 1 ); //创建一个Pcm格式空闲帧。
+		if( p_IdleFrmPt == NULL )
+		{
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧失败。原因：内存不足。" ) );
+			goto Out;
+		}
+
+		p_IdleFrmPt->m_PcmFrmPt = ( int16_t * )calloc( AdoInptPt->m_FrmLenByt, 1 ); //创建一个Pcm格式帧。
+		if( p_IdleFrmPt->m_PcmFrmPt == NULL )
+		{
+			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧失败。原因：内存不足。" ) );
+			goto Out;
+		}
+
+		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧成功。" ) );
+	}
+
+	p_Rslt = 0; //设置本函数执行成功。
+	
+	Out:
+	if( p_Rslt != 0 ) //如果本函数执行失败。
+	{
+		if( p_IdleFrmPt != NULL )
+		{
+			if( p_IdleFrmPt->m_PcmFrmPt != NULL ) free( p_IdleFrmPt->m_PcmFrmPt );
+			free( p_IdleFrmPt );
+			p_IdleFrmPt = NULL;
+		}
+	}
+	return p_IdleFrmPt;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 函数名称：AdoInptThrdRun
  * 功能说明：音频输入线程主函数。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
@@ -1877,8 +1899,6 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		p_DvcGlblIntfcTablePt->Release();
 	}
 	
-	if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：开始准备音频输入。" ) );
-
 	if( AdoInptPt->m_IsCanUseAec != 0 ) //如果可以使用声学回音消除器，就自适应计算回音延迟，并设置到声学回音消除器。放在音频输入线程中计算，可以减少媒体处理线程的初始化时间。
 	{
 		int32_t p_AdoInptDelay; //存放音频输入延迟。
@@ -1886,10 +1906,15 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 		int32_t p_Delay; //存放回音延迟，单位为毫秒。
 		int32_t p_TmpInt32;
 
+		//计算音频输入的延迟。
 		p_AdoInptDelay = /*AdoInptPt->m_Dvc.m_BufSzUnit * 1000 / AdoInptPt->m_Dvc.m_WaveFmtExPt->nSamplesPerSec*/10; //音频输入延迟固定为10毫秒。
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：音频输入延迟 %z32d 毫秒。" ), p_AdoInptDelay );
+
+		//计算音频输出的延迟。
 		p_AdoOtptDelay = AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_BufSzUnit * 1000 / AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_WaveFmtExPt->nSamplesPerSec;
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：音频输出延迟 %z32d 毫秒。" ), p_AdoOtptDelay );
+
+		//计算回音延迟。
 		p_Delay = p_AdoInptDelay + p_AdoOtptDelay;
 		if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：回音延迟 %z32d 毫秒。" ), p_Delay );
 
@@ -1962,6 +1987,9 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			AdoInptPt->m_MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
 		}
 	}
+	
+	AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec = FuncGetTickAsMsec(); //设置当前帧的时间戳。
+	if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：开始准备音频输入。当前帧的时间戳：%uz64d。" ), AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec );
 
 	//音频输入循环开始。
 	if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) AdoInptPt->m_Thrd.m_LastTickMsec = FuncGetTickAsMsec();
@@ -2087,35 +2115,11 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			}
 
 			//获取一个Pcm格式空闲帧。
-			AdoInptPt->m_PcmIdleFrmCntnr.GetTotal( &AdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式空闲帧容器的元素总数。
-			if( AdoInptPt->m_Thrd.m_ElmTotal > 0 ) //如果Pcm格式空闲帧容器中有帧。
+			AdoInptPt->m_Thrd.m_PcmSrcFrmPt = AdoInptGetPcmIdleFrm( AdoInptPt, 1 );
+			if( AdoInptPt->m_Thrd.m_PcmSrcFrmPt == NULL )
 			{
-				AdoInptPt->m_PcmIdleFrmCntnr.GetHead( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, 1, NULL ); //从Pcm格式空闲帧容器中取出并删除第一个帧。
-				if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：从Pcm格式空闲帧容器中取出并删除第一个帧，Pcm格式空闲帧容器元素总数：%uzd。" ), AdoInptPt->m_Thrd.m_ElmTotal );
-			}
-			else //如果Pcm格式空闲帧容器中没有帧。
-			{
-				AdoInptPt->m_PcmSrcFrmCntnr.GetTotal( &AdoInptPt->m_Thrd.m_ElmTotal, 1, NULL ); //获取Pcm格式原始帧容器的元素总数。
-				if( AdoInptPt->m_Thrd.m_ElmTotal <= 50 )
-				{
-					AdoInptPt->m_Thrd.m_PcmSrcFrmPt = ( int16_t * )calloc( AdoInptPt->m_FrmLenByt, 1 ); //创建一个Pcm格式空闲帧。
-					if( AdoInptPt->m_Thrd.m_PcmSrcFrmPt != NULL )
-					{
-						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧成功。" ) );
-					}
-					else
-					{
-						if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGE( Cu8vstr( "音频输入线程：Pcm格式空闲帧容器中没有帧，创建一个Pcm格式空闲帧失败。原因：内存不足。" ) );
-						SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
-						goto OutPocs;
-					}
-				}
-				else
-				{
-					if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：Pcm格式原始帧容器中帧总数为%uzd已经超过上限50，不再创建Pcm格式空闲帧。" ), AdoInptPt->m_Thrd.m_ElmTotal );
-					SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
-					goto OutPocs;
-				}
+				SleepMsec( 1 ); //暂停一下，避免CPU使用率过高。
+				goto OutPocs;
 			}
 
 			//将Pcm格式缓冲区帧转换为Pcm格式原始帧。
@@ -2123,20 +2127,138 @@ DWORD WINAPI AdoInptThrdRun( AdoInpt * AdoInptPt )
 			//fwrite( AdoInptPt->m_Dvc.m_PcmBufFrmPt, AdoInptPt->m_Dvc.m_PcmBufFrmLenByt, 1, AdoInptFile2Pt );
 			if( AdoInptPt->m_Dvc.m_PcmSrcFrmSpeexResamplerPt != NULL )
 			{
-				SpeexResamplerPocs( AdoInptPt->m_Dvc.m_PcmSrcFrmSpeexResamplerPt, AdoInptPt->m_Dvc.m_PcmBufFrmPt, AdoInptPt->m_Dvc.m_PcmBufFrmLenUnit, AdoInptPt->m_Thrd.m_PcmSrcFrmPt, AdoInptPt->m_FrmLenUnit, NULL );
-				//fwrite( AdoInptPt->m_Thrd.m_PcmSrcFrmPt, AdoInptPt->m_FrmLenByt, 1, AdoInptFile3Pt );
+				SpeexResamplerPocs( AdoInptPt->m_Dvc.m_PcmSrcFrmSpeexResamplerPt, AdoInptPt->m_Dvc.m_PcmBufFrmPt, AdoInptPt->m_Dvc.m_PcmBufFrmLenUnit, AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt, AdoInptPt->m_FrmLenUnit, NULL );
+				//fwrite( AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt, AdoInptPt->m_FrmLenByt, 1, AdoInptFile3Pt );
 			}
 			else
 			{
-				memcpy( AdoInptPt->m_Thrd.m_PcmSrcFrmPt, AdoInptPt->m_Dvc.m_PcmBufFrmPt, AdoInptPt->m_FrmLenByt );
-				//fwrite( AdoInptPt->m_Thrd.m_PcmSrcFrmPt, AdoInptPt->m_FrmLenByt, 1, AdoInptFile3Pt );
+				memcpy( AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt, AdoInptPt->m_Dvc.m_PcmBufFrmPt, AdoInptPt->m_FrmLenByt );
+				//fwrite( AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt, AdoInptPt->m_FrmLenByt, 1, AdoInptFile3Pt );
 			}
 
-			//追加本次Pcm格式原始帧到Pcm格式原始帧容器。注意：从取出到追加过程中不能跳出，否则会内存泄露。
+			//放入本次Pcm格式原始帧到Pcm格式原始帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。
 			{
+				//判断是否需要补帧或丢帧。
+				{
+					AdoInptPt->m_Thrd.m_NowTickMsec = FuncGetTickAsMsec() - AdoInptPt->m_FrmLenMsec; //设置本次的滴答钟。因为当前帧的时间戳为帧的起始时间，所以要递减一个帧长。
+
+					if( ( AdoInptPt->m_Thrd.m_NowTickMsec > AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec ) && ( AdoInptPt->m_Thrd.m_NowTickMsec - AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec > AdoInptPt->m_FrmLenMsec ) ) //如果本次的滴答钟比当前帧的时间戳高一个帧长，就表示当前少帧了，需要补帧。
+					{
+						if( AdoInptPt->m_Thrd.m_NowTickMsec - AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec < 1000 ) //如果本次的滴答钟比当前帧的时间戳高了小于1秒，就表示可以补帧。
+						{
+							if( ( int64_t )AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec > 0 ) //如果已经准备开始补帧。
+							{
+								if( AdoInptPt->m_Thrd.m_NowTickMsec - AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec < 1000 ) //如果已经准备开始补帧小于1秒。
+								{
+									if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 高一个帧长 %uzd，就表示当前少帧了，继续准备补帧。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec, AdoInptPt->m_FrmLenMsec );
+								}
+								else //如果已经准备开始补帧大于等于1秒，才开始补帧，因为可能是帧数不稳定导致误判需要补帧。
+								{
+									if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 高一个帧长 %uzd，就表示当前少帧了，立即开始补帧。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec, AdoInptPt->m_FrmLenMsec );
+
+									//获取一个Pcm格式空闲帧。
+									AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt = AdoInptGetPcmIdleFrm( AdoInptPt, 0 );
+									if( AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt == NULL )
+									{
+										goto OutAddOrDropFrm;
+									}
+
+									//放入本次补的Pcm格式原始帧到Pcm格式原始帧容器。
+									memcpy( AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt->m_PcmFrmPt, AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt, AdoInptPt->m_FrmLenByt );
+									AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt->m_TimeStampMsec = AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec;
+									AdoInptPt->m_PcmSrcFrmCntnr.PutTail( &AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt, NULL, 1, NULL );
+									AdoInptPt->m_Thrd.m_AddPcmSrcFrmPt = NULL;
+
+									AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec += AdoInptPt->m_FrmLenMsec; //递增当前帧的时间戳。
+									AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec = 0; //清空补帧或丢帧的起始时间戳。
+								}
+							}
+							else
+							{
+								if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 高一个帧长 %uzd，就表示当前少帧了，准备开始补帧。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec, AdoInptPt->m_FrmLenMsec );
+
+								AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec = AdoInptPt->m_Thrd.m_NowTickMsec; //设置补帧的起始时间戳。
+							}
+						}
+						else //如果本次的滴答钟比当前帧的时间戳高了大于等于1秒，就表示不要补帧了，直接发送音频输入设备关闭线程消息来重启音频输入。
+						{
+							//放入本次取出的Pcm格式原始帧到Pcm格式空闲帧容器。防止内存泄露。
+							AdoInptPt->m_PcmIdleFrmCntnr.PutTail( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
+							AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
+
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 高了大于等于1秒，就表示不要补帧了，直接发送音频输入设备关闭线程消息来重启音频输入。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec );
+							{
+								MediaPocsThrd::ThrdMsgAdoInptDvcClos p_ThrdMsgAdoInptDvcClos;
+								if( MsgQueueSendMsg( AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcClos, &p_ThrdMsgAdoInptDvcClos, sizeof( p_ThrdMsgAdoInptDvcClos ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								{
+									if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：发送音频输入设备关闭线程消息失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								}
+							}
+							break; //这里要退出线程，防止多次发送线程消息。
+						}
+					}
+					else if( ( AdoInptPt->m_Thrd.m_NowTickMsec < AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec ) && ( AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec - AdoInptPt->m_Thrd.m_NowTickMsec > AdoInptPt->m_FrmLenMsec ) ) //如果本次的滴答钟比当前帧的时间戳低一个帧长，就表示当前多帧了，需要丢帧。
+					{
+						if( AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec - AdoInptPt->m_Thrd.m_NowTickMsec < 1000 ) //如果本次的滴答钟比当前帧的时间戳低了小于1秒，就表示可以丢帧。
+						{
+							if( ( int64_t )AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec < 0 ) //如果已经准备开始丢帧。
+							{
+								if( AdoInptPt->m_Thrd.m_NowTickMsec - ( AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec & 0x7FFFFFFFFFFFFFFF ) < 1000 ) //如果已经准备开始丢帧小于1秒。
+								{
+									if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 低一个帧长 %uzd，就表示当前多帧了，继续准备丢帧。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec, AdoInptPt->m_FrmLenMsec );
+								}
+								else //如果已经准备开始丢帧大于等于1秒，才开始丢帧，因为可能是帧数不稳定导致误判需要丢帧。
+								{
+									if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 低一个帧长 %uzd，就表示当前多帧了，立即开始丢帧。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec, AdoInptPt->m_FrmLenMsec );
+
+									//放入本次丢的Pcm格式原始帧到Pcm格式空闲帧容器。
+									AdoInptPt->m_PcmIdleFrmCntnr.PutTail( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
+									AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
+
+									AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec = 0; //清空补帧或丢帧的起始时间戳。
+
+									goto OutPutFrm;
+								}
+							}
+							else
+							{
+								if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 低一个帧长 %uzd，就表示当前多帧了，准备开始丢帧。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec, AdoInptPt->m_FrmLenMsec );
+
+								AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec = AdoInptPt->m_Thrd.m_NowTickMsec | 0x8000000000000000; //设置丢帧的起始时间戳。
+							}
+						}
+						else //如果本次的滴答钟比当前帧的时间戳低了大于等于1秒，就表示不要丢帧了，直接发送音频输入设备关闭线程消息来重启音频输入。
+						{
+							//放入本次取出的Pcm格式原始帧到Pcm格式空闲帧容器。防止内存泄露。
+							AdoInptPt->m_PcmIdleFrmCntnr.PutTail( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
+							AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
+
+							if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 低了大于等于1秒，就表示不要丢帧了，直接发送音频输入设备关闭线程消息来重启音频输入。" ), AdoInptPt->m_Thrd.m_NowTickMsec, AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec );
+							{
+								MediaPocsThrd::ThrdMsgAdoInptDvcClos p_ThrdMsgAdoInptDvcClos;
+								if( MsgQueueSendMsg( AdoInptPt->m_MediaPocsThrdPt->m_ThrdMsgQueuePt, 0, 0, MediaPocsThrd::ThrdMsgTypAdoInptDvcClos, &p_ThrdMsgAdoInptDvcClos, sizeof( p_ThrdMsgAdoInptDvcClos ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) != 0 )
+								{
+									if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输入线程：发送音频输入设备关闭线程消息失败。原因：%vs" ), AdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+								}
+							}
+							break; //这里要退出线程，防止多次发送线程消息。
+						}
+					}
+					else //如果不需要补帧或丢帧。
+					{
+						AdoInptPt->m_Thrd.m_AddOrDropFrmStartTimeStampMsec = 0; //清空补帧或丢帧的起始时间戳。
+					}
+				}
+				OutAddOrDropFrm:;
+
+				//放入本次Pcm格式原始帧到Pcm格式原始帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。
+				AdoInptPt->m_Thrd.m_PcmSrcFrmPt->m_TimeStampMsec = AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec;
 				AdoInptPt->m_PcmSrcFrmCntnr.PutTail( &AdoInptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
 				AdoInptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
+
+				AdoInptPt->m_Thrd.m_CurFrmTimeStampMsec += AdoInptPt->m_FrmLenMsec; //递增当前帧的时间戳。
 			}
+			OutPutFrm:;
 
 			if( AdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 )
 			{

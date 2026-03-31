@@ -312,7 +312,7 @@ public:
 
 			m_VdoInptPt->m_Thrd.m_FrmPt->m_TimeStampMsec = m_VdoInptPt->m_Thrd.m_LastTickMsec; //设置时间戳。
 
-			//追加本次帧到帧容器。注意：从取出到放入过程中可以跳出，跳出后会重新放入到空闲帧容器。
+			//放入本次帧到帧容器。注意：从取出到放入过程中可以跳出，跳出后会重新放入到空闲帧容器。
 			{
 				m_VdoInptPt->m_FrmCntnr.PutTail( &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, NULL );
 				m_VdoInptPt->m_Thrd.m_FrmPt = NULL;
@@ -326,7 +326,7 @@ public:
 		}
 		OutPocs:;
 
-		if( m_VdoInptPt->m_Thrd.m_FrmPt != NULL ) //如果获取的空闲帧没有追加到帧容器。
+		if( m_VdoInptPt->m_Thrd.m_FrmPt != NULL ) //如果获取的空闲帧没有放入到帧容器。
 		{
 			m_VdoInptPt->m_IdleFrmCntnr.PutTail( &m_VdoInptPt->m_Thrd.m_FrmPt, NULL, 1, NULL );
 			m_VdoInptPt->m_Thrd.m_FrmPt = NULL;
