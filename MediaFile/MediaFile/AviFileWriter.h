@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "MediaFile.h"
 
@@ -18,9 +18,8 @@ __MEDIAFILE_DLLAPI__ int AviFileWriterSetStartTimeStamp( AviFileWriter * AviFile
 __MEDIAFILE_DLLAPI__ int AviFileWriterGetStartTimeStamp( AviFileWriter * AviFileWriterPt, uint64_t * StartTimeStampMsecPt, Vstr * ErrInfoVstrPt );
 
 __MEDIAFILE_DLLAPI__ int AviFileWriterAddAdoStrm( AviFileWriter * AviFileWriterPt, uint32_t Fmt, uint32_t SampleRate, uint32_t ChanlNum, uint32_t * AdoStrmIdxPt, Vstr * ErrInfoVstrPt );
-__MEDIAFILE_DLLAPI__ int AviFileWriterAdoStrmSetCurTimeStamp( AviFileWriter * AviFileWriterPt, uint32_t AdoStrmIdx, uint64_t CurTimeStampMsec, Vstr * ErrInfoVstrPt );
 __MEDIAFILE_DLLAPI__ int AviFileWriterAdoStrmGetCurTimeStamp( AviFileWriter * AviFileWriterPt, uint32_t AdoStrmIdx, uint64_t * CurTimeStampMsecPt, Vstr * ErrInfoVstrPt );
-__MEDIAFILE_DLLAPI__ int AviFileWriterAdoStrmWrite( AviFileWriter * AviFileWriterPt, uint32_t AdoStrmIdx, void * FrmPt, size_t FrmLenByt, uint64_t FrmLenMsec, Vstr * ErrInfoVstrPt );
+__MEDIAFILE_DLLAPI__ int AviFileWriterAdoStrmWrite( AviFileWriter * AviFileWriterPt, uint32_t AdoStrmIdx, uint64_t FrmTimeStampMsec, void * FrmPt, size_t FrmLenByt, uint64_t FrmLenMsec, Vstr * ErrInfoVstrPt );
 
 __MEDIAFILE_DLLAPI__ int AviFileWriterAddVdoStrm( AviFileWriter * AviFileWriterPt, uint32_t Fmt, uint32_t MaxSampleRate, uint32_t * VdoStrmIdxPt, Vstr * ErrInfoVstrPt );
 __MEDIAFILE_DLLAPI__ int AviFileWriterVdoStrmGetCurTimeStamp( AviFileWriter * AviFileWriterPt, uint32_t VdoStrmIdx, uint64_t * CurTimeStampMsecPt, Vstr * ErrInfoVstrPt );

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Func.h"
 
@@ -7,11 +7,13 @@ extern "C"
 {
 #endif
 
-#ifdef g_JvmPt
-extern JavaVM * g_JvmPt;
-#else
-#error undefinition g_JvmPt
-#endif
+//__FUNC_DLLAPI__ extern JavaVM * g_JavaVM; //不建议跨动态库直接使用全局变量。
+__FUNC_DLLAPI__ void SetJavaVM( JavaVM * JavaVM );
+__FUNC_DLLAPI__ JavaVM * GetJavaVM();
+
+//__FUNC_DLLAPI__ extern __thread JNIEnv * g_JniEnv; //不建议跨动态库直接使用线程局部变量。
+__FUNC_DLLAPI__ void SetJniEnv( JNIEnv * JniEnv );
+__FUNC_DLLAPI__ JNIEnv * GetJniEnv();
 
 __FUNC_DLLAPI__ int GetJavaCls( JNIEnv * env, jobject ClsObj, const char * PkgNameClsNameStrPt, jclass * ClsPt );
 

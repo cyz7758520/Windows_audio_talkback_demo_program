@@ -7,7 +7,9 @@ extern "C"
 {
 #endif
 
-__FUNC_DLLAPI__ extern __thread napi_env g_NapiEnv;
+//__FUNC_DLLAPI__ extern __thread napi_env g_NapiEnv; //不建议跨动态库直接使用线程局部变量。
+__FUNC_DLLAPI__ void SetNapiEnv( napi_env NapiEnv );
+__FUNC_DLLAPI__ napi_env GetNapiEnv();
 
 #define GetArkTsVarVal( env, Var, ValPt ) _GetArkTsVarVal( env, Var, GetDataTyp( *ValPt ), ValPt )
 __FUNC_DLLAPI__ int _GetArkTsVarVal( napi_env env, napi_value Var, DataTyp ValDt, const void * ValPt );
@@ -26,11 +28,11 @@ __FUNC_DLLAPI__ int _GetArkTsObjMbrVarStrToMem( napi_env env, napi_value Obj, co
 #define GetArkTsObjMbrVarStrToMalloc( env, Obj, ModPathU8str, MbrVarNameU8str, MbrVarPt, StrPtPt, ChrSet_, LenChrPt ) _GetArkTsObjMbrVarStrToMalloc( env, Obj, ModPathU8str, MbrVarNameU8str, MbrVarPt, StrPtPt, ChrSet_, LenChrPt )
 __FUNC_DLLAPI__ int _GetArkTsObjMbrVarStrToMalloc( napi_env env, napi_value Obj, const char * ModPathU8str, const char * MbrVarNameU8str, napi_value * MbrVarPt, void * * StrPtPt, ChrSet ChrSet_, size_t * LenChrPt );
 
-#define SetArkTsHTPtObjVal( env, HTPtObj, PtValPt ) SetArkTsObjMbrVarVal( env, HTPtObj, NULL, "m_Val", NULL, napi_external, PtValPt )
-#define GetArkTsHTPtObjVal( env, HTPtObj, PtValPt ) GetArkTsObjMbrVarVal( env, HTPtObj, NULL, "m_Val", NULL, PtValPt )
-
 #define SetArkTsHTNumberObjVal( env, HTNumberObj, NumberValPt ) SetArkTsObjMbrVarVal( env, HTNumberObj, NULL, "m_Val", NULL, napi_number, NumberValPt )
 #define GetArkTsHTNumberObjVal( env, HTNumberObj, NumberValPt ) GetArkTsObjMbrVarVal( env, HTNumberObj, NULL, "m_Val", NULL, NumberValPt )
+
+#define SetArkTsHTBigIntObjVal( env, HTBigIntObj, PtValPt ) SetArkTsObjMbrVarVal( env, HTBigIntObj, NULL, "m_Val", NULL, napi_bigint, PtValPt )
+#define GetArkTsHTBigIntObjVal( env, HTBigIntObj, PtValPt ) GetArkTsObjMbrVarVal( env, HTBigIntObj, NULL, "m_Val", NULL, PtValPt )
 
 #define SetArkTsHTStringObjVal( env, HTStringObj, StrPt, ChrSet_, LenChr ) SetArkTsObjMbrVarStr( env, HTStringObj, NULL, "m_Val", NULL, StrPt, ChrSet_, LenChr )
 #define GetArkTsHTStringObjValToMem( env, HTStringObj, StrPt, ChrSet_, SzChr, LenChrPt ) GetArkTsObjMbrVarStrToMem( env, HTStringObj, NULL, "m_Val", NULL, StrPt, ChrSet_, SzChr, LenChrPt )

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Func.h"
 
@@ -12,7 +12,7 @@
 		#elif( defined __COMEXE__ ) //如果正在编译EXE可执行文件。
 			#define __LIBYUV_DLLAPI__
 		#endif
-	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#if( defined __COMLIB__ ) //如果正在编译LIB静态库文件。
 			#define __LIBYUV_DLLAPI__
 		#elif( defined __COMDLL__ ) //如果正在编译DLL动态库文件。
@@ -30,7 +30,7 @@
 		#elif( defined __LNKDLL__ ) //如果正在链接DLL动态库文件。
 			#define __LIBYUV_DLLAPI__ __declspec( dllimport )
 		#endif
-	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、KEIL ARMCLANG/ARMCC编译器。
+	#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) || ( defined __KEIL_ARMC__ ) ) //如果正在使用Cygwin GCC/G++、Linux GCC/G++、Android NDK、Harmony NDK、KEIL ARMCLANG/ARMCC编译器。
 		#define __LIBYUV_DLLAPI__
 	#else //如果正在使用未知编译器。
 		#define __LIBYUV_DLLAPI__
@@ -43,7 +43,7 @@ extern "C"
 #endif
 
 //图片格式。
-enum PictrFmt
+typedef enum PictrFmt
 {
 	PictrFmtBt601F8Nv12,          //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','UVUVUVUV……'。libyuv::FOURCC_NV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
 	PictrFmtBt601F8Nv21,          //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VUVUVUVU……'。libyuv::FOURCC_NV21，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
@@ -60,25 +60,28 @@ enum PictrFmt
 	PictrFmtSrgbF8Rgba8888,       //sRGB标准，Full Range，8位，内存排列：'R','G','B','A'。
 	PictrFmtSrgbF8Bgra8888,       //sRGB标准，Full Range，8位，内存排列：'B','G','R','A'。libyuv::FOURCC_ARGB，MEDIASUBTYPE_RGB32
 	PictrFmtUnkown,               //未知。
-};
+}PictrFmt;
+
+//图片格式字符串。
+__LIBYUV_DLLAPI__ extern const uint8_t * g_PictrFmtStrArrPt[];
 
 //旋转角度。
-enum RotateDegree
+typedef enum RotateDegree
 {
-	ROTATE_DEGREE_0 = 0,      //0度。libyuv::kRotate0
-	ROTATE_DEGREE_90 = 90,    //90度。libyuv::kRotate90
-	ROTATE_DEGREE_180 = 180,  //180度。libyuv::kRotate180
-	ROTATE_DEGREE_270 = 270   //270度。libyuv::kRotate270
-};
+	RotateDegree0 = 0,      //0度。libyuv::kRotate0
+	RotateDegree90 = 90,    //90度。libyuv::kRotate90
+	RotateDegree180 = 180,  //180度。libyuv::kRotate180
+	RotateDegree270 = 270   //270度。libyuv::kRotate270
+}RotateDegree;
 
-__LIBYUV_DLLAPI__ int LibYUVPictrCrop( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+__LIBYUV_DLLAPI__ int LibYUVPictrCrop( const uint8_t * SrcPictrPt, PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 									   int32_t CropX, int32_t CropY, int32_t CropWidth, int32_t CropHeight,
 									   uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 									   Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrCropWithStrd( const uint8_t * SrcPictrPlane1Pt, size_t SrcPictrPlane1StrdByt,
 											   const uint8_t * SrcPictrPlane2Pt, size_t SrcPictrPlane2StrdByt,
 											   const uint8_t * SrcPictrPlane3Pt, size_t SrcPictrPlane3StrdByt,
-											   int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+											   PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 
 											   int32_t CropX, int32_t CropY, int32_t CropWidth, int32_t CropHeight,
 
@@ -88,14 +91,14 @@ __LIBYUV_DLLAPI__ int LibYUVPictrCropWithStrd( const uint8_t * SrcPictrPlane1Pt,
 											   int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 
 											   Vstr * ErrInfoVstrPt );
-__LIBYUV_DLLAPI__ int LibYUVPictrMirror( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+__LIBYUV_DLLAPI__ int LibYUVPictrMirror( const uint8_t * SrcPictrPt, PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										 int32_t HorizontalOrVertical,
 										 uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 										 Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrMirrorWithStrd( const uint8_t * SrcPictrPlane1Pt, size_t SrcPictrPlane1StrdByt,
 												 const uint8_t * SrcPictrPlane2Pt, size_t SrcPictrPlane2StrdByt,
 												 const uint8_t * SrcPictrPlane3Pt, size_t SrcPictrPlane3StrdByt,
-												 int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+												 PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 
 												 int32_t HorizontalOrVertical,
 
@@ -105,30 +108,30 @@ __LIBYUV_DLLAPI__ int LibYUVPictrMirrorWithStrd( const uint8_t * SrcPictrPlane1P
 												 int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 
 												 Vstr * ErrInfoVstrPt );
-__LIBYUV_DLLAPI__ int LibYUVPictrRotate( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
-										 int32_t RotateDegree,
+__LIBYUV_DLLAPI__ int LibYUVPictrRotate( const uint8_t * SrcPictrPt, PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+										 RotateDegree RotateDegree,
 										 uint8_t * DstPictrPt, size_t DstPictrSzByt, int32_t * DstPictrWidthPt, int32_t * DstPictrHeightPt,
 										 Vstr * ErrInfoVstrPt );
-__LIBYUV_DLLAPI__ int LibYUVPictrScale( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+__LIBYUV_DLLAPI__ int LibYUVPictrScale( const uint8_t * SrcPictrPt, PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 										int32_t Quality,
 										uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, int32_t DstPictrWidth, int32_t DstPictrHeight,
 										Vstr * ErrInfoVstrPt );
-__LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrt( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
-										   uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, int32_t DstPictrFmt,
+__LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrt( const uint8_t * SrcPictrPt, PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+										   uint8_t * DstPictrPt, size_t DstPictrSzByt, size_t * DstPictrLenBytPt, PictrFmt DstPictrFmt,
 										   Vstr * ErrInfoVstrPt );
 __LIBYUV_DLLAPI__ int LibYUVPictrFmtCnvrtWithStrd( const uint8_t * SrcPictrPlane1Pt, size_t SrcPictrPlane1StrdByt,
 												   const uint8_t * SrcPictrPlane2Pt, size_t SrcPictrPlane2StrdByt,
 												   const uint8_t * SrcPictrPlane3Pt, size_t SrcPictrPlane3StrdByt,
-												   int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+												   PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 
 												   uint8_t * DstPictrPlane1Pt, size_t DstPictrPlane1SzByt, size_t DstPictrPlane1StrdByt, size_t * DstPictrPlane1LenBytPt,
 												   uint8_t * DstPictrPlane2Pt, size_t DstPictrPlane2SzByt, size_t DstPictrPlane2StrdByt, size_t * DstPictrPlane2LenBytPt,
 												   uint8_t * DstPictrPlane3Pt, size_t DstPictrPlane3SzByt, size_t DstPictrPlane3StrdByt, size_t * DstPictrPlane3LenBytPt,
-												   int32_t DstPictrFmt,
+												   PictrFmt DstPictrFmt,
 
 												   Vstr * ErrInfoVstrPt );
 #if( ( defined __MS_VCXX__ ) || ( defined __CYGWIN_GCC__ ) )
-__LIBYUV_DLLAPI__ int LibYUVPictrDrawToWnd( const uint8_t * SrcPictrPt, int32_t SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
+__LIBYUV_DLLAPI__ int LibYUVPictrDrawToWnd( const uint8_t * SrcPictrPt, PictrFmt SrcPictrFmt, int32_t SrcPictrWidth, int32_t SrcPictrHeight,
 											int32_t CenterOrStretch,
 											HWND DstWndHdl,
 											Vstr * ErrInfoVstrPt );

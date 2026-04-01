@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Sokt.h"
 
@@ -16,7 +16,7 @@ enum TcpCnctSts
 	TcpCnctStsFail, //连接状态：连接失败。
 };
 
-__SOKT_DLLAPI__ int TcpSrvrInit( TcpSrvrSokt * * TcpSrvrSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, uint16_t TcpClntSoktNtwkTmotMsec, Vstr * ErrInfoVstrPt );
+__SOKT_DLLAPI__ int TcpSrvrInit( TcpSrvrSokt * * TcpSrvrSoktPtPt, const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseLclNodeAddr, uint16_t TcpClntSoktNtwkTmotMsec, Vstr * ErrInfoVstrPt );
 __SOKT_DLLAPI__ int TcpSrvrDstoy( TcpSrvrSokt * TcpSrvrSoktPt, Vstr * ErrInfoVstrPt );
 
 __SOKT_DLLAPI__ int TcpSrvrLocked( TcpSrvrSokt * TcpSrvrSoktPt, Vstr * ErrInfoVstrPt );
@@ -110,7 +110,7 @@ public:
 	TcpSrvrSoktCls() { m_Pt = NULL; }
 	~TcpSrvrSoktCls() { Dstoy( NULL ); }
 
-	int Init( const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseAddr, uint16_t TcpClntSoktNtwkTmotMsec, Vstr * ErrInfoVstrPt ) { return TcpSrvrInit( &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, MaxWait, IsReuseAddr, TcpClntSoktNtwkTmotMsec, ErrInfoVstrPt ); }
+	int Init( const int32_t LclNodeAddrFmly, const Vstr * LclNodeNameVstrPt, const Vstr * LclNodeSrvcVstrPt, int MaxWait, int IsReuseLclNodeAddr, uint16_t TcpClntSoktNtwkTmotMsec, Vstr * ErrInfoVstrPt ) { return TcpSrvrInit( &m_Pt, LclNodeAddrFmly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, MaxWait, IsReuseLclNodeAddr, TcpClntSoktNtwkTmotMsec, ErrInfoVstrPt ); }
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = TcpSrvrDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 
 	int Locked( Vstr * ErrInfoVstrPt ) { return TcpSrvrLocked( m_Pt, ErrInfoVstrPt ); }

@@ -1,4 +1,4 @@
-﻿#ifndef __WEBRTC3_H__
+#ifndef __WEBRTC3_H__
 #define __WEBRTC3_H__
 
 #include "Func.h"

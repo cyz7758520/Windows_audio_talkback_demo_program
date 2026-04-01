@@ -1,7 +1,14 @@
-﻿#pragma once
+#pragma once
 
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRTDBG_MAP_ALLOC					//设置检查内存泄漏宏。要在最前面定义，因为crtdbg.h头文件不知道会在哪个头文件里面被包含了。
+#endif
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS				//设置允许使用不安全的函数
+#endif
+#ifndef __LARGE64_FILES
 #define __LARGE64_FILES						//Cygwin下：ftello64、fseeko64、fgetpos64、fsetpos64
+#endif
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE							//Cygwin下：CLOCK_MONOTONIC_RAW
 #endif
@@ -42,7 +49,6 @@
 #define _WIN32_IE        0xFFFF				//设置_WIN32_IE宏为最高版本IE
 #define WIN32_LEAN_AND_MEAN					//设置WIN32_LEAN_AND_MEAN宏，防止windows.h头文件包含winsock.h头文件，从而防止AF_IPX宏重定义
 #define NOMINMAX							//设置NOMINMAX宏，防止min和max被定义为宏
-#define _CRTDBG_MAP_ALLOC					//设置检查内存泄漏宏
 #include <windows.h>						//包含整个Windows SDK支持的API
 #include <windowsx.h>						//ComboBox_AddString、ComboBox_ResetContent
 #include <commctrl.h>						//ListView_InsertItem、ListView_DeleteItem、ListView_DeleteAllItems、ListView_SetItem、ListView_GetItem
@@ -148,6 +154,8 @@
 #include <netdb.h>
 #include <pthread.h>						//pthread_create、pthread_join
 #include <intrin.h>							//_mm_pause、__cpuid、__cpuidex
+#include <sys/mman.h>						//mmap、munmap
+#include <sys/poll.h>						//struct pollfd、poll、ppoll
 
 #undef StrCpy
 #undef StrTrim
@@ -176,11 +184,12 @@
 #include <netdb.h>
 #include <pthread.h>						//pthread_create、pthread_join
 #include <immintrin.h>						//_mm_pause
+#include <sys/mman.h>						//mmap、munmap
+#include <sys/poll.h>						//struct pollfd、poll、ppoll
 
 #define gettid() ( pid_t )syscall( SYS_gettid )
 
 typedef int HANDLE;
-#define Sleep( Msec ) usleep( ( Msec ) * 1000 )
 
 #define __cdecl __attribute__( ( __cdecl__ ) )
 #define __stdcall __attribute__( ( __stdcall__ ) )
@@ -200,12 +209,13 @@ typedef int HANDLE;
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>						//pthread_create、pthread_join
+#include <sys/mman.h>						//mmap、munmap
+#include <sys/poll.h>						//struct pollfd、poll、ppoll
 #if( ( defined __X86__ ) || ( defined __X64__ ) )
 #include <immintrin.h>						//_mm_pause
 #endif
 
 typedef int HANDLE;
-#define Sleep( Msec ) usleep( ( Msec ) * 1000 )
 
 #include <jni.h>
 #include <android/log.h>
@@ -213,6 +223,9 @@ typedef int HANDLE;
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <sys/system_properties.h>
+#include <android/api-level.h>
+#include <media/NdkMediaCodec.h>
+#include <media/NdkMediaError.h>
 #endif
 
 #if( defined __HARMONY_NDK__ )
@@ -230,15 +243,26 @@ typedef int HANDLE;
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>						//pthread_create、pthread_join
+#include <sys/mman.h>						//mmap、munmap
+#include <sys/poll.h>						//struct pollfd、poll、ppoll
 #if( ( defined __X86__ ) || ( defined __X64__ ) )
 #include <immintrin.h>						//_mm_pause
 #endif
 
 typedef int HANDLE;
-#define Sleep( Msec ) usleep( ( Msec ) * 1000 )
 
 #include <napi/native_api.h>
 #include <hilog/log.h>
+#include <ace/xcomponent/native_interface_xcomponent.h>//OH_NativeXComponent_GetXComponentSize、OH_NativeXComponent_GetXComponentOffset、OH_NativeXComponent_GetXComponentId、OH_XCOMPONENT_ID_LEN_MAX、OH_MAX_TOUCH_POINTS_NUMBER
+#include <native_window/external_window.h>	//struct Region、enum NativeWindowOperation
+#include <native_buffer/native_buffer.h>	//OH_NativeBuffer_Format
+#include <native_window/graphic_error_code.h>//enum OHNativeErrorCode
+#include <multimedia/player_framework/native_avcodec_videoencoder.h>
+#include <multimedia/player_framework/native_avcodec_videodecoder.h>
+#include <multimedia/player_framework/native_avcodec_base.h>
+#include <multimedia/player_framework/native_avcapability.h>
+#include <multimedia/player_framework/native_avbuffer.h>
+#include <multimedia/player_framework/native_avbuffer_info.h>
 #endif
 
 #if( defined __KEIL_ARMC__ )
@@ -259,7 +283,7 @@ typedef int64_t ssize_t;
 #define MAX_PATH PATH_MAX
 #define PATH_MAX 1024
 
-//线程局部变量宏。
+//线程局部变量宏。特别注意：跨动态库直接使用线程局部变量可能会导致崩溃，应该是编译器的BUG，所以建议添加设置和获取导出函数来使用。
 #if( defined __MS_VCXX__ )
 #define __thread __declspec( thread )
 #endif
@@ -300,6 +324,16 @@ typedef int64_t ssize_t;
 #define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 #endif
 #endif
+
+//操作系统类型。
+typedef enum OsType
+{
+	OsTypeWindows,
+	OsTypeCygwin,
+	OsTypeLinux,
+	OsTypeAndroid,
+	OsTypeHarmony,
+} OsType;
 
 //数据类型。
 typedef enum DataTyp
@@ -430,6 +464,7 @@ typedef enum BufAutoAdjMeth
 
 #include "Vstr.h"
 #include "Log.h"
+#include "MemCpy.h"
 #include "MutexLock.h"
 #include "ChrStrMem.h"
 #include "Utf.h"
@@ -443,6 +478,7 @@ typedef enum BufAutoAdjMeth
 #endif
 #if( defined __HARMONY_NDK__ )
 #include "ArkTsNtvIntfc.h"
+#include "ArkTsXComponent.h"
 #endif
 
 #ifdef __cplusplus
@@ -496,13 +532,6 @@ __FUNC_DLLAPI__ int FuncIsForegroundFullscreen();
 __FUNC_DLLAPI__ int FuncCreatePipe( HANDLE * PipeReadHdl, HANDLE * PipeWriteHdl, LPVOID * SecurityDescriptor, BOOL InheritHdl, DWORD BufSz );
 __FUNC_DLLAPI__ int FuncReadPipe( HANDLE PipeReadHdl, char * * BufPtPt, size_t * BufSzBytPt, size_t * BufLenBytPt, const char * EndMemPt, size_t EndMemLenByt, int IsAllowRealloc, uint64_t TmotMsec );
 __FUNC_DLLAPI__ void FuncClosePipe( HANDLE PipeReadHdl, HANDLE PipeWriteHdl );
-#endif
-
-//休眠函数。
-#if( defined __MS_VCXX__ )
-#define FuncSleep( SleepTimeMesc ) WaitForSingleObject( ( HANDLE )-1, SleepTimeMesc )
-#elif( ( defined __CYGWIN_GCC__ ) || ( defined __LINUX_GCC__ ) || ( defined __ANDROID_NDK__ ) || ( defined __HARMONY_NDK__ ) )
-#define FuncSleep( SleepTimeMesc ) usleep( SleepTimeMesc * 1000 )
 #endif
 
 #ifdef __cplusplus
