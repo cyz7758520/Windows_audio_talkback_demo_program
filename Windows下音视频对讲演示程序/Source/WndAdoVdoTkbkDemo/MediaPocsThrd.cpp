@@ -2576,7 +2576,7 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "媒体处理线程的指针不正确。" ), , );
 		goto Out;
 	}
-	if( ( MaxSmplRate < 1 ) || ( MaxSmplRate > 60 ) )
+	if( ( MaxSmplRate <= 0 ) || ( MaxSmplRate > 60 ) )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "最大采样频率不正确。" ), , );
 		goto Out;
@@ -2589,6 +2589,21 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 	if( ( FrmHeight <= 0 ) || ( ( FrmHeight & 1 ) != 0 ) )
 	{
 		VstrCpy( ErrInfoVstrPt, Cu8vstr( "帧高度不正确。" ), , );
+		goto Out;
+	}
+	if( ( SrcMaxSmplRate < 0 ) || ( SrcMaxSmplRate > 60 ) )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始最大采样频率不正确。" ), , );
+		goto Out;
+	}
+	if( ( SrcFrmWidth < 0 ) || ( ( SrcFrmWidth & 1 ) != 0 ) )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始帧宽度不正确。" ), , );
+		goto Out;
+	}
+	if( ( SrcFrmHeight < 0 ) || ( ( SrcFrmHeight & 1 ) != 0 ) )
+	{
+		VstrCpy( ErrInfoVstrPt, Cu8vstr( "原始帧高度不正确。" ), , );
 		goto Out;
 	}
 	
@@ -3923,7 +3938,7 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 {
 	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
 
-	if( MediaPocsThrdPt->m_AdoOtpt.m_IsUse != 0 ) //如果要使用音频输出。在初始化音频输入前初始化音频输出，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
+	if( MediaPocsThrdPt->m_AdoOtpt.m_IsUse != 0 ) //如果要使用音频输出。在初始化音频输入前初始化音频输出，因为要音频输入线程去开始音频输出线程。
 	{
 		if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit == 0 ) //如果未初始化音频输出。
 		{
@@ -3932,9 +3947,8 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 			MediaPocsThrdPt->m_AdoOtpt.m_IsInit = 1; //设置已初始化音频输出。
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsUse == 0 ) //如果不使用音频输入。
 			{
-				MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
 				MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
-			} //如果要使用音频输入，就不设置已初始化音频输出，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
+			} //如果要使用音频输入，就不设置已初始化音频输出，因为要音频输入线程去开始音频输出线程。
 		}
 		else //如果已初始化音频输出。
 		{
@@ -3942,7 +3956,7 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 			{
 				if( MediaPocsThrdPt->m_AdoInpt.m_IsInit == 0 ) //如果未初始化音频输入。
 				{
-					AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt ); //销毁并初始化音频输出设备和线程，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
+					AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt ); //销毁并初始化音频输出设备和线程，因为要音频输入线程去开始音频输出线程。
 					MediaPocsThrdSetIsCanUseAec( MediaPocsThrdPt ); //设置是否可以使用声学回音消除器。
 					if( AdoOtptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoOtpt ) != 0 ) goto Out;
 				} //如果音频输入已初始化，表示音频输入输出都已初始化，无需再销毁并初始化。
@@ -3963,7 +3977,7 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 		if( MediaPocsThrdPt->m_AdoInpt.m_IsInit == 0 ) //如果未初始化音频输入。
 		{
 			MediaPocsThrdSetIsCanUseAec( MediaPocsThrdPt ); //设置是否可以使用声学回音消除器。
-			if( AdoInptInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out; //在音频输出初始化后再初始化音频输入，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
+			if( AdoInptInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out; //在音频输出初始化后再初始化音频输入，因为要音频输入线程去开始音频输出线程。
 			MediaPocsThrdPt->m_AdoInpt.m_IsInit = 1; //设置已初始化音频输入。
 			MediaPocsThrdTmpVarInit( MediaPocsThrdPt );
 		}
@@ -3975,7 +3989,7 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 				{
 					if( MediaPocsThrdPt->m_AdoInpt.m_Thrd.m_IsStartAdoOtptThrd != 0 ) //如果音频输入线程已开始音频输出线程。
 					{
-						AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt ); //销毁并初始化音频输入设备和线程，因为要音频输入线程让音频输出设备开始播放和开始音频输出线程。
+						AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt ); //销毁并初始化音频输入设备和线程，因为要音频输入线程去开始音频输出线程。
 						MediaPocsThrdSetIsCanUseAec( MediaPocsThrdPt ); //设置是否可以使用声学回音消除器。
 						if( AdoInptDvcAndThrdInit( &MediaPocsThrdPt->m_AdoInpt ) != 0 ) goto Out;
 					} //如果音频输入线程未开始音频输出线程，就不用管，等一会音频输入线程就会开始音频输出线程。
@@ -4524,7 +4538,6 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 				}
 				else
 				{
-					MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
 					MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
 				}
 			}
@@ -4620,7 +4633,6 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 				}
 				else
 				{
-					MediaPocsThrdPt->m_AdoOtpt.m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
 					MediaPocsThrdPt->m_AdoOtpt.m_Thrd.m_ThrdIsStart = 1; //设置音频输出线程已开始。
 				}
 			}

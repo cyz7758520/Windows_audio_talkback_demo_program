@@ -801,17 +801,10 @@ int AdoOtptDvcAndThrdInit( AdoOtpt * AdoOtptPt )
 			goto Out;
 		}
 
-		p_HRslt = CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&AdoOtptPt->m_Dvc.m_GlblIntfcTablePt ); //初始化设备全局接口表。
+		p_HRslt = AdoOtptPt->m_Dvc.m_ClntPt->Start(); //让音频输出设备开始播放。
 		if( p_HRslt != S_OK )
 		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：初始化设备的全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
-			goto Out;
-		}
-
-		p_HRslt = AdoOtptPt->m_Dvc.m_GlblIntfcTablePt->RegisterInterfaceInGlobal( AdoOtptPt->m_Dvc.m_RndrClntPt, IID_IAudioRenderClient, &AdoOtptPt->m_Dvc.m_RndrClntCookie ); //注册设备的渲染客户端到全局接口表。
-		if( p_HRslt != S_OK )
-		{
-			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：注册设备的渲染客户端到全局接口表失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
+			if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "媒体处理线程：音频输出：让音频输出设备开始播放失败。原因：%vs" ), GetWinSysErrInfo( p_HRslt, AdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) );
 			goto Out;
 		}
 
@@ -1012,16 +1005,6 @@ void AdoOtptDvcAndThrdDstoy( AdoOtpt * AdoOtptPt )
 		AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit = 0;
 		AdoOtptPt->m_Dvc.m_PcmBufFrmLenByt = 0;
 		AdoOtptPt->m_Dvc.m_PcmBufFrmPt = NULL;
-		if( AdoOtptPt->m_Dvc.m_RndrClntCookie != 0 ) //销毁设备渲染客户端的Cookie。
-		{
-			AdoOtptPt->m_Dvc.m_GlblIntfcTablePt->RevokeInterfaceFromGlobal( AdoOtptPt->m_Dvc.m_RndrClntCookie );
-			AdoOtptPt->m_Dvc.m_RndrClntCookie = 0;
-		}
-		if( AdoOtptPt->m_Dvc.m_GlblIntfcTablePt != NULL ) //销毁设备的全局接口表。
-		{
-			AdoOtptPt->m_Dvc.m_GlblIntfcTablePt->Release();
-			AdoOtptPt->m_Dvc.m_GlblIntfcTablePt = NULL;
-		}
 		if( AdoOtptPt->m_Dvc.m_RndrClntPt != NULL ) //销毁设备的渲染客户端。
 		{
 			AdoOtptPt->m_Dvc.m_RndrClntPt->Release();
@@ -1219,7 +1202,6 @@ inline AdoOtpt::Frm * AdoOtptGetPcmIdleFrm( AdoOtpt * AdoOtptPt, int IsChkPcmSrc
 
 DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 {
-	IAudioRenderClient * p_DvcRndrClntPt; //存放设备渲染客户端的指针。
 	HRESULT p_HRslt;
 
 	CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_SPEED_OVER_MEMORY ); //初始化COM库。
@@ -1235,14 +1217,6 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 	sprintf( path, "F:\\%lld-AdoOtptAndOtpt-Otpt3.pcm", time( NULL ) );
 	AdoOtptFile3Pt = fopen( path, "wb+" );*/
 
-	//获取设备渲染客户端。
-	{
-		IGlobalInterfaceTable * p_DvcGlblIntfcTablePt;
-		CoCreateInstance( CLSID_StdGlobalInterfaceTable, NULL, CLSCTX_INPROC_SERVER, IID_IGlobalInterfaceTable, ( void * * )&p_DvcGlblIntfcTablePt );
-		p_DvcGlblIntfcTablePt->GetInterfaceFromGlobal( AdoOtptPt->m_Dvc.m_RndrClntCookie, IID_IAudioRenderClient, ( void * * )&p_DvcRndrClntPt );
-		p_DvcGlblIntfcTablePt->Release();
-	}
-	
 	while( ( AdoOtptPt->m_Thrd.m_ThrdIsStart == 0 ) && ( AdoOtptPt->m_Thrd.m_ExitFlag == 0 ) ) SleepMsec( 1 ); //等待线程开始。这里判断退出标记是因为音频输入可能会初始化失败导致不会让线程开始。
 	
 	AdoOtptPt->m_Thrd.m_CurFrmTimeStampMsec = FuncGetTickAsMsec(); //设置当前帧的时间戳。
@@ -1254,7 +1228,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 		{
 			if( AdoOtptPt->m_Dvc.m_PcmBufFrmPt == NULL ) //如果还没有获取设备的Pcm格式缓冲区。
 			{
-				p_HRslt = p_DvcRndrClntPt->GetBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, ( BYTE * * )&AdoOtptPt->m_Dvc.m_PcmBufFrmPt ); //获取设备的Pcm格式缓冲区。
+				p_HRslt = AdoOtptPt->m_Dvc.m_RndrClntPt->GetBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, ( BYTE * * )&AdoOtptPt->m_Dvc.m_PcmBufFrmPt ); //获取设备的Pcm格式缓冲区。
 				if( p_HRslt == S_OK ) //如果获取设备的Pcm格式缓冲区成功。
 				{
 					if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit：%uzd。" ), AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit );
@@ -1483,14 +1457,15 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 				}
 			}
 
-			p_DvcRndrClntPt->ReleaseBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, 0 ); //释放设备的Pcm格式缓冲区。
+			AdoOtptPt->m_Dvc.m_RndrClntPt->ReleaseBuffer( AdoOtptPt->m_Dvc.m_PcmBufFrmLenUnit, 0 ); //释放设备的Pcm格式缓冲区。
 			AdoOtptPt->m_Dvc.m_PcmBufFrmPt = NULL;
 
 			//放入本次Pcm格式原始帧到Pcm格式原始帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。
 			{
 				//判断是否需要补帧或丢帧。
 				{
-					AdoOtptPt->m_Thrd.m_NowTickMsec = FuncGetTickAsMsec() - AdoOtptPt->m_FrmLenMsec; //设置本次的滴答钟。因为当前帧的时间戳为帧的起始时间，所以要递减一个帧长。
+					AdoOtptPt->m_Thrd.m_NowTickMsec = FuncGetTickAsMsec(); //设置本次的滴答钟。因为当前帧的时间戳为帧的起始时间，而音频输出帧是在帧开始前就获取的，所以不要递减一个帧长。
+					//LOGFE( Cu8vstr( "音频输出线程：本次的滴答钟：%uz64d，当前帧的时间戳：%uz64d。" ), AdoOtptPt->m_Thrd.m_NowTickMsec, AdoOtptPt->m_Thrd.m_CurFrmTimeStampMsec );
 
 					if( ( AdoOtptPt->m_Thrd.m_NowTickMsec > AdoOtptPt->m_Thrd.m_CurFrmTimeStampMsec ) && ( AdoOtptPt->m_Thrd.m_NowTickMsec - AdoOtptPt->m_Thrd.m_CurFrmTimeStampMsec > AdoOtptPt->m_FrmLenMsec ) ) //如果本次的滴答钟比当前帧的时间戳高一个帧长，就表示当前少帧了，需要补帧。
 					{
@@ -1513,7 +1488,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 										goto OutAddOrDropFrm;
 									}
 
-									//放入本次补的Pcm格式原始帧到Pcm格式原始帧容器。
+									//放入本次补的Pcm格式原始帧到Pcm格式原始帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。
 									memcpy( AdoOtptPt->m_Thrd.m_AddPcmSrcFrmPt->m_PcmFrmPt, AdoOtptPt->m_Thrd.m_PcmSrcFrmPt->m_PcmFrmPt, AdoOtptPt->m_FrmLenByt );
 									AdoOtptPt->m_Thrd.m_AddPcmSrcFrmPt->m_TimeStampMsec = AdoOtptPt->m_Thrd.m_CurFrmTimeStampMsec;
 									AdoOtptPt->m_PcmSrcFrmCntnr.PutTail( &AdoOtptPt->m_Thrd.m_AddPcmSrcFrmPt, NULL, 1, NULL );
@@ -1532,7 +1507,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 						}
 						else //如果本次的滴答钟比当前帧的时间戳高了大于等于1秒，就表示不要补帧了，直接发送音频输出设备关闭线程消息来重启音频输出。
 						{
-							//放入本次取出的Pcm格式原始帧到音频输出Pcm格式空闲帧容器。防止内存泄露。
+							//放入本次取出的Pcm格式原始帧到Pcm格式空闲帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。
 							AdoOtptPt->m_PcmIdleFrmCntnr.PutTail( &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
 							AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
 
@@ -1561,7 +1536,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 								{
 									if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFE( Cu8vstr( "音频输出线程：本次的滴答钟 %uz64d 比当前帧的时间戳 %uz64d 低一个帧长 %uzd，就表示当前多帧了，立即开始丢帧。" ), AdoOtptPt->m_Thrd.m_NowTickMsec, AdoOtptPt->m_Thrd.m_CurFrmTimeStampMsec, AdoOtptPt->m_FrmLenMsec );
 
-									//放入本次丢的Pcm格式原始帧到音频输出Pcm格式空闲帧容器。
+									//放入本次丢的Pcm格式原始帧到Pcm格式空闲帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。
 									AdoOtptPt->m_PcmIdleFrmCntnr.PutTail( &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
 									AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
 
@@ -1579,7 +1554,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 						}
 						else //如果本次的滴答钟比当前帧的时间戳低了大于等于1秒，就表示不要丢帧了，直接发送音频输出设备关闭线程消息来重启音频输出。
 						{
-							//放入本次取出的Pcm格式原始帧到音频输出Pcm格式空闲帧容器。防止内存泄露。
+							//放入本次取出的Pcm格式原始帧到Pcm格式空闲帧容器。注意：从取出到放入过程中不能跳出，否则会内存泄露。
 							AdoOtptPt->m_PcmIdleFrmCntnr.PutTail( &AdoOtptPt->m_Thrd.m_PcmSrcFrmPt, NULL, 1, NULL );
 							AdoOtptPt->m_Thrd.m_PcmSrcFrmPt = NULL;
 
@@ -1626,7 +1601,7 @@ DWORD WINAPI AdoOtptThrdRun( AdoOtpt * AdoOtptPt )
 	} //音频输出循环结束。
 
 	CoUninitialize(); //销毁COM库。
-	
+
 	if( AdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "音频输出线程：本线程已退出。" ) );
 	return 0;
 }

@@ -228,7 +228,7 @@ public:
 			}
 
 			//预览Bgra8888格式原始帧。
-			if( m_VdoInptPt->m_Dvc.m_PrvwWndHdl != NULL )
+			if( m_VdoInptPt->m_Dvc.m_PrvwWndHdl != NULL ) //如果指定了预览窗口的句柄。
 			{
 				//水平翻转镜像Bgra8888格式原始帧。
 				if( LibYUVPictrMirror( m_VdoInptPt->m_Thrd.m_TmpFrm1Pt, PictrFmtSrgbF8Bgra8888, m_VdoInptPt->m_Dvc.m_BgraSrcFrmScaleWidth, m_VdoInptPt->m_Dvc.m_BgraSrcFrmScaleHeight,
@@ -492,23 +492,25 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 		//选择设备过滤器上合适的引脚和媒体类型。
 		if( p_DvcFilterPt->EnumPins( &p_EnumPinsPt ) == S_OK ) //创建引脚枚举器。
 		{
-			int32_t p_TgtFrmWidth = VdoInptPt->m_FrmWidth; //存放目标的帧宽度，单位为像素。
-			int32_t p_TgtFrmHeight = VdoInptPt->m_FrmHeight; //存放目标的帧高度，单位为像素。
-			double p_TgtFrmWidthToHeightRatio = ( double )VdoInptPt->m_FrmWidth / ( double )VdoInptPt->m_FrmHeight; //存放目标的帧宽高比。
-			int32_t p_TgtAvgTimePerFrm = 1000.0 / ( VdoInptPt->m_MaxSmplRate / 10.0 / 1000.0 ); //存放目标的帧间隔时间，单位为100纳秒。
-			int32_t p_SrcAvgTimePerFrm = ( VdoInptPt->m_SrcMaxSmplRate == 0 ) ? INT32_MAX : ( 1000.0 / ( VdoInptPt->m_SrcMaxSmplRate / 10.0 / 1000.0 ) ); //存放原始的帧间隔时间，单位为100纳秒。
+			int32_t p_TgtFrmWidth = ( VdoInptPt->m_SrcFrmWidth == 0 ) ? VdoInptPt->m_FrmWidth : VdoInptPt->m_SrcFrmWidth; //存放目标Nv21格式原始帧的高度，单位为像素。如果要自动选择，就用指定帧的宽度。如果不要自动选择，就用原始帧的宽度。
+			int32_t p_TgtFrmHeight = ( VdoInptPt->m_SrcFrmHeight == 0 ) ? VdoInptPt->m_FrmHeight : VdoInptPt->m_SrcFrmHeight; //存放目标Nv21格式原始帧的宽度，单位为像素。如果要自动选择，就用指定帧的高度。如果不要自动选择，就用原始帧的高度。
+			double p_TgtFrmWidthToHeightRatio = ( double )p_TgtFrmWidth / ( double )p_TgtFrmHeight; //存放目标的帧宽高比。
+			int32_t p_TgtAvgTimePerFrm = ( VdoInptPt->m_SrcMaxSmplRate == 0 ) ? ( 1000.0 / ( VdoInptPt->m_MaxSmplRate / 10.0 / 1000.0 ) ) : ( 1000.0 / ( VdoInptPt->m_SrcMaxSmplRate / 10.0 / 1000.0 ) ); //存放目标的帧间隔时间，单位为100纳秒。
 			double p_BufFrmAspectRatio; //存放本次的缓冲区帧宽高比。
 			int32_t p_BufFrmCropX; //存放本次的缓冲区帧裁剪区域左上角横坐标，单位像素。
 			int32_t p_BufFrmCropY; //存放本次的缓冲区帧裁剪区域左上角纵坐标，单位像素。
 			int32_t p_BufFrmCropWidth; //存放本次的缓冲区帧裁剪区域宽度，单位像素。
 			int32_t p_BufFrmCropHeight; //存放本次的缓冲区帧裁剪区域高度，单位像素。
 			int32_t p_IsSetSelCur; //存放是否设置选择的为本次的，为0表示不设置，为非0表示要设置。
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：目标的媒体格式：帧间隔时间：%z32d，%lf，宽度：%ld，高度：%ld。" ),
-																		 p_TgtAvgTimePerFrm, 1000.0 / ( p_TgtAvgTimePerFrm / 10.0 / 1000.0 ),
-																		 p_TgtFrmWidth, p_TgtFrmHeight );
-			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：指定的媒体格式：帧间隔时间：%z32d，%lf，宽度：%ld，高度：%ld。" ),
-																		 p_SrcAvgTimePerFrm, 1000.0 / ( p_SrcAvgTimePerFrm / 10.0 / 1000.0 ),
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：指定帧的媒体格式：帧间隔时间：%z32d，%z32d，宽度：%ld，高度：%ld。" ),
+																		 VdoInptPt->m_MaxSmplRate, ( int32_t )( 1000.0 / ( VdoInptPt->m_MaxSmplRate / 10.0 / 1000.0 ) ),
+																		 VdoInptPt->m_FrmWidth, VdoInptPt->m_FrmHeight );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：原始帧的媒体格式：帧间隔时间：%z32d，%z32d，宽度：%ld，高度：%ld。" ),
+																		 VdoInptPt->m_SrcMaxSmplRate, ( VdoInptPt->m_SrcMaxSmplRate == 0 ) ? 0 : ( int32_t )( 1000.0 / ( VdoInptPt->m_SrcMaxSmplRate / 10.0 / 1000.0 ) ),
 																		 VdoInptPt->m_SrcFrmWidth, VdoInptPt->m_SrcFrmHeight );
+			if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：目标帧的媒体格式：帧间隔时间：%z32d，%z32d，宽度：%ld，高度：%ld。" ),
+																		 ( VdoInptPt->m_SrcMaxSmplRate == 0 ) ? VdoInptPt->m_MaxSmplRate : VdoInptPt->m_SrcMaxSmplRate, p_TgtAvgTimePerFrm,
+																		 p_TgtFrmWidth, p_TgtFrmHeight );
 
 			while( p_EnumPinsPt->Next( 1, &p_PinPt, NULL ) == S_OK ) //遍历引脚。
 			{
@@ -558,58 +560,48 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 										p_BufFrmCropY -= p_BufFrmCropY % 2;
 									}
 									
-									//如果本次的帧率和帧的大小符合原始的，就设置选择的为本次的。
-									//如果要自动选择原始帧率和帧的大小，或选择的帧率和帧的大小不符合原始的，就判断本次的和目标的。
+									//如果选择的帧裁剪区域不满足目标的，则只要本次的帧裁剪区域比选择的大，就设置选择的为本次的。
+									//如果选择的帧裁剪区域满足目标的，但帧率不满足目标的，则只要本次的帧裁剪区域满足目标的，且本次的帧率比选择的高，就设置选择的为本次的。
+									//如果选择的帧裁剪区域和帧率都满足目标的，就只要本次的帧裁剪区域和帧率都满足目标的，且本次的帧裁剪区域比选择的小、或本次的帧裁剪区域相同但裁剪量比选择的小、或本次的帧裁剪区域和裁剪量都相同但帧率比选择的低，就设置选择的为本次的。
 									p_IsSetSelCur = 0;
-									if( ( VIDEOINFOHEADER_AvgTimePerFrm( p_AmMediaTypePt ) <= p_SrcAvgTimePerFrm ) && ( VIDEOINFOHEADER_Width( p_AmMediaTypePt ) == VdoInptPt->m_SrcFrmWidth ) && ( VIDEOINFOHEADER_Height( p_AmMediaTypePt ) == VdoInptPt->m_SrcFrmHeight ) )
+									if( ( VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth < p_TgtFrmWidth ) && ( VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight < p_TgtFrmHeight ) )
 									{
-										p_IsSetSelCur = 1;
-									}
-									else if( ( ( VdoInptPt->m_SrcMaxSmplRate == 0 ) && ( VdoInptPt->m_SrcFrmWidth == 0 ) && ( VdoInptPt->m_SrcFrmHeight == 0 ) ) ||
-											 ( ( p_SelAmMediaTypePt == NULL ) || ( VIDEOINFOHEADER_AvgTimePerFrm( p_AmMediaTypePt ) > p_SrcAvgTimePerFrm ) || ( VIDEOINFOHEADER_Width( p_AmMediaTypePt ) != VdoInptPt->m_SrcFrmWidth ) || ( VIDEOINFOHEADER_Height( p_AmMediaTypePt ) != VdoInptPt->m_SrcFrmHeight ) ) )
-									{
-										//如果选择的帧裁剪区域不满足目标的，则只要本次的帧裁剪区域比选择的大，就设置选择的为本次的。
-										//如果选择的帧裁剪区域满足目标的，但帧率不满足目标的，则只要本次的帧裁剪区域满足目标的，且本次的帧率比选择的高，就设置选择的为本次的。
-										//如果选择的帧裁剪区域和帧率都满足目标的，就只要本次的帧裁剪区域和帧率都满足目标的，且本次的帧裁剪区域比选择的小、或本次的帧裁剪区域相同但裁剪量比选择的小、或本次的帧裁剪区域和裁剪量都相同但帧率比选择的低，就设置选择的为本次的。
-										if( ( VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth < p_TgtFrmWidth ) && ( VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight < p_TgtFrmHeight ) )
+										if( ( p_BufFrmCropWidth > VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) && ( p_BufFrmCropHeight > VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) )
 										{
-											if( ( p_BufFrmCropWidth > VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) && ( p_BufFrmCropHeight > VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) )
+											p_IsSetSelCur = 1;
+										}
+									}
+									else if( VIDEOINFOHEADER_AvgTimePerFrm( p_SelAmMediaTypePt ) > p_TgtAvgTimePerFrm )
+									{
+										if( ( p_BufFrmCropWidth >= p_TgtFrmWidth ) && ( p_BufFrmCropHeight >= p_TgtFrmHeight ) )
+										{
+											if( VIDEOINFOHEADER_AvgTimePerFrmCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) )
 											{
 												p_IsSetSelCur = 1;
 											}
 										}
-										else if( VIDEOINFOHEADER_AvgTimePerFrm( p_SelAmMediaTypePt ) > p_TgtAvgTimePerFrm )
+									}
+									else
+									{
+										if( ( p_BufFrmCropWidth >= p_TgtFrmWidth ) && ( p_BufFrmCropHeight >= p_TgtFrmHeight ) )
 										{
-											if( ( p_BufFrmCropWidth >= p_TgtFrmWidth ) && ( p_BufFrmCropHeight >= p_TgtFrmHeight ) )
+											if( VIDEOINFOHEADER_AvgTimePerFrm( p_AmMediaTypePt ) <= p_TgtAvgTimePerFrm )
 											{
-												if( VIDEOINFOHEADER_AvgTimePerFrmCom( p_AmMediaTypePt, < , p_SelAmMediaTypePt ) )
+												if( ( p_BufFrmCropWidth < VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) && ( p_BufFrmCropHeight < VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) )
 												{
 													p_IsSetSelCur = 1;
 												}
-											}
-										}
-										else
-										{
-											if( ( p_BufFrmCropWidth >= p_TgtFrmWidth ) && ( p_BufFrmCropHeight >= p_TgtFrmHeight ) )
-											{
-												if( VIDEOINFOHEADER_AvgTimePerFrm( p_AmMediaTypePt ) <= p_TgtAvgTimePerFrm )
+												else if( ( p_BufFrmCropWidth == VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) && ( p_BufFrmCropHeight == VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) )
 												{
-													if( ( p_BufFrmCropWidth < VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) && ( p_BufFrmCropHeight < VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) )
+													if( p_BufFrmCropX + p_BufFrmCropY < VdoInptPt->m_Dvc.m_BgraSrcFrmCropX + VdoInptPt->m_Dvc.m_BgraSrcFrmCropY )
 													{
 														p_IsSetSelCur = 1;
 													}
-													else if( ( p_BufFrmCropWidth == VdoInptPt->m_Dvc.m_BgraSrcFrmCropWidth ) && ( p_BufFrmCropHeight == VdoInptPt->m_Dvc.m_BgraSrcFrmCropHeight ) )
+													else if( p_BufFrmCropX + p_BufFrmCropY == VdoInptPt->m_Dvc.m_BgraSrcFrmCropX + VdoInptPt->m_Dvc.m_BgraSrcFrmCropY )
 													{
-														if( p_BufFrmCropX + p_BufFrmCropY < VdoInptPt->m_Dvc.m_BgraSrcFrmCropX + VdoInptPt->m_Dvc.m_BgraSrcFrmCropY )
+														if( VIDEOINFOHEADER_AvgTimePerFrmCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) )
 														{
 															p_IsSetSelCur = 1;
-														}
-														else if( p_BufFrmCropX + p_BufFrmCropY == VdoInptPt->m_Dvc.m_BgraSrcFrmCropX + VdoInptPt->m_Dvc.m_BgraSrcFrmCropY )
-														{
-															if( VIDEOINFOHEADER_AvgTimePerFrmCom( p_AmMediaTypePt, > , p_SelAmMediaTypePt ) )
-															{
-																p_IsSetSelCur = 1;
-															}
 														}
 													}
 												}

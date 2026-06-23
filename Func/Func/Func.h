@@ -226,6 +226,14 @@ typedef int HANDLE;
 #include <android/api-level.h>
 #include <media/NdkMediaCodec.h>
 #include <media/NdkMediaError.h>
+
+//Android下的FD_SET会被重定义为__FD_SET_chk符号，要Android 5.0以及上才有，Android 5.0以下只有__FD_SET符号。
+#undef FD_SET
+#undef FD_ISSET
+#undef FD_CLR
+#define FD_SET __FD_SET
+#define FD_ISSET __FD_ISSET
+#define FD_CLR __FD_CLR
 #endif
 
 #if( defined __HARMONY_NDK__ )
@@ -253,10 +261,17 @@ typedef int HANDLE;
 
 #include <napi/native_api.h>
 #include <hilog/log.h>
+#include <ohaudio/native_audiostreambuilder.h>//OH_AudioStreamBuilder_Create、OH_AudioStreamBuilder_Destroy、OH_AudioStreamBuilder_SetSamplingRate、OH_AudioStreamBuilder_SetChannelCount、OH_AudioStreamBuilder_SetSampleFormat、OH_AudioStreamBuilder_SetEncodingType、OH_AudioStreamBuilder_SetCapturerInfo、OH_AudioStreamBuilder_SetRendererInfo、OH_AudioStreamBuilder_SetCapturerCallback、OH_AudioStreamBuilder_SetRendererCallback、OH_AudioStreamBuilder_GenerateCapturer、OH_AudioStreamBuilder_GenerateRenderer
+#include <ohaudio/native_audiocapturer.h>	//
 #include <ace/xcomponent/native_interface_xcomponent.h>//OH_NativeXComponent_GetXComponentSize、OH_NativeXComponent_GetXComponentOffset、OH_NativeXComponent_GetXComponentId、OH_XCOMPONENT_ID_LEN_MAX、OH_MAX_TOUCH_POINTS_NUMBER
 #include <native_window/external_window.h>	//struct Region、enum NativeWindowOperation
-#include <native_buffer/native_buffer.h>	//OH_NativeBuffer_Format
+#include <native_buffer/native_buffer.h>	//OH_NativeBuffer_Format、OHNativeWindowBuffer
 #include <native_window/graphic_error_code.h>//enum OHNativeErrorCode
+/*#include <ohcamera/camera.h>
+#include <ohcamera/camera_manager.h>
+#include <ohcamera/camera_input.h>
+#include <ohcamera/capture_session.h>
+#include <ohcamera/preview_output.h>*/
 #include <multimedia/player_framework/native_avcodec_videoencoder.h>
 #include <multimedia/player_framework/native_avcodec_videodecoder.h>
 #include <multimedia/player_framework/native_avcodec_base.h>

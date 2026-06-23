@@ -208,9 +208,6 @@ typedef struct AdoInpt //存放音频输入。
 		IAcousticEchoCancellationControl * m_OneSystemAecNsAgcAecCtrlPt; //存放第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器的声学回音消除控制器的指针。
 		UINT32 m_BufSzUnit; //存放缓冲区的大小，单位为采样单元。
 		IAudioCaptureClient * m_CptrClntPt; //存放捕获客户端的指针。
-		IGlobalInterfaceTable * m_GlblIntfcTablePt; //存放全局接口表的指针。
-		DWORD m_SystemAecNsAgcMediaObjCookie; //存放系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的Cookie。
-		DWORD m_CptrClntCookie; //存放捕获客户端的Cookie。
 		BufQueueCls m_PcmBufFrmBufQueue; //存放Pcm格式缓冲区帧的缓冲区队列。
 		int16_t * m_PcmBufFrmPt; //存放Pcm格式缓冲区帧的指针。
 		size_t m_PcmBufFrmLenUnit; //存放Pcm格式缓冲区帧的长度，单位为采样单元。
