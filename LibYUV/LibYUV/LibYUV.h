@@ -51,13 +51,13 @@ typedef enum PictrFmt
 	PictrFmtBt601F8Yv12,          //BT.601标准，Full Range，8位，内存排列：'YYYYYYYY……','VVVV……','UUUU……'。libyuv::FOURCC_YV12，libyuv::kYuvJPEGConstants，libyuv::kYvuJPEGConstants
 	PictrFmtSrgbF8Rgb555,         //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
 	PictrFmtSrgbF8Bgr555,         //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB555
-	PictrFmtSrgbF8Rgb565,         //sRGB标准，Full Range，8位，内存排列：'R','G','B'。libyuv::FOURCC_RGBP，WINDOW_FORMAT_RGB_565
-	PictrFmtSrgbF8Bgr565,         //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB565
+	PictrFmtSrgbF8Rgb565,         //sRGB标准，Full Range，8位，内存排列：'R','G','B'。WINDOW_FORMAT_RGB_565
+	PictrFmtSrgbF8Bgr565,         //sRGB标准，Full Range，8位，内存排列：'B','G','R'。libyuv::FOURCC_RGB565，libyuv::FOURCC_RGBP，MEDIASUBTYPE_RGB565
 	PictrFmtSrgbF8Rgb888,         //sRGB标准，Full Range，8位，内存排列：'R','G','B'。
 	PictrFmtSrgbF8Bgr888,         //sRGB标准，Full Range，8位，内存排列：'B','G','R'。MEDIASUBTYPE_RGB24
-	PictrFmtSrgbF8Argb8888,       //sRGB标准，Full Range，8位，内存排列：'A','R','G','B'。
-	PictrFmtSrgbF8Abgr8888,       //sRGB标准，Full Range，8位，内存排列：'A','B','G','R'。libyuv::FOURCC_ABGR，WINDOW_FORMAT_RGBA_8888
-	PictrFmtSrgbF8Rgba8888,       //sRGB标准，Full Range，8位，内存排列：'R','G','B','A'。
+	PictrFmtSrgbF8Argb8888,       //sRGB标准，Full Range，8位，内存排列：'A','R','G','B'。libyuv::FOURCC_BGRA
+	PictrFmtSrgbF8Abgr8888,       //sRGB标准，Full Range，8位，内存排列：'A','B','G','R'。libyuv::FOURCC_RGBA，WINDOW_FORMAT_RGBA_8888
+	PictrFmtSrgbF8Rgba8888,       //sRGB标准，Full Range，8位，内存排列：'R','G','B','A'。libyuv::FOURCC_ABGR
 	PictrFmtSrgbF8Bgra8888,       //sRGB标准，Full Range，8位，内存排列：'B','G','R','A'。libyuv::FOURCC_ARGB，MEDIASUBTYPE_RGB32
 	PictrFmtUnkown,               //未知。
 }PictrFmt;

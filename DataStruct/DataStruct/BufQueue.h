@@ -9,7 +9,7 @@ extern "C"
 
 typedef struct BufQueue BufQueue;
 
-__DATASTRUCT_DLLAPI__ int BufQueueInit( BufQueue * * BufQueuePtPt, size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int BufQueueInit( BufQueue * * BufQueuePtPt, size_t BufInitSzByt, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int BufQueueDstoy( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int BufQueueLocked( BufQueue * BufQueuePt, Vstr * ErrInfoVstrPt );
@@ -42,7 +42,7 @@ public:
 	BufQueueCls() { m_Pt = NULL; }
 	~BufQueueCls() { Dstoy( NULL ); }
 
-	int Init( size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return BufQueueInit( &m_Pt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
+	int Init( size_t BufInitSzByt, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return BufQueueInit( &m_Pt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = BufQueueDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return BufQueueLocked( m_Pt, ErrInfoVstrPt ); }

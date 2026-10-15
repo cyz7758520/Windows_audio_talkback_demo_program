@@ -9,7 +9,7 @@ extern "C"
 	
 typedef struct CLnkLst CLnkLst;
 
-__DATASTRUCT_DLLAPI__ int CLnkLstInit( CLnkLst * * CLnkLstPtPt, size_t ElmDataLenByt, size_t BufInitSzNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int CLnkLstInit( CLnkLst * * CLnkLstPtPt, size_t ElmDataLenByt, size_t BufInitSzNum, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzNum, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int CLnkLstDstoy( CLnkLst * CLnkLstPt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int CLnkLstLocked( CLnkLst * CLnkLstPt, Vstr * ErrInfoVstrPt );
@@ -54,7 +54,7 @@ public:
 	CLnkLstCls() { m_Pt = NULL; }
 	~CLnkLstCls() { Dstoy( NULL ); }
 
-	int Init( size_t ElmDataLenByt, size_t BufInitSzNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzNum, Vstr * ErrInfoVstrPt ) { return CLnkLstInit( &m_Pt, ElmDataLenByt, BufInitSzNum, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzNum, ErrInfoVstrPt ); }
+	int Init( size_t ElmDataLenByt, size_t BufInitSzNum, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzNum, Vstr * ErrInfoVstrPt ) { return CLnkLstInit( &m_Pt, ElmDataLenByt, BufInitSzNum, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzNum, ErrInfoVstrPt ); }
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = CLnkLstDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return CLnkLstLocked( m_Pt, ErrInfoVstrPt ); }

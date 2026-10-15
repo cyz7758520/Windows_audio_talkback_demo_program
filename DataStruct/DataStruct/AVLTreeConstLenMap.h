@@ -9,7 +9,7 @@ extern "C"
 
 typedef struct AVLTreeConstLenMap AVLTreeConstLenMap;
 
-__DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapInit( AVLTreeConstLenMap * * AVLTreeConstLenMapPtPt, size_t ElmKeySzByt, size_t ElmValSzByt, BufAutoAdjMeth BufAutoAdjMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapInit( AVLTreeConstLenMap * * AVLTreeConstLenMapPtPt, size_t ElmKeySzByt, size_t ElmValSzByt, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoAdjParm, size_t ElmMinNum, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapDstoy( AVLTreeConstLenMap * AVLTreeConstLenMapPt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int AVLTreeConstLenMapPut( AVLTreeConstLenMap * AVLTreeConstLenMapPt, const void * NewElmKeyPt, const void * NewElmValPt, Vstr * ErrInfoVstrPt );

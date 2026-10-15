@@ -35,7 +35,7 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, const void * LicnCod
 					   MediaPocsThrd::MediaPocsThrdUserWriteVdoOtptFrmFuncPt UserWriteVdoOtptFrmFuncPt, MediaPocsThrd::MediaPocsThrdUserGetVdoOtptFrmFuncPt UserGetVdoOtptFrmFuncPt,
 					   Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd * p_MediaPocsThrdPt = NULL; //存放媒体处理线程的指针。
 	
 	//判断各个变量是否正确。
@@ -140,7 +140,7 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, const void * LicnCod
 
 	//初始化音频输出。
 	p_MediaPocsThrdPt->m_AdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置音频输出的媒体处理线程的指针。
-	if( p_MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.Init( sizeof( AdoOtpt::Strm ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( p_MediaPocsThrdPt->m_AdoOtpt.m_StrmCntnr.Init( sizeof( AdoOtpt::Strm ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化音频输出流容器失败。原因：" ) );
 		goto Out;
@@ -169,7 +169,7 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, const void * LicnCod
 
 	//初始化视频输出。
 	p_MediaPocsThrdPt->m_VdoOtpt.m_MediaPocsThrdPt = p_MediaPocsThrdPt; //设置视频输出的媒体处理线程的指针。
-	if( p_MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Init( sizeof( VdoOtpt::Strm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( p_MediaPocsThrdPt->m_VdoOtpt.m_StrmCntnr.Init( sizeof( VdoOtpt::Strm * ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化视频输出流容器失败。原因：" ) );
 		goto Out;
@@ -231,7 +231,7 @@ int MediaPocsThrdInit( MediaPocsThrd * * MediaPocsThrdPtPt, const void * LicnCod
 
 int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -357,7 +357,7 @@ int MediaPocsThrdDstoy( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 
 int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT * AdoInptDvcTotalPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	Vstr * * p_AdoInptDvcNameArrPtPt = NULL; //存放音频输入设备名称动态字符串数组的指针。
 	UINT p_AdoInptDvcTotal = 0; //存放音频输入设备总数。
 	IMMDeviceEnumerator * p_AdoInptDvcEnumPt = NULL; //存放音频输入设备枚举器的指针。
@@ -516,7 +516,7 @@ int MediaPocsThrdGetAdoInptDvcName( Vstr * * * AdoInptDvcNameVstrArrPtPtPt, UINT
 
 int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT * AdoOtptDvcTotalPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	Vstr * * p_AdoOtptDvcNameArrPtPt = NULL; //存放音频输出设备名称动态字符串数组的指针。
 	UINT p_AdoOtptDvcTotal = 0; //存放音频输出设备总数。
 	IMMDeviceEnumerator * p_AdoOtptDvcEnumPt = NULL; //存放音频输出设备枚举器的指针。
@@ -675,7 +675,7 @@ int MediaPocsThrdGetAdoOtptDvcName( Vstr * * * AdoOtptDvcNameVstrArrPtPtPt, UINT
 
 int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT * VdoInptDvcTotalPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	Vstr * * p_VdoInptDvcNameArrPtPt = NULL; //存放视频输入设备名称动态字符串数组的指针。
 	Vstr * * p_TmpVstrPtPt = NULL;
 	UINT p_VdoInptDvcTotal = 0; //存放视频输入设备总数。
@@ -782,7 +782,7 @@ int MediaPocsThrdGetVdoInptDvcName( Vstr * * * VdoInptDvcNameVstrArrPtPtPt, UINT
 
 int MediaPocsThrdDstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	UINT p_TmpUint;
 
 	//判断各个变量是否正确。
@@ -827,7 +827,7 @@ int MediaPocsThrdDstoyDvcName( Vstr * * DvcNameArrPtPt, UINT DvcTotal, Vstr * Er
 
 int MediaPocsThrdGetAdoInptDvcId( Vstr * AdoInptDvcNameVstrPt, UINT * AdoInptDvcIdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	Vstr * * p_AdoInptDvcNameArrPtPt = NULL; //存放音频输入设备名称动态字符串的指针数组的指针。
 	UINT p_AdoInptDvcTotal = 0; //存放音频输入设备总数。
 	UINT p_AdoInptDvcId; //存放音频输入设备的标识符，取值范围为从1到音频输入设备的总数，为0表示使用默认设备。
@@ -889,7 +889,7 @@ int MediaPocsThrdGetAdoInptDvcId( Vstr * AdoInptDvcNameVstrPt, UINT * AdoInptDvc
 
 int MediaPocsThrdGetAdoOtptDvcId( Vstr * AdoOtptDvcNameVstrPt, UINT * AdoOtptDvcIdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	Vstr * * p_AdoOtptDvcNameArrPtPt = NULL; //存放音频输出设备名称动态字符串的指针数组的指针。
 	UINT p_AdoOtptDvcTotal = 0; //存放音频输出设备总数。
 	UINT p_AdoOtptDvcId; //存放音频输出设备的标识符，取值范围为从1到音频输出设备的总数，为0表示使用默认设备。
@@ -951,7 +951,7 @@ int MediaPocsThrdGetAdoOtptDvcId( Vstr * AdoOtptDvcNameVstrPt, UINT * AdoOtptDvc
 
 int MediaPocsThrdGetVdoInptDvcId( Vstr * VdoInptDvcNameVstrPt, UINT * VdoInptDvcIdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	Vstr * * p_VdoInptDvcNameArrPtPt = NULL; //存放视频输入设备名称动态字符串的指针数组的指针。
 	UINT p_VdoInptDvcTotal = 0; //存放视频输入设备总数。
 	UINT p_VdoInptDvcId; //存放视频输入设备的标识符，取值范围为从1到视频输入设备的总数，为0表示使用默认设备。
@@ -1015,7 +1015,7 @@ int MediaPocsThrdGetVdoInptDvcId( Vstr * VdoInptDvcNameVstrPt, UINT * VdoInptDvc
 
 int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetAdoInpt p_ThrdMsgSetAdoInpt;
 
 	//判断各个变量是否正确。
@@ -1058,7 +1058,8 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
  * 功能说明：媒体处理线程的音频输入设置是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
  * 参数说明：MediaPocsThrdPt：[输入]，存放媒体处理线程的指针，不能为NULL。
              IsBlockWait：[输入]，存放是否阻塞等待，为0表示不阻塞，为非0表示要阻塞。
-             IsUseSystemAecNsAgc：[输入]，存放是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
+             IsUseFirstSystemAecNsAgc：[输入]，存放是否使用第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
+             IsUseSecondSystemAecNsAgc：[输入]，存放是否使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
              ErrInfoVstrPt：[输出]，存放错误信息动态字符串的指针，可以为NULL。
  * 返回说明：0：成功。
              非0：失败。
@@ -1066,9 +1067,9 @@ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
  * 调用样例：填写调用此函数的样例，并解释函数参数和返回值。
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseSystemAecNsAgc, Vstr * ErrInfoVstrPt )
+int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseFirstSystemAecNsAgc, int32_t IsUseSecondSystemAecNsAgc, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetIsUseSystemAecNsAgc p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc;
 
 	//判断各个变量是否正确。
@@ -1078,7 +1079,8 @@ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt,
 		goto Out;
 	}
 
-	p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc.m_IsUseSystemAecNsAgc = IsUseSystemAecNsAgc;
+	p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc.m_IsUseFirstSystemAecNsAgc = IsUseFirstSystemAecNsAgc;
+	p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc.m_IsUseSecondSystemAecNsAgc = IsUseSecondSystemAecNsAgc;
 	if( MsgQueueSendMsg( MediaPocsThrdPt->m_ThrdMsgQueuePt, IsBlockWait, 1, MediaPocsThrd::ThrdMsgTypAdoInptSetIsUseSystemAecNsAgc, &p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc, sizeof( p_ThrdMsgAdoInptSetIsUseSystemAecNsAgc ), ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "发送线程消息失败。原因：" ) );
@@ -1109,7 +1111,7 @@ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt,
 
 int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseNoAec p_ThrdMsgAdoInptSetUseNoAec;
 
 	//判断各个变量是否正确。
@@ -1155,7 +1157,7 @@ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBloc
 
 int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexAec p_ThrdMsgAdoInptSetUseSpeexAec;
 
 	//判断各个变量是否正确。
@@ -1204,7 +1206,7 @@ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseCNGMode, int32_t EchoMode, int32_t Delay, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAecm p_ThrdMsgAdoInptSetUseWebRtcAecm;
 
 	//判断各个变量是否正确。
@@ -1253,7 +1255,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcAecm( MediaPocsThrd * MediaPocsThrdPt, int I
 
 int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t EchoMode, int32_t Delay, int32_t IsUseDelayAgstcMode, int32_t IsUseExtdFilterMode, int32_t IsUseRefinedFilterAdaptAecMode, int32_t IsUseAdaptAdjDelay, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec p_ThrdMsgAdoInptSetUseWebRtcAec;
 
 	//判断各个变量是否正确。
@@ -1300,7 +1302,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 int MediaPocsThrdAdoInptSetUseWebRtcAec3( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t Delay, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcAec3 p_ThrdMsgAdoInptSetUseWebRtcAec3;
 
 	//判断各个变量是否正确。
@@ -1360,7 +1362,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcAec3( MediaPocsThrd * MediaPocsThrdPt, int I
 
 int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t WorkMode, int32_t SpeexAecFilterLenMsec, int32_t SpeexAecIsUseRec, float SpeexAecEchoMutp, float SpeexAecEchoCntu, int32_t SpeexAecEchoSupes, int32_t SpeexAecEchoSupesAct, int32_t WebRtcAecmIsUseCNGMode, int32_t WebRtcAecmEchoMode, int32_t WebRtcAecmDelay, int32_t WebRtcAecEchoMode, int32_t WebRtcAecDelay, int32_t WebRtcAecIsUseDelayAgstcMode, int32_t WebRtcAecIsUseExtdFilterMode, int32_t WebRtcAecIsUseRefinedFilterAdaptAecMode, int32_t WebRtcAecIsUseAdaptAdjDelay, int32_t WebRtcAec3Delay, int32_t IsUseSameRoomAec, int32_t SameRoomEchoMinDelay, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexWebRtcAec p_ThrdMsgAdoInptSetUseSpeexWebRtcAec;
 
 	//判断各个变量是否正确。
@@ -1419,7 +1421,7 @@ int MediaPocsThrdAdoInptSetUseSpeexWebRtcAec( MediaPocsThrd * MediaPocsThrdPt, i
 
 int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseNoNs p_ThrdMsgAdoInptSetUseNoNs;
 
 	//判断各个变量是否正确。
@@ -1462,7 +1464,7 @@ int MediaPocsThrdAdoInptSetUseNoNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 
 int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseNs, int32_t NoiseSupes, int32_t IsUseDereverb, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexPrpocsNs p_ThrdMsgAdoInptSetUseSpeexPrpocsNs;
 
 	//判断各个变量是否正确。
@@ -1506,7 +1508,7 @@ int MediaPocsThrdAdoInptSetUseSpeexPrpocsNs( MediaPocsThrd * MediaPocsThrdPt, in
 
 int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t PolicyMode, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNsx p_ThrdMsgAdoInptSetUseWebRtcNsx;
 
 	//判断各个变量是否正确。
@@ -1548,7 +1550,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcNsx( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t PolicyMode, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseWebRtcNs p_ThrdMsgAdoInptSetUseWebRtcNs;
 
 	//判断各个变量是否正确。
@@ -1589,7 +1591,7 @@ int MediaPocsThrdAdoInptSetUseWebRtcNs( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseRNNoise p_ThrdMsgAdoInptSetUseRNNoise;
 
 	//判断各个变量是否正确。
@@ -1638,7 +1640,7 @@ int MediaPocsThrdAdoInptSetUseRNNoise( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 
 int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseSpeexPrpocs, int32_t IsUseVad, int32_t VadProbStart, int32_t VadProbCntu, int32_t IsUseAgc, int32_t AgcLevel, int32_t AgcIncrement, int32_t AgcDecrement, int32_t AgcMaxGain, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetIsUseSpeexPrpocs p_ThrdMsgAdoInptSetIsUseSpeexPrpocs;
 
 	//判断各个变量是否正确。
@@ -1687,7 +1689,7 @@ int MediaPocsThrdAdoInptSetIsUseSpeexPrpocs( MediaPocsThrd * MediaPocsThrdPt, in
 
 int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUsePcm p_ThrdMsgAdoInptSetUsePcm;
 
 	//判断各个变量是否正确。
@@ -1731,7 +1733,7 @@ int MediaPocsThrdAdoInptSetUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t UseCbrOrVbr, int32_t Qualt, int32_t Cmplxt, int32_t PlcExptLossRate, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseSpeexEncd p_ThrdMsgAdoInptSetUseSpeexEncd;
 
 	//判断各个变量是否正确。
@@ -1775,7 +1777,7 @@ int MediaPocsThrdAdoInptSetUseSpeexEncd( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseOpusEncd p_ThrdMsgAdoInptSetUseOpusEncd;
 
 	//判断各个变量是否正确。
@@ -1818,7 +1820,7 @@ int MediaPocsThrdAdoInptSetUseOpusEncd( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsDraw, HWND SrcWndHdl, HWND RsltWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd p_ThrdMsgAdoInptSetIsDrawAdoWavfmToWnd;
 
 	//判断各个变量是否正确。
@@ -1884,7 +1886,7 @@ int MediaPocsThrdAdoInptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 
 int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, const Vstr * RsltFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetIsSaveAdoToWaveFile p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile;
 	p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
 	p_ThrdMsgAdoInptSetIsSaveAdoToWaveFile.m_RsltFullPathVstrPt = NULL;
@@ -1954,7 +1956,7 @@ int MediaPocsThrdAdoInptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 
 int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * NameVstrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetUseDvc p_ThrdMsgAdoInptSetUseDvc;
 	p_ThrdMsgAdoInptSetUseDvc.m_NameVstrPt = NULL;
 
@@ -2006,7 +2008,7 @@ int MediaPocsThrdAdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsMute, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoInptSetIsMute p_ThrdMsgAdoInptSetIsMute;
 
 	//判断各个变量是否正确。
@@ -2049,7 +2051,7 @@ int MediaPocsThrdAdoInptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetAdoOtpt p_ThrdMsgSetAdoOtpt;
 
 	//判断各个变量是否正确。
@@ -2102,7 +2104,7 @@ int MediaPocsThrdSetAdoOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 
 int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptAddStrm p_ThrdMsgAdoOtptAddStrm;
 
 	//判断各个变量是否正确。
@@ -2145,7 +2147,7 @@ int MediaPocsThrdAdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptDelStrm p_ThrdMsgAdoOtptDelStrm;
 
 	//判断各个变量是否正确。
@@ -2187,7 +2189,7 @@ int MediaPocsThrdAdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetStrmUsePcm p_ThrdMsgAdoOtptSetStrmUsePcm;
 
 	//判断各个变量是否正确。
@@ -2230,7 +2232,7 @@ int MediaPocsThrdAdoOtptSetStrmUsePcm( MediaPocsThrd * MediaPocsThrdPt, int IsBl
 
 int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, int32_t IsUsePrcplEnhsmt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseSpeexDecd p_ThrdMsgAdoOtptSetStrmUseSpeexDecd;
 
 	//判断各个变量是否正确。
@@ -2273,7 +2275,7 @@ int MediaPocsThrdAdoOtptSetStrmUseSpeexDecd( MediaPocsThrd * MediaPocsThrdPt, in
 
 int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetStrmUseOpusDecd p_ThrdMsgAdoOtptSetStrmUseOpusDecd;
 
 	//判断各个变量是否正确。
@@ -2316,7 +2318,7 @@ int MediaPocsThrdAdoOtptSetStrmUseOpusDecd( MediaPocsThrd * MediaPocsThrdPt, int
 
 int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t StrmIdx, int32_t IsUse, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetStrmIsUse p_ThrdMsgAdoOtptSetStrmIsUse;
 
 	//判断各个变量是否正确。
@@ -2360,7 +2362,7 @@ int MediaPocsThrdAdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 
 int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsDraw, HWND SrcWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd p_ThrdMsgAdoOtptSetIsDrawAdoWavfmToWnd;
 
 	//判断各个变量是否正确。
@@ -2410,7 +2412,7 @@ int MediaPocsThrdAdoOtptSetIsDrawAdoWavfmToWnd( MediaPocsThrd * MediaPocsThrdPt,
 
 int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsSave, const Vstr * SrcFullPathVstrPt, size_t WrBufSzByt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetIsSaveAdoToWaveFile p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile;
 	p_ThrdMsgAdoOtptSetIsSaveAdoToWaveFile.m_SrcFullPathVstrPt = NULL;
 
@@ -2467,7 +2469,7 @@ int MediaPocsThrdAdoOtptSetIsSaveAdoToWaveFile( MediaPocsThrd * MediaPocsThrdPt,
 
 int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * NameVstrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetUseDvc p_ThrdMsgAdoOtptSetUseDvc;
 	p_ThrdMsgAdoOtptSetUseDvc.m_NameVstrPt = NULL;
 
@@ -2519,7 +2521,7 @@ int MediaPocsThrdAdoOtptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsMute, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAdoOtptSetIsMute p_ThrdMsgAdoOtptSetIsMute;
 
 	//判断各个变量是否正确。
@@ -2567,7 +2569,7 @@ int MediaPocsThrdAdoOtptSetIsMute( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t MaxSmplRate, int32_t FrmWidth, int32_t FrmHeight, int32_t SrcMaxSmplRate, int32_t SrcFrmWidth, int32_t SrcFrmHeight, HWND PrvwWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetVdoInpt p_ThrdMsgSetVdoInpt;
 
 	//判断各个变量是否正确。
@@ -2644,7 +2646,7 @@ int MediaPocsThrdSetVdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, i
 
 int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgVdoInptSetUseYu12 p_ThrdMsgVdoInptSetUseYu12;
 
 	//判断各个变量是否正确。
@@ -2689,7 +2691,7 @@ int MediaPocsThrdVdoInptSetUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 
 int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t VdoType, int32_t EncdBitrate, int32_t BitrateCtrlMode, int32_t IDRFrmIntvl, int32_t Cmplxt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgVdoInptSetUseOpenH264Encd p_ThrdMsgVdoInptSetUseOpenH264Encd;
 
 	//判断各个变量是否正确。
@@ -2735,7 +2737,7 @@ int MediaPocsThrdVdoInptSetUseOpenH264Encd( MediaPocsThrd * MediaPocsThrdPt, int
 
 int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * NameVstrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgVdoInptSetUseDvc p_ThrdMsgVdoInptSetUseDvc;
 	p_ThrdMsgVdoInptSetUseDvc.m_NameVstrPt = NULL;
 
@@ -2787,7 +2789,7 @@ int MediaPocsThrdVdoInptSetUseDvc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockW
 
 int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int IsBlack, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetVdoInptIsBlack p_ThrdMsgSetVdoInptIsBlack;
 
 	//判断各个变量是否正确。
@@ -2829,7 +2831,7 @@ int MediaPocsThrdVdoInptSetIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlock
 
 int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgAddVdoOtptStrm p_ThrdMsgAddVdoOtptStrm;
 
 	//判断各个变量是否正确。
@@ -2872,7 +2874,7 @@ int MediaPocsThrdVdoOtptAddStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int AddFirstOrLast, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgDelVdoOtptStrm p_ThrdMsgDelVdoOtptStrm;
 
 	//判断各个变量是否正确。
@@ -2915,7 +2917,7 @@ int MediaPocsThrdVdoOtptDelStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, HWND DspyWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetVdoOtptStrm p_ThrdMsgSetVdoOtptStrm;
 
 	//判断各个变量是否正确。
@@ -2958,7 +2960,7 @@ int MediaPocsThrdVdoOtptSetStrm( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWai
 
 int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseYu12 p_ThrdMsgSetVdoOtptStrmUseYu12;
 
 	//判断各个变量是否正确。
@@ -3001,7 +3003,7 @@ int MediaPocsThrdVdoOtptSetStrmUseYu12( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, int32_t DecdThrdNum, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetVdoOtptStrmUseOpenH264Decd p_ThrdMsgSetVdoOtptStrmUseOpenH264Decd;
 
 	//判断各个变量是否正确。
@@ -3045,7 +3047,7 @@ int MediaPocsThrdVdoOtptSetStrmUseOpenH264Decd( MediaPocsThrd * MediaPocsThrdPt,
 
 int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, int32_t IsBlack, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsBlack p_ThrdMsgSetVdoOtptStrmIsBlack;
 
 	//判断各个变量是否正确。
@@ -3089,7 +3091,7 @@ int MediaPocsThrdVdoOtptSetStrmIsBlack( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, uint32_t StrmIdx, int32_t IsUse, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetVdoOtptStrmIsUse p_ThrdMsgSetVdoOtptStrmIsUse;
 
 	//判断各个变量是否正确。
@@ -3135,7 +3137,7 @@ int MediaPocsThrdVdoOtptSetStrmIsUse( MediaPocsThrd * MediaPocsThrdPt, int IsBlo
 
 int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseAdoInpt, int32_t IsUseAdoOtpt, int32_t IsUseVdoInpt, int32_t IsUseVdoOtpt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetIsUseAdoVdoInptOtpt p_ThrdMsgSetIsUseAdoVdoInptOtpt;
 
 	//判断各个变量是否正确。
@@ -3181,7 +3183,7 @@ int MediaPocsThrdSetIsUseAdoVdoInptOtpt( MediaPocsThrd * MediaPocsThrdPt, int Is
 
 int MediaPocsThrdSetIsPrintLogShowToast( MediaPocsThrd * MediaPocsThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3221,7 +3223,7 @@ int MediaPocsThrdSetIsPrintLogShowToast( MediaPocsThrd * MediaPocsThrdPt, int32_
 
 int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetIsUsePrvntSysSleep p_ThrdMsgSetIsUsePrvntSysSleep;
 
 	//判断各个变量是否正确。
@@ -3269,7 +3271,7 @@ int MediaPocsThrdSetIsUsePrvntSysSleep( MediaPocsThrd * MediaPocsThrdPt, int IsB
 
 int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, size_t WrBufSzByt, int32_t MaxStrmNum, int32_t IsSaveAdoInpt, int32_t IsSaveAdoOtpt, int32_t IsSaveVdoInpt, int32_t IsSaveVdoOtpt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile;
 	p_ThrdMsgSetIsSaveAdoVdoInptOtptToAviFile.m_FullPathVstrPt = NULL;
 
@@ -3330,7 +3332,7 @@ int MediaPocsThrdSetIsSaveAdoVdoInptOtptToAviFile( MediaPocsThrd * MediaPocsThrd
 
 int MediaPocsThrdSaveStsToTxtFile( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, const Vstr * FullPathVstrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgSaveStsToTxtFile p_ThrdMsgSaveStsToTxtFile;
 	p_ThrdMsgSaveStsToTxtFile.m_FullPathVstrPt = NULL;
 
@@ -3406,7 +3408,7 @@ void MediaPocsThrdPrvntSysSleepInitOrDstoy( MediaPocsThrd * MediaPocsThrdPt, int
 
 int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3452,7 +3454,7 @@ int MediaPocsThrdStart( MediaPocsThrd * MediaPocsThrdPt, Vstr * ErrInfoVstrPt )
 
 int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int ExitFlag, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	MediaPocsThrd::ThrdMsgRqirExit p_ThrdMsgRqirExit;
 
 	//判断各个变量是否正确。
@@ -3501,7 +3503,7 @@ int MediaPocsThrdRqirExit( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int
 
 int MediaPocsThrdSendUserMsg( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( MediaPocsThrdPt == NULL )
@@ -3589,7 +3591,7 @@ void MediaPocsThrdSetIsCanUseAec( MediaPocsThrd * MediaPocsThrdPt )
 
 int MediaPocsThrdAdoVdoInptOtptAviFileWriterInit( MediaPocsThrd * MediaPocsThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	if( ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoInpt != 0 ) || ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveAdoOtpt != 0 ) || ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoInpt != 0 ) || ( MediaPocsThrdPt->m_AdoVdoInptOtptAviFile.m_IsSaveVdoOtpt != 0 ) )
 	{
@@ -3760,7 +3762,7 @@ void MediaPocsThrdAdoVdoInptOtptAviFileWriterDstoy( MediaPocsThrd * MediaPocsThr
 
 int MediaPocsThrdTmpVarInit( MediaPocsThrd * MediaPocsThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	MediaPocsThrdPt->m_Thrd.m_IsInitThrdTmpVar = 1; //设置已初始化线程临时变量。
 	if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
@@ -3936,7 +3938,7 @@ void MediaPocsThrdTmpVarDstoy( MediaPocsThrd * MediaPocsThrdPt )
 
 int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	if( MediaPocsThrdPt->m_AdoOtpt.m_IsUse != 0 ) //如果要使用音频输出。在初始化音频输入前初始化音频输出，因为要音频输入线程去开始音频输出线程。
 	{
@@ -3997,7 +3999,7 @@ int MediaPocsThrdAdoVdoInptOtptInit( MediaPocsThrd * MediaPocsThrdPt )
 			}
 			else //如果不使用音频输出。
 			{
-				if( ( MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_TwoSystemAecNsAgcMediaObjPt != NULL ) ) //如果要使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
+				if( ( MediaPocsThrdPt->m_AdoInpt.m_Dvc.m_SecondSystemAecNsAgcMediaObjPt != NULL ) ) //如果要使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
 				{
 					AdoInptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoInpt ); //销毁并初始化音频输入设备和线程，因为第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器没有音频输出无法工作。
 					MediaPocsThrdSetIsCanUseAec( MediaPocsThrdPt ); //设置是否可以使用声学回音消除器。
@@ -4166,7 +4168,8 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 				if( MediaPocsThrdPt->m_AdoOtpt.m_IsInit != 0 ) AdoOtptDvcAndThrdDstoy( &MediaPocsThrdPt->m_AdoOtpt );
 			}
 
-			MediaPocsThrdPt->m_AdoInpt.m_IsUseSystemAecNsAgc = p_ThrdMsgAdoInptSetIsUseSystemAecNsAgcPt->m_IsUseSystemAecNsAgc;
+			MediaPocsThrdPt->m_AdoInpt.m_IsUseFirstSystemAecNsAgc = p_ThrdMsgAdoInptSetIsUseSystemAecNsAgcPt->m_IsUseFirstSystemAecNsAgc;
+			MediaPocsThrdPt->m_AdoInpt.m_IsUseSecondSystemAecNsAgc = p_ThrdMsgAdoInptSetIsUseSystemAecNsAgcPt->m_IsUseSecondSystemAecNsAgc;
 
 			if( MediaPocsThrdPt->m_AdoInpt.m_IsInit != 0 )
 			{
@@ -4839,7 +4842,8 @@ int MediaPocsThrdThrdMsgPocs( MsgQueue * MsgQueuePt, MediaPocsThrd * MediaPocsTh
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenData：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenData );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_FrmLenByt：%uzd\n" ), MediaPocsThrdPt->m_AdoInpt.m_FrmLenByt );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
-			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUseSystemAecNsAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUseSystemAecNsAgc );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUseFirstSystemAecNsAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUseFirstSystemAecNsAgc );
+			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_IsUseSecondSystemAecNsAgc：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_IsUseSecondSystemAecNsAgc );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "m_AdoInpt.m_UseWhatAec：%z32d\n" ), MediaPocsThrdPt->m_AdoInpt.m_UseWhatAec );
 			FileFmtWrite( p_StsFilePt, 0, NULL, Cu8vstr( "\n" ) );
@@ -5275,7 +5279,7 @@ void MediaPocsThrdAdoVdoInptOtptFrmPocs( MediaPocsThrd * MediaPocsThrdPt )
 		if( MediaPocsThrdPt->m_IsPrintLog != 0 )
 		{
 			p_NowTickMsec = FuncGetTickAsMsec();
-			//LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的处理函数成功。耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
+			LOGFI( Cu8vstr( "媒体处理线程：调用用户定义的处理函数成功。耗时 %uz64d 毫秒。" ), p_NowTickMsec - p_LastTickMsec );
 			p_LastTickMsec = p_NowTickMsec;
 		}
 	}

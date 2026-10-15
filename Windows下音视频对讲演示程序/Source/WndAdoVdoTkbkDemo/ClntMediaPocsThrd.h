@@ -155,7 +155,40 @@ typedef struct ClntMediaPocsThrd //客户端媒体处理线程。
 	//用户定义的设备改变函数。
 	typedef void( __cdecl * ClntMediaPocsThrdUserDvcChgFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
 	ClntMediaPocsThrdUserDvcChgFuncPt m_UserDvcChgFuncPt;
-	
+
+	//用户定义的读取音视频输入帧函数。
+	typedef void( __cdecl * ClntMediaPocsThrdUserReadAdoVdoInptFrmFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt,
+																			int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
+																			uint8_t * AdoInptEncdRsltFrmPt, size_t AdoInptEncdRsltFrmLenByt, int32_t AdoInptEncdRsltFrmIsNeedTrans,
+																			uint8_t * VdoInptBgraSrcFrmPt, int32_t VdoInptBgraSrcFrmWidth, int32_t VdoInptBgraSrcFrmHeight, size_t VdoInptBgraSrcFrmLenByt,
+																			uint8_t * VdoInptYu12RsltFrmPt, int32_t VdoInptYu12RsltFrmWidth, int32_t VdoInptYu12RsltFrmHeight, size_t VdoInptYu12RsltFrmLenByt,
+																			uint8_t * VdoInptEncdRsltFrmPt, size_t VdoInptEncdRsltFrmLenByt );
+	ClntMediaPocsThrdUserReadAdoVdoInptFrmFuncPt m_UserReadAdoVdoInptFrmFuncPt;
+
+	//用户定义的写入音频输出帧函数。
+	typedef void( __cdecl * ClntMediaPocsThrdUserWriteAdoOtptFrmFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int32_t AdoOtptStrmIdx,
+																		  int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+																		  uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmSzByt, size_t * AdoOtptEncdSrcFrmLenBytPt );
+	ClntMediaPocsThrdUserWriteAdoOtptFrmFuncPt m_UserWriteAdoOtptFrmFuncPt;
+
+	//用户定义的获取音频输出帧函数。
+	typedef void( __cdecl * ClntMediaPocsThrdUserGetAdoOtptFrmFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int32_t AdoOtptStrmIdx,
+																		int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+																		uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt );
+	ClntMediaPocsThrdUserGetAdoOtptFrmFuncPt m_UserGetAdoOtptFrmFuncPt;
+
+	//用户定义的写入视频输出帧函数。
+	typedef void( __cdecl * ClntMediaPocsThrdUserWriteVdoOtptFrmFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, uint32_t VdoOtptStrmIdx,
+																		  uint8_t * VdoOtptYu12SrcFrmPt, int32_t * VdoOtptYu12SrcFrmWidthPt, int32_t * VdoOtptYu12SrcFrmHeightPt,
+																		  uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmSzByt, size_t * VdoOtptEncdSrcFrmLenBytPt );
+	ClntMediaPocsThrdUserWriteVdoOtptFrmFuncPt m_UserWriteVdoOtptFrmFuncPt;
+
+	//用户定义的获取视频输出帧函数。
+	typedef void( __cdecl * ClntMediaPocsThrdUserGetVdoOtptFrmFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, uint32_t VdoOtptStrmIdx,
+																		uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
+																		uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt );
+	ClntMediaPocsThrdUserGetVdoOtptFrmFuncPt m_UserGetVdoOtptFrmFuncPt;
+
 	//用户定义的显示日志函数。
 	typedef void( __cdecl * ClntMediaPocsThrdUserShowLogFuncPt )( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * InfoVstrPt );
 	ClntMediaPocsThrdUserShowLogFuncPt m_UserShowLogFuncPt;
@@ -225,6 +258,9 @@ extern const char * const g_TkbkModeU8strArrPt[ 17 ];
 __WNDADOVDOTKBK_DLLAPI__ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const void * LicnCodePt, void * UserDataPt,
 													ClntMediaPocsThrd::ClntMediaPocsThrdUserInitFuncPt UserInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserDstoyFuncPt UserDstoyFuncPt,
 													ClntMediaPocsThrd::ClntMediaPocsThrdUserPocsFuncPt UserPocsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserMsgFuncPt UserMsgFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserDvcChgFuncPt UserDvcChgFuncPt,
+													ClntMediaPocsThrd::ClntMediaPocsThrdUserReadAdoVdoInptFrmFuncPt UserReadAdoVdoInptFrmFuncPt,
+													ClntMediaPocsThrd::ClntMediaPocsThrdUserWriteAdoOtptFrmFuncPt UserWriteAdoOtptFrmFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserGetAdoOtptFrmFuncPt UserGetAdoOtptFrmFuncPt,
+													ClntMediaPocsThrd::ClntMediaPocsThrdUserWriteVdoOtptFrmFuncPt UserWriteVdoOtptFrmFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserGetVdoOtptFrmFuncPt UserGetVdoOtptFrmFuncPt,
 													ClntMediaPocsThrd::ClntMediaPocsThrdUserShowLogFuncPt UserShowLogFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserShowToastFuncPt UserShowToastFuncPt,
 													ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctInitFuncPt UserTkbkClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctDstoyFuncPt UserTkbkClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctStsFuncPt UserTkbkClntCnctStsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntMyTkbkIdxFuncPt UserTkbkClntMyTkbkIdxFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntLclTkbkModeFuncPt UserTkbkClntLclTkbkModeFuncPt,
 													ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoInitFuncPt UserTkbkClntTkbkInfoInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoDstoyFuncPt UserTkbkClntTkbkInfoDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt UserTkbkClntTkbkInfoRmtTkbkModeFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTstNtwkDlyFuncPt UserTkbkClntTstNtwkDlyFuncPt,
@@ -302,6 +338,33 @@ public:
 	
 	//用户定义的设备改变函数。
 	virtual void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt ) = 0;
+	
+	//用户定义的读取音视频输入帧函数。
+	virtual void UserReadAdoVdoInptFrm( int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
+										uint8_t * AdoInptEncdRsltFrmPt, size_t AdoInptEncdRsltFrmLenByt, int32_t AdoInptEncdRsltFrmIsNeedTrans,
+										uint8_t * VdoInptBgraSrcFrmPt, int32_t VdoInptBgraSrcFrmWidth, int32_t VdoInptBgraSrcFrmHeight, size_t VdoInptBgraSrcFrmLenByt,
+										uint8_t * VdoInptYu12RsltFrmPt, int32_t VdoInptYu12RsltFrmWidth, int32_t VdoInptYu12RsltFrmHeight, size_t VdoInptYu12RsltFrmLenByt,
+										uint8_t * VdoInptEncdRsltFrmPt, size_t VdoInptEncdRsltFrmLenByt ) = 0;
+
+	//用户定义的写入音频输出帧函数。
+	virtual void UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
+									  int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+									  uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmSzByt, size_t * AdoOtptEncdSrcFrmLenBytPt ) = 0;
+
+	//用户定义的获取音频输出帧函数。
+	virtual void UserGetAdoOtptFrm( int32_t AdoOtptStrmIdx,
+									int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+									uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt ) = 0;
+
+	//用户定义的写入视频输出帧函数。
+	virtual void UserWriteVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+									  uint8_t * VdoOtptYu12SrcFrmPt, int32_t * VdoOtptYu12SrcFrmWidthPt, int32_t * VdoOtptYu12SrcFrmHeightPt,
+									  uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmSzByt, size_t * VdoOtptEncdSrcFrmLenBytPt ) = 0;
+
+	//用户定义的获取视频输出帧函数。
+	virtual void UserGetVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+									uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
+									uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt ) = 0;
 
 	//用户定义的显示日志函数。
 	virtual void UserShowLog( Vstr * InfoVstrPt ) = 0;

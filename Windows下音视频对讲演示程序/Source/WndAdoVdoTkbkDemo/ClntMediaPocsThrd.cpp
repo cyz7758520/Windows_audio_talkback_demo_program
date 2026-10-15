@@ -24,6 +24,9 @@ const char * const g_TkbkModeU8strArrPt[ 17 ] = {
 int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const void * LicnCodePt, void * UserDataPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserInitFuncPt UserInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserDstoyFuncPt UserDstoyFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserPocsFuncPt UserPocsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserMsgFuncPt UserMsgFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserDvcChgFuncPt UserDvcChgFuncPt,
+						   ClntMediaPocsThrd::ClntMediaPocsThrdUserReadAdoVdoInptFrmFuncPt UserReadAdoVdoInptFrmFuncPt,
+						   ClntMediaPocsThrd::ClntMediaPocsThrdUserWriteAdoOtptFrmFuncPt UserWriteAdoOtptFrmFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserGetAdoOtptFrmFuncPt UserGetAdoOtptFrmFuncPt,
+						   ClntMediaPocsThrd::ClntMediaPocsThrdUserWriteVdoOtptFrmFuncPt UserWriteVdoOtptFrmFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserGetVdoOtptFrmFuncPt UserGetVdoOtptFrmFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserShowLogFuncPt UserShowLogFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserShowToastFuncPt UserShowToastFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctInitFuncPt UserTkbkClntCnctInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctDstoyFuncPt UserTkbkClntCnctDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntCnctStsFuncPt UserTkbkClntCnctStsFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntMyTkbkIdxFuncPt UserTkbkClntMyTkbkIdxFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntLclTkbkModeFuncPt UserTkbkClntLclTkbkModeFuncPt,
 						   ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoInitFuncPt UserTkbkClntTkbkInfoInitFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoDstoyFuncPt UserTkbkClntTkbkInfoDstoyFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTkbkInfoRmtTkbkModeFuncPt UserTkbkClntTkbkInfoRmtTkbkModeFuncPt, ClntMediaPocsThrd::ClntMediaPocsThrdUserTkbkClntTstNtwkDlyFuncPt UserTkbkClntTstNtwkDlyFuncPt,
@@ -63,7 +66,7 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const vo
 
 	//初始化对讲客户端。
 	p_ClntMediaPocsThrdPt->m_TkbkClnt.m_ClntMediaPocsThrdPt = p_ClntMediaPocsThrdPt;
-	if( CQueueInit( &p_ClntMediaPocsThrdPt->m_TkbkClnt.m_TkbkInfoCntnrPt, sizeof( TkbkClnt::TkbkInfo ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( CQueueInit( &p_ClntMediaPocsThrdPt->m_TkbkClnt.m_TkbkInfoCntnrPt, sizeof( TkbkClnt::TkbkInfo ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化对讲客户端的对讲信息容器失败。原因" ) );
 		goto Out;
@@ -73,7 +76,7 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const vo
 
 	//初始化广播客户端。
 	p_ClntMediaPocsThrdPt->m_BdctClnt.m_ClntMediaPocsThrdPt = p_ClntMediaPocsThrdPt;
-	if( CQueueInit( &p_ClntMediaPocsThrdPt->m_BdctClnt.m_CnctInfoCntnrPt, sizeof( BdctClnt::CnctInfo ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( CQueueInit( &p_ClntMediaPocsThrdPt->m_BdctClnt.m_CnctInfoCntnrPt, sizeof( BdctClnt::CnctInfo ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化广播客户端的连接信息容器失败。原因" ) );
 		goto Out;
@@ -134,6 +137,14 @@ int ClntMediaPocsThrdInit( ClntMediaPocsThrd * * ClntMediaPocsThrdPtPt, const vo
 	p_ClntMediaPocsThrdPt->m_UserPocsFuncPt = UserPocsFuncPt; //设置用户定义的处理函数的指针。
 	p_ClntMediaPocsThrdPt->m_UserMsgFuncPt = UserMsgFuncPt; //设置用户定义的消息函数的指针。
 	p_ClntMediaPocsThrdPt->m_UserDvcChgFuncPt = UserDvcChgFuncPt; //设置用户定义的设备改变函数的指针。
+	
+	p_ClntMediaPocsThrdPt->m_UserReadAdoVdoInptFrmFuncPt = UserReadAdoVdoInptFrmFuncPt; //设置用户定义的读取音视频输入帧函数的指针。
+
+	p_ClntMediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt = UserWriteAdoOtptFrmFuncPt; //设置用户定义的写入音频输出帧函数的指针。
+	p_ClntMediaPocsThrdPt->m_UserGetAdoOtptFrmFuncPt = UserGetAdoOtptFrmFuncPt; //设置用户定义的获取音频输出帧函数的指针。
+
+	p_ClntMediaPocsThrdPt->m_UserWriteVdoOtptFrmFuncPt = UserWriteVdoOtptFrmFuncPt; //设置用户定义的写入视频输出帧函数的指针。
+	p_ClntMediaPocsThrdPt->m_UserGetVdoOtptFrmFuncPt = UserGetVdoOtptFrmFuncPt; //设置用户定义的获取视频输出帧函数的指针。
 
 	p_ClntMediaPocsThrdPt->m_UserShowLogFuncPt = UserShowLogFuncPt; //设置用户定义的显示日志函数的指针。
 	p_ClntMediaPocsThrdPt->m_UserShowToastFuncPt = UserShowToastFuncPt; //设置用户定义的显示Toast函数的指针。
@@ -211,7 +222,7 @@ int ClntMediaPocsThrdDstoy( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * ErrI
 //发送对讲客户端设置是否测试网络延迟消息。
 int ClntMediaPocsThrdSendTkbkClntSetIsTstNtwkDlyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgTkbkClntSetIsTstNtwkDly p_UserMsgTkbkClntSetIsTstNtwkDly;
 	
 	//判断各个变量是否正确。
@@ -242,7 +253,7 @@ int ClntMediaPocsThrdSendTkbkClntSetIsTstNtwkDlyMsg( ClntMediaPocsThrd * ClntMed
 //发送对讲客户端的连接初始化消息。
 int ClntMediaPocsThrdSendTkbkClntCnctInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgTkbkClntCnctInit p_UserMsgTkbkClntCnctInit;
 	
 	//判断各个变量是否正确。
@@ -282,7 +293,7 @@ int ClntMediaPocsThrdSendTkbkClntCnctInitMsg( ClntMediaPocsThrd * ClntMediaPocsT
 //发送对讲客户端的连接销毁消息。
 int ClntMediaPocsThrdSendTkbkClntCnctDstoyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgTkbkClntCnctDstoy p_UserMsgTkbkClntCnctDstoy;
 	
 	//判断各个变量是否正确。
@@ -311,7 +322,7 @@ int ClntMediaPocsThrdSendTkbkClntCnctDstoyMsg( ClntMediaPocsThrd * ClntMediaPocs
 //发送对讲客户端的本端对讲模式消息。
 int ClntMediaPocsThrdSendTkbkClntLclTkbkModeMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t LclTkbkMode, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgTkbkClntLclTkbkMode p_UserMsgTkbkClntLclTkbkMode;
 	
 	//判断各个变量是否正确。
@@ -341,7 +352,7 @@ int ClntMediaPocsThrdSendTkbkClntLclTkbkModeMsg( ClntMediaPocsThrd * ClntMediaPo
 //发送对讲客户端的一键即按即通按钮按下消息。
 int ClntMediaPocsThrdSendTkbkClntPttBtnDownMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgTkbkClntPttBtnDown p_UserMsgTkbkClntPttBtnDown;
 	
 	//判断各个变量是否正确。
@@ -370,7 +381,7 @@ int ClntMediaPocsThrdSendTkbkClntPttBtnDownMsg( ClntMediaPocsThrd * ClntMediaPoc
 //发送对讲客户端的一键即按即通按钮弹起消息。
 int ClntMediaPocsThrdSendTkbkClntPttBtnUpMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgTkbkClntPttBtnUp p_UserMsgTkbkClntPttBtnUp;
 	
 	//判断各个变量是否正确。
@@ -399,7 +410,7 @@ int ClntMediaPocsThrdSendTkbkClntPttBtnUpMsg( ClntMediaPocsThrd * ClntMediaPocsT
 //发送广播客户端初始化消息。
 int ClntMediaPocsThrdSendBdctClntInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t CnctNumIsDecr, int32_t LclTkbkMode, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgBdctClntInit p_UserMsgBdctClntInit;
 	
 	//判断各个变量是否正确。
@@ -430,7 +441,7 @@ int ClntMediaPocsThrdSendBdctClntInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdP
 //发送广播客户端销毁消息。
 int ClntMediaPocsThrdSendBdctClntDstoyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgBdctClntDstoy p_UserMsgBdctClntDstoy;
 	
 	//判断各个变量是否正确。
@@ -459,7 +470,7 @@ int ClntMediaPocsThrdSendBdctClntDstoyMsg( ClntMediaPocsThrd * ClntMediaPocsThrd
 //发送广播客户端的连接初始化消息。
 int ClntMediaPocsThrdSendBdctClntCnctInitMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgBdctClntCnctInit p_UserMsgBdctClntCnctInit;
 	
 	//判断各个变量是否正确。
@@ -499,7 +510,7 @@ int ClntMediaPocsThrdSendBdctClntCnctInitMsg( ClntMediaPocsThrd * ClntMediaPocsT
 //发送广播客户端的连接销毁消息。
 int ClntMediaPocsThrdSendBdctClntCnctDstoyMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	ClntMediaPocsThrd::ThrdMsgBdctClntCnctDstoy p_UserMsgBdctClntCnctDstoy;
 	
 	//判断各个变量是否正确。
@@ -529,7 +540,7 @@ int ClntMediaPocsThrdSendBdctClntCnctDstoyMsg( ClntMediaPocsThrd * ClntMediaPocs
 //发送用户消息到媒体处理线程。
 int ClntMediaPocsThrdSendUserMsg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( ClntMediaPocsThrdPt == NULL )
@@ -1020,6 +1031,13 @@ void __cdecl ClntMediaPocsThrdUserReadAdoVdoInptFrm( MediaPocsThrd * MediaPocsTh
 									   VdoInptYu12RsltFrmPt, VdoInptYu12RsltFrmWidth, VdoInptYu12RsltFrmHeight, VdoInptYu12RsltFrmLenByt,
 									   VdoInptEncdRsltFrmPt, VdoInptEncdRsltFrmLenByt );
 	}
+
+	p_ClntMediaPocsThrdPt->m_UserReadAdoVdoInptFrmFuncPt( p_ClntMediaPocsThrdPt,
+														  AdoInptPcmSrcFrmPt, AdoInptPcmRsltFrmPt, AdoInptPcmFrmLenUnit, AdoInptPcmRsltFrmVoiceActSts,
+														  AdoInptEncdRsltFrmPt, AdoInptEncdRsltFrmLenByt, AdoInptEncdRsltFrmIsNeedTrans,
+														  VdoInptBgraSrcFrmPt, VdoInptBgraSrcFrmWidth, VdoInptBgraSrcFrmHeight, VdoInptBgraSrcFrmLenByt,
+														  VdoInptYu12RsltFrmPt, VdoInptYu12RsltFrmWidth, VdoInptYu12RsltFrmHeight, VdoInptYu12RsltFrmLenByt,
+														  VdoInptEncdRsltFrmPt, VdoInptEncdRsltFrmLenByt );
 }
 
 //用户定义的写入音频输出帧函数。
@@ -1032,6 +1050,11 @@ void __cdecl ClntMediaPocsThrdUserWriteAdoOtptFrm( MediaPocsThrd * MediaPocsThrd
 	TkbkClntUserWriteAdoOtptFrm( &p_ClntMediaPocsThrdPt->m_TkbkClnt, AdoOtptStrmIdx,
 								 AdoOtptPcmSrcFrmPt, AdoOtptPcmFrmLenUnit,
 								 AdoOtptEncdSrcFrmPt, AdoOtptEncdSrcFrmSzByt, AdoOtptEncdSrcFrmLenBytPt );
+
+	p_ClntMediaPocsThrdPt->m_UserWriteAdoOtptFrmFuncPt( p_ClntMediaPocsThrdPt, AdoOtptStrmIdx,
+														AdoOtptPcmSrcFrmPt, AdoOtptPcmFrmLenUnit,
+														AdoOtptEncdSrcFrmPt, AdoOtptEncdSrcFrmSzByt, AdoOtptEncdSrcFrmLenBytPt );
+
 }
 
 //用户定义的获取音频输出帧函数。
@@ -1039,7 +1062,11 @@ void __cdecl ClntMediaPocsThrdUserGetAdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt
 												 int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
 												 uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt )
 {
+	ClntMediaPocsThrd * p_ClntMediaPocsThrdPt = ( ClntMediaPocsThrd * )MediaPocsThrdPt->m_UserDataPt; //存放客户端媒体处理线程的指针。
 
+	p_ClntMediaPocsThrdPt->m_UserGetAdoOtptFrmFuncPt( p_ClntMediaPocsThrdPt, AdoOtptStrmIdx,
+													  AdoOtptPcmSrcFrmPt, AdoOtptPcmFrmLenUnit,
+													  AdoOtptEncdSrcFrmPt, AdoOtptEncdSrcFrmLenByt );
 }
 
 //用户定义的写入视频输出帧函数。
@@ -1052,6 +1079,10 @@ void __cdecl ClntMediaPocsThrdUserWriteVdoOtptFrm( MediaPocsThrd * MediaPocsThrd
 	TkbkClntUserWriteVdoOtptFrm( &p_ClntMediaPocsThrdPt->m_TkbkClnt, VdoOtptStrmIdx,
 								 VdoOtptYu12SrcFrmPt, VdoOtptYu12SrcFrmWidthPt, VdoOtptYu12SrcFrmHeightPt,
 								 VdoOtptEncdSrcFrmPt, VdoOtptEncdSrcFrmSzByt, VdoOtptEncdSrcFrmLenBytPt );
+
+	p_ClntMediaPocsThrdPt->m_UserWriteVdoOtptFrmFuncPt( p_ClntMediaPocsThrdPt, VdoOtptStrmIdx,
+														VdoOtptYu12SrcFrmPt, VdoOtptYu12SrcFrmWidthPt, VdoOtptYu12SrcFrmHeightPt,
+														VdoOtptEncdSrcFrmPt, VdoOtptEncdSrcFrmSzByt, VdoOtptEncdSrcFrmLenBytPt );
 }
 
 //用户定义的获取视频输出帧函数。
@@ -1059,7 +1090,11 @@ void __cdecl ClntMediaPocsThrdUserGetVdoOtptFrm( MediaPocsThrd * MediaPocsThrdPt
 												 uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
 												 uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt )
 {
+	ClntMediaPocsThrd * p_ClntMediaPocsThrdPt = ( ClntMediaPocsThrd * )MediaPocsThrdPt->m_UserDataPt; //存放客户端媒体处理线程的指针。
 
+	p_ClntMediaPocsThrdPt->m_UserGetVdoOtptFrmFuncPt( p_ClntMediaPocsThrdPt, VdoOtptStrmIdx,
+													  VdoOtptYu12SrcFrmPt, VdoOtptYu12SrcFrmWidth, VdoOtptYu12SrcFrmHeight,
+													  VdoOtptEncdSrcFrmPt, VdoOtptEncdSrcFrmLenByt );
 }
 
 //回调ClntMediaPocsThrdCls类的用户定义的初始化函数。
@@ -1090,6 +1125,61 @@ extern "C" int __cdecl ClntMediaPocsThrdClsUserMsg( ClntMediaPocsThrd * ClntMedi
 extern "C" void __cdecl ClntMediaPocsThrdClsUserDvcChg( ClntMediaPocsThrd * ClntMediaPocsThrdPt, Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt )
 {
 	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserDvcChg( AdoInptDvcNameVstrPt, AdoOtptDvcNameVstrPt, VdoInptDvcNameVstrPt );
+}
+
+
+
+//回调ClntMediaPocsThrdCls类的用户定义的读取音视频输入帧函数。
+extern "C" void __cdecl ClntMediaPocsThrdClsUserReadAdoVdoInptFrm( ClntMediaPocsThrd * ClntMediaPocsThrdPt,
+																int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
+																uint8_t * AdoInptEncdRsltFrmPt, size_t AdoInptEncdRsltFrmLenByt, int32_t AdoInptEncdRsltFrmIsNeedTrans,
+																uint8_t * VdoInptBgraSrcFrmPt, int32_t VdoInptBgraSrcFrmWidth, int32_t VdoInptBgraSrcFrmHeight, size_t VdoInptBgraSrcFrmLenByt,
+																uint8_t * VdoInptYu12RsltFrmPt, int32_t VdoInptYu12RsltFrmWidth, int32_t VdoInptYu12RsltFrmHeight, size_t VdoInptYu12RsltFrmLenByt,
+																uint8_t * VdoInptEncdRsltFrmPt, size_t VdoInptEncdRsltFrmLenByt )
+{
+	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserReadAdoVdoInptFrm( AdoInptPcmSrcFrmPt, AdoInptPcmRsltFrmPt, AdoInptPcmFrmLenUnit, AdoInptPcmRsltFrmVoiceActSts,
+																							AdoInptEncdRsltFrmPt, AdoInptEncdRsltFrmLenByt, AdoInptEncdRsltFrmIsNeedTrans,
+																							VdoInptBgraSrcFrmPt, VdoInptBgraSrcFrmWidth, VdoInptBgraSrcFrmHeight, VdoInptBgraSrcFrmLenByt,
+																							VdoInptYu12RsltFrmPt, VdoInptYu12RsltFrmWidth, VdoInptYu12RsltFrmHeight, VdoInptYu12RsltFrmLenByt,
+																							VdoInptEncdRsltFrmPt, VdoInptEncdRsltFrmLenByt );
+}
+
+//回调ClntMediaPocsThrdCls类的用户定义的写入音频输出帧函数。
+extern "C" void __cdecl ClntMediaPocsThrdClsUserWriteAdoOtptFrm( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int32_t AdoOtptStrmIdx,
+															  int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+															  uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmSzByt, size_t * AdoOtptEncdSrcFrmLenBytPt )
+{
+	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserWriteAdoOtptFrm( AdoOtptStrmIdx, AdoOtptPcmSrcFrmPt, AdoOtptPcmFrmLenUnit, AdoOtptEncdSrcFrmPt, AdoOtptEncdSrcFrmSzByt, AdoOtptEncdSrcFrmLenBytPt );
+}
+
+//回调ClntMediaPocsThrdCls类的用户定义的获取音频输出帧函数。
+extern "C" void __cdecl ClntMediaPocsThrdClsUserGetAdoOtptFrm( ClntMediaPocsThrd * ClntMediaPocsThrdPt, int32_t AdoOtptStrmIdx,
+															int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+															uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt )
+{
+	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserGetAdoOtptFrm( AdoOtptStrmIdx,
+																						AdoOtptPcmSrcFrmPt, AdoOtptPcmFrmLenUnit,
+																						AdoOtptEncdSrcFrmPt, AdoOtptEncdSrcFrmLenByt );
+}
+
+//回调ClntMediaPocsThrdCls类的用户定义的写入视频输出帧函数。
+extern "C" void __cdecl ClntMediaPocsThrdClsUserWriteVdoOtptFrm( ClntMediaPocsThrd * ClntMediaPocsThrdPt, uint32_t VdoOtptStrmIdx,
+															  uint8_t * VdoOtptYu12SrcFrmPt, int32_t * VdoOtptYu12SrcFrmWidthPt, int32_t * VdoOtptYu12SrcFrmHeightPt,
+															  uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmSzByt, size_t * VdoOtptEncdSrcFrmLenBytPt )
+{
+	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserWriteVdoOtptFrm( VdoOtptStrmIdx,
+																						  VdoOtptYu12SrcFrmPt, VdoOtptYu12SrcFrmWidthPt, VdoOtptYu12SrcFrmHeightPt,
+																						  VdoOtptEncdSrcFrmPt, VdoOtptEncdSrcFrmSzByt, VdoOtptEncdSrcFrmLenBytPt );
+}
+
+//回调ClntMediaPocsThrdCls类的用户定义的获取视频输出帧函数。
+extern "C" void __cdecl ClntMediaPocsThrdClsUserGetVdoOtptFrm( ClntMediaPocsThrd * ClntMediaPocsThrdPt, uint32_t VdoOtptStrmIdx,
+															uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
+															uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt )
+{
+	( ( ClntMediaPocsThrdCls * )ClntMediaPocsThrdPt->m_UserDataPt )->UserGetVdoOtptFrm( VdoOtptStrmIdx,
+																						VdoOtptYu12SrcFrmPt, VdoOtptYu12SrcFrmWidth, VdoOtptYu12SrcFrmHeight,
+																						VdoOtptEncdSrcFrmPt, VdoOtptEncdSrcFrmLenByt );
 }
 
 //回调ClntMediaPocsThrdCls类的用户定义的显示日志函数。
@@ -1193,6 +1283,9 @@ int ClntMediaPocsThrdCls::Init( const void * LicnCodePt, Vstr * ErrInfoVstrPt )
 	int p_Rslt = ClntMediaPocsThrdInit( &m_ClntMediaPocsThrdPt, LicnCodePt, this,
 										ClntMediaPocsThrdClsUserClntMediaPocsThrdInit, ClntMediaPocsThrdClsUserClntMediaPocsThrdDstoy,
 										ClntMediaPocsThrdClsUserClntMediaPocsThrdPocs, ClntMediaPocsThrdClsUserMsg, ClntMediaPocsThrdClsUserDvcChg,
+										ClntMediaPocsThrdClsUserReadAdoVdoInptFrm,
+										ClntMediaPocsThrdClsUserWriteAdoOtptFrm, ClntMediaPocsThrdClsUserGetAdoOtptFrm,
+										ClntMediaPocsThrdClsUserWriteVdoOtptFrm, ClntMediaPocsThrdClsUserGetVdoOtptFrm,
 										ClntMediaPocsThrdClsUserShowLog, ClntMediaPocsThrdClsUserShowToast,
 										ClntMediaPocsThrdClsUserTkbkClntCnctInit, ClntMediaPocsThrdClsUserTkbkClntCnctDstoy, ClntMediaPocsThrdClsUserTkbkClntCnctSts, ClntMediaPocsThrdClsUserTkbkClntMyTkbkIdx, ClntMediaPocsThrdClsUserTkbkClntLclTkbkMode,
 										ClntMediaPocsThrdClsUserTkbkClntTkbkInfoInit, ClntMediaPocsThrdClsUserTkbkClntTkbkInfoDstoy, ClntMediaPocsThrdClsUserTkbkClntTkbkInfoRmtTkbkMode, ClntMediaPocsThrdClsUserTkbkClntTstNtwkDly,

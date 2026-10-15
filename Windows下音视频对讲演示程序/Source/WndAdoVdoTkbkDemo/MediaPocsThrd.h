@@ -141,7 +141,8 @@ typedef struct MediaPocsThrd //媒体处理线程。
 	} ThrdMsgSetAdoInpt;
 	typedef struct
 	{
-		int32_t m_IsUseSystemAecNsAgc;
+		int32_t m_IsUseFirstSystemAecNsAgc;
+		int32_t m_IsUseSecondSystemAecNsAgc;
 	} ThrdMsgAdoInptSetIsUseSystemAecNsAgc;
 	typedef struct
 	{
@@ -565,7 +566,7 @@ __WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdGetVdoInptDvcId( Vstr * VdoInptDvcName
 
 __WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdSetAdoInpt( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt );
 
-__WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseSystemAecNsAgc, Vstr * ErrInfoVstrPt );
+__WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t IsUseFirstSystemAecNsAgc, int32_t IsUseSecondSystemAecNsAgc, Vstr * ErrInfoVstrPt );
 
 __WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdAdoInptSetUseNoAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt );
 __WNDADOVDOTKBK_DLLAPI__ int MediaPocsThrdAdoInptSetUseSpeexAec( MediaPocsThrd * MediaPocsThrdPt, int IsBlockWait, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt );
@@ -700,7 +701,7 @@ public:
 
 	int SetAdoInpt( int IsBlockWait, int32_t SmplRate, size_t FrmLenMsec, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdSetAdoInpt( m_MediaPocsThrdPt, IsBlockWait, SmplRate, FrmLenMsec, ErrInfoVstrPt ); }
 
-	int AdoInptSetIsUseSystemAecNsAgc( int IsBlockWait, int32_t IsUseSystemAecNsAgc, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( m_MediaPocsThrdPt, IsBlockWait, IsUseSystemAecNsAgc, ErrInfoVstrPt ); }
+	int AdoInptSetIsUseSystemAecNsAgc( int IsBlockWait, int32_t IsUseFirstSystemAecNsAgc, int32_t IsUseSecondSystemAecNsAgc, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetIsUseSystemAecNsAgc( m_MediaPocsThrdPt, IsBlockWait, IsUseFirstSystemAecNsAgc, IsUseSecondSystemAecNsAgc, ErrInfoVstrPt ); }
 
 	int AdoInptSetUseNoAec( int IsBlockWait, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetUseNoAec( m_MediaPocsThrdPt, IsBlockWait, ErrInfoVstrPt ); }
 	int AdoInptSetUseSpeexAec( int IsBlockWait, int32_t FilterLenMsec, int32_t IsUseRec, float EchoMutp, float EchoCntu, int32_t EchoSupes, int32_t EchoSupesAct, Vstr * ErrInfoVstrPt ) { return MediaPocsThrdAdoInptSetUseSpeexAec( m_MediaPocsThrdPt, IsBlockWait, FilterLenMsec, IsUseRec, EchoMutp, EchoCntu, EchoSupes, EchoSupesAct, ErrInfoVstrPt ); }

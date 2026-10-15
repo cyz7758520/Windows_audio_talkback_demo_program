@@ -9,7 +9,7 @@ extern "C"
 
 typedef struct CQueue CQueue;
 
-__DATASTRUCT_DLLAPI__ int CQueueInit( CQueue * * CQueuePtPt, size_t ElmDataLenByt, size_t ElmInitNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int CQueueInit( CQueue * * CQueuePtPt, size_t ElmDataLenByt, size_t ElmInitNum, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t ElmMaxNum, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int CQueueDstoy( CQueue * CQueuePt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int CQueueLocked( CQueue * CQueuePt, Vstr * ErrInfoVstrPt );
@@ -44,7 +44,7 @@ public:
 	CQueueCls() { m_Pt = NULL; }
 	~CQueueCls() { Dstoy( NULL ); }
 
-	int Init( size_t ElmDataLenByt, size_t ElmInitNum, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return CQueueInit( &m_Pt, ElmDataLenByt, ElmInitNum, BufAutoExtdMeth, BufAutoExtdParm, ElmMaxNum, ErrInfoVstrPt ); }
+	int Init( size_t ElmDataLenByt, size_t ElmInitNum, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t ElmMaxNum, Vstr * ErrInfoVstrPt ) { return CQueueInit( &m_Pt, ElmDataLenByt, ElmInitNum, BufAutoExtdMeth, BufAutoExtdParm, ElmMaxNum, ErrInfoVstrPt ); }
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = CQueueDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return CQueueLocked( m_Pt, ErrInfoVstrPt ); }

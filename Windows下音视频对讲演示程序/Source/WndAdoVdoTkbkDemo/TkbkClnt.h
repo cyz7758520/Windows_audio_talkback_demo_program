@@ -111,15 +111,9 @@ void TkbkClntUserReadAdoVdoInptFrm( TkbkClnt * TkbkClntPt,
 void TkbkClntUserWriteAdoOtptFrm( TkbkClnt * TkbkClntPt, int32_t AdoOtptStrmIdx,
 								  int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
 								  uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmSzByt, size_t * AdoOtptEncdSrcFrmLenBytPt );
-void TkbkClntUserGetAdoOtptFrm( TkbkClnt * TkbkClntPt, int32_t AdoOtptStrmIdx,
-								int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
-								uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt );
 void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx,
 								  uint8_t * VdoOtptYu12SrcFrmPt, int32_t * VdoOtptYu12SrcFrmWidthPt, int32_t * VdoOtptYu12SrcFrmHeightPt,
 								  uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmSzByt, size_t * VdoOtptEncdSrcFrmLenBytPt );
-void TkbkClntUserGetVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx,
-								uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
-								uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt );
 
 #ifdef __cplusplus
 }

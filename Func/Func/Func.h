@@ -118,6 +118,7 @@
 #include <windows.h>						//包含整个Windows SDK支持的API
 #include <windowsx.h>						//ComboBox_AddString、ComboBox_ResetContent
 #include <tchar.h>							//_tmain、_tWinMain、TCHAR
+#include <alloca.h>							//alloca
 #include <process.h>						//
 #include <psapi.h>							//GetProcessImageFileName
 #include <shellapi.h>						//ShellExecute
@@ -214,6 +215,9 @@ typedef int HANDLE;
 #if( ( defined __X86__ ) || ( defined __X64__ ) )
 #include <immintrin.h>						//_mm_pause
 #endif
+#if( ( defined __ARMAT32__ ) || ( defined __ARMA64__ ) )
+#include <arm_neon.h>						//vld1q_u8、vst1q_u8
+#endif
 
 typedef int HANDLE;
 
@@ -255,6 +259,9 @@ typedef int HANDLE;
 #include <sys/poll.h>						//struct pollfd、poll、ppoll
 #if( ( defined __X86__ ) || ( defined __X64__ ) )
 #include <immintrin.h>						//_mm_pause
+#endif
+#if( ( defined __ARMAT32__ ) || ( defined __ARMA64__ ) )
+#include <arm_neon.h>						//vld1q_u8、vst1q_u8
 #endif
 
 typedef int HANDLE;
@@ -434,13 +441,13 @@ typedef enum ChrSet
 //检查字符集参数是否不正确。
 #define CHKCHRSET( ChrSet ) ( ( ChrSet != Utf8 ) && ( ChrSet != Utf16 ) && ( ChrSet != Utf32 ) )
 
-//缓冲区自动调整方式。
-typedef enum BufAutoAdjMeth
+//缓冲区自动扩大方式。
+typedef enum BufAutoExtdMeth
 {
-	BufAutoAdjMethNone,        //缓冲区不自动调整。
-	BufAutoAdjMethFreeAtio,    //缓冲区按空闲与已用的比率自动调整。
-	BufAutoAdjMethFreeNumber,  //缓冲区按空闲的个数自动调整。
-}BufAutoAdjMeth;
+	BufAutoExtdMethNone,        //缓冲区不自动调整。
+	BufAutoExtdMethFreeAtio,    //缓冲区按空闲与已用的比率自动调整。
+	BufAutoExtdMethFreeNumber,  //缓冲区按空闲的个数自动调整。
+}BufAutoExtdMeth;
 
 //Func项目的DLL动态库文件导入导出符号宏。
 #if( defined __NAME_FUNC__ ) //如果正在编译Func项目。
@@ -508,19 +515,19 @@ __FUNC_DLLAPI__ int FuncInit();
 #if( ( defined __X86__ ) || ( defined __X64__ ) )
 __FUNC_DLLAPI__ void __cdecl GetCpuId( uint32_t Eax, uint32_t Ecx, uint32_t * EaxPt, uint32_t * EbxPt, uint32_t * EcxPt, uint32_t * EdxPt );
 __FUNC_DLLAPI__ extern char g_CpuNameStrArr[ 4 * 4 * 3 + 1 ]; //Cpu名称字符串数组。
-__FUNC_DLLAPI__ extern uint16_t g_CpuCacheLineSzByt; //Cpu缓存行的大小，单位为字节。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSupt64Bit; //Cpu是否支持64位。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptEnhncFastStrRepMovsbStosb; //Cpu是否支持增强的快速字符串Rep Movsb/Stosb指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptMMX; //Cpu是否支持MMX指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE; //Cpu是否支持SSE指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE2; //Cpu是否支持SSE2指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE3; //Cpu是否支持SSE3指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSSE3; //Cpu是否支持SSSE3指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE4_1; //Cpu是否支持SSE4.1指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptSSE4_2; //Cpu是否支持SSE4.2指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptAVX; //Cpu是否支持AVX指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptAVX2; //Cpu是否支持AVX2指令。
-__FUNC_DLLAPI__ extern int8_t g_CpuIsSuptAVX512F; //Cpu是否支持AVX512F指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuCacheLineSzByt; //Cpu缓存行的大小，单位为字节。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSupt64Bit; //Cpu是否支持64位。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptEnhncFastStrRepMovsbStosb; //Cpu是否支持增强的快速字符串Rep Movsb/Stosb指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptMMX; //Cpu是否支持MMX指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptSSE; //Cpu是否支持SSE指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptSSE2; //Cpu是否支持SSE2指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptSSE3; //Cpu是否支持SSE3指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptSSSE3; //Cpu是否支持SSSE3指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptSSE4_1; //Cpu是否支持SSE4.1指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptSSE4_2; //Cpu是否支持SSE4.2指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptAVX; //Cpu是否支持AVX指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptAVX2; //Cpu是否支持AVX2指令。
+__FUNC_DLLAPI__ extern uint32_t g_CpuIsSuptAVX512F; //Cpu是否支持AVX512F指令。
 #elif( ( defined __ARMAT32__ ) || ( defined __ARMA64__ ) )
 #endif
 

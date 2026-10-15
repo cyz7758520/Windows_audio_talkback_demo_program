@@ -231,8 +231,12 @@ void SaveStngToXmlFile()
 									 ( IsDlgButtonChecked( g_StngDlgWndHdl, UseAdoFrmLen30msRdBtnId ) == BST_CHECKED ) ? 30 : 20 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
-		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseSystemAecNsAgc" );
-		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseFirstSystemAecNsAgc" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
+		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
+		
+		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "IsUseSecondSystemAecNsAgc" );
+		p_TmpXMLElement2Pt->SetText( ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0 );
 		p_TmpXMLElement1Pt->InsertEndChild( p_TmpXMLElement2Pt );
 
 		p_TmpXMLElement2Pt = p_XMLDocument.NewElement( "UseWhatAec" );
@@ -1251,15 +1255,26 @@ void ReadStngFromXmlFile()
 								CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen30msRdBtnId );
 							}
 						}
-						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSystemAecNsAgc" ) == 0 )
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseFirstSystemAecNsAgc" ) == 0 )
 						{
 							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
 							{
-								CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_UNCHECKED );
+								CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_UNCHECKED );
 							}
 							else
 							{
-								CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+								CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_CHECKED );
+							}
+						}
+						else if( strcmp( p_TmpXMLElement2Pt->Name(), "IsUseSecondSystemAecNsAgc" ) == 0 )
+						{
+							if( strcmp( p_TmpXMLElement2Pt->GetText(), "0" ) == 0 )
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_UNCHECKED );
+							}
+							else
+							{
+								CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_CHECKED );
 							}
 						}
 						else if( strcmp( p_TmpXMLElement2Pt->Name(), "UseWhatAec" ) == 0 )
@@ -2299,7 +2314,8 @@ void SetEffectAecTendStng()
 		{
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate8000RdBtnId );
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen20msRdBtnId );
-			CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_CHECKED );
 			if( p_UseWhatAecTend == 0 ) CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAecmRdBtnId ); //声学回音消除倾向：消除彻底，双讲吃音。
 			else CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexAecRdBtnId ); //声学回音消除倾向：双讲流畅，残余回音。
 			CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseSpeexPrpocsNsRdBtnId );
@@ -2349,7 +2365,7 @@ void SetEffectAecTendStng()
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), L"0" );
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_UNCHECKED );
-			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"380" );
+			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"320" );
 
 			CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId ), L"-32768" );
@@ -2387,7 +2403,8 @@ void SetEffectAecTendStng()
 		{
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate16000RdBtnId );
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen20msRdBtnId );
-			CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_CHECKED );
 			if( p_UseWhatAecTend == 0 ) CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAecRdBtnId ); //声学回音消除倾向：消除彻底，双讲吃音。
 			else CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAec3RdBtnId ); //声学回音消除倾向：双讲流畅，残余回音。
 			CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseWebRtcNsxRdBtnId );
@@ -2437,7 +2454,7 @@ void SetEffectAecTendStng()
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), L"0" );
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_UNCHECKED );
-			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"380" );
+			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"320" );
 
 			CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId ), L"-32768" );
@@ -2475,7 +2492,8 @@ void SetEffectAecTendStng()
 		{
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate16000RdBtnId );
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen20msRdBtnId );
-			CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_CHECKED );
 			if( p_UseWhatAecTend == 0 ) CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAecRdBtnId ); //声学回音消除倾向：消除彻底，双讲吃音。
 			else CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseWebRtcAec3RdBtnId ); //声学回音消除倾向：双讲流畅，残余回音。
 			CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseWebRtcNsRdBtnId );
@@ -2525,7 +2543,7 @@ void SetEffectAecTendStng()
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), L"0" );
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_UNCHECKED );
-			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"380" );
+			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"320" );
 
 			CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId ), L"-32768" );
@@ -2563,7 +2581,8 @@ void SetEffectAecTendStng()
 		{
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate16000RdBtnId );
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen20msRdBtnId );
-			CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_CHECKED );
 			if( p_UseWhatAecTend == 0 ) CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexWebRtcAecRdBtnId ); //声学回音消除倾向：消除彻底，双讲吃音。
 			else CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexWebRtcAecRdBtnId ); //声学回音消除倾向：双讲流畅，残余回音。
 			CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseRNNoiseRdBtnId );
@@ -2613,7 +2632,7 @@ void SetEffectAecTendStng()
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), L"0" );
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_CHECKED );
-			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"380" );
+			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"320" );
 
 			CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId ), L"-32768" );
@@ -2651,7 +2670,8 @@ void SetEffectAecTendStng()
 		{
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoSmplRate8000RdBtnId, UseAdoSmplRate48000RdBtnId, UseAdoSmplRate32000RdBtnId );
 			CheckRadioButton( g_StngDlgWndHdl, UseAdoFrmLen10msRdBtnId, UseAdoFrmLen30msRdBtnId, UseAdoFrmLen20msRdBtnId );
-			CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_CHECKED );
+			CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_CHECKED );
 			if( p_UseWhatAecTend == 0 ) CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexWebRtcAecRdBtnId ); //声学回音消除倾向：消除彻底，双讲吃音。
 			else CheckRadioButton( g_StngDlgWndHdl, UseNoAecRdBtnId, UseSpeexWebRtcAecRdBtnId, UseSpeexWebRtcAecRdBtnId ); //声学回音消除倾向：双讲流畅，残余回音。
 			CheckRadioButton( g_StngDlgWndHdl, UseNoNsRdBtnId, UseRNNoiseRdBtnId, UseRNNoiseRdBtnId );
@@ -2701,7 +2721,7 @@ void SetEffectAecTendStng()
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAecIsUseAdaptAdjDelayCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecWebRtcAec3DelayEdTxtId ), L"0" );
 			CheckDlgButton( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecIsUseSameRoomAecCkBoxId, BST_CHECKED );
-			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"380" );
+			SetWindowText( GetDlgItem( g_SpeexWebRtcAecStngDlgWndHdl, SpeexWebRtcAecSameRoomEchoMinDelayEdTxtId ), L"320" );
 
 			CheckDlgButton( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsIsUseNsCkBoxId, BST_CHECKED );
 			SetWindowText( GetDlgItem( g_SpeexPrpocsNsStngDlgWndHdl, SpeexPrpocsNoiseSupesEdTxtId ), L"-32768" );

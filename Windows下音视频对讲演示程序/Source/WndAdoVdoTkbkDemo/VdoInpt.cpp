@@ -351,7 +351,7 @@ public:
 
 int VdoInptInit( VdoInpt * VdoInptPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
 	
@@ -373,7 +373,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 
 	//初始化设备。
 	{
-		int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+		int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 		UINT p_VdoInptDvcId; //存放视频输入设备的标识符，取值范围为从0到视频输入设备的总数减一。
 
 		ICreateDevEnum * p_CreateDevEnumPt = NULL;
@@ -933,7 +933,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 	}
 
 	//初始化帧容器。
-	if( VdoInptPt->m_FrmCntnr.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( VdoInptPt->m_FrmCntnr.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化帧容器成功。" ) );
 	}
@@ -944,7 +944,7 @@ int VdoInptInit( VdoInpt * VdoInptPt )
 	}
 
 	//初始化空闲帧容器。
-	if( VdoInptPt->m_IdleFrmCntnr.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( VdoInptPt->m_IdleFrmCntnr.Init( sizeof( VdoInpt::Frm * ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, VdoInptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( VdoInptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输入：初始化空闲帧容器成功。" ) );
 	}

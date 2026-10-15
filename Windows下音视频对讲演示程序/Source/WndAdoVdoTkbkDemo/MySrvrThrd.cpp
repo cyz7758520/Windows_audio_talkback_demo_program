@@ -4,7 +4,7 @@
 //我的服务端线程初始化。
 int MySrvrThrdCls::Init( const void * LicnCodePt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	wchar_t p_TmpU16strPt[ 1024 ];
 	Vstr * p_SrvrUrlVstrPt = NULL;
 	Vstr * p_PrtclVstrPt = NULL;
@@ -103,7 +103,7 @@ int MySrvrThrdCls::Init( const void * LicnCodePt )
 	VstrDstoy( p_PortVstrPt );
 	if( p_Rslt != 0 )
 	{
-		Dstoy();
+		SendRqirExitMsg( 0, g_ErrInfoVstr.m_Pt );
 	}
 	return p_Rslt;
 }

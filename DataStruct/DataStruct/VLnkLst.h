@@ -9,7 +9,7 @@ extern "C"
 	
 typedef struct VLnkLst VLnkLst;
 
-__DATASTRUCT_DLLAPI__ int VLnkLstInit( VLnkLst * * VLnkLstPtPt, size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
+__DATASTRUCT_DLLAPI__ int VLnkLstInit( VLnkLst * * VLnkLstPtPt, size_t BufInitSzByt, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt );
 __DATASTRUCT_DLLAPI__ int VLnkLstDstoy( VLnkLst * VLnkLstPt, Vstr * ErrInfoVstrPt );
 
 __DATASTRUCT_DLLAPI__ int VLnkLstLocked( VLnkLst * VLnkLstPt, Vstr * ErrInfoVstrPt );
@@ -54,7 +54,7 @@ public:
 	VLnkLstCls() { m_Pt = NULL; }
 	~VLnkLstCls() { Dstoy( NULL ); }
 
-	int Init( size_t BufInitSzByt, BufAutoAdjMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return VLnkLstInit( &m_Pt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
+	int Init( size_t BufInitSzByt, BufAutoExtdMeth BufAutoExtdMeth, float BufAutoExtdParm, size_t BufMaxSzByt, Vstr * ErrInfoVstrPt ) { return VLnkLstInit( &m_Pt, BufInitSzByt, BufAutoExtdMeth, BufAutoExtdParm, BufMaxSzByt, ErrInfoVstrPt ); }
 	int Dstoy( Vstr * ErrInfoVstrPt ) { int p_Rslt = VLnkLstDstoy( m_Pt, ErrInfoVstrPt ); m_Pt = NULL; return p_Rslt; }
 	
 	int Locked( Vstr * ErrInfoVstrPt ) { return VLnkLstLocked( m_Pt, ErrInfoVstrPt ); }

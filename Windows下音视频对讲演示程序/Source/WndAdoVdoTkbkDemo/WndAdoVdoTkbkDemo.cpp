@@ -437,7 +437,7 @@ void SendVdoInptOtptWndSetTitleMsg( HWND DspyTxtWndHdl, Vstr * TitleVstrPt )
 //窗口消息处理过程函数。
 INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	
 	UNREFERENCED_PARAMETER( lParam );
 	switch( message )
@@ -699,23 +699,15 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 					if( g_MyClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未初始化。
 					{
 						g_MyClntMediaPocsThrdPt = new MyClntMediaPocsThrdCls( g_MainDlgWndHdl );
-						if( g_MyClntMediaPocsThrdPt->Init( g_LicnCodePt ) != 0 )
-						{
-							delete g_MyClntMediaPocsThrdPt;
-							g_MyClntMediaPocsThrdPt = NULL;
-						}
 					}
 
-					if( g_MyClntMediaPocsThrdPt != NULL ) //如果我的客户端媒体处理线程已初始化。
+					if( ( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt == NULL ) || ( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) ) //如果对讲客户端连接未初始化。
 					{
-						if( g_MyClntMediaPocsThrdPt->m_ClntMediaPocsThrdPt->m_TkbkClnt.m_CnctIsInit == 0 ) //如果对讲客户端连接未初始化。
-						{
-							g_MyClntMediaPocsThrdPt->TkbkInit( g_LicnCodePt );
-						}
-						else //如果对讲客户端端连接已初始化。
-						{
-							g_MyClntMediaPocsThrdPt->TkbkDstoy();
-						}
+						g_MyClntMediaPocsThrdPt->TkbkInit( g_LicnCodePt );
+					}
+					else //如果对讲客户端端连接已初始化。
+					{
+						g_MyClntMediaPocsThrdPt->TkbkDstoy();
 					}
 					return ( INT_PTR )TRUE;
 				}
@@ -1362,6 +1354,7 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 		{
 			MainDlgWndMsgVdoInptOtptWndInit * p_MainDlgWndMsgVdoInptOtptWndInitPt = ( MainDlgWndMsgVdoInptOtptWndInit * )wParam;
 			VdoInptOtptWnd p_VdoInptOtptWnd = { 0 };
+			int p_CmpRsltPt;
 			
 			if( p_MainDlgWndMsgVdoInptOtptWndInitPt != NULL )
 			{
@@ -1391,7 +1384,9 @@ INT_PTR CALLBACK WndMsgPocsPocdr( HWND hDlg, UINT message, WPARAM wParam, LPARAM
 																   NULL );
 				SendMessage( p_VdoInptOtptWnd.m_DspyTxtWndHdl, WM_SETFONT, ( WPARAM )SendMessage( g_VdoInptOtptTxtWndHdl, WM_GETFONT, 0, 0 ), MAKELPARAM( TRUE, 0 ) );
 
-				g_VdoInptOtptWndCntnr.PutTail( &p_VdoInptOtptWnd, NULL, 0, NULL ); //放入视频输入输出窗口容器。
+				VstrCmp( p_MainDlgWndMsgVdoInptOtptWndInitPt->m_TitleVstrPt, 0, 4, Cu16vstr( L"视频输入" ), 0, &p_CmpRsltPt );
+				if( p_CmpRsltPt == 0 ) g_VdoInptOtptWndCntnr.PutHead( &p_VdoInptOtptWnd, NULL, 0, NULL ); //放入视频输入输出窗口容器。
+				else g_VdoInptOtptWndCntnr.PutTail( &p_VdoInptOtptWnd, NULL, 0, NULL ); //放入视频输入输出窗口容器。
 				SetVdoWndShowMode( g_VdoWndShowMode ); //移动视频输入输出窗口。
 
 				p_MainDlgWndMsgVdoInptOtptWndInitPt->m_DspyTxtWndHdl = p_VdoInptOtptWnd.m_DspyTxtWndHdl; //设置显示文本框窗口的句柄。
@@ -1745,7 +1740,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 		g_VdoInptDvcCbBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, UseVdoInptDvcCbBoxId ); //设置视频输入设备组合框窗口的句柄。
 		g_LogLstBoxWndHdl = GetDlgItem( g_MainDlgWndHdl, LogLstBoxId ); //设置日志列表框窗口的句柄。
 		g_VdoInptOtptTxtWndHdl = GetDlgItem( g_MainDlgWndHdl, VdoInptOtptTxtId ); //设置视频输入输出文本框窗口的句柄。
-		g_VdoInptOtptWndCntnr.Init( sizeof( VdoInptOtptWnd ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, NULL ); //视频输入输出窗口容器初始化。
+		g_VdoInptOtptWndCntnr.Init( sizeof( VdoInptOtptWnd ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, NULL ); //视频输入输出窗口容器初始化。
 		g_PttDlgWndHdl = CreateDialog( g_IstnsHdl, MAKEINTRESOURCE( PttDlgId ), g_MainDlgWndHdl, WndMsgPocsPocdr );
 		g_PttBtnWndHdl = GetDlgItem( g_PttDlgWndHdl, PttBtnId );
 
@@ -2071,13 +2066,21 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance,
 			{
 				CheckDlgButton( g_StngDlgWndHdl, IsSaveAdoVdoInptOtptToAviFileCkBoxId, BST_UNCHECKED );
 			}
-			else if( wcscmp( p_Argv[ p_Argn ], L"-UseSystemAecNsAgc" ) == 0 )
+			else if( wcscmp( p_Argv[ p_Argn ], L"-UseFirstSystemAecNsAgc" ) == 0 )
 			{
-				CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_CHECKED );
+				CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_CHECKED );
 			}
-			else if( wcscmp( p_Argv[ p_Argn ], L"-NoUseSystemAecNsAgc" ) == 0 )
+			else if( wcscmp( p_Argv[ p_Argn ], L"-NoUseFirstSystemAecNsAgc" ) == 0 )
 			{
-				CheckDlgButton( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId, BST_UNCHECKED );
+				CheckDlgButton( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId, BST_UNCHECKED );
+			}
+			else if( wcscmp( p_Argv[ p_Argn ], L"-UseSecondSystemAecNsAgc" ) == 0 )
+			{
+				CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_CHECKED );
+			}
+			else if( wcscmp( p_Argv[ p_Argn ], L"-NoUseSecondSystemAecNsAgc" ) == 0 )
+			{
+				CheckDlgButton( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId, BST_UNCHECKED );
 			}
 			else if( wcscmp( p_Argv[ p_Argn ], L"-SaveAdoInptOtptToWaveFile" ) == 0 )
 			{

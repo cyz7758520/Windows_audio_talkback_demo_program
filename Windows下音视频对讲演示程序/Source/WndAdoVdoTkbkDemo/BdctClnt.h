@@ -52,6 +52,7 @@ int BdctClntCnctInfoSendPkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInf
 int BdctClntCnctInfoSendTkbkModePkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfoPt, int LclTkbkMode );
 void BdctClntAllCnctSendAdoVdoPkt( BdctClnt * BdctClntPt, const void * PktPt, size_t PktLenByt, uint32_t Times, int IsRlab );
 void BdctClntCnctPocs( BdctClnt * BdctClntPt );
+
 void BdctClntUserReadAdoVdoInptFrm( BdctClnt * BdctClntPt,
 									short AdoInptPcmSrcFrmPt[], short AdoInptPcmRsltFrmPt[], long AdoInptPcmFrmLenUnit, int AdoInptPcmRsltFrmVoiceActSts,
 									byte AdoInptEncdRsltFrmPt[], long AdoInptEncdRsltFrmLenByt, int AdoInptEncdRsltFrmIsNeedTrans,

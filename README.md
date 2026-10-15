@@ -109,8 +109,10 @@
 &emsp;&emsp;**-NoPrintLogShowToast**：表示不打印Log日志，不显示Toast。  
 &emsp;&emsp;**-SaveAdoVdoInptOtptToAviFile xxx.avi**：表示要保存音视频输入输出到xxx.avi文件，可以为相对或绝对完整路径。  
 &emsp;&emsp;**-NoSaveAdoVdoInptOtptToAviFile**：表示不保存音视频输入输出到Avi文件。  
-&emsp;&emsp;**-UseSystemAecNsAgc**：表示要使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
-&emsp;&emsp;**-NoUseSystemAecNsAgc**：表示不使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
+&emsp;&emsp;**-UseFirstSystemAecNsAgc**：表示要使用第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
+&emsp;&emsp;**-NoUseFirstSystemAecNsAgc**：表示不使用第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
+&emsp;&emsp;**-UseSecondSystemAecNsAgc**：表示要使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
+&emsp;&emsp;**-NoUseSecondSystemAecNsAgc**：表示不使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器。  
 &emsp;&emsp;**-SaveAdoInptOtptToWaveFile AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav**：表示要分别保存音频输入原始、音频输入结果、音频输出原始到AdoInptSrc.wav AdoInptRslt.wav AdoOtptSrc.wav文件，可以为相对或绝对完整路径。  
 &emsp;&emsp;**-NoSaveAdoInptOtptToWaveFile**：表示不保存音频输入输出到Wave文件。  
 &emsp;&emsp;**-VdoWndShowMode 0|1|2**：表示设置视频窗口的显示模式，为0表示正常，为1表示垂直最大化排列，为2表示水平最大化排列。  

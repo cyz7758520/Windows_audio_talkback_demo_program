@@ -25,7 +25,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt );
 
 int VdoOtptStrmDecdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	switch( StrmPt->m_UseWhatDecd )
 	{
@@ -123,7 +123,7 @@ void VdoOtptStrmDecdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 int VdoOtptStrmThrdInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	
 	//初始化线程的临时变量。
 	{
@@ -229,7 +229,7 @@ void VdoOtptStrmThrdDstoy( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 
 int VdoOtptStrmInit( VdoOtpt * VdoOtptPt, VdoOtpt::Strm * StrmPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	
 	if( VdoOtptStrmDecdInit( VdoOtptPt, StrmPt ) != 0 ) goto Out;
 	if( VdoOtptStrmThrdInit( VdoOtptPt, StrmPt ) != 0 ) goto Out;
@@ -509,7 +509,7 @@ DWORD WINAPI VdoOtptThrdRun( VdoOtptThrdParm * VdoOtptThrdParmPt )
 
 int VdoOtptAddStrm( VdoOtpt * VdoOtptPt, uint32_t StrmIdx )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	VdoOtpt::Strm * p_StrmPt = NULL; //存放流的指针。
 	
 	//查找流索引。
@@ -767,7 +767,7 @@ void VdoOtptSetStrmIsUse( VdoOtpt * VdoOtptPt, uint32_t StrmIdx, int32_t IsUseSt
 
 int VdoOtptInit( VdoOtpt * VdoOtptPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	VdoOtpt::Strm * p_StrmPt; //存放流的指针。
 	uint64_t p_LastTickMsec = 0;
 	uint64_t p_NowTickMsec = 0;
@@ -775,7 +775,7 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
 	if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) p_LastTickMsec = FuncGetTickAsMsec(); //记录初始化开始的嘀嗒钟。
 	
 	//初始化帧容器。
-	if( VdoOtptPt->m_FrmCntnr.Init( sizeof( VdoOtpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( VdoOtptPt->m_FrmCntnr.Init( sizeof( VdoOtpt::Frm * ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出：初始化帧容器成功。" ) );
 	}
@@ -786,7 +786,7 @@ int VdoOtptInit( VdoOtpt * VdoOtptPt )
 	}
 
 	//初始化空闲帧容器。
-	if( VdoOtptPt->m_IdleFrmCntnr.Init( sizeof( VdoOtpt::Frm * ), 1, BufAutoAdjMethFreeNumber, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+	if( VdoOtptPt->m_IdleFrmCntnr.Init( sizeof( VdoOtpt::Frm * ), 1, BufAutoExtdMethFreeNumber, 1, SIZE_MAX, VdoOtptPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 	{
 		if( VdoOtptPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGFI( Cu8vstr( "媒体处理线程：视频输出：初始化空闲帧容器成功。" ) );
 	}

@@ -30,6 +30,36 @@ public:
 	//用户定义的消息函数。
 	int UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt );
 	
+	//用户定义的设备改变函数。
+	void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
+
+	//用户定义的读取音视频输入帧函数。
+	void UserReadAdoVdoInptFrm( int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
+								uint8_t * AdoInptEncdRsltFrmPt, size_t AdoInptEncdRsltFrmLenByt, int32_t AdoInptEncdRsltFrmIsNeedTrans,
+								uint8_t * VdoInptBgraSrcFrmPt, int32_t VdoInptBgraSrcFrmWidth, int32_t VdoInptBgraSrcFrmHeight, size_t VdoInptBgraSrcFrmLenByt,
+								uint8_t * VdoInptYu12RsltFrmPt, int32_t VdoInptYu12RsltFrmWidth, int32_t VdoInptYu12RsltFrmHeight, size_t VdoInptYu12RsltFrmLenByt,
+								uint8_t * VdoInptEncdRsltFrmPt, size_t VdoInptEncdRsltFrmLenByt );
+
+	//用户定义的写入音频输出帧函数。
+	void UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
+							  int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+							  uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmSzByt, size_t * AdoOtptEncdSrcFrmLenBytPt );
+
+	//用户定义的获取音频输出帧函数。
+	void UserGetAdoOtptFrm( int32_t AdoOtptStrmIdx,
+							int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+							uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt );
+
+	//用户定义的写入视频输出帧函数。
+	void UserWriteVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+							  uint8_t * VdoOtptYu12SrcFrmPt, int32_t * VdoOtptYu12SrcFrmWidthPt, int32_t * VdoOtptYu12SrcFrmHeightPt,
+							  uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmSzByt, size_t * VdoOtptEncdSrcFrmLenBytPt );
+
+	//用户定义的获取视频输出帧函数。
+	void UserGetVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+							uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
+							uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt );
+
 	//用户定义的显示日志函数。
 	void UserShowLog( Vstr * InfoVstrPt );
 
@@ -78,9 +108,6 @@ public:
 	//用户定义的广播客户端连接状态函数。
 	void UserBdctClntCnctSts( BdctClnt::CnctInfo * CnctInfoPt, int32_t CurCnctSts );
 	
-	//用户定义的设备改变函数。
-	void UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt );
-
 	void SetToUseAdoInpt();
 	void SetNotUseAdoInpt();
 	void SetToUseAdoOtpt();

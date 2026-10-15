@@ -4,7 +4,7 @@
 //连接信息初始化。
 int TkbkClntCnctInfoInit( TkbkClnt * TkbkClntPt, int32_t IsTcpOrAudpPrtcl, Vstr * RmtNodeNameVstrPt, Vstr * RmtNodeSrvcVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	
 	TkbkClntPt->m_CnctIsInit = 1; //设置连接已初始化。
 	TkbkClntPt->m_IsTcpOrAudpPrtcl = IsTcpOrAudpPrtcl; //设置协议为Tcp协议或高级Udp协议。
@@ -49,7 +49,7 @@ int TkbkClntCnctInfoInit( TkbkClnt * TkbkClntPt, int32_t IsTcpOrAudpPrtcl, Vstr 
 //连接信息销毁。
 void TkbkClntCnctInfoDstoy( TkbkClnt * TkbkClntPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	TkbkClnt::TkbkInfo * p_TkbkInfoTmpPt;
 	size_t p_ElmTotal; //存放元素总数。
 
@@ -134,7 +134,7 @@ void TkbkClntCnctInfoDstoy( TkbkClnt * TkbkClntPt )
 			VstrDstoy( TkbkClntPt->m_RmtNodeSrvcVstrPt ); //销毁远端套接字绑定的远端节点服务动态字符串。
 		}
 
-		ClntMediaPocsThrdSetTkbkMode( TkbkClntPt->m_ClntMediaPocsThrdPt, 0, 0 ); //设置对讲模式。
+		ClntMediaPocsThrdSetTkbkMode( TkbkClntPt->m_ClntMediaPocsThrdPt, 1, 0 ); //设置对讲模式。这里要阻塞等待，为了让连接销毁时音视频输入输出已经全部停止并清空容器，否则后续的处理可能会导致连接已经断开，但还有音视频输入输出帧要处理，从而导致出现问题。
 	}
 
 	ClntMediaPocsThrdIsAutoRqirExit( TkbkClntPt->m_ClntMediaPocsThrdPt, NULL ); //判断是否自动请求退出。
@@ -152,7 +152,7 @@ void TkbkClntCnctInfoDstoy( TkbkClnt * TkbkClntPt )
 //连接发送数据包。
 int TkbkClntCnctSendPkt( TkbkClnt * TkbkClntPt, const void * PktPt, size_t PktLenByt, uint32_t Times, int IsRlab, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	if( ( TkbkClntPt->m_CnctIsInit != 0 ) && ( TkbkClntPt->m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct ) ) //如果连接已初始化，且当前连接状态为已连接。
 	{
@@ -186,7 +186,7 @@ int TkbkClntCnctSendPkt( TkbkClnt * TkbkClntPt, const void * PktPt, size_t PktLe
 //连接发送对讲模式包。
 int TkbkClntCnctSendTkbkModePkt( TkbkClnt * TkbkClntPt, int LclTkbkMode )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = ( int8_t )ClntMediaPocsThrd::PktTypTkbkMode; //设置对讲模式包。
 	TkbkClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = ( int8_t )TkbkClntPt->m_MyTkbkIdx; //设置对讲索引。
@@ -245,7 +245,7 @@ TkbkClnt::TkbkInfo * TkbkClntTkbkInfoInit( TkbkClnt * TkbkClntPt, int32_t TkbkId
 		case 0: //如果要使用容器。
 		{
 			//初始化接收音频输出帧容器。
-			if( VQueueInit( &p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, BufAutoAdjMethFreeNumber, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, SIZE_MAX, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( VQueueInit( &p_TkbkInfoTmpPt->m_RecvAdoOtptFrmCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, BufAutoExtdMethFreeNumber, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, SIZE_MAX, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "初始化接收音频输出帧容器成功。" ) );
 			}
@@ -258,7 +258,7 @@ TkbkClnt::TkbkInfo * TkbkClntTkbkInfoInit( TkbkClnt * TkbkClntPt, int32_t TkbkId
 			}
 
 			//初始化接收视频输出帧容器。
-			if( VQueueInit( &p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, BufAutoAdjMethFreeNumber, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, SIZE_MAX, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
+			if( VQueueInit( &p_TkbkInfoTmpPt->m_RecvVdoOtptFrmCntnrPt, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, BufAutoExtdMethFreeNumber, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_AdoOtpt.m_FrmLenByt, SIZE_MAX, TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt ) == 0 )
 			{
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_MediaPocsThrdPt->m_IsPrintLog != 0 ) LOGI( Cu8vstr( "初始化接收视频输出帧容器成功。" ) );
 			}
@@ -349,7 +349,7 @@ TkbkClnt::TkbkInfo * TkbkClntTkbkInfoInit( TkbkClnt * TkbkClntPt, int32_t TkbkId
 //对讲信息销毁。
 void TkbkClntTkbkInfoDstoy( TkbkClnt * TkbkClntPt, int32_t TkbkIdx )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	TkbkClnt::TkbkInfo * p_TkbkInfoTmpPt;
 	TkbkClnt::TkbkInfo * p_TkbkInfoTmp2Pt;
 	
@@ -435,7 +435,7 @@ void TkbkClntTkbkInfoDstoy( TkbkClnt * TkbkClntPt, int32_t TkbkIdx )
 //对讲信息全部销毁。
 void TkbkClntTkbkInfoAllDstoy( TkbkClnt * TkbkClntPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	TkbkClnt::TkbkInfo * p_TkbkInfoTmpPt;
 
 	for( size_t p_TkbkInfoIdx = 0; CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, p_TkbkInfoIdx, NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ) == 0; p_TkbkInfoIdx++ )
@@ -459,7 +459,7 @@ void TkbkClntTkbkInfoAllDstoy( TkbkClnt * TkbkClntPt )
 //连接处理，包括连接服务端、接收数据包。
 void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	TkbkClnt::TkbkInfo * p_TkbkInfoTmpPt;
 
 	if( TkbkClntPt->m_CnctIsInit != 0 )
@@ -482,7 +482,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 
 			if( TkbkClntPt->m_IsTcpOrAudpPrtcl == 0 ) //用本端Tcp协议客户端套接字连接远端Tcp协议服务端套接字。
 			{
-				int p_PocsRslt = -1; //存放本处理段的执行结果，为0表示成功，为非0表示失败。
+				int p_PocsRslt = -1; //存放本处理段执行结果，为0表示成功，为非0表示失败。
 				TcpCnctSts p_TcpCnctSts;
 
 				if( TkbkClntPt->m_TcpClntSoktPt == NULL ) //如果未初始化本端Tcp协议客户端套接字。
@@ -607,7 +607,7 @@ void TkbkClntCnctPocs( TkbkClnt * TkbkClntPt )
 			}
 			else //用本端高级Udp协议客户端套接字连接远端高级Udp协议服务端套接字。
 			{
-				int p_PocsRslt = -1; //存放本处理段的执行结果，为0表示成功，为非0表示失败。
+				int p_PocsRslt = -1; //存放本处理段执行结果，为0表示成功，为非0表示失败。
 				AudpCnctSts p_AudpCnctSts;
 
 				if( TkbkClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt == NULL ) //如果未初始化本端高级Udp协议客户端套接字。
@@ -1300,7 +1300,7 @@ void TkbkClntUserWriteAdoOtptFrm( TkbkClnt * TkbkClntPt, int32_t AdoOtptStrmIdx,
 	uint32_t p_AdoOtptFrmTimeStamp;
 	size_t m_TmpSz = 0;
 	
-	CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, AdoOtptStrmIdx, NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL );
+	CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, AdoOtptStrmIdx, NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ); //这里不用加线程锁，因为媒体处理线程只会递增对讲信息容器的大小，且递增的时候只有一次赋值操作，且音频输出流索引不可能会越界。
 	
 	//取出并写入音频输出帧。
 	{
@@ -1425,14 +1425,6 @@ void TkbkClntUserWriteAdoOtptFrm( TkbkClnt * TkbkClntPt, int32_t AdoOtptStrmIdx,
 	}
 }
 
-//用户定义的获取音频输出帧函数。
-void TkbkClntUserGetAdoOtptFrm( TkbkClnt * TkbkClntPt, int32_t AdoOtptStrmIdx,
-								int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
-								uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt )
-{
-		
-}
-
 //用户定义的写入视频输出帧函数。
 void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx,
 								  uint8_t * VdoOtptYu12SrcFrmPt, int32_t * VdoOtptYu12SrcFrmWidthPt, int32_t * VdoOtptYu12SrcFrmHeightPt,
@@ -1442,7 +1434,7 @@ void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx
 	uint32_t p_VdoOtptFrmTimeStamp;
 	size_t m_TmpSz = 0;
 
-	CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, VdoOtptStrmIdx, NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL );
+	CQueueGetByNum( TkbkClntPt->m_TkbkInfoCntnrPt, VdoOtptStrmIdx, NULL, ( void * * )&p_TkbkInfoTmpPt, 0, 0, NULL ); //这里不用加线程锁，因为媒体处理线程只会递增对讲信息容器的大小，且递增的时候只有一次赋值操作，且视频输出流索引不可能会越界。
 
 	//从容器或自适应抖动缓冲器取出一个视频输出帧。
 	switch( TkbkClntPt->m_UseWhatRecvOtptFrm ) //使用什么接收输出帧。
@@ -1548,12 +1540,4 @@ void TkbkClntUserWriteVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx
 			
 		}
 	}
-}
-
-//用户定义的获取视频输出帧函数。
-void TkbkClntUserGetVdoOtptFrm( TkbkClnt * TkbkClntPt, uint32_t VdoOtptStrmIdx,
-								uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
-								uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt )
-{
-	
 }

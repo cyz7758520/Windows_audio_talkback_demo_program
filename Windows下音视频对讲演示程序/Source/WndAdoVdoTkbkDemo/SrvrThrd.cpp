@@ -19,7 +19,7 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * Use
 				  SrvrThrd::SrvrThrdUserCnctInitFuncPt UserCnctInitFuncPt, SrvrThrd::SrvrThrdUserCnctDstoyFuncPt UserCnctDstoyFuncPt, SrvrThrd::SrvrThrdUserCnctStsFuncPt UserCnctStsFuncPt, SrvrThrd::SrvrThrdUserCnctRmtTkbkModeFuncPt UserCnctRmtTkbkModeFuncPt, SrvrThrd::SrvrThrdUserCnctTstNtwkDlyFuncPt UserCnctTstNtwkDlyFuncPt,
 				  Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd * p_SrvrThrdPt = NULL; //存放服务端线程的指针。
 	
 	//判断各个变量是否正确。
@@ -116,7 +116,7 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * Use
 		memcpy( ( void * )p_SrvrThrdPt->m_LicnCodePt, LicnCodePt, p_LicnCodeLenByt );
 	}
 
-	if( CQueueInit( &p_SrvrThrdPt->m_CnctInfoCntnrPt, sizeof( SrvrThrd::CnctInfo ), 10, BufAutoAdjMethFreeNumber, 10, SIZE_MAX, ErrInfoVstrPt ) != 0 )
+	if( CQueueInit( &p_SrvrThrdPt->m_CnctInfoCntnrPt, sizeof( SrvrThrd::CnctInfo ), 10, BufAutoExtdMethFreeNumber, 10, SIZE_MAX, ErrInfoVstrPt ) != 0 )
 	{
 		VstrIns( ErrInfoVstrPt, 0, Cu8vstr( "初始化连接信息容器失败。原因" ) );
 		goto Out;
@@ -207,7 +207,7 @@ int SrvrThrdInit( SrvrThrd * * SrvrThrdPtPt, const void * LicnCodePt, void * Use
 //服务端线程销毁。
 int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( SrvrThrdPt == NULL )
@@ -278,7 +278,7 @@ int SrvrThrdDstoy( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 //设置是否打印Log日志、显示Toast。
 int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, int32_t IsShowToast, HWND ShowToastWndHdl, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( SrvrThrdPt == NULL )
@@ -304,7 +304,7 @@ int SrvrThrdSetIsPrintLogShowToast( SrvrThrd * SrvrThrdPt, int32_t IsPrintLog, i
 //发送设置是否使用阻止系统睡眠消息。
 int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsUsePrvntSysSleep, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::ThrdMsgSetIsUsePrvntSysSleep p_ThrdMsgSetIsUsePrvntSysSleep;
 
 	//判断各个变量是否正确。
@@ -334,7 +334,7 @@ int SrvrThrdSendSetIsUsePrvntSysSleepMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait
 //发送设置是否测试网络延迟消息。
 int SrvrThrdSendSetIsTstNtwkDlyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTstNtwkDly, uint64_t SendIntvlMsec, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::ThrdMsgSetIsTstNtwkDly p_ThrdMsgSetIsTstNtwkDly;
 	
 	//判断各个变量是否正确。
@@ -380,7 +380,7 @@ void SrvrThrdPrvntSysSleepInitOrDstoy( SrvrThrd * SrvrThrdPt, int32_t IsInitPrvn
 //发送服务端初始化消息。
 int SrvrThrdSendSrvrInitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::ThrdMsgSrvrInit p_ThrdMsgSrvrInit;
 	
 	//判断各个变量是否正确。
@@ -422,7 +422,7 @@ int SrvrThrdSendSrvrInitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t IsT
 //发送服务端销毁消息。
 int SrvrThrdSendSrvrDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::ThrdMsgSrvrDstoy p_ThrdMsgSrvrDstoy;
 	
 	//判断各个变量是否正确。
@@ -451,7 +451,7 @@ int SrvrThrdSendSrvrDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * Err
 //发送连接销毁消息。
 int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t CnctNum, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::ThrdMsgCnctDstoy p_ThrdMsgCnctDstoy;
 	
 	//判断各个变量是否正确。
@@ -481,7 +481,7 @@ int SrvrThrdSendCnctDstoyMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, int32_t Cn
 //服务端线程启动。
 int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( SrvrThrdPt == NULL )
@@ -515,7 +515,7 @@ int SrvrThrdStart( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 //发送请求退出消息。
 int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::ThrdMsgRqirExit p_ThrdMsgRqirExit;
 
 	//判断各个变量是否正确。
@@ -544,7 +544,7 @@ int SrvrThrdSendRqirExitMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, Vstr * ErrI
 //发送用户消息。
 int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	//判断各个变量是否正确。
 	if( SrvrThrdPt == NULL )
@@ -572,8 +572,8 @@ int SrvrThrdSendUserMsg( SrvrThrd * SrvrThrdPt, int IsBlockWait, unsigned int Ms
 //服务端初始化。
 int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * LclNodeNameVstrPt, Vstr * LclNodeSrvcVstrPt, int32_t MaxCnctNum, int32_t IsAutoRqirExit )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
-	int p_RmtNodeAddrFamly; //存放远端节点的地址族，为4表示IPv4，为6表示IPv6，为0表示自动选择。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
+	int p_LclNodeAddrFamly; //存放本端节点的地址族，为4表示IPv4，为6表示IPv6，为0表示自动选择。
 
 	if( SrvrThrdPt->m_SrvrIsInit != 0 ) //如果服务端已初始化。
 	{
@@ -587,19 +587,19 @@ int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * Lc
 
 	SrvrThrdPt->m_SrvrIsInit = 1; //设置服务端已初始化。
 
-	{ //设置远端节点的地址族。
+	{ //设置本端节点的地址族。
 		ADDRINFOW * p_AddrInfoListPt;
 		if( GetAddrInfo( ( PCWSTR )LclNodeNameVstrPt->m_StrPt, NULL, NULL, &p_AddrInfoListPt ) == 0 )
 		{
-			p_RmtNodeAddrFamly = ( p_AddrInfoListPt->ai_family == AF_INET ) ? 4 : ( p_AddrInfoListPt->ai_family == AF_INET6 ) ? 6 : 0;
+			p_LclNodeAddrFamly = ( p_AddrInfoListPt->ai_family == AF_INET ) ? 4 : ( p_AddrInfoListPt->ai_family == AF_INET6 ) ? 6 : 0;
 			FreeAddrInfo( p_AddrInfoListPt );
 		}
-		else p_RmtNodeAddrFamly = 0;
+		else p_LclNodeAddrFamly = 0;
 	}
 
 	if( IsTcpOrAudpPrtcl == 0 ) //如果要使用Tcp协议。
 	{
-		if( TcpSrvrInit( &SrvrThrdPt->m_TcpSrvrSoktPt, p_RmtNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, 1, 1, 5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议服务端套接字成功。
+		if( TcpSrvrInit( &SrvrThrdPt->m_TcpSrvrSoktPt, p_LclNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, 1, 1, 5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端TCP协议服务端套接字成功。
 		{
 			if( TcpSrvrGetLclAddr( SrvrThrdPt->m_TcpSrvrSoktPt, NULL, SrvrThrdPt->m_Thrd.m_LclNodeAddrPt, SrvrThrdPt->m_Thrd.m_LclNodePortPt, 0, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果获取本端TCP协议服务端套接字绑定的本地节点地址和端口失败。
 			{
@@ -623,7 +623,7 @@ int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * Lc
 	}
 	else //如果要使用高级Udp协议。
 	{
-		if( AudpInit( SrvrThrdPt->m_LicnCodePt, &SrvrThrdPt->m_AudpSrvrSoktPt, p_RmtNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ( short )1, ( short )5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议服务端套接字成功。
+		if( AudpInit( SrvrThrdPt->m_LicnCodePt, &SrvrThrdPt->m_AudpSrvrSoktPt, p_LclNodeAddrFamly, LclNodeNameVstrPt, LclNodeSrvcVstrPt, ( short )1, ( short )5000, SrvrThrdPt->m_ErrInfoVstrPt ) == 0 ) //如果初始化本端高级Udp协议服务端套接字成功。
 		{
 			if( AudpSetSendBufSz( SrvrThrdPt->m_AudpSrvrSoktPt, 1024 * 1024, SrvrThrdPt->m_ErrInfoVstrPt ) != 0 ) //如果设置本端高级UDP协议套接字的发送缓冲区的大小失败。
 			{
@@ -678,7 +678,7 @@ int SrvrThrdSrvrInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpOrAudpPrtcl, Vstr * Lc
 //服务端销毁。
 void SrvrThrdSrvrDstoy( SrvrThrd * SrvrThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::CnctInfo * p_CnctInfoTmpPt;
 
 	if( SrvrThrdPt->m_SrvrIsInit == 0 ) //如果服务端未初始化。
@@ -897,7 +897,7 @@ SrvrThrd::CnctInfo * SrvrThrdCnctInfoInit( SrvrThrd * SrvrThrdPt, int32_t IsTcpO
 //连接信息销毁。
 void SrvrThrdCnctInfoDstoy( SrvrThrd * SrvrThrdPt, SrvrThrd::CnctInfo * CnctInfoPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::CnctInfo * p_CnctInfoTmpPt;
 	size_t p_ElmTotal; //存放元素总数。
 
@@ -1038,7 +1038,7 @@ void SrvrThrdIsAutoRqirExit( SrvrThrd * SrvrThrdPt, Vstr * ErrInfoVstrPt )
 //连接处理，包括接受连接、接收发送数据包、删除连接。
 void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	SrvrThrd::CnctInfo * p_CnctInfoTmpPt;
 	SrvrThrd::CnctInfo * p_CnctInfoTmp2Pt;
 	size_t p_PktLenByt;
@@ -1135,7 +1135,7 @@ void SrvrThrdCnctPocs( SrvrThrd * SrvrThrdPt )
 	//用本端高级Udp协议服务端套接字接受远端高级Udp协议客户端套接字的连接。
 	if( SrvrThrdPt->m_AudpSrvrSoktPt != NULL )
 	{
-		int p_PocsRslt = -1; //存放本处理段的执行结果，为0表示成功，为非0表示失败。
+		int p_PocsRslt = -1; //存放本处理段执行结果，为0表示成功，为非0表示失败。
 		size_t p_AudpCnctIdx = SIZE_MAX; //存放本端高级UDP协议连接索引。
 
 		while( true ) //循环接受远端高级Udp协议套接字的连接。

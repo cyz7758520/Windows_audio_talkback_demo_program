@@ -59,7 +59,8 @@ typedef struct AdoInpt //存放音频输入。
 	size_t m_FrmLenData; //存放帧的长度，单位为采样数据，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80、20毫秒为160、30毫秒为240，16000Hz的10毫秒为160、20毫秒为320、30毫秒为480，32000Hz的10毫秒为320、20毫秒为640、30毫秒为960，48000Hz的10毫秒为480、20毫秒为960、30毫秒为1440。
 	size_t m_FrmLenByt; //存放帧的长度，单位为字节，取值只能为10毫秒的倍数。例如：8000Hz的10毫秒为80*2、20毫秒为160*2、30毫秒为240*2，16000Hz的10毫秒为160*2、20毫秒为320*2、30毫秒为480*2，32000Hz的10毫秒为320*2、20毫秒为640*2、30毫秒为960*2，48000Hz的10毫秒为480*2、20毫秒为960*2、30毫秒为1440*2。
 	
-	int32_t m_IsUseSystemAecNsAgc; //存放是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
+	int32_t m_IsUseFirstSystemAecNsAgc; //存放是否使用第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
+	int32_t m_IsUseSecondSystemAecNsAgc; //存放是否使用第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器，为0表示不使用，为非0表示要使用。
 
 	int32_t m_UseWhatAec; //存放使用什么声学回音消除器，为0表示不使用，为1表示Speex声学回音消除器，为2表示WebRtc定点版声学回音消除器，为3表示WebRtc浮点版声学回音消除器，为4表示WebRtc第三版声学回音消除器，为5表示SpeexWebRtc三重声学回音消除器。
 	int32_t m_IsCanUseAec; //存放是否可以使用声学回音消除器，为0表示不可以，为非0表示可以。
@@ -199,13 +200,13 @@ typedef struct AdoInpt //存放音频输入。
 		Vstr * m_NameVstrPt; //存放名称动态字符串的指针。
 		IMMDeviceEnumerator * m_EnumPt; //存放枚举器的指针。
 		IMMNotificationClient * m_NotificationClientPt; //存放默认设备改变消息客户端的指针。
-		IMediaObject * m_TwoSystemAecNsAgcMediaObjPt; //存放第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的指针。
-		DMO_OUTPUT_DATA_BUFFER * m_TwoSystemAecNsAgcOtptDataBufPt; //存放第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象的指针。
+		IMediaObject * m_SecondSystemAecNsAgcMediaObjPt; //存放第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器对象的指针。
+		DMO_OUTPUT_DATA_BUFFER * m_SecondSystemAecNsAgcOtptDataBufPt; //存放第二种系统自带的声学回音消除器、噪音抑制器和自动增益控制器输出数据缓冲区对象的指针。
 		IMMDeviceCollection * m_ClctPt; //存放收集器的指针。
 		IMMDevice * m_Pt; //存放指针。
 		IAudioClient2 * m_ClntPt; //存放客户端的指针。
 		WAVEFORMATEX * m_WaveFmtExPt; //存放格式的指针。
-		IAcousticEchoCancellationControl * m_OneSystemAecNsAgcAecCtrlPt; //存放第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器的声学回音消除控制器的指针。
+		IAcousticEchoCancellationControl * m_FirstSystemAecNsAgcAecCtrlPt; //存放第一种系统自带的声学回音消除器、噪音抑制器和自动增益控制器的声学回音消除控制器的指针。
 		UINT32 m_BufSzUnit; //存放缓冲区的大小，单位为采样单元。
 		IAudioCaptureClient * m_CptrClntPt; //存放捕获客户端的指针。
 		BufQueueCls m_PcmBufFrmBufQueue; //存放Pcm格式缓冲区帧的缓冲区队列。

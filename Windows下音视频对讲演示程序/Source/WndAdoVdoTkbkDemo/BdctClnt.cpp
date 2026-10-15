@@ -27,7 +27,7 @@ int BdctClntInit( BdctClnt * BdctClntPt, int32_t CnctNumIsDecr, int32_t LclTkbkM
 //广播客户端销毁。
 void BdctClntDstoy( BdctClnt * BdctClntPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	BdctClnt::CnctInfo * p_CnctInfoTmpPt;
 
 	//连接信息全部销毁。
@@ -143,7 +143,7 @@ BdctClnt::CnctInfo * BdctClntCnctInfoInit( BdctClnt * BdctClntPt, int IsTcpOrAud
 //连接信息销毁。
 void BdctClntCnctInfoDstoy( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfoPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	BdctClnt::CnctInfo * p_CnctInfoTmpPt;
 
 	if( CnctInfoPt->m_IsInit != 0 )
@@ -251,7 +251,7 @@ void BdctClntCnctInfoDstoy( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfo
 //连接信息发送数据包。
 int BdctClntCnctInfoSendPkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfoPt, const void * PktPt, size_t PktLenByt, uint32_t Times, int IsRlab, Vstr * ErrInfoVstrPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	if( ( CnctInfoPt->m_IsInit != 0 ) && ( CnctInfoPt->m_CurCnctSts == ClntMediaPocsThrd::CnctStsCnct ) ) //如果连接信息已初始化，且当前连接状态为已连接。
 	{
@@ -285,7 +285,7 @@ int BdctClntCnctInfoSendPkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInf
 //连接信息发送对讲模式包。
 int BdctClntCnctInfoSendTkbkModePkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo * CnctInfoPt, int LclTkbkMode )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	BdctClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 0 ] = ( byte )ClntMediaPocsThrd::PktTypTkbkMode;
 	BdctClntPt->m_ClntMediaPocsThrdPt->m_Thrd.m_TmpBytePt[ 1 ] = ( byte )CnctInfoPt->m_MyTkbkIdx;
@@ -315,7 +315,7 @@ int BdctClntCnctInfoSendTkbkModePkt( BdctClnt * BdctClntPt, BdctClnt::CnctInfo *
 //所有连接发送音频视频数据包。
 void BdctClntAllCnctSendAdoVdoPkt( BdctClnt * BdctClntPt, const void * PktPt, size_t PktLenByt, uint32_t Times, int IsRlab )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	BdctClnt::CnctInfo * p_CnctInfoTmpPt;
 
 	for( int p_CnctInfoLstNum = 0; CQueueGetByNum( BdctClntPt->m_CnctInfoCntnrPt, p_CnctInfoLstNum, NULL, ( void * * )&p_CnctInfoTmpPt, 0, 0, NULL ) == 0; p_CnctInfoLstNum++ )
@@ -345,7 +345,7 @@ void BdctClntAllCnctSendAdoVdoPkt( BdctClnt * BdctClntPt, const void * PktPt, si
 //连接处理，包括连接服务端、接收数据包、删除连接信息。
 void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 	BdctClnt::CnctInfo * p_CnctInfoTmpPt;
 	size_t p_PktLenByt;
 	size_t p_TmpElmTotal;
@@ -373,7 +373,7 @@ void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 
 				if( p_CnctInfoTmpPt->m_IsTcpOrAudpPrtcl == 0 ) //用本端Tcp协议客户端套接字连接远端Tcp协议服务端套接字。
 				{
-					int p_PocsRslt = -1; //存放本处理段的执行结果，为0表示成功，为非0表示失败。
+					int p_PocsRslt = -1; //存放本处理段执行结果，为0表示成功，为非0表示失败。
 					TcpCnctSts p_TcpCnctSts;
 
 					if( p_CnctInfoTmpPt->m_TcpClntSoktPt == NULL ) //如果未初始化本端Tcp协议客户端套接字。
@@ -497,7 +497,7 @@ void BdctClntCnctPocs( BdctClnt * BdctClntPt )
 				}
 				else //用本端高级Udp协议客户端套接字连接远端高级Udp协议服务端套接字。
 				{
-					int p_PocsRslt = -1; //存放本处理段的执行结果，为0表示成功，为非0表示失败。
+					int p_PocsRslt = -1; //存放本处理段执行结果，为0表示成功，为非0表示失败。
 					AudpCnctSts p_AudpCnctSts;
 
 					if( BdctClntPt->m_ClntMediaPocsThrdPt->m_AudpClntSoktPt == NULL ) //如果未初始化本端高级Udp协议客户端套接字。

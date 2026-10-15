@@ -4,7 +4,7 @@
 //我的客户端媒体处理线程初始化。
 int MyClntMediaPocsThrdCls::Init( const void * LicnCodePt )
 {
-	int p_Rslt = -1; //存放本函数的执行结果，为0表示成功，为非0表示失败。
+	int p_Rslt = -1; //存放本函数执行结果，为0表示成功，为非0表示失败。
 
 	if( m_ClntMediaPocsThrdPt == NULL ) //如果我的客户端媒体处理线程未启动。
 	{
@@ -89,7 +89,7 @@ int MyClntMediaPocsThrdCls::Init( const void * LicnCodePt )
 	Out:
 	if( p_Rslt != 0 )
 	{
-		Dstoy();
+		m_MediaPocsThrdClsPt->RqirExit( 0, 1, g_ErrInfoVstr.m_Pt );
 	}
 	return p_Rslt;
 }
@@ -158,7 +158,7 @@ int MyClntMediaPocsThrdCls::TkbkInit( const void * LicnCodePt )
 	VstrDstoy( p_RmtNodeSrvcVstrPt );
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		TkbkDstoy();
+		SendTkbkClntCnctDstoyMsg( 0, g_ErrInfoVstr.m_Pt );
 	}
 	return p_Rslt;
 }
@@ -220,7 +220,7 @@ int MyClntMediaPocsThrdCls::BdctInit( const void * LicnCodePt )
 	VstrDstoy( p_RmtNodeSrvcVstrPt );
 	if( p_Rslt != 0 ) //如果本函数执行失败。
 	{
-		BdctDstoy();
+		SendBdctClntDstoyMsg( 0, g_ErrInfoVstr.m_Pt );
 	}
 	return p_Rslt;
 }
@@ -255,6 +255,70 @@ void MyClntMediaPocsThrdCls::UserPocs()
 int MyClntMediaPocsThrdCls::UserMsg( unsigned int MsgTyp, void * MsgParmPt, size_t MsgParmLenByt )
 {
 	return 0;
+}
+
+//用户定义的设备改变函数。
+void MyClntMediaPocsThrdCls::UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt )
+{
+	Vstr * p_DvcNameVstrPt;
+
+	if( AdoInptDvcNameVstrPt != NULL )
+	{
+		VstrInit( &p_DvcNameVstrPt, Utf16, , AdoInptDvcNameVstrPt );
+		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypAdoInptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
+	}
+	else if( AdoOtptDvcNameVstrPt != NULL )
+	{
+		VstrInit( &p_DvcNameVstrPt, Utf16, , AdoOtptDvcNameVstrPt );
+		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypAdoOtptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
+	}
+	else if( VdoInptDvcNameVstrPt != NULL )
+	{
+		VstrInit( &p_DvcNameVstrPt, Utf16, , VdoInptDvcNameVstrPt );
+		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypVdoInptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
+	}
+}
+
+//用户定义的读取音视频输入帧函数。
+void MyClntMediaPocsThrdCls::UserReadAdoVdoInptFrm( int16_t * AdoInptPcmSrcFrmPt, int16_t * AdoInptPcmRsltFrmPt, size_t AdoInptPcmFrmLenUnit, int32_t AdoInptPcmRsltFrmVoiceActSts,
+													uint8_t * AdoInptEncdRsltFrmPt, size_t AdoInptEncdRsltFrmLenByt, int32_t AdoInptEncdRsltFrmIsNeedTrans,
+													uint8_t * VdoInptBgraSrcFrmPt, int32_t VdoInptBgraSrcFrmWidth, int32_t VdoInptBgraSrcFrmHeight, size_t VdoInptBgraSrcFrmLenByt,
+													uint8_t * VdoInptYu12RsltFrmPt, int32_t VdoInptYu12RsltFrmWidth, int32_t VdoInptYu12RsltFrmHeight, size_t VdoInptYu12RsltFrmLenByt,
+													uint8_t * VdoInptEncdRsltFrmPt, size_t VdoInptEncdRsltFrmLenByt )
+{
+
+}
+
+//用户定义的写入音频输出帧函数。
+void MyClntMediaPocsThrdCls::UserWriteAdoOtptFrm( int32_t AdoOtptStrmIdx,
+												  int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+												  uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmSzByt, size_t * AdoOtptEncdSrcFrmLenBytPt )
+{
+
+}
+
+//用户定义的获取音频输出帧函数。
+void MyClntMediaPocsThrdCls::UserGetAdoOtptFrm( int32_t AdoOtptStrmIdx,
+												int16_t * AdoOtptPcmSrcFrmPt, size_t AdoOtptPcmFrmLenUnit,
+												uint8_t * AdoOtptEncdSrcFrmPt, size_t AdoOtptEncdSrcFrmLenByt )
+{
+
+}
+
+//用户定义的写入视频输出帧函数。
+void MyClntMediaPocsThrdCls::UserWriteVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+												  uint8_t * VdoOtptYu12SrcFrmPt, int32_t * VdoOtptYu12SrcFrmWidthPt, int32_t * VdoOtptYu12SrcFrmHeightPt,
+												  uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmSzByt, size_t * VdoOtptEncdSrcFrmLenBytPt )
+{
+
+}
+
+//用户定义的获取视频输出帧函数。
+void MyClntMediaPocsThrdCls::UserGetVdoOtptFrm( uint32_t VdoOtptStrmIdx,
+												uint8_t * VdoOtptYu12SrcFrmPt, int32_t VdoOtptYu12SrcFrmWidth, int32_t VdoOtptYu12SrcFrmHeight,
+												uint8_t * VdoOtptEncdSrcFrmPt, size_t VdoOtptEncdSrcFrmLenByt )
+{
+
 }
 
 //用户定义的显示日志函数。
@@ -620,28 +684,6 @@ void MyClntMediaPocsThrdCls::UserBdctClntCnctSts( BdctClnt::CnctInfo * CnctInfoP
 	PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypClntLstModifyItem, ( WPARAM )p_MainDlgWndMsgClntLstModifyItemPt, 0 );
 }
 
-//用户定义的设备改变函数。
-void MyClntMediaPocsThrdCls::UserDvcChg( Vstr * AdoInptDvcNameVstrPt, Vstr * AdoOtptDvcNameVstrPt, Vstr * VdoInptDvcNameVstrPt )
-{
-	Vstr * p_DvcNameVstrPt;
-
-	if( AdoInptDvcNameVstrPt != NULL )
-	{
-		VstrInit( &p_DvcNameVstrPt, Utf16, , AdoInptDvcNameVstrPt );
-		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypAdoInptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
-	}
-	else if( AdoOtptDvcNameVstrPt != NULL )
-	{
-		VstrInit( &p_DvcNameVstrPt, Utf16, , AdoOtptDvcNameVstrPt );
-		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypAdoOtptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
-	}
-	else if( VdoInptDvcNameVstrPt != NULL )
-	{
-		VstrInit( &p_DvcNameVstrPt, Utf16, , VdoInptDvcNameVstrPt );
-		PostMessage( m_MainDlgWndHdl, MainDlgWndMsgTypVdoInptDvcChg, ( WPARAM )p_DvcNameVstrPt, 0 );
-	}
-}
-
 //设置要使用音频输入。
 void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 {
@@ -659,7 +701,7 @@ void MyClntMediaPocsThrdCls::SetToUseAdoInpt()
 									  m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输入是否使用系统自带的声学回音消除器、噪音抑制器和自动增益控制器。
-	m_MediaPocsThrdClsPt->AdoInptSetIsUseSystemAecNsAgc( 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
+	m_MediaPocsThrdClsPt->AdoInptSetIsUseSystemAecNsAgc( 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseFirstSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0, ( IsDlgButtonChecked( g_StngDlgWndHdl, IsUseSecondSystemAecNsAgcCkBoxId ) == BST_CHECKED ) ? 1 : 0, m_MediaPocsThrdClsPt->m_MediaPocsThrdPt->m_ErrInfoVstrPt );
 
 	//设置音频输入是否不使用声学回音消除器。
 	if( IsDlgButtonChecked( g_StngDlgWndHdl, UseNoAecRdBtnId ) == BST_CHECKED )
@@ -1261,9 +1303,10 @@ void MyClntMediaPocsThrdCls::SetNotUseVdoOtptStrm( int TkbkIdx )
 	{
 		if( p_StrmPt->m_Idx == TkbkIdx )
 		{
-			SendVdoInptOtptWndDstoyMsg( p_StrmPt->m_Dvc.m_DspyWndHdl );
+			HWND p_DspyWndHdl = p_StrmPt->m_Dvc.m_DspyWndHdl;
+			m_MediaPocsThrdClsPt->VdoOtptDelStrm( 1, 0, TkbkIdx, NULL ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流，且要在销毁视频输入输出窗口前删除流，否则会导致渲染错误。
+			SendVdoInptOtptWndDstoyMsg( p_DspyWndHdl );
 			break;
 		}
 	}
-	m_MediaPocsThrdClsPt->VdoOtptDelStrm( 1, 0, TkbkIdx, NULL ); //删除流操作需要立即执行，因为要防止中途出现其他消息导致重复删除流。
 }
